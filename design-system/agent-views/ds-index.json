@@ -18410,13 +18410,7 @@
         ]
       },
       {
-        "not": "InlineEditableTextfield required",
-        "use": [
-          "InlineEditableTextfield.isRequired"
-        ]
-      },
-      {
-        "not": "TagInput required / disabled / readOnly",
+        "not": "TagInput / RichTextEditor / InlineEditableTextfield required, disabled, readOnly",
         "use": [
           "TagInput.isRequired",
           "TagInput.isDisabled",
@@ -18424,33 +18418,22 @@
         ]
       },
       {
-        "not": "RichTextEditor readOnly / disabled",
-        "use": [
-          "RichTextEditor.isReadOnly",
-          "RichTextEditor.isDisabled"
-        ]
-      },
-      {
         "not": "Select / PopupSelect / FilterMenu open",
         "use": [
-          "Select.isOpen",
-          "PopupSelect.isOpen",
-          "FilterMenu.isOpen"
+          "Select.isOpen"
         ]
       },
       {
-        "not": "DropdownMenu / Section loading",
+        "not": "Section / DropdownMenu loading",
         "use": [
-          "DropdownMenu.isLoading",
           "Section.isLoading"
         ]
       },
       {
-        "not": "Select / PopupSelect / FilterMenu option disabled",
+        "not": "Select option disabled",
         "use": [
           "Select.isDisabled"
-        ],
-        "why": "on an option object too"
+        ]
       }
     ],
     "tokens": [
@@ -18461,7 +18444,7 @@
           "--inline-sm",
           "--pad-x-xs"
         ],
-        "why": "a primitive; read the step for the role"
+        "why": "a primitive"
       },
       {
         "not": "--space-050 (8px)",
@@ -18509,7 +18492,7 @@
           "--radius-md",
           "--radius-xl"
         ],
-        "why": "read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height"
+        "why": "the role's step, --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg"
       },
       {
         "not": "--ds-on-surface",
@@ -18524,8 +18507,7 @@
           "--pad-x-md",
           "--stack-md",
           "--radius-md"
-        ],
-        "why": "retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name"
+        ]
       }
     ],
     "words": [

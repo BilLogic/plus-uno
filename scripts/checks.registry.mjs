@@ -283,6 +283,14 @@ export const CHECKS = [
     guards: 'one naming rule for slots: iconBefore / elemBefore by what the slot accepts, with leadingVisual, trailingVisual and a bare leading slot staying out of the tree.',
   },
   {
+    name: 'check:prop-names',
+    script: 'node scripts/check-prop-names.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-prop-names.mjs',
+    guards: 'one naming rule for props: boolean state is isDisabled / isOpen style, a look or kind is appearance or type; bare names and variant/tone stay out.',
+  },
+  {
     name: 'check:old-system',
     script: 'node scripts/check-old-system.mjs',
     pkg: 'root',

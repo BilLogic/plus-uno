@@ -23,8 +23,7 @@ token roles · motion and prototype outputs.
 ## Build (Step 4)
 
 a. **Ask for a Figma file first — one question, before any build:** *"Do you
-   already have a Figma file you want to build upon?"* (one question this
-   message, Yes/No).
+   already have a Figma file you want to build upon?"*
    - **Yes** → get the link, then follow the full implement-design workflow in
      `design-system/guidelines/figma/mcp-guide.md` — no skipped steps; registries load
      first per `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY);
@@ -34,8 +33,7 @@ b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
    — writes the Vite app with a first page in the default template, names it, picks the next free port
    (details: `docs/engineering/setup.md`; config shape:
    `skills/uno-prototype/examples/vite-config-example.js`).
-c. **Follow the staged build** (`design-system/guidelines/overview.md`):
-   **1. Template → 2. Blocks → 3. Pieces → 4. Polish → 5. Motion**.
+c. **Follow the staged build** (`design-system/guidelines/overview.md`).
    Look names up with `ds find` / `ds get` / `ds tokens` (or the MCP tools
    `ds_find`, `ds_get`, `ds_tokens`, `ds_guide`).
 d. **One human check-in after the Template stage.** Once Stage 1 (Template) is

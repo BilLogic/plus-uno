@@ -120,7 +120,7 @@ export default {
         defaultSearchTerm: { table: { disable: true, category: 'Development' } },
         lineWrap: { table: { disable: true, category: 'Development' } },
         truncate: { table: { disable: true, category: 'Development' } },
-        open: { table: { disable: true, category: 'Development' } },
+        isOpen: { table: { disable: true, category: 'Development' } },
         isValid: { table: { disable: true, category: 'Development' } },
         successMessage: { table: { disable: true, category: 'Development' } },
         errorMessage: { table: { disable: true, category: 'Development' } },
