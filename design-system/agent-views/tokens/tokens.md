@@ -111,8 +111,6 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --popup-radius  /* Corner rounding of a Popup. */
 --popup-width-3-col  /* Width of a 3-column Popup: a filter menu or the profile menu. */
 --popup-width-4-col  /* Width of a 4-column Popup: content, or a stacked filter menu. The widest a Popup goes. */
---section-toolbar-count-min-width  /* Minimum width of the result count in a Section toolbar before it truncates. */
---section-toolbar-min-width  /* Minimum width of the start group in a Section toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
 --table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
 --table-footer-height  /* Height of a table footer row: the range, the page-size Select and Pagination on one line. */

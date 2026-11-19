@@ -193,10 +193,10 @@ test('a component in its own folder is written as index.md, a flat one as <Name>
 test('generated template slot JSDoc carries the governing pattern where source readers look', async () => {
   const fs = await import('node:fs');
   const source = fs.readFileSync('design-system/src/templates/Section/Section.jsx', 'utf8');
-  const toolbar = source.match(/\/\*\*([^*]|\*(?!\/))*\*\/\s*toolbar: PropTypes.node/)[0];
-  assert.match(toolbar, /@ds-context Used in: Section\.toolbar/);
-  assert.match(toolbar, /@ds-context Governed by:.*Filtering/);
-  for (const line of toolbar.split('\n').filter((l) => l.includes('@ds-context'))) assert.ok(line.length <= 400);
+  const search = source.match(/\/\*\*([^*]|\*(?!\/))*\*\/\s*search: PropTypes.node/)[0];
+  assert.match(search, /@ds-context Used in: Section\.search/);
+  assert.match(search, /@ds-context Governed by:.*Filtering/);
+  for (const line of search.split('\n').filter((l) => l.includes('@ds-context'))) assert.ok(line.length <= 400);
 });
 
 test('the template index lists the nine current templates and their overview', async () => {

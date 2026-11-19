@@ -27,7 +27,7 @@ import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
 export default {
     title: 'Templates/Page/Reference screens',
-    tags: ['!autodocs'],
+    tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
 };
 

@@ -14,7 +14,7 @@ Also asked as: surface.
 
 **Source:** `design-system/src/templates/Page/Page.jsx`
 
-**Stories:** `design-system/src/templates/Page/Page.stories.jsx` — Overview, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
+**Stories:** `design-system/src/templates/Page/Page.stories.jsx` — Overview, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, TypeReading, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
 
 **Storybook page:** `design-system/src/templates/Page/Page.mdx`
 
@@ -22,7 +22,7 @@ Also asked as: surface.
 
 ## Usage
 
-Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is for a page that fills it.
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at 1232; full width is for a page that fills the window, such as chat, a board or a wide table; reading caps it at 864 for text people read through.
 
 ## Motion
 
@@ -113,7 +113,6 @@ Which tier a message belongs to: the Notifications pattern.
 - Frame: use when deciding which type the page sits in.
 - Section: use when a region needs its own heading, views or detail.
 - Card: use when one object has a shape already agreed.
-- Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
@@ -121,7 +120,10 @@ Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
 ## Types
 
 - **Default.** The content grid, centered and capped at its content width. Nearly every page.
-- **Full width.** The content runs to the pad with no cap, for a page that fills it, such as chat or a board.
+- **Full width.** The content runs to the pad with no cap, for a page that fills it, such as chat, a board or a wide table.
+- **Reading.** The grid capped at 864, the readable measure: training lessons, help articles and policies. A multi-step task and sign-in use it too.
+
+The Frame's `width` sets the type: `default`, `full` or `reading`.
 
 ## Anatomy
 
@@ -142,9 +144,9 @@ A record page one level down shows every header slot, with markers in the gutter
 | `title` | The page's one h1, at the heading-lg size, above the content. |
 | `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |
 | `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |
-| `description` · `status` | Planned. `PageHeader` has neither slot; the title block holds them. |
+| `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |
 | `banner` | One page `Banner`, below the header. Page separates the slots and content with `--page-stack-md`. |
-| `width` | Planned. `default` or `full`; today the Frame's `width` sets `content` or `reading`. |
+| Type | Set on the Frame's `width`: `default` (1232), `full` (no cap) or `reading` (864). |
 | Scrolled header | Planned. The sticky one-row header. |
 | `as` | The container element. |
 
@@ -152,14 +154,13 @@ A record page one level down shows every header slot, with markers in the gutter
 
 | Token | Used for |
 | --- | --- |
-| `--stack-sm` | Breadcrumb to title; title to description. |
-| `--section-stack-sm` | Header to page tabs. |
-| `--page-stack-md` | Header to the first Section; between Sections. |
-| `--page-stack-sm` | Between related Sections. |
+| `--page-header-stack` | Between the breadcrumb, the title row and the page tabs. |
+| `--page-header-gap` | Between the title and the page actions. |
+| `--page-stack-md` | Header to the banner and the first Section; between Sections. |
 | `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |
-| `--content-max-width`, `--content-min-width` | The cap and the floor of the content grid. |
+| `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |
 | `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
-| `--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`, `--ds-surface-overlay` | The four levels' fills, each with its shadow from Elevation. |
+| `--ds-surface` | The Page's one fill, with no shadow. |
 
 ## Content guidelines
 

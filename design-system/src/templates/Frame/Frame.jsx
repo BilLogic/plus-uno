@@ -100,7 +100,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
  *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
- *   `--content-max-width` (1232), centered, on a 12-column grid with a
+ *   `--content-max-width` (1232), centered (`width="full"` lifts the cap, `width="reading"` caps it at 864), on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
  */
 const Frame = ({
@@ -117,7 +117,7 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    width = 'content',
+    width = 'default',
     contentAs: Content = 'main',
     contentClassName = '',
     surfaceDirect = false,
@@ -700,8 +700,8 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** Content cap: content 1232, reading 864 */
-    width: PropTypes.oneOf(['content', 'reading']),
+    /** Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. */
+    width: PropTypes.oneOf(['default', 'full', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */
     contentAs: PropTypes.elementType,
     contentClassName: PropTypes.string,

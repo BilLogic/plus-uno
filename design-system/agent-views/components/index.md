@@ -39,7 +39,9 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
-| `Drawer` | `Panel` (a floating Panel, imported from @/components) |
+| `Drawer` | `Panel` (a floating Panel) |
+| `SectionToolbar` | `Section` |
+| `Section.Toolbar` | `Section` |
 
 **Props**
 
@@ -49,8 +51,12 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button size` | `Button spacing` (spacing is default, compact or spacious) |
 | `Button disabled` | `Button isDisabled` |
 | `Button appearance="secondary"` | `Button appearance="default"` |
-| `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
-| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
+| `Heading level` | `Heading as` (the level comes from the surrounding sections) |
+| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` |
+| `Section tabs / type="tabs-only"` | `Section views` |
+| `Section toolbar / type="toolbar"` | `Section search`, `Section filters` |
+| `Frame width="content"` | `Frame width="default"` |
+| `Section onAddView / addViewLabel` | `Section views` |
 | `Rating variant` | `Rating type` |
 | `CloseButton tone` | `CloseButton appearance` |
 
