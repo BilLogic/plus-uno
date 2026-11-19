@@ -360,8 +360,11 @@ const useResolvedTokens = () => {
     return { values, modes };
 };
 
+/* token gap: demo canvas size, no role token */
+const DEMO_SIZE = { swatchMinHeight: '48px' };
+
 const swatchBase = {
-    minHeight: 'calc(var(--stack-2xl) * 2)',
+    minHeight: DEMO_SIZE.swatchMinHeight,
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--pad-x-md)',
     display: 'flex',
@@ -417,7 +420,7 @@ export const Modes = () => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-                    gap: 'var(--stack-xl)',
+                    gap: 'var(--inline-xl)',
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (

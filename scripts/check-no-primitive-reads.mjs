@@ -2,11 +2,17 @@
  * `npm run check:no-primitive-reads` — the ratchet on components and patterns
  * reading a primitive (ADR-038): a component or pattern reads a tier
  * token (components, templates, semantics), never `--space-*`, `--radius-<n>`,
- * `--size-<n>` or `--stroke-<n>` directly. Stories, the docs figures and the
- * docs styles feed Show code and the pages readers copy from, so they read
- * a role token too; there the check counts the spacing and color primitives
- * (`--space-<n>`, `--palette-*`) and is held at zero. When no tier holds the value, the
- * gap is named and a ladder row is added (`scripts/lib/tokens/plan.mjs`).
+ * `--size-<n>` or `--stroke-<n>` directly.
+ *
+ * STORIES AND DOCS. Stories feed Show code, and the docs figures and styles
+ * feed the pages readers copy from, so they read a role token too. Until the
+ * remaining numbered reads there are migrated, stories and docs files are
+ * checked for `--space-<n>` and `--palette-*` ONLY, and held at zero. Their
+ * `--size`, `--stroke`, `--height`, `--width` and `--type-size` reads are not
+ * counted yet (a follow-up migration).
+ *
+ * When no tier holds the value, the gap is named and a ladder row is added
+ * (`scripts/lib/tokens/plan.mjs`).
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js` file under
  * `design-system/src/components`, `design-system/src/templates`,

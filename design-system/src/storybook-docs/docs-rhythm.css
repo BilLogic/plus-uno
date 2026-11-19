@@ -216,12 +216,13 @@
 /* The illustration kit's hairline: the stroke token. A hero drawing overrides it
    with half a stroke (HeroDrawing.jsx), since one kit unit is 2px there. */
 :root {
-    --stroke-hairline: var(--stroke-1);
+    --stroke-hairline: var(--border-width-default);
 }
 
 /* Docs chrome roles over the size scale: the docs' own measures, named for the job
    so no docs stylesheet reads a size primitive. */
 :root {
+    /* token gap: text size alone, no role token (the roles are whole font shorthands) */
     --docs-text-size: var(--type-size-100);
     --docs-code-size: var(--type-size-075);
     --docs-header-offset: var(--height-500);

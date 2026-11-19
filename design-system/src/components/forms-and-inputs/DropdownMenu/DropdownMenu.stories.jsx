@@ -29,6 +29,9 @@ export default {
     },
 };
 
+/* token gap: demo canvas size, no role token */
+const DEMO_SIZE = { top: '80px', side: '48px' };
+
 const onRetry = fn();
 
 const basicMenu = (
@@ -40,7 +43,7 @@ const basicMenu = (
 );
 
 export const Overview = () => (
-    <div style={{ padding: 'calc(var(--stack-3xl) * 2 + var(--stack-xl)) var(--inline-2xl) var(--size-1000)' }}>
+    <div style={{ padding: `${DEMO_SIZE.top} var(--inline-2xl) var(--size-1000)` }}>
         <DropdownMenu trigger={<Button text="Session actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
             {basicMenu}
         </DropdownMenu>
@@ -61,7 +64,7 @@ Overview.play = async ({ canvasElement }) => {
 };
 
 export const Placements = () => (
-    <div style={{ display: 'flex', gap: 'calc(var(--stack-2xl) * 2)', padding: 'calc(var(--stack-3xl) * 2 + var(--stack-xl)) var(--inline-2xl) var(--size-1500)' }}>
+    <div style={{ display: 'flex', gap: DEMO_SIZE.side, padding: `${DEMO_SIZE.top} var(--inline-2xl) var(--size-1500)` }}>
         <DropdownMenu trigger={<Button>Bottom start</Button>} placement="bottom-start">
             {basicMenu}
         </DropdownMenu>
@@ -75,7 +78,7 @@ export const Placements = () => (
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', gap: 'calc(var(--stack-2xl) * 2)', padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1500)' }}>
+    <div style={{ display: 'flex', gap: DEMO_SIZE.side, padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1500)' }}>
         <DropdownMenu trigger={<Button>Default</Button>} spacing="default">
             {basicMenu}
         </DropdownMenu>
@@ -215,7 +218,7 @@ export const Interactive = {
         shouldFlip: true,
     },
     render: (args) => (
-        <div style={{ padding: 'calc(var(--stack-3xl) * 2 + var(--stack-xl)) calc(var(--stack-2xl) * 2)' }}>
+        <div style={{ padding: `${DEMO_SIZE.top} ${DEMO_SIZE.side}` }}>
             <DropdownMenu trigger={<Button>Session actions</Button>} {...args}>
                 {basicMenu}
             </DropdownMenu>
