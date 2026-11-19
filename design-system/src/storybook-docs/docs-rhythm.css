@@ -510,3 +510,22 @@
 .sb-ds-modal-stack > .plus-modal-blanket-inline {
     grid-area: 1 / 1;
 }
+
+/*
+ * A Flag group shown inside a docs picture. The group the page prints is the
+ * consumer's default (fixed to the screen); on the page it is placed in its
+ * stage instead, at the same top-end corner.
+ */
+.sb-ds-flag-stage {
+    position: relative;
+}
+
+.sb-ds-flag-stage .plus-flag-container[data-container-position] {
+    position: absolute;
+    inset-inline: 0;
+    align-items: flex-end;
+}
+
+.sb-ds-flag-stage .plus-flag {
+    max-inline-size: 100%;
+}

@@ -9,6 +9,7 @@ import { ButtonItem, DropdownMenu, IconButton, Select, Tooltip } from '@/compone
 
 const MoreMenu = ({ children }) => (
     <DropdownMenu
+        // isOpen forces the menu open so the page can show it; a real menu opens from its trigger.
         isOpen
         placement="bottom-start"
         minWidth="var(--menu-group-min-width)"

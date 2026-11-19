@@ -8,13 +8,13 @@ import { Banner, Flag, FlagGroup } from '@/components';
  */
 
 export const FlagDo = () => (
-    <FlagGroup position="top-end" containerPosition="static">
+    <FlagGroup>
         <Flag icon="circle-check" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>
     </FlagGroup>
 );
 
 export const FlagDont = () => (
-    <FlagGroup position="top-end" containerPosition="static">
+    <FlagGroup>
         <Flag title="Move this session to 4:30 PM?" autohide={false} show actions={[{ text: 'Move', onClick: () => {} }, { text: 'Keep', onClick: () => {} }]} />
     </FlagGroup>
 );

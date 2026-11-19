@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Dialog, EmptyState, FooterActions, SearchField, Tabs, TextField, Tooltip } from '@/components';
-import { Section } from '@/templates';
+import { Button, EmptyState, FooterActions, SearchField, Tabs, TextField, Tooltip } from '@/components';
+import { Modal, Section } from '@/templates';
 
 /**
  * The Errors page's do and don't examples, as PLUS parts only. Show code prints
@@ -48,7 +48,7 @@ export const FailureInSlot = () => (
         title="Sessions"
         description="This week"
         views={(
-            <Tabs appearance="pill" activeKey="This week" onSelect={() => {}} aria-label="Views">
+            <Tabs appearance="pill" defaultActiveKey="This week" aria-label="Views">
                 <Tabs.Tab eventKey="This week">This week</Tabs.Tab>
                 <Tabs.Tab eventKey="Next week">Next week</Tabs.Tab>
             </Tabs>
@@ -66,10 +66,10 @@ export const FailureInSlot = () => (
 );
 
 export const FailureInModal = () => (
-    <Dialog
+    <Modal
+        inline
+        show
         title="Couldn't load sessions"
-        onClose={() => {}}
-        style={{ inlineSize: '100%' }}
         footer={(
             <FooterActions>
                 <Button text="Close" onClick={() => {}} />
@@ -78,5 +78,5 @@ export const FailureInModal = () => (
         )}
     >
         <p style={{ margin: 0 }}>Check your connection and try again.</p>
-    </Dialog>
+    </Modal>
 );

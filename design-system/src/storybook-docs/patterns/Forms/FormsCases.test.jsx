@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { CODE, EditInModal, EditInPanel, ErrorInSecondDialog, ErrorOnField, OneColumnFields, TwoColumnFields } from './FormsCases.jsx';
+import { CODE, EditInModal, EditInPanel, ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, OneColumnFields, TwoColumnFields } from './FormsCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -41,11 +42,49 @@ describe('Forms live cases', () => {
         expect(screen.queryByText('Enter the student’s name')).toBeNull();
     });
 
+    it('MinorityMarked marks only the optional field; MajorityMarked repeats (required) on the others', () => {
+        const minority = render(<MinorityMarked />);
+        expect(minority.container.textContent).not.toContain('(required)');
+        expect(minority.container.textContent).toContain('(optional)');
+        minority.unmount();
+        const majority = render(<MajorityMarked />);
+        expect(majority.container.textContent.match(/\(required\)/g)).toHaveLength(2);
+    });
+
+    it('HelpInCaptionCase renders visible standing help in the caption while HelpInTooltipCase puts it in an info button', async () => {
+        const user = userEvent.setup();
+        const { unmount } = render(<HelpInCaptionCase />);
+        const captionInput = screen.getByRole('textbox', { name: 'School email' });
+        const caption = screen.getByText('Shared with your site supervisor.');
+        expect(captionInput.getAttribute('aria-describedby')).toContain(caption.id);
+        await user.clear(captionInput);
+        await user.type(captionInput, 'marcus.lee@lincoln.edu');
+        expect(captionInput).toHaveValue('marcus.lee@lincoln.edu');
+        unmount();
+
+        render(<HelpInTooltipCase />);
+        const tooltipInput = screen.getByRole('textbox', { name: 'School email' });
+        expect(tooltipInput).toHaveValue('ana.ruiz@lincoln.edu');
+        await user.clear(tooltipInput);
+        await user.type(tooltipInput, 'sofia.ramirez@lincoln.edu');
+        expect(tooltipInput).toHaveValue('sofia.ramirez@lincoln.edu');
+        const infoBtn = screen.getByRole('button', { name: 'About School email' });
+        infoBtn.focus();
+        expect(infoBtn).toHaveFocus();
+        expect(screen.queryByText('Shared with your site supervisor.')).toBeNull();
+    });
+
     it('prints each example from its own source, with the helpers it reads and the PLUS imports it needs', () => {
-        expect(Object.keys(CODE)).toEqual(['OneColumnFields', 'TwoColumnFields', 'EditInPanel', 'EditInModal', 'ErrorOnField', 'ErrorInSecondDialog']);
+        expect(Object.keys(CODE)).toEqual([
+            'OneColumnFields', 'TwoColumnFields', 'EditInPanel', 'EditInModal', 'ErrorOnField', 'ErrorInSecondDialog',
+            'MinorityMarked', 'MajorityMarked', 'HelpInCaption', 'HelpInTooltip',
+        ]);
         expect(CODE.EditInPanel).toContain('const SessionFields');
         expect(CODE.EditInPanel).toContain('const SessionsBehind');
         expect(CODE.EditInPanel).toMatch(/from '@\/templates';/);
+        expect(CODE.EditInModal).toContain('<Modal inline show title="Ana Ruiz"');
+        expect(CODE.EditInModal).not.toMatch(/Dialog|Blanket|100%/);
+        expect(CODE.EditInPanel).not.toContain('flex');
         expect(CODE.ErrorOnField).toContain('const LogSessionFooter');
         expect(CODE.ErrorInSecondDialog).toContain('<Modal');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs|formHosts/);

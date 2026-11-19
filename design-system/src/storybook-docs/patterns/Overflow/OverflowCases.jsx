@@ -15,6 +15,9 @@ export const CODE = showCode(examplesSource, [
     'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList',
 ]);
 
+/** The table sits in a narrow column so the long note runs past its cell. Docs geometry. */
+const NARROW_TABLE = { maxInlineSize: 'var(--card-min-width-lg)' }; // docs-literal
+
 /** Do: a long Section title wraps to a second line so the list stays named. */
 export const WrappedSectionTitleCase = () => <CaseSurface><Example.WrappedSectionTitle /></CaseSurface>;
 
@@ -24,12 +27,12 @@ export const ClippedSectionTitleCase = () => <CaseSurface><Example.ClippedSectio
 /** Do: a clipped cell opens its full text in a Tooltip on hover and focus only while clipped. */
 export const ClippedCellOpensTextCase = () => (
     <DocsOverlayBoundary fit={false} containHeight>
-        <CaseSurface><Example.ClippedCellOpensText /></CaseSurface>
+        <CaseSurface><div style={NARROW_TABLE}><Example.ClippedCellOpensText /></div></CaseSurface>
     </DocsOverlayBoundary>
 );
 
 /** Don't: a clipped cell without a Tooltip leaves the rest of the value unreadable. */
-export const ClippedCellNoTextCase = () => <CaseSurface><Example.ClippedCellNoText /></CaseSurface>;
+export const ClippedCellNoTextCase = () => <CaseSurface><div style={NARROW_TABLE}><Example.ClippedCellNoText /></div></CaseSurface>;
 
 /** Do: a "Show n more" control names what is left and expands the list in place. */
 export const ShowMoreWithCountCase = () => <CaseSurface><Example.ShowMoreWithCount /></CaseSurface>;

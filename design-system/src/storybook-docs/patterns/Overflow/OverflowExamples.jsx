@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, DynamicTable } from '@/components';
-import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { Section } from '@/templates';
 
 /**
@@ -35,7 +34,8 @@ const clipStyle = { display: 'block', overflow: 'hidden', textOverflow: 'ellipsi
 const NotesTable = ({ note }) => (
     <DynamicTable
         label="Session notes"
-        head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
+        isFixedSize
+        head={{ cells: ['Student', 'Note'].map((content) => ({ key: content, content })) }}
         rows={STUDENTS.slice(0, 3).map(([name], i) => ({
             key: name,
             cells: [{ key: `${name}-n`, content: name }, { key: `${name}-t`, content: i === 0 ? note : 'On track' }],
@@ -59,17 +59,7 @@ export const ClippedSectionTitle = () => (
     </div>
 );
 
-export const ClippedCellOpensText = () => (
-    <NotesTable
-        note={(
-            <ClippedTooltip text={LONG_NOTE} placement="top">
-                {({ measureRef, truncated }) => (
-                    <span ref={measureRef} className="plus-table-cell-text" tabIndex={truncated ? 0 : undefined}>{LONG_NOTE}</span>
-                )}
-            </ClippedTooltip>
-        )}
-    />
-);
+export const ClippedCellOpensText = () => <NotesTable note={LONG_NOTE} />;
 
 export const ClippedCellNoText = () => (
     <NotesTable note={<span className="plus-table-cell-text" style={clipStyle}>{LONG_NOTE}</span>} />
@@ -96,13 +86,18 @@ export const ShowMoreWithCount = () => {
 
 export const FadedList = () => (
     <Section title="Students">
-        <div
-            style={{
-                maskImage: 'linear-gradient(to bottom, black 35%, transparent)',
-                WebkitMaskImage: 'linear-gradient(to bottom, black 35%, transparent)',
-            }}
-        >
+        <div style={{ position: 'relative' }}>
             <StudentsTable count={4} />
+            <div
+                aria-hidden="true"
+                style={{
+                    position: 'absolute',
+                    insetInline: 0,
+                    insetBlockEnd: 0,
+                    blockSize: 'calc(var(--control-lg) * 3)',
+                    backgroundImage: 'linear-gradient(to bottom, transparent, var(--ds-surface))',
+                }}
+            />
         </div>
     </Section>
 );

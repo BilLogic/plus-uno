@@ -1,5 +1,6 @@
 import React from 'react';
-import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './ErrorsExamples.jsx';
@@ -12,6 +13,9 @@ import examplesSource from './ErrorsExamples.jsx?raw';
  */
 
 export const CODE = showCode(examplesSource, ['MessageOnField', 'BorderAndTooltip', 'FailureInSlot', 'FailureInModal']);
+
+/** The stand-in screen the Modal example is drawn on. Docs geometry, px. */
+const SCREEN = { width: 1024, height: 300 }; // docs-literal
 
 /** Do: the message sits right under the invalid field, in words that say what to fix. */
 export const MessageOnFieldCase = () => (
@@ -32,9 +36,11 @@ export const BorderAndTooltipCase = () => (
 /** Do: the failure in the Section's slot, with its header rows and the rest of the page still working. */
 export const FailureInSlot = () => <Example.FailureInSlot />;
 
-/** Don't: a Modal over the whole page to report one Section's failure. */
+/** Don't: a Modal over the whole page to report one Section's failure, on a stand-in screen scaled to the card. */
 export const FailureInModal = () => (
-    <CaseBlanket height={300}>
-        <Example.FailureInModal />
-    </CaseBlanket>
+    <FitStage width={SCREEN.width} reflow={false}>
+        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': `${SCREEN.height}px` }}>
+            <Example.FailureInModal />
+        </div>
+    </FitStage>
 );

@@ -3,11 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { BreadcrumbCase, CODE } from './NavigationCases.jsx';
 import {
-    OpenItemsDont,
-    OpenItemsPicture,
-} from './navigationDemo.jsx';
+    BreadcrumbCase, CODE, OneTabSystemCase, OpenItemsDoCase, OpenItemsDontCase, TwoTabSystemsCase,
+} from './NavigationCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -34,7 +32,9 @@ describe('Navigation live cases and links', () => {
     });
 
     it('prints the breadcrumb examples from their own source', () => {
-        expect(Object.keys(CODE)).toEqual(['BreadcrumbOnRecordPage', 'BreadcrumbOnAreaPage']);
+        expect(Object.keys(CODE)).toEqual([
+            'BreadcrumbOnRecordPage', 'BreadcrumbOnAreaPage', 'OpenItemsByTimeAndWho', 'OpenItemsCarryEverything', 'OneTabSystem', 'TwoTabSystems',
+        ]);
         expect(CODE.BreadcrumbOnRecordPage).toContain("import { Breadcrumb, DynamicTable, PageHeader } from '@/components';");
         expect(CODE.BreadcrumbOnAreaPage).toContain('const Table');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
@@ -44,8 +44,8 @@ describe('Navigation live cases and links', () => {
         const user = userEvent.setup();
         const { container } = render(
             <div>
-                <OpenItemsPicture />
-                <OpenItemsDont />
+                <OpenItemsDoCase />
+                <OpenItemsDontCase />
             </div>,
         );
         expect(container.querySelector('[inert]')).toBeNull();
@@ -55,6 +55,16 @@ describe('Navigation live cases and links', () => {
         const item = screen.getByRole('button', { name: '4:00 PM · Ms. Ortiz' });
         await user.click(item);
         expect(item).toHaveAttribute('aria-current', 'page');
+    });
+
+    it('OneTabSystemCase has one tab system under the page tabs; TwoTabSystemsCase adds pill views', () => {
+        const one = render(<OneTabSystemCase />);
+        expect(screen.getAllByRole('tab')).toHaveLength(2);
+        expect(screen.getByRole('button', { name: /Status/ })).toBeInTheDocument();
+        one.unmount();
+        render(<TwoTabSystemsCase />);
+        expect(screen.getAllByRole('tab')).toHaveLength(4);
+        expect(CODE.OneTabSystem).toContain('<PopupSelect');
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Navigation.mdx', () => {

@@ -181,14 +181,19 @@ export const TierSectionCase = () => {
 /** The Show code for each do and don't example, read from `NotificationsExamples.jsx`. */
 export const CODE = showCode(examplesSource, ['FlagDo', 'FlagDont', 'BannerDo', 'BannerDont']);
 
+/** Holds a Flag group inside the picture instead of the screen: `.sb-ds-flag-stage` turns its fixed layer into one placed in the stage. */
+const FlagStage = ({ children }) => (
+    <div className="sb-ds-flag-stage" style={{ boxSizing: 'border-box', inlineSize: '100%', minBlockSize: 'calc(var(--control-lg) * 4)' }}>{children}</div>
+);
+
 /** Do: a passing notice, one line of next step, held at the top right of the picture. */
 export const FlagDo = () => (
-    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}><Example.FlagDo /></div>
+    <FlagStage><Example.FlagDo /></FlagStage>
 );
 
 /** Don't: a decision in a Flag, which is gone before it is answered. */
 export const FlagDont = () => (
-    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}><Example.FlagDont /></div>
+    <FlagStage><Example.FlagDont /></FlagStage>
 );
 
 /** Do: one Banner, one line, at the tier it concerns. */

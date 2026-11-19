@@ -5,9 +5,9 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
-import { HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
+import { STAGE } from './formsDemo.jsx';
 import { PAGE_WIDTH } from './formHosts.jsx';
-import { CODE, EditInModal, EditInPanel, ErrorInSecondDialog, ErrorOnField, OneColumnFields, TwoColumnFields } from './FormsCases.jsx';
+import { CODE, EditInModal, EditInPanel, ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, OneColumnFields, TwoColumnFields } from './FormsCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -190,8 +190,10 @@ When most fields are required, mark the optional ones `"(optional)"` (`labelMark
 
 <DoDontPair
     doExample={<MinorityMarked />}
+    doCode={CODE.MinorityMarked}
     doCaption="Two required fields stay unmarked; only the optional field says so."
     dontExample={<MajorityMarked />}
+    dontCode={CODE.MajorityMarked}
     dontCaption="Every field carries a marker, so none stands out."
 />
 
@@ -203,8 +205,10 @@ A caption stays after the person types and is read by a screen reader with the f
 
 <DoDontPair
     doExample={<HelpInCaptionCase />}
+    doCode={CODE.HelpInCaption}
     doCaption="Help in the caption, where it stays after typing."
     dontExample={<HelpInTooltipCase />}
+    dontCode={CODE.HelpInTooltip}
     dontCaption="Help only in a tooltip: gone on touch, gone after typing."
 />
 

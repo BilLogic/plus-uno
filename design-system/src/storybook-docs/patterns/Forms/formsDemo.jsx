@@ -63,48 +63,6 @@ export const BoundInputs = () => {
     );
 };
 
-const pairStack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' };
-
-/** Do: two required fields stay unmarked; the lone optional field carries `(optional)`. */
-export const MinorityMarked = () => (
-    <div style={pairStack}>
-        <TextField label="Student" isRequired defaultValue="Ana Ruiz" />
-        <TextField label="Site" isRequired defaultValue="Lincoln Middle" />
-        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
-    </div>
-);
-
-/** Don't: marking the majority case repeats `(required)` on nearly every label. */
-export const MajorityMarked = () => (
-    <div style={pairStack}>
-        <TextField label="Student" isRequired labelMarker="required" defaultValue="Ana Ruiz" />
-        <TextField label="Site" isRequired labelMarker="required" defaultValue="Lincoln Middle" />
-        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
-    </div>
-);
-
-/** Do: standing help stays in the caption under the field, still visible after typing. */
-export const HelpInCaptionCase = () => (
-    <div style={pairStack}>
-        <TextField
-            label="School email"
-            defaultValue="ana.ruiz@lincoln.edu"
-            caption="Shared with your site supervisor."
-        />
-    </div>
-);
-
-/** Don't: help placed only in an info tooltip beside the label disappears on touch and while typing. */
-export const HelpInTooltipCase = () => (
-    <div style={pairStack}>
-        <TextField
-            label="School email"
-            defaultValue="ana.ruiz@lincoln.edu"
-            info="Shared with your site supervisor."
-        />
-    </div>
-);
-
 /** Window height for the settings page example: docs geometry, in px. */
 export const SETTINGS_PAGE_HEIGHT = 560; // docs-literal
 

@@ -74,7 +74,7 @@ describe('Overflow live cases and TypeCard links', () => {
 
     it('prints each example from its own source', () => {
         expect(Object.keys(CODE)).toHaveLength(6);
-        expect(CODE.ClippedCellOpensText).toContain("import { ClippedTooltip } from '@/lib/ClippedTooltip';");
+        expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
         expect(CODE.ShowMoreWithCount).toContain('const StudentsTable');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });

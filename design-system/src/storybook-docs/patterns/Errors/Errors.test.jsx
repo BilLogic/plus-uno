@@ -42,7 +42,7 @@ describe('Errors live cases and TypeCard links', () => {
         expect(Object.keys(CODE)).toEqual(['MessageOnField', 'BorderAndTooltip', 'FailureInSlot', 'FailureInModal']);
         expect(CODE.FailureInSlot).toMatch(/^import \{ .*EmptyState.* \} from '@\/components';/);
         expect(CODE.FailureInSlot).toContain("header=\"Couldn't load this week's sessions\"");
-        expect(CODE.FailureInModal).toContain('<Dialog');
+        expect(CODE.FailureInModal).toContain('<Modal');
         expect(CODE.MessageOnField).toContain('isValidEmail');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });

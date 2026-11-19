@@ -19,9 +19,18 @@
  *      but `{CODE.Name}`: a string or template literal is a typed snippet;
  *   3. a `CODE` export that is not built with `showCode(`, or that holds a
  *      template-literal entry;
- *   4. an `*Examples.jsx` module that imports a docs-only wrapper (anything
- *      from `@/storybook-docs`) or reaches outside its own folder
- *      with a relative path: it imports only the public barrels.
+ *   4. an `*Examples.jsx` module that imports anything but `react`,
+ *      `@/components` and `@/templates`. Those are the public barrels; there is
+ *      no `@/lib` barrel, so a `@/lib/...` path is an internal helper a
+ *      consumer cannot import and never belongs in printed code. A docs-only
+ *      wrapper (`@/storybook-docs`) or a relative path is the same fault.
+ *   5. a printed example that writes a color or percent literal (a hex or
+ *      rgb color, a `35%`): style on tokens or a PLUS part, and stage anything
+ *      with no DS part in the Cases module;
+ *   6. under the patterns folder, a `DoDontPair` without both `doCode` and
+ *      `dontCode`, unless its page is on `DEFERRED_PAGES` with the reason it
+ *      waits. (Template pages still hold pairs that do not print; they are a
+ *      separate follow-up and not read by this rule yet.)
  *
  * WHAT IT CANNOT SEE. Whether an example reads well or is the right one; that
  * is the docs review.
@@ -30,7 +39,26 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { trackedFiles, trackedSources } from './lib/tracked-sources.mjs';
 
-const ROOTS = ['design-system/src/templates', 'design-system/src/storybook-docs/patterns'];
+const PATTERNS_ROOT = 'design-system/src/storybook-docs/patterns';
+const ROOTS = ['design-system/src/templates', PATTERNS_ROOT];
+
+/** The only modules an example may import: the public barrels and React. */
+const ALLOWED_IMPORTS = new Set(['react', '@/components', '@/templates']);
+
+/** A hex or functional color, or a percent other than the full width, written inside an example's own source. */
+const LITERAL = /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\b(?!100%)\d+(?:\.\d+)?%/g;
+
+/** A pair, from its opening tag to the line that closes it. */
+const PAIR = /<DoDontPair\b[\s\S]*?(?:\n\/>|\/>\n)/g;
+
+/**
+ * Pages whose pairs do not print yet, each with the reason it waits. An entry
+ * leaves this list the day its pairs print; the list never grows.
+ */
+export const DEFERRED_PAGES = {
+  'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx': 'the footers rewrite in flight renames and reworks these cases; their examples move once it lands',
+  'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx': 'FilterMenu and the filtering wording are being reworked in the same change; their examples move once it lands',
+};
 
 const CODE_PROP = /\b(doCode|dontCode)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
 const CODE_REFERENCE = /^\{CODE\.[A-Za-z_$][\w$]*\}$/;
@@ -60,11 +88,26 @@ export function checkFile(file, text) {
     }
   }
   if (/Examples\.jsx$/.test(file)) {
-    for (const match of text.matchAll(/^import\s[^;]*?from\s+'(@\/storybook-docs[^']*)'/gm)) {
-      found.push({ line: lineOf(text, match.index), message: `imports ${match[1]}; an example is PLUS parts only, and staging belongs in the Cases module` });
+    for (const match of text.matchAll(/^import\s[^;]*?from\s+'([^']+)'/gm)) {
+      const from = match[1];
+      if (ALLOWED_IMPORTS.has(from)) continue;
+      const why = from.startsWith('@/storybook-docs')
+        ? 'an example is PLUS parts only, and staging belongs in the Cases module'
+        : from.startsWith('.')
+          ? 'a relative path reaches outside the example; import PLUS parts from @/components or @/templates'
+          : from.startsWith('@/lib')
+            ? 'there is no @/lib barrel, so a consumer cannot write this import; use a PLUS part, or stage it in the Cases module'
+            : 'an example imports only react, @/components and @/templates';
+      found.push({ line: lineOf(text, match.index), message: `imports ${from}; ${why}` });
     }
-    for (const match of text.matchAll(/^import\s[^;]*?from\s+'(\.\.[^']*)'/gm)) {
-      found.push({ line: lineOf(text, match.index), message: `imports ${match[1]}, outside its own template folder; import PLUS parts from @/components or @/templates (a Blanket belongs to the Modal, so stage dimming goes in the Cases module)` });
+    for (const match of text.matchAll(LITERAL)) {
+      found.push({ line: lineOf(text, match.index), message: `writes the literal ${match[0].trim()}; style on a token or a PLUS part, and stage anything with no DS part in the Cases module` });
+    }
+  }
+  if (/\.mdx$/.test(file) && file.startsWith(PATTERNS_ROOT) && !DEFERRED_PAGES[file]) {
+    for (const match of text.matchAll(PAIR)) {
+      const missing = ['doCode', 'dontCode'].filter((prop) => !new RegExp(`\\b${prop}=`).test(match[0]));
+      if (missing.length) found.push({ line: lineOf(text, match.index), message: `DoDontPair has no ${missing.join(' or ')}; every pair prints both examples' source` });
     }
   }
   return found;

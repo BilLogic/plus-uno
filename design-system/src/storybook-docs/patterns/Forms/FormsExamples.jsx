@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Dialog, Fieldset, FooterActions, Select, Skeleton, TextField } from '@/components';
+import { Button, Fieldset, FooterActions, Select, Skeleton, TextField } from '@/components';
 import { Modal, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, Section } from '@/templates';
 
 /**
@@ -89,7 +89,7 @@ export const TwoColumnFields = () => {
 
 export const EditInPanel = () => (
     <>
-        <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}>
+        <div style={{ padding: 'var(--page-pad)' }}>
             <SessionsBehind />
         </div>
         <PanelContainer width="var(--panel-width-default)">
@@ -101,9 +101,9 @@ export const EditInPanel = () => (
 );
 
 export const EditInModal = () => (
-    <Dialog title="Ana Ruiz" onClose={() => {}} style={{ inlineSize: '100%' }} footer={<SaveFooter />}>
+    <Modal inline show title="Ana Ruiz" footer={<SaveFooter />}>
         <SessionFields />
-    </Dialog>
+    </Modal>
 );
 
 export const ErrorOnField = () => (
@@ -127,4 +127,28 @@ export const ErrorInSecondDialog = () => (
             <p style={{ margin: 0 }}>The session was not saved.</p>
         </Modal>
     </>
+);
+
+export const MinorityMarked = () => (
+    <>
+        <TextField label="Student" isRequired defaultValue="Ana Ruiz" />
+        <TextField label="Site" isRequired defaultValue="Lincoln Middle" />
+        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
+    </>
+);
+
+export const MajorityMarked = () => (
+    <>
+        <TextField label="Student" isRequired labelMarker="required" defaultValue="Ana Ruiz" />
+        <TextField label="Site" isRequired labelMarker="required" defaultValue="Lincoln Middle" />
+        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
+    </>
+);
+
+export const HelpInCaption = () => (
+    <TextField label="School email" defaultValue="ana.ruiz@lincoln.edu" caption="Shared with your site supervisor." />
+);
+
+export const HelpInTooltip = () => (
+    <TextField label="School email" defaultValue="ana.ruiz@lincoln.edu" info="Shared with your site supervisor." />
 );

@@ -46,7 +46,6 @@ export const BareString = () => (
 );
 
 export const ReplacedTable = () => {
-    const [view, setView] = useState('All students');
     const [isFiltered, setIsFiltered] = useState(true);
     const rows = isFiltered ? [] : rowsOf(STUDENTS);
     return (
@@ -54,15 +53,7 @@ export const ReplacedTable = () => {
             title="Students"
             description="Lincoln Middle"
             views={(
-                <Tabs
-                    appearance="pill"
-                    activeKey={view}
-                    onSelect={(next) => {
-                        setView(next);
-                        setIsFiltered(next === 'All students');
-                    }}
-                    aria-label="Views"
-                >
+                <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
                     <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
                     <Tabs.Tab eventKey="Needs follow-up">Needs follow-up</Tabs.Tab>
                 </Tabs>
@@ -99,7 +90,7 @@ export const HeaderOverNothing = () => (
         title="Students"
         description="Lincoln Middle"
         views={(
-            <Tabs appearance="pill" activeKey="All students" onSelect={() => {}} aria-label="Views">
+            <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
                 <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
                 <Tabs.Tab eventKey="Needs follow-up">Needs follow-up</Tabs.Tab>
             </Tabs>
