@@ -42,7 +42,7 @@ _Avoid_: "journey" for a Flow (the blueprint's journey is a different thing), "w
 
 **Sidebar**:
 The full-height area at the left of the **Frame**, holding navigation. From 1024 it is **docked**; below it is collapsed, where a hover **peek**s it and the toggle opens it as an **overlay**. A peek and an overlay look the same; they differ in how they open and close.
-_Avoid_: "left nav", "side nav"
+_Avoid_: "left nav", "side nav", "side navigation"
 
 **Panel**:
 The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
@@ -422,7 +422,7 @@ _Avoid_: "send whoosh"
 _Avoid_: "success sound"
 
 **Done milestone**:
-`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a goal reached, a term start or end, a badge claimed. An Expressive milestone plays it.
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a goal reached, a term start or end, an achievement claimed. An Expressive milestone plays it.
 _Avoid_: "fanfare", "celebration sound"
 
 **Concern sound**:

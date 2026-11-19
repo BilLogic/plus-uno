@@ -620,7 +620,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-ds-vocabulary.mjs',
-    guards: 'DS docs pages using glossary terms over avoid-words (warns; strict pages fail), and no avoid-word colliding with a DS name.',
+    guards: 'glossary words in DS docs, agent views and token intents (warns; Lozenge-type outside names fail), and no avoid-word colliding with a DS name.',
   },
   {
     name: 'check:docs-token-literals',
