@@ -4,7 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
+import { PAGE_WIDTH } from '../Forms/formHosts.jsx';
 import { CARD_STAGE, LongValue, OwnedForm, PlainText, ReadOnlyChoices, ReadOnlyField, ReadOnlyPickers } from './readOnlyDemo.jsx';
 
 /**

@@ -567,7 +567,7 @@ Select.propTypes = {
     displayMode: PropTypes.oneOf(['tags', 'text']),
     /** With `isMulti`: wrap the picks onto more rows (the default). `false` keeps one row that scrolls sideways. */
     lineWrap: PropTypes.bool,
-    /** With `isMulti`: collapse the picks into a "+n" count until the field is focused. */
+    /** With `isMulti`: the tags collapse into a "+n" count until the field is focused. With `displayMode="text"` the row clips with a fade. */
     truncate: PropTypes.bool,
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(SELECT_SPACINGS),

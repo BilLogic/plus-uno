@@ -8,13 +8,13 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Import:** `import { Modal } from '@/templates';`
 
-**Used in:** Card (`ds guide card`); Form (`ds guide form`); Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`)
+**Used in:** Card (`ds guide card`); Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 
 **Source:** `design-system/src/templates/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterLeadingAction, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
+**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterLeadingAction, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyWithForm, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
 
 **Storybook page:** `design-system/src/templates/Modal/Modal.mdx`
 
@@ -112,7 +112,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 ## Related
 
 - Dialog: use when drawing the dialog panel itself with no Blanket or modal behavior, such as in docs and mockups.
-- Form: use when the Modal holds fields.
+- Forms: use when the Modal holds fields.
 - Panel: use when the page must stay usable.
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.

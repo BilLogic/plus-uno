@@ -146,6 +146,7 @@ const TOPIC_ALIASES = {
   viewbar: 'section',
   validation: 'forms',
   forms: 'forms',
+  form: 'forms',
   search: 'search',
   empty: 'empty',
   'empty state': 'empty',
@@ -203,7 +204,7 @@ const TOPIC_ALIASES = {
   sounds: 'sound',
 };
 /** Topic words that are everyday English too ("copy to clipboard", "grid of cards"). */
-const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas'.split(' '));
+const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas form'.split(' '));
 /** Words that ask for a guideline outright, so a weak topic word beside one counts. */
 const GUIDE_CUES = new Set('guide guides guideline guidelines guidance rule rules convention conventions'.split(' '));
 
@@ -1047,7 +1048,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   const topics = () => index.topics;
   const topicText = (rel) => index.guides[rel];
-  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The nine templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
+  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The eight templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
   const isBriefGuide = (rel) =>
     rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
     rel.startsWith(`${AGENT_VIEWS}/templates/`) ||

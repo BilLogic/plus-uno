@@ -8,7 +8,7 @@ Arrange components by filling a template's slots. Use patterns to guide the choi
 
 **Storybook page:** `design-system/src/storybook-docs/templates/TemplatesOverview.mdx`
 
-## The nine templates
+## The eight templates
 
 Templates run from broadest to smallest. Each page covers types, anatomy, key states and usage. See Templates and patterns below for how the layers fit together.
 
@@ -17,7 +17,6 @@ Templates run from broadest to smallest. Each page covers types, anatomy, key st
 - **Section.** A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.
 - **Card.** A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.
 - **Table.** How a table sits on a page: the Section header carries the title and toolbar, and the table spans the section under it.
-- **Form.** A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.
 - **Modal.** One task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps.
 - **Panel.** A full-height layer beside or over the Page with no Blanket. Two floating types: Details and Notifications.
 - **Popup.** A floating layer that hangs off its trigger and closes on an outside click. Six types, from menu to stacked filter menu.
@@ -58,8 +57,8 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Dialog`, `Button` |
-| A long task with steps | Frame multi-step task, with a Form in steps | Forms · Navigation | `Sidebar` (inner mode), `Fieldset`, `FooterActions`, `Button` |
-| Settings saved as a group | Form in a page, on the Page under its page-level header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
+| A long task with steps | Frame multi-step task, with a form in steps | Forms · Navigation | `Sidebar` (inner mode), `Fieldset`, `FooterActions`, `Button` |
+| Settings saved as a group | A settings form on the Page under its page-level Section header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
 | Signing in | Frame · bare | Forms · Errors | `Logo`, `TextField`, `Button` |
 | Notifications | Panel · Notifications (the Inbox) | Notifications | `Panel`, `Avatar`, `PopupSelect` |

@@ -10,7 +10,7 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Used in:** Page (`ds guide page`); Section (`ds guide section`)
 
-**Governed by:** Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+**Governed by:** Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 
 **Source:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx`
 

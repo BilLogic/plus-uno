@@ -180,11 +180,17 @@ const expectTrailingOnFirstRow = async (box) => {
 };
 
 export const Multi = {
-    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['lincoln', 'roosevelt']} placeholder="Select sites" /></div>,
+    render: () => (
+        <div style={field}>
+            <Select label="Site" options={sampleOptions} defaultValue="lincoln" />
+            <Select label="Sites" isMulti options={sampleOptions} defaultValue={['lincoln', 'roosevelt']} placeholder="Select sites" />
+        </div>
+    ),
     play: async ({ canvasElement }) => {
+        const single = boxOf(canvasElement, 'Site');
         const box = boxOf(canvasElement, 'Sites');
         // Two short tags are one row: the field is as tall as a single select, with no blank line under them.
-        await expect(box.getBoundingClientRect().height).toBe(40);
+        await expect(box.getBoundingClientRect().height).toBe(single.getBoundingClientRect().height);
         const input = box.querySelector('.plus-select-input').getBoundingClientRect();
         const last = tagsIn(box).at(-1).getBoundingClientRect();
         await expect(Math.abs(input.top - last.top)).toBeLessThanOrEqual(1);
@@ -210,7 +216,8 @@ export const MultiRows = {
         const step = rowStep(box);
         // Whole tag rows past the first, never a blank trailing row.
         await expect(height).toBeGreaterThan(single);
-        await expect((height - single) % step).toBeCloseTo(0, 0);
+        const rows = (height - single) / step;
+        await expect(Math.abs(Math.round(rows) * step - (height - single))).toBeLessThanOrEqual(1);
         const input = box.querySelector('.plus-select-input').getBoundingClientRect();
         const last = tagsIn(box).at(-1).getBoundingClientRect();
         const content = box.querySelector('.plus-field__content').getBoundingClientRect();
@@ -235,18 +242,24 @@ const OverflowSet = (props) => (
 
 /** Wrap, the default: every tag shows and the field grows by rows. Pick it when the picks matter at a glance. */
 export const OverflowWrap = {
+    name: 'Overflow: wrap',
     render: () => <OverflowSet />,
     play: async ({ canvasElement }) => {
         const box = boxOf(canvasElement, 'Many sites');
         await expect(tagsIn(box)).toHaveLength(longTags.length);
         await expect(box.querySelector('.plus-tag-group__overflow')).toBeNull();
         await expect(box.getBoundingClientRect().height).toBeGreaterThan(40);
+        // The group stays a labeled list in the accessibility tree though its box is display: contents.
+        const list = within(box).getByRole('list', { name: 'Many sites' });
+        await expect(getComputedStyle(list).display).toBe('contents');
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(longTags.length);
         await expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth);
     },
 };
 
 /** No wrap: one row that scrolls sideways. Pick it when the field must stay one line and the picks are still all reachable. */
 export const OverflowNowrap = {
+    name: 'Overflow: nowrap',
     render: () => <OverflowSet lineWrap={false} />,
     play: async ({ canvasElement }) => {
         const box = boxOf(canvasElement, 'Many sites');
@@ -262,6 +275,7 @@ export const OverflowNowrap = {
 
 /** Truncate: one row with a "+n" count until the field is focused, then every tag. Pick it for dense forms and filter bars. */
 export const OverflowTruncate = {
+    name: 'Overflow: truncate',
     render: () => <OverflowSet truncate />,
     play: async ({ canvasElement }) => {
         const box = boxOf(canvasElement, 'Many sites');
@@ -269,6 +283,7 @@ export const OverflowTruncate = {
         const count = box.querySelector('.plus-tag-group__overflow');
         await expect(count).not.toBeNull();
         await expect(count).toHaveTextContent(/^\+\d+$/);
+        await expectTrailingOnFirstRow(box);
         await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Many sites' }));
         await waitFor(() => expect(tagsIn(box)).toHaveLength(longTags.length));
         await expect(box.querySelector('.plus-tag-group__overflow')).toBeNull();

@@ -70,7 +70,6 @@ export const MOTION_LIBRARY_LINKS = Object.freeze({
   "pattern:Search": "?path=/docs/patterns-search--docs#motion",
   "template:Blanket": "?path=/docs/templates-modal--docs#blanket-motion",
   "template:Card": "?path=/docs/templates-card--docs#motion",
-  "template:Form": "?path=/docs/templates-form--docs#motion",
   "template:Frame": "?path=/docs/templates-frame--docs#motion",
   "template:Modal": "?path=/docs/templates-modal--docs#motion",
   "template:Page": "?path=/docs/templates-page--docs#motion",
