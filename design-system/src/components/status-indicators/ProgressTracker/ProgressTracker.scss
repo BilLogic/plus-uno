@@ -6,8 +6,9 @@
  */
 @use '../../../styles/state' as *;
 
-// Never wider than the space it sits in: steps shrink and a long label
-// truncates, instead of the row setting its own width.
+// In a flex or grid parent that centers its children, the row is sized by its
+// longest label and can outgrow the parent. Capping it at the parent's width lets
+// the steps shrink and a long label truncate instead.
 .plus-progress-tracker {
     max-inline-size: 100%;
     min-inline-size: 0;

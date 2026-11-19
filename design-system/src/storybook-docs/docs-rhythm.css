@@ -452,10 +452,20 @@
     border-width: 0 !important;
 }
 
-/* A demo wider than its card scrolls in the well, not the page. */
+/*
+ * A demo wider than its card scrolls in the well, not the page. Only a well that
+ * does scroll (the card sets data-scrolls) becomes a scroll box, so a layer an
+ * example opens (a popover, a Spotlight, a focus ring) keeps overflowing freely
+ * everywhere else. A scroll box clips vertically and has no vertical scroll of
+ * its own: the well's own padding (--card-pad) holds a focus ring and a shadow.
+ */
 .sbdocs .sb-ds-dodont-card__well {
     min-inline-size: 0;
+}
+
+.sbdocs .sb-ds-dodont-card__well[data-scrolls] {
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 /*

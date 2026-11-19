@@ -322,21 +322,53 @@ export function DoDontCaption({ tone, children, style }) {
     );
 }
 
-/** True while the element's content is wider than the element: it scrolls sideways. */
-function useScrollsSideways(ref) {
-    const [scrolls, setScrolls] = useState(false);
+/**
+ * Whether a scroll box's content is wider than the box, and a name for it.
+ *
+ * Measured again when the box or the example inside changes size (a ResizeObserver
+ * on both) and when anything is added or removed under it (a MutationObserver), so
+ * a demo that renders late or deep (a chart, a lazily loaded table) is still seen.
+ * The box takes focus and a name only while it scrolls sideways: a keyboard user
+ * is not given a tab stop that scrolls nothing.
+ *
+ * @param {React.RefObject<HTMLElement>} ref - the scroll box
+ * @param {(box: HTMLElement) => string} getLabel - its name, read from the page
+ * @returns {{ scrolls: boolean, label: string }}
+ */
+export function useScrollsSideways(ref, getLabel) {
+    const [state, setState] = useState({ scrolls: false, label: '' });
     useEffect(() => {
-        const well = ref.current;
-        if (!well || typeof ResizeObserver === 'undefined') return undefined;
-        const measure = () => setScrolls(well.scrollWidth > well.clientWidth + 1);
+        const box = ref.current;
+        if (!box || typeof ResizeObserver === 'undefined') return undefined;
+        const measure = () => {
+            const scrolls = box.scrollWidth > box.clientWidth + 1;
+            const label = scrolls ? getLabel(box) : '';
+            setState((prev) => (prev.scrolls === scrolls && prev.label === label ? prev : { scrolls, label }));
+        };
         measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(well);
-        // The demo inside can change size on its own (a font or a chart loading).
-        well.querySelectorAll(':scope > * , :scope > * > *').forEach((node) => observer.observe(node));
-        return () => observer.disconnect();
-    }, [ref]);
-    return scrolls;
+        const resizes = new ResizeObserver(measure);
+        resizes.observe(box);
+        // The example's own box and its parts: the content that can outgrow the box.
+        box.querySelectorAll(':scope > *, :scope > * > *').forEach((node) => resizes.observe(node));
+        const mutations = new MutationObserver(() => {
+            measure();
+            box.querySelectorAll(':scope > *, :scope > * > *').forEach((node) => resizes.observe(node));
+        });
+        mutations.observe(box, { childList: true, subtree: true });
+        return () => {
+            resizes.disconnect();
+            mutations.disconnect();
+        };
+    }, [ref, getLabel]);
+    return state;
+}
+
+/** A well's name: its verdict and its caption, read from the card around it. */
+function wellLabel(well) {
+    const card = well.closest('.sb-ds-dodont-card');
+    const verdict = card?.dataset.verdict === 'do' ? 'Do' : "Don't";
+    const caption = card?.querySelector('.sb-ds-dodont-caption__body > span')?.textContent?.trim();
+    return caption ? `${verdict} example: ${caption}` : `${verdict} example`;
 }
 
 /**
@@ -350,7 +382,7 @@ function useScrollsSideways(ref) {
  */
 export function DoDontCard({ tone, children, caption, code }) {
     const wellRef = useRef(null);
-    const scrolls = useScrollsSideways(wellRef);
+    const { scrolls, label } = useScrollsSideways(wellRef, wellLabel);
     return (
         <figure
             className="sb-ds-dodont-card"
@@ -379,7 +411,8 @@ export function DoDontCard({ tone, children, caption, code }) {
                 ref={wellRef}
                 className="sb-ds-dodont-card__well"
                 // A well that scrolls sideways takes focus, so the keyboard can scroll it.
-                {...(scrolls ? { role: 'region', 'aria-label': 'Example', tabIndex: 0 } : {})}
+                data-scrolls={scrolls ? '' : undefined}
+                {...(scrolls ? { role: 'region', 'aria-label': label, tabIndex: 0 } : {})}
                 style={{
                     flex: 1,
                     minHeight: 'calc(var(--field-min-height-sm) * 2)',

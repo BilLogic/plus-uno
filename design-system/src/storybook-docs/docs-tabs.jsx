@@ -33,6 +33,7 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import { ArgTypes, Markdown, useOf } from '@storybook/addon-docs/blocks';
 
 import { Button, CodeBlock, LinkButton } from '@/components';
+import { useScrollsSideways } from './ds-docs-layout.jsx';
 import {
   TABS,
   agentViewEntry,
@@ -186,13 +187,35 @@ function CodeTabPanel({ of, importName, importFrom, children }) {
 }
 
 /**
+ * A table's name: the heading above it, else its first header. A second table
+ * under the same name is numbered, so no two regions on a page share one.
+ */
+function tableLabel(box) {
+  const baseOf = (table) => {
+    let heading = table.previousElementSibling;
+    while (heading && !/^H[1-6]$/.test(heading.tagName)) heading = heading.previousElementSibling;
+    return (heading?.textContent || table.querySelector('th')?.textContent || 'Generated file').trim();
+  };
+  const base = baseOf(box);
+  const tables = [...(box.parentElement?.querySelectorAll('.sb-ds-agent-view__table') || [])];
+  const index = tables.filter((table) => baseOf(table) === base).indexOf(box);
+  return index > 0 ? `${base} table ${index + 1}` : `${base} table`;
+}
+
+/**
  * A table in the generated file keeps its own width and scrolls in its own box,
- * so a wide one never pushes the docs column wide. The box takes focus so the
- * keyboard can scroll it.
+ * so a wide one never pushes the docs column wide. The box takes focus and a name
+ * only while it scrolls sideways, so the keyboard can scroll it.
  */
 function AgentViewTable(props) {
+  const ref = useRef(null);
+  const { scrolls, label } = useScrollsSideways(ref, tableLabel);
   return (
-    <div className="sb-ds-agent-view__table" role="region" aria-label="Table" tabIndex={0}>
+    <div
+      ref={ref}
+      className="sb-ds-agent-view__table"
+      {...(scrolls ? { role: 'region', 'aria-label': label, tabIndex: 0 } : {})}
+    >
       <table {...props} />
     </div>
   );
