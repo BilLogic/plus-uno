@@ -110,7 +110,7 @@ Markup without its own stylesheet can use the generated utility classes (`.headi
 
 Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards, never a page title. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
 
-<Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
+<Canvas of={TypographyStories.HeadingLevels} />
 
 <RefTable
     head={['Level', 'Style']}
@@ -144,7 +144,7 @@ Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 `Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
-<Canvas of={TypographyStories.CodeStyle} sourceState="none" />
+<Canvas of={TypographyStories.CodeStyle} />
 
 </FoundationSection>
 

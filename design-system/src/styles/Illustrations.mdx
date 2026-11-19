@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { FigureRow } from '@/storybook-docs/ds-docs-layout.jsx';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -6,24 +6,13 @@ import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
     DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
 
 import { Illustration } from '@/components';
+import * as IllustrationsStories from './Illustrations.stories.jsx';
 
-export const Row = ({ children }) => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)' }}>{children}</div>
-);
-
-export const Captioned = ({ caption, children }) => (
-    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
-        {children}
-        <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>
-    </figure>
-);
-
-<Meta title="Foundations/Brand/Illustrations" />
+<Meta of={IllustrationsStories} />
 
 <DocsLanding
     page="foundations-brand-illustrations"
@@ -58,25 +47,13 @@ The five SMART characters each stand for an area; the seven math characters stan
 
 <FoundationSubsection title="SMART characters">
 
-<FoundationExample>
-<Row>
-    {['mastering-content', 'advocacy', 'technology', 'relationships', 'social-emotional'].map((c) => (
-        <Captioned key={c} caption={c}><Illustration character={c} size={96} title={c.replace(/-/g, ' ')} /></Captioned>
-    ))}
-</Row>
-</FoundationExample>
+<Canvas of={IllustrationsStories.SmartCharacters} />
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Math characters">
 
-<FoundationExample>
-<Row>
-    {['dot', 'approximately-equal', 'root', 'all', 'pi', 'equal', 'divider'].map((c) => (
-        <Captioned key={c} caption={c}><Illustration character={c} size={96} title={c.replace(/-/g, ' ')} /></Captioned>
-    ))}
-</Row>
-</FoundationExample>
+<Canvas of={IllustrationsStories.MathCharacters} />
 
 </FoundationSubsection>
 
@@ -133,8 +110,10 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
 The body color stands for the area, so a character only appears with its own area.
 
 <DoDont>
-<Do caption="The technology character with the Technology & tools lesson."><TheTechnologyCharacterDoFigure /></Do>
-<Dont caption="The mastering content character on a Relationships lesson."><TheMasteringContentDontFigure /></Dont>
+<Do caption="The technology character with the Technology & tools lesson." code={`<Illustration character="technology" size={48} />
+<strong>Technology & tools</strong>`}><TheTechnologyCharacterDoFigure /></Do>
+<Dont caption="The mastering content character on a Relationships lesson." code={`<Illustration character="mastering-content" size={48} />
+<strong>Relationships</strong>`}><TheMasteringContentDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -144,10 +123,13 @@ The body color stands for the area, so a character only appears with its own are
 Scale with the size; the limbs and texture distort when stretched.
 
 <DoDont>
-<Do caption="Scaled uniformly to a size on the scale.">
+<Do caption="Scaled uniformly to a size on the scale." code={`<Illustration character="technology" size={96} />`}>
 <Illustration character="technology" size={96} />
 </Do>
-<Dont caption="Stretched to fill a banner."><StretchedToFillDontFigure /></Dont>
+<Dont caption="Stretched to fill a banner." code={`{/* Never scale one axis: the size prop is the only dimension */}
+<div style={{ transform: 'scale(2.5, 0.5)' }}>
+    <Illustration character="technology" size={96} />
+</div>`}><StretchedToFillDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -157,8 +139,13 @@ Scale with the size; the limbs and texture distort when stretched.
 A single character carries the mood; a crowd competes with the message.
 
 <DoDont>
-<Do caption="One character above the empty-state message."><OneCharacterAboveDoFigure /></Do>
-<Dont caption="Four characters crowding one empty state; a collage like this belongs on a marketing page, not in the product."><FourCharactersCrowdingDontFigure /></Dont>
+<Do caption="One character above the empty-state message." code={`<Illustration character="relationships" size={96} />
+<strong>No sessions yet</strong>
+<span>Your scheduled sessions show up here.</span>`}><OneCharacterAboveDoFigure /></Do>
+<Dont code={`{['mastering-content', 'advocacy', 'technology', 'relationships'].map((character) => (
+    <Illustration key={character} character={character} size={48} />
+))}
+<strong>No sessions yet</strong>`} caption="Four characters crowding one empty state; a collage like this belongs on a marketing page, not in the product."><FourCharactersCrowdingDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
