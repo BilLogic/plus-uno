@@ -2,7 +2,7 @@
 
 # Table
 
-Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `toolbar`, `tabs`).
+Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).
 
 Also asked as: list of records, data table on a page, sortable list, records with filters, rows and columns, grid, table pattern.
 

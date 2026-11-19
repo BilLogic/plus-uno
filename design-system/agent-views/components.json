@@ -9701,8 +9701,10 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Tabs row under the title row (header type `tabs`, or `tabs-only`)",
-          "deprecated": null
+          "description": "use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).",
+          "deprecated": {
+            "replacement": "views"
+          }
         },
         {
           "name": "toolbar",
@@ -9710,8 +9712,10 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`",
-          "deprecated": null
+          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`.",
+          "deprecated": {
+            "replacement": "search"
+          }
         },
         {
           "name": "header",
@@ -14919,7 +14923,7 @@
       "import": "import { Table } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Table/Table.jsx",
-      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `toolbar`, `tabs`).",
+      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).",
       "props": [
         {
           "name": "kind",

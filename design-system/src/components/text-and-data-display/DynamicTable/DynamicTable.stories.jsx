@@ -4,7 +4,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { Button, DynamicTable, EmptyState, HeadCell, StaticTable } from '@/components';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
-import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
+import PatternSection from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -283,19 +283,14 @@ const FilteredDynamicTable = () => {
         <HeadingLevelContext.Provider value={3}>
             <PatternSection
                 title="Students"
-                toolbar={(
-                    <SectionToolbar
-                        count={`${visible.length} students`}
-                        filters={(
-                            <Button
-                                text={filtered ? 'Grade: Grade 5' : 'All grades'}
-                                appearance="subtle"
-                                spacing="compact"
-                                onClick={() => setFiltered((prev) => !prev)}
-                            />
-                        )}
-                    />
-                )}
+                filters={[{
+                    key: 'grade',
+                    label: 'Grade',
+                    text: filtered ? '5' : 'All',
+                    isSelected: filtered,
+                    onClick: () => setFiltered((prev) => !prev),
+                }]}
+                count={`${visible.length} students`}
             >
                 <DynamicTable
                     head={head}
@@ -332,7 +327,7 @@ export const EmptyHiddenByFilter = {
         const box = canvas.getByRole('region', { name: 'Students' });
         await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
-        await expect(canvas.getByRole('button', { name: 'Grade: Grade 5' })).toBeVisible();
+        await expect(canvas.getByRole('button', { name: 'Grade: 5' })).toBeVisible();
         const clear = within(box).getByRole('button', { name: 'Clear filter' });
         await expect(clear.className).not.toContain('primary');
         await userEvent.click(clear);
@@ -418,7 +413,7 @@ const RosterWithBulkBar = (args) => {
     const [selected, setSelected] = React.useState([]);
     return (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection title="Students" toolbar={<SectionToolbar count={`${args.rows.length} students`} />}>
+            <PatternSection title="Students" description={`${args.rows.length} students`}>
                 <DynamicTable
                     {...args}
                     isSelectable
@@ -434,7 +429,7 @@ const RosterWithBulkBar = (args) => {
 export const Selection = {
     render: (args) => <RosterWithBulkBar {...args} />,
     args: { head, rows, label: 'Students' },
-    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected the head row becomes the bulk bar: the count, then up to three `bulkActions` with an overflow menu for the rest. The labels cross-fade in place and the row keeps its height. There is no Clear; the checkboxes clear it. The Section toolbar stays put.' } } },
+    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected the head row becomes the bulk bar: the count, then up to three `bulkActions` with an overflow menu for the rest. The labels cross-fade in place and the row keeps its height. There is no Clear; the checkboxes clear it. The Section header stays put.' } } },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const headRow = () => canvasElement.querySelector('thead tr');
@@ -455,7 +450,7 @@ export const Selection = {
         // The bar fades in over the motion token's short duration.
         await waitFor(() => expect(within(bar).getByRole('button', { name: 'More actions' })).toBeVisible());
         await expect(canvas.queryByRole('button', { name: /clear/i }), 'no Clear button').toBeNull();
-        await expect(canvas.getByText('8 students'), 'the toolbar stays put').toBeVisible();
+        await expect(canvas.getByText('8 students'), 'the Section header stays put').toBeVisible();
         await userEvent.click(all);
         await expect(all).toHaveAttribute('aria-checked', 'true');
         await expect(bar).toHaveTextContent('8 selected');
