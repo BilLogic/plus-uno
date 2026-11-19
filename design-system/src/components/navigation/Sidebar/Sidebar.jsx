@@ -5,7 +5,9 @@ import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { useMotionReduced } from '@/lib/motionPreference';
 import { measureRelativeBox } from '@/lib/navigationMotion';
+import Button from '../../forms-and-inputs/Button';
 import CountTag from '../../labels/CountTag';
+import DropdownMenu, { ButtonItem } from '../../forms-and-inputs/DropdownMenu';
 import Icon from '../../images-and-icons/Icon';
 import IconButton from '../../forms-and-inputs/IconButton';
 import Logo from '../../images-and-icons/Logo';
@@ -58,7 +60,7 @@ const writeCollapsed = (key, value) => {
 /**
  * The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the
  * sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with
- * radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing
+ * radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing
  * slot centered on x 208.
  *
  * By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting
@@ -97,6 +99,16 @@ const writeCollapsed = (key, value) => {
  *   one subtle icon color. A selected row shows the fill and the selected icon
  *   color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only
  *   exception.
+ * - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner
+ *   sidebar: one full-width Back button (`onBack`) with the area name centered,
+ *   an optional full-width context dropdown (`inner.switcher`), then text-only
+ *   rows (`inner.rows`: a record's stages, or a task's steps). The container,
+ *   logo row and account row stay still; only the content swaps. The old
+ *   content leaves at once and the new enters as one block, sliding 12 on
+ *   `spatial.fast` from the end going in and from the start going back, and
+ *   fading on `appearance.fast`, with no overshoot. Reduced motion keeps only
+ *   the fade. Back shows the main Sidebar, where what was left sits as one open
+ *   row (`tabs`) under its area.
  * - **Account row**: `SidebarAccount`, under a divider.
  *
  * Content is data. Nothing here changes the URL.
@@ -125,6 +137,8 @@ const Sidebar = ({
     slackUrl,
     onHome,
     onToggle,
+    inner,
+    onBack,
     storageKey = SIDEBAR_SECTIONS_STORAGE_KEY,
     label = 'Main',
     visible = true,
@@ -137,6 +151,10 @@ const Sidebar = ({
     const openTabs = useOpenTabs();
     const reduced = useMotionReduced();
     const navRef = useRef(null);
+    const swapRef = useRef(null);
+    const swapModeRef = useRef(inner ? 'inner' : 'main');
+    const reducedRef = useRef(reduced);
+    reducedRef.current = reduced;
     const glideRef = useRef(null);
     const mountedRef = useRef(false);
     const lastRowRef = useRef(null);
@@ -240,6 +258,59 @@ const Sidebar = ({
     }, [resolvedActiveId, reduced, visible]);
 
     useLayoutEffect(() => () => { glideAnimRef.current?.stop?.(); }, []);
+
+    // Swapping between the main and the inner sidebar: the container stays still
+    // and only its content moves. The old content is already gone; the new one
+    // enters as one block, sliding 12 from the end going in and from the start
+    // going back on spatial.fast while it fades on appearance.fast. The slide and
+    // the fade are two springs writing two custom properties the stylesheet reads
+    // (`--swap-p`, `--swap-a`), so the distance stays the `--space-075` token.
+    // Reduced motion drops the slide and keeps the fade.
+    const mode = inner ? 'inner' : 'main';
+    useLayoutEffect(() => {
+        const previous = swapModeRef.current;
+        swapModeRef.current = mode;
+        const el = swapRef.current;
+        if (previous === mode || !el) return undefined;
+        const direction = getComputedStyle(el).direction === 'rtl' ? -1 : 1;
+        const fadeOnly = reducedRef.current;
+        el.dataset.swapping = 'true';
+        el.dataset.swapMotion = fadeOnly ? 'fade' : 'slide-fade';
+        el.dataset.swapFrom = mode === 'inner' ? 'end' : 'start';
+        el.style.setProperty('--swap-dir', String(mode === 'inner' ? direction : -direction));
+        el.style.setProperty('--swap-p', fadeOnly ? '1' : '0');
+        el.style.setProperty('--swap-a', '0');
+        // The old content unmounted with the focus inside it: put focus where the new content begins.
+        if (!document.activeElement || document.activeElement === document.body) {
+            const target = mode === 'inner'
+                ? el.querySelector('.plus-pattern-sidebar__back')
+                : (el.querySelector('[aria-current="page"]') ?? el.querySelector('.plus-pattern-sidebar__row'));
+            target?.focus({ preventScroll: true });
+        }
+        const fade = animate(0, 1, {
+            ...SPRINGS['appearance.fast'].productive,
+            onUpdate: (value) => el.style.setProperty('--swap-a', String(Math.min(1, value))),
+        });
+        const slide = fadeOnly ? null : animate(0, 1, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: (value) => el.style.setProperty('--swap-p', String(value)),
+        });
+        let live = true;
+        Promise.all([fade.finished, slide?.finished]).then(() => {
+            if (!live) return;
+            delete el.dataset.swapping;
+            delete el.dataset.swapMotion;
+            delete el.dataset.swapFrom;
+            el.style.removeProperty('--swap-dir');
+            el.style.removeProperty('--swap-p');
+            el.style.removeProperty('--swap-a');
+        });
+        return () => {
+            live = false;
+            fade.stop?.();
+            slide?.stop?.();
+        };
+    }, [mode]);
 
     // A different person has their own sections.
     useEffect(() => { setShutGroups(readCollapsed(sectionsKey)); }, [sectionsKey]);
@@ -380,9 +451,11 @@ const Sidebar = ({
 
     const rowContent = (item, extra, labelRef) => (
         <>
-            <span className="plus-pattern-sidebar__slot" aria-hidden="true">
-                {item.icon ? <Icon name={item.icon} /> : null}
-            </span>
+            {item.textOnly ? null : (
+                <span className="plus-pattern-sidebar__slot" aria-hidden="true">
+                    {item.icon ? <Icon name={item.icon} /> : null}
+                </span>
+            )}
             <span ref={labelRef} className="plus-pattern-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
             {trailing(item, extra)}
@@ -451,7 +524,14 @@ const Sidebar = ({
                 placement="right"
             >
                 {({ measureRef }) => renderRow({
-                    item: { id: tab.id, text: tab.label, href: tab.href },
+                    item: {
+                        id: tab.id,
+                        // A task's progress rides on its label, so Close never hides it.
+                        text: tab.progress
+                            ? <>{tab.label}<span className="plus-pattern-sidebar__progress">{tab.progress}</span></>
+                            : tab.label,
+                        href: tab.href,
+                    },
                     rowClass: ['plus-pattern-sidebar__row', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
                     current: selected,
                     onPress: () => handleSelectTab(tab, item),
@@ -637,6 +717,65 @@ const Sidebar = ({
         );
     };
 
+    const renderInner = () => {
+        const switcher = inner.switcher;
+        const chosen = switcher?.options.find((option) => option.id === switcher.value);
+        return (
+            <div className="plus-pattern-sidebar__inner">
+                <Button
+                    className="plus-pattern-sidebar__back"
+                    appearance="default"
+                    shouldFitContainer
+                    iconBefore="arrow-left"
+                    text={inner.areaLabel}
+                    onClick={onBack}
+                />
+                {switcher ? (
+                    <div className="plus-pattern-sidebar__switcher">
+                        <DropdownMenu
+                            placement="bottom-start"
+                            trigger={(
+                                <Button
+                                    className="plus-pattern-sidebar__switcher-trigger"
+                                    appearance="default"
+                                    shouldFitContainer
+                                    iconAfter="angle-down"
+                                    text={chosen?.text ?? switcher.label}
+                                    aria-label={switcher.label ? `${switcher.label}: ${chosen?.text ?? ''}` : undefined}
+                                />
+                            )}
+                        >
+                            {switcher.options.map((option) => (
+                                <ButtonItem
+                                    key={option.id}
+                                    isSelected={option.id === switcher.value}
+                                    onClick={() => switcher.onChange?.(option.id, option)}
+                                >
+                                    {option.text}
+                                </ButtonItem>
+                            ))}
+                        </DropdownMenu>
+                    </div>
+                ) : null}
+                <ul className="plus-pattern-sidebar__list" aria-label={inner.label ?? `${inner.areaLabel} steps`}>
+                    {inner.rows.map((row) => {
+                        const selected = resolvedActiveId === row.id;
+                        return (
+                            <li key={row.id} className="plus-pattern-sidebar__item">
+                                {renderRow({
+                                    item: { ...row, textOnly: true },
+                                    rowClass: ['plus-pattern-sidebar__row', 'plus-pattern-sidebar__row--text', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                                    current: selected,
+                                    onPress: () => onSelect?.(row.id, row),
+                                })}
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        );
+    };
+
     const brand = handleHome ? (
         <a
             className="plus-pattern-sidebar__brand"
@@ -664,7 +803,9 @@ const Sidebar = ({
             </div>
             <nav ref={navRef} aria-label={label} className="plus-pattern-sidebar__nav">
                 <span ref={glideRef} className="plus-pattern-sidebar__glide" aria-hidden="true" />
-                {resolvedGroups.map(renderGroup)}
+                <div key={mode} ref={swapRef} className="plus-pattern-sidebar__swap" data-mode={mode}>
+                    {inner ? renderInner() : resolvedGroups.map(renderGroup)}
+                </div>
             </nav>
             {account ? (
                 <SidebarAccount
@@ -713,6 +854,8 @@ const tabShape = PropTypes.shape({
     href: PropTypes.string,
     /** A session happening now: the live dot at rest */
     live: PropTypes.bool,
+    /** A task's progress ("2 of 5"), after its label */
+    progress: PropTypes.string,
 });
 
 const groupShape = PropTypes.shape({
@@ -781,6 +924,41 @@ Sidebar.propTypes = {
     onHome: PropTypes.func,
     /** Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state. */
     onToggle: PropTypes.func,
+    /**
+     * Swaps the content for an inner sidebar: the area's Back button, an optional
+     * context dropdown, then text-only rows. Omit it for the main Sidebar.
+     */
+    inner: PropTypes.shape({
+        /** The area name, centered in the Back button ("Sessions") */
+        areaLabel: PropTypes.string.isRequired,
+        /** Text-only rows: a record's stages or a task's steps. The selected one is `activeId`. */
+        rows: PropTypes.arrayOf(PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            text: PropTypes.string.isRequired,
+            href: PropTypes.string,
+            count: PropTypes.number,
+            countLabel: PropTypes.string,
+            dot: PropTypes.bool,
+            dotLabel: PropTypes.string,
+        })).isRequired,
+        /** Accessible name of the rows' list; defaults to "<area> steps" */
+        label: PropTypes.string,
+        /** The full-width context dropdown under Back, such as the session switcher */
+        switcher: PropTypes.shape({
+            /** The dropdown's name; also its text when nothing is chosen */
+            label: PropTypes.string,
+            /** Id of the chosen option */
+            value: PropTypes.string,
+            options: PropTypes.arrayOf(PropTypes.shape({
+                id: PropTypes.string.isRequired,
+                text: PropTypes.string.isRequired,
+            })).isRequired,
+            /** Called with `(id, option)` when one is picked */
+            onChange: PropTypes.func,
+        }),
+    }),
+    /** Called by the inner sidebar's Back; the caller shows the main Sidebar and leaves the page where it is */
+    onBack: PropTypes.func,
     /** The localStorage key collapsed sections are kept under, per account id; null keeps nothing */
     storageKey: PropTypes.string,
     /** Accessible name of the `nav` landmark */

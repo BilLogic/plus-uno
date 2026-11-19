@@ -98,7 +98,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Frame | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
 | Frame | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
-| Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
+| Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (8) |
 | Page | `--page-pad` (declared elsewhere) |  |
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |

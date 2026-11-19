@@ -196,7 +196,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
-  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-sm)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-md)', note: 'the rounding of a Sidebar row (8)', use: 'Corner rounding of a Sidebar row.' },
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
