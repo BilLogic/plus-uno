@@ -341,8 +341,9 @@ export function DoDontCaption({ tone, children, style }) {
  * @param {'do' | 'dont'} tone
  * @param {React.ReactNode} children - the live example, built from real components
  * @param {React.ReactNode} caption - the rule, in one sentence
+ * @param {string} [code] - the example's source, folded under the caption behind Show code
  */
-export function DoDontCard({ tone, children, caption }) {
+export function DoDontCard({ tone, children, caption, code }) {
     return (
         <figure
             className="sb-ds-dodont-card"
@@ -353,7 +354,7 @@ export function DoDontCard({ tone, children, caption }) {
                 // caption row, so wells and captions line up across the pair.
                 display: 'grid',
                 gridTemplateRows: 'subgrid',
-                gridRow: 'span 2',
+                gridRow: code ? 'span 3' : 'span 2',
                 rowGap: 'var(--section-stack-md)',
                 minInlineSize: 0,
                 boxSizing: 'border-box',
@@ -383,12 +384,18 @@ export function DoDontCard({ tone, children, caption }) {
                 <div className="sb-ds-dodont-card__example sb-unstyled" style={{ inlineSize: '100%' }}>{children}</div>
             </div>
             <DoDontCaption tone={tone}>{caption}</DoDontCaption>
+            {code ? (
+                <details className="sb-ds-dodont-card__code">
+                    <summary>Show code</summary>
+                    <DocsSource code={code} />
+                </details>
+            ) : null}
         </figure>
     );
 }
 
 /** A matched do and don't, side by side (or `stacked` one above the other when an example is too wide to halve). */
-export function DoDontPair({ doExample, doCaption, dontExample, dontCaption, stacked = false }) {
+export function DoDontPair({ doExample, doCaption, doCode, dontExample, dontCaption, dontCode, stacked = false }) {
     return (
         <div
             className="sb-ds-dodont-pair"
@@ -401,8 +408,8 @@ export function DoDontPair({ doExample, doCaption, dontExample, dontCaption, sta
                 alignItems: 'stretch',
             }}
         >
-            <DoDontCard tone="do" caption={doCaption}>{doExample}</DoDontCard>
-            <DoDontCard tone="dont" caption={dontCaption}>{dontExample}</DoDontCard>
+            <DoDontCard tone="do" caption={doCaption} code={doCode}>{doExample}</DoDontCard>
+            <DoDontCard tone="dont" caption={dontCaption} code={dontCode}>{dontExample}</DoDontCard>
         </div>
     );
 }

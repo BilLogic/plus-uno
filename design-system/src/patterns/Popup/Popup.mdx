@@ -1,6 +1,7 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
+import { CODE } from './PopupCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
@@ -260,8 +261,10 @@ A trigger at the start of a bar, such as the view picker under page tabs, gets a
 
 <DoDontPair
     doExample={<EndAligned />}
+    doCode={CODE.EndAligned}
     doCaption="More sits at the end of the bar, so its menu aligns to its end edge and grows into the page."
     dontExample={<StartAlignedAtEnd />}
+    dontCode={CODE.StartAlignedAtEnd}
     dontCaption="An end trigger with a start-aligned menu: it runs off the edge of the page."
 />
 

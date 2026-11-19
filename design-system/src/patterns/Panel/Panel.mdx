@@ -1,6 +1,7 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
+import { CODE } from './PanelCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PanelStories from './Panel.stories.jsx';
@@ -226,8 +227,10 @@ The page keeps scrolling and stays clickable. A press on the page outside the Pa
 <DoDontPair
     stacked
     doExample={<FloatsNoBlanket />}
+    doCode={CODE.FloatsNoBlanket}
     doCaption="The Panel floats on its shadow and the page beside it stays undimmed."
     dontExample={<PanelOnBlanket />}
+    dontCode={CODE.PanelOnBlanket}
     dontCaption="The same Panel with a Blanket dimming the whole page."
 />
 
@@ -240,8 +243,10 @@ Another row swaps the content; the Inbox replaces Details. The overlay module ke
 <DoDontPair
     stacked
     doExample={<OneFloatingPanel />}
+    doCode={CODE.OneFloatingPanel}
     doCaption="One Panel; another row swaps what it shows."
     dontExample={<TwoFloatingPanels />}
+    dontCode={CODE.TwoFloatingPanels}
     dontCaption="Two Panels open at once, the second covering the first."
 />
 

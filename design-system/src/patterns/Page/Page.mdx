@@ -1,6 +1,7 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
+import { CODE } from './PageCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
@@ -260,8 +261,10 @@ A Section never stands in for it. Sections inside open at h2.
 
 <DoDontPair
     doExample={<HeaderIsTheH1 />}
+    doCode={CODE.HeaderIsTheH1}
     doCaption="The page header is the one h1; the Section under it opens at h2."
     dontExample={<SectionsAsTitles />}
+    dontCode={CODE.SectionsAsTitles}
     dontCaption="Sections standing in for the page title: two page-title-sized headings and no page header."
 />
 
@@ -273,8 +276,10 @@ When it shows and what it holds: the <DocsLink id="patterns-navigation">Navigati
 
 <DoDontPair
     doExample={<AreaPageTitleAlone />}
+    doCode={CODE.AreaPageTitleAlone}
     doCaption="An area page: the title alone."
     dontExample={<BreadcrumbOnAreaPage />}
+    dontCode={CODE.BreadcrumbOnAreaPage}
     dontCaption="A breadcrumb on a top-level area page, repeating the Sidebar's place."
 />
 
@@ -299,8 +304,10 @@ Anything longer moves into the first Section.
 
 <DoDontPair
     doExample={<OneLineDescription />}
+    doCode={CODE.OneLineDescription}
     doCaption="One detail line under the title."
     dontExample={<ParagraphUnderTitle />}
+    dontCode={CODE.ParagraphUnderTitle}
     dontCaption="A paragraph under the title pushes the first Section down."
 />
 

@@ -1,6 +1,7 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
+import { CODE } from './FormCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FormStories from './Form.stories.jsx';
@@ -244,8 +245,10 @@ Editing a row opens a Panel so the person keeps the page in view. A Modal is for
 <DoDontPair
     stacked
     doExample={<EditInPanel />}
+    doCode={CODE.EditInPanel}
     doCaption="A short edit in a Panel, the rows still in view."
     dontExample={<EditInModal />}
+    dontCode={CODE.EditInModal}
     dontCaption="The same short edit in a Modal that covers the rows."
 />
 
