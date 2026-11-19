@@ -466,6 +466,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-700);
   --chart-brown-boldest: var(--palette-brown-800);
   --chart-brown-boldest-hovered: var(--palette-brown-900);
+  --ds-surface-material-media: var(--palette-white-alpha-50);
+  --ds-surface-material-control: var(--palette-white-alpha-74);
+  --ds-surface-material-overlay: var(--palette-white-alpha-94);
+  --ds-border-material: var(--palette-neutral-0);
   --ds-interaction-dragged: var(--palette-neutral-alpha-700);
   --ds-interaction-inverse-hovered: var(--palette-dark-neutral-alpha-200);
   --ds-interaction-inverse-pressed: var(--palette-dark-neutral-alpha-500);
@@ -1022,6 +1026,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-400);
   --chart-brown-boldest: var(--palette-brown-300);
   --chart-brown-boldest-hovered: var(--palette-brown-200);
+  --ds-surface-material-media: var(--palette-overlay-alpha-50);
+  --ds-surface-material-control: var(--palette-overlay-alpha-72);
+  --ds-surface-material-overlay: var(--palette-overlay-alpha-94);
+  --ds-border-material: var(--palette-white-alpha-14);
   --ds-interaction-dragged: var(--palette-dark-neutral-alpha-700);
   --ds-interaction-inverse-hovered: var(--palette-neutral-alpha-250);
   --ds-interaction-inverse-pressed: var(--palette-neutral-alpha-500);
@@ -1579,6 +1587,10 @@
     --chart-brown-bolder-hovered: var(--palette-brown-400);
     --chart-brown-boldest: var(--palette-brown-300);
     --chart-brown-boldest-hovered: var(--palette-brown-200);
+    --ds-surface-material-media: var(--palette-overlay-alpha-50);
+    --ds-surface-material-control: var(--palette-overlay-alpha-72);
+    --ds-surface-material-overlay: var(--palette-overlay-alpha-94);
+    --ds-border-material: var(--palette-white-alpha-14);
     --ds-interaction-dragged: var(--palette-dark-neutral-alpha-700);
     --ds-interaction-inverse-hovered: var(--palette-neutral-alpha-250);
     --ds-interaction-inverse-pressed: var(--palette-neutral-alpha-500);
@@ -1950,6 +1962,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-1000);
   --chart-brown-boldest: var(--palette-brown-1000);
   --chart-brown-boldest-hovered: var(--palette-brown-1100);
+  --ds-surface-material-media: var(--palette-neutral-0);
+  --ds-surface-material-control: var(--palette-neutral-0);
+  --ds-surface-material-overlay: var(--palette-neutral-0);
+  --ds-border-material: var(--palette-neutral-alpha-900);
   --ds-border-surface: var(--palette-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-900);
@@ -2279,6 +2295,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-1000);
   --chart-brown-boldest: var(--palette-brown-1000);
   --chart-brown-boldest-hovered: var(--palette-brown-1100);
+  --ds-surface-material-media: var(--palette-neutral-0);
+  --ds-surface-material-control: var(--palette-neutral-0);
+  --ds-surface-material-overlay: var(--palette-neutral-0);
+  --ds-border-material: var(--palette-neutral-alpha-900);
   --ds-border-surface: var(--palette-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-900);
@@ -2609,6 +2629,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-1000);
   --chart-brown-boldest: var(--palette-brown-1000);
   --chart-brown-boldest-hovered: var(--palette-brown-1100);
+  --ds-surface-material-media: var(--palette-neutral-0);
+  --ds-surface-material-control: var(--palette-neutral-0);
+  --ds-surface-material-overlay: var(--palette-neutral-0);
+  --ds-border-material: var(--palette-neutral-alpha-900);
   --ds-border-surface: var(--palette-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-900);
@@ -2939,6 +2963,10 @@
   --chart-brown-bolder-hovered: var(--palette-brown-1000);
   --chart-brown-boldest: var(--palette-brown-1000);
   --chart-brown-boldest-hovered: var(--palette-brown-1100);
+  --ds-surface-material-media: var(--palette-neutral-0);
+  --ds-surface-material-control: var(--palette-neutral-0);
+  --ds-surface-material-overlay: var(--palette-neutral-0);
+  --ds-border-material: var(--palette-neutral-alpha-900);
   --ds-border-surface: var(--palette-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-900);
@@ -3243,6 +3271,10 @@
   --chart-brown-bolder: var(--palette-brown-200);
   --chart-brown-bolder-hovered: var(--palette-brown-100);
   --chart-brown-boldest: var(--palette-brown-100);
+  --ds-surface-material-media: var(--palette-dark-neutral-250);
+  --ds-surface-material-control: var(--palette-dark-neutral-250);
+  --ds-surface-material-overlay: var(--palette-dark-neutral-250);
+  --ds-border-material: var(--palette-dark-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-900);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold-hovered: var(--palette-teal-250);
@@ -3543,6 +3575,10 @@
   --chart-brown-bolder: var(--palette-brown-200);
   --chart-brown-bolder-hovered: var(--palette-brown-100);
   --chart-brown-boldest: var(--palette-brown-100);
+  --ds-surface-material-media: var(--palette-dark-neutral-250);
+  --ds-surface-material-control: var(--palette-dark-neutral-250);
+  --ds-surface-material-overlay: var(--palette-dark-neutral-250);
+  --ds-border-material: var(--palette-dark-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-900);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold-hovered: var(--palette-teal-250);
@@ -3844,6 +3880,10 @@
   --chart-brown-bolder: var(--palette-brown-200);
   --chart-brown-bolder-hovered: var(--palette-brown-100);
   --chart-brown-boldest: var(--palette-brown-100);
+  --ds-surface-material-media: var(--palette-dark-neutral-250);
+  --ds-surface-material-control: var(--palette-dark-neutral-250);
+  --ds-surface-material-overlay: var(--palette-dark-neutral-250);
+  --ds-border-material: var(--palette-dark-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-900);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold-hovered: var(--palette-teal-250);
@@ -4145,6 +4185,10 @@
   --chart-brown-bolder: var(--palette-brown-200);
   --chart-brown-bolder-hovered: var(--palette-brown-100);
   --chart-brown-boldest: var(--palette-brown-100);
+  --ds-surface-material-media: var(--palette-dark-neutral-250);
+  --ds-surface-material-control: var(--palette-dark-neutral-250);
+  --ds-surface-material-overlay: var(--palette-dark-neutral-250);
+  --ds-border-material: var(--palette-dark-neutral-alpha-900);
   --ds-background-competency-mastering-content-subtle: var(--palette-teal-900);
   --ds-background-competency-mastering-content-bold: var(--palette-teal-300);
   --ds-background-competency-mastering-content-bold-hovered: var(--palette-teal-250);
@@ -4189,4 +4233,22 @@
   --chart-smart-technology-tools: var(--palette-brown-300);
   --chart-smart-technology-tools-hovered: var(--palette-brown-200);
 }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  [data-color-mode] {
+    --ds-surface-material-media: var(--ds-surface-overlay);
+    --ds-surface-material-control: var(--ds-surface-overlay);
+    --ds-surface-material-overlay: var(--ds-surface-overlay);
+  }
+}
+@media (forced-colors: active) {
+  :root,
+  [data-color-mode] {
+    --ds-surface-material-media: Canvas;
+    --ds-surface-material-control: Canvas;
+    --ds-surface-material-overlay: Canvas;
+    --ds-border-material: CanvasText;
+  }
 }

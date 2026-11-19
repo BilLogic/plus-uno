@@ -1776,6 +1776,10 @@
       "color/chart/brown/bolder/hovered": "var(--chart-brown-bolder-hovered)",
       "color/chart/brown/boldest/default": "var(--chart-brown-boldest)",
       "color/chart/brown/boldest/hovered": "var(--chart-brown-boldest-hovered)",
+      "elevation/surface/material/media": "var(--ds-surface-material-media)",
+      "elevation/surface/material/control": "var(--ds-surface-material-control)",
+      "elevation/surface/material/overlay": "var(--ds-surface-material-overlay)",
+      "color/border/material": "var(--ds-border-material)",
       "color/interaction/dragged": "var(--ds-interaction-dragged)",
       "color/interaction/inverse/hovered": "var(--ds-interaction-inverse-hovered)",
       "color/interaction/inverse/pressed": "var(--ds-interaction-inverse-pressed)",
@@ -1866,11 +1870,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1221,
+    "scssTokenCount": 1232,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1767,
-      "resolved": 1730,
+      "total": 1771,
+      "resolved": 1734,
       "percent": 98,
       "skippedCollections": [
         {

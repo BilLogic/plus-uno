@@ -36,20 +36,21 @@ const MODE_SELECTORS = [
     '@media (prefers-color-scheme: dark)', '[data-color-mode="auto"][data-contrast-mode="more"]',
     '@media (prefers-color-scheme: dark) and (prefers-contrast: more)', '[data-color-mode="auto"][data-contrast-mode="auto"]',
 ];
+const MATERIAL_SELECTORS = ['@media (prefers-reduced-transparency: reduce)', '[data-color-mode]', '@media (forced-colors: active)', '[data-color-mode]'];
 
 test('_semantic.scss selector structure: light, dark, auto dark, and all 8 increased-contrast combinations', () => {
   const sem = files['_semantic.scss'];
-  assert.deepEqual(selectors(sem), MODE_SELECTORS);
+  assert.deepEqual(selectors(sem), [...MODE_SELECTORS, ...MATERIAL_SELECTORS]);
   assert.match(sem, /^:root,\n\[data-color-mode="light"\] \{$/m);
   assert.equal((sem.match(/color-scheme: dark;/g) ?? []).length, 2);
 });
 
-test('light and dark carry all 552 tokens; increased contrast only the rows it changes', () => {
+test('light and dark carry all 556 tokens; increased contrast only the rows it changes', () => {
   const sem = files['_semantic.scss'];
   const blocks = sem.split(/\n(?=\S)/).map((b) => (b.match(/--[\w-]+:/g) ?? []).length).filter(Boolean);
-  assert.deepEqual(blocks.slice(0, 3), [552, 552, 552]);
-  assert.equal(blocks[3], 326); // light IC overrides
-  assert.equal(blocks.at(-1), 297); // dark IC overrides
+  assert.deepEqual(blocks.slice(0, 3), [556, 556, 556]);
+  assert.equal(blocks[3], 330); // light IC overrides
+  assert.equal(blocks.at(-3), 301); // dark IC overrides, before the material fallbacks
   assert.doesNotMatch(sem, /var\(--[^)]*,/); // no fallbacks
 });
 

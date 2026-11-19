@@ -73,6 +73,21 @@ function contrastBlocks(lines, scheme) {
 }
 
 /**
+ * The floating material's solid fallbacks. Reduced transparency swaps each translucent surface
+ * for the solid overlay surface; forced colors swap them for the system canvas and keep the
+ * border as a system-colored line. Increased contrast is already a row override.
+ */
+function materialFallbacks(rows) {
+  const surfaces = rows.filter((r) => /^elevation[.]surface[.]material[.]/.test(r.name)).map((r) => dsName(r.name));
+  const border = rows.filter((r) => r.name === 'color.border.material').map((r) => dsName(r.name));
+  if (!surfaces.length) return '';
+  const solid = surfaces.map((n) => `${n}: var(--ds-surface-overlay);`);
+  const forced = [...surfaces.map((n) => `${n}: Canvas;`), ...border.map((n) => `${n}: CanvasText;`)];
+  const inMedia = (query, lines) => `@media ${query} {\n${block(':root,\n[data-color-mode]', lines).replace(/^/gm, '  ').replace(/^ {2}$/gm, '')}}\n`;
+  return `\n${inMedia('(prefers-reduced-transparency: reduce)', solid)}${inMedia('(forced-colors: active)', forced)}`;
+}
+
+/**
  * @param {{rows: object[], shadows: object[], opacity: object[], palette: object}} semantics
  * @param {string} header  first line of every file, ending in "\n"
  * @returns {Record<string, string>} file name -> contents
@@ -95,7 +110,8 @@ export function emitScss({ rows, shadows, opacity, palette }, header) {
     `${header}${block(LIGHT, rows.map(decl('light')))}\n${block(DARK, ['color-scheme: dark;', ...dark])}` +
     `\n${autoDark(['color-scheme: dark;', ...dark], { indent: true })}` +
     contrastBlocks(lic, 'light') +
-    contrastBlocks(dic, 'dark');
+    contrastBlocks(dic, 'dark') +
+    materialFallbacks(rows);
 
   // Shadows and opacity follow the same switches as the semantic colors.
   const elevationLines = (k) => [

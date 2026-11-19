@@ -102,3 +102,8 @@ test('plan parity: identical mappings pass, one changed reference fails', () => 
   c.rows.pop();
   assert.equal(planParity({ A: fresh('A'), B: c }).length, 1);
 });
+
+test('material grounds: a clear overlay material fails body text over the worst page behind it', () => {
+  assert.ok(!failing(fresh()).includes('material grounds'));
+  assert.ok(failing(set(fresh(), 'elevation.surface.material.overlay', 'light', '#ffffff40')).includes('material grounds'));
+});
