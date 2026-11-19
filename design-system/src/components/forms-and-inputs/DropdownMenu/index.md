@@ -24,7 +24,7 @@ Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions
 
 Use `DropdownMenu` for a trigger that opens a menu of actions or navigation links (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`).
 
-`trigger` opens the menu and `children` supply its rows. Pass `isOpen` and `onOpenChange` for controlled mode, `placement` and `shouldFlip` for positioning (left uncontrolled, it opens and closes on its own), `spacing` for `default` (32 rows) or `compact` (24), `maxHeight` to cap height before scrolling, and `container` for the portal target. `loading` shows one "Loading options" row with a spinner; `hasError` shows "Couldn't load options" with a Retry row (`onRetry`). A menu never draws skeleton rows.
+`trigger` opens the menu and `children` supply its rows. Pass `isOpen` and `onOpenChange` for controlled mode, `placement` and `shouldFlip` for positioning (left uncontrolled, it opens and closes on its own), `spacing` for `default` (32 rows) or `compact` (24), `maxHeight` to cap height before scrolling, and `container` for the portal target. `isLoading` shows one "Loading options" row with a spinner; `hasError` shows "Couldn't load options" with a Retry row (`onRetry`). A menu never draws skeleton rows.
 
 ## Motion
 
@@ -162,7 +162,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 | `placement` | oneOf | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
 | `shouldFlip` | bool | `true` | Flips to the opposite side when there isn't room. |
 | `spacing` | enum | `'default'` | `default` draws 32px rows, `compact` draws 24px. |
-| `loading` | bool | `false` | Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. |
+| `isLoading` | bool | `false` | Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. |
 | `hasError` | bool | `false` | Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. |
 | `onRetry` | func | — | Called when Retry is pressed. The menu stays open. |
 | `minWidth` | string | — | Minimum width of the menu list, as a CSS length such as `240px`. |

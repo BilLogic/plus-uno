@@ -1,5 +1,5 @@
 {
-  "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one retirement list (scripts/lib/retirement.mjs answers retired(name) and allowed(file) from it): components, props, tokens, words, spellings and outside names each with what to use instead, plus the shared places old names may stay (a place may name the kinds it keeps) and the concepts a words, spellings or outside row may point at that are not components, such as Blanket. A component row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs). Retiring a name replaces every use in the same change; this list only stops it coming back (docs/engineering/coding.md § Retiring a name).",
+  "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one retirement list (scripts/lib/retirement.mjs answers retired(name) and allowed(file) from it): components, props, tokens, words, spellings and outside names each with what to use instead, plus the shared places old names may stay (a place may name the kinds it keeps) and the concepts a words, spellings or outside row may point at that are not components, such as Blanket. A component row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs). Retiring a name replaces every use in the same change; this list only stops it coming back (docs/engineering/coding.md \u00a7 Retiring a name).",
   "components": [
     {
       "not": "Alert",
@@ -318,6 +318,63 @@
       "use": [
         "CloseButton.appearance"
       ]
+    },
+    {
+      "not": "TagInput required / disabled / readOnly",
+      "use": [
+        "TagInput.isRequired",
+        "TagInput.isDisabled",
+        "TagInput.isReadOnly"
+      ]
+    },
+    {
+      "not": "RichTextEditor readOnly / disabled",
+      "use": [
+        "RichTextEditor.isReadOnly",
+        "RichTextEditor.isDisabled"
+      ]
+    },
+    {
+      "not": "InlineEditableTextfield required",
+      "use": [
+        "InlineEditableTextfield.isRequired"
+      ]
+    },
+    {
+      "not": "Select open",
+      "use": [
+        "Select.isOpen"
+      ]
+    },
+    {
+      "not": "PopupSelect open",
+      "use": [
+        "PopupSelect.isOpen"
+      ]
+    },
+    {
+      "not": "FilterMenu open",
+      "use": [
+        "FilterMenu.isOpen"
+      ]
+    },
+    {
+      "not": "DropdownMenu loading",
+      "use": [
+        "DropdownMenu.isLoading"
+      ]
+    },
+    {
+      "not": "Section loading",
+      "use": [
+        "Section.isLoading"
+      ]
+    },
+    {
+      "not": "Option disabled",
+      "use": [
+        "option isDisabled"
+      ]
     }
   ],
   "tokens": [
@@ -546,22 +603,22 @@
       "pattern": "\\bfoundations-(?:basics|motion|sound)-[a-z-]+"
     },
     {
-      "not": "Foundations › Basics",
+      "not": "Foundations \u203a Basics",
       "use": [
         "the Foundations groups"
       ],
-      "why": "Motion and Sound sit under Foundations › Expression; Basics is gone",
+      "why": "Motion and Sound sit under Foundations \u203a Expression; Basics is gone",
       "caseSensitive": true,
-      "pattern": "\\bFoundations(?: · |\\/)(?:Basics|Motion|Sound)\\b"
+      "pattern": "\\bFoundations(?: \u00b7 |\\/)(?:Basics|Motion|Sound)\\b"
     },
     {
-      "not": "Get started › Content design",
+      "not": "Get started \u203a Content design",
       "use": [
-        "Foundations › Brand › Content"
+        "Foundations \u203a Brand \u203a Content"
       ],
-      "why": "Content design became Foundations › Brand › Content (Voice and tone, Language, Messages)",
+      "why": "Content design became Foundations \u203a Brand \u203a Content (Voice and tone, Language, Messages)",
       "caseSensitive": true,
-      "pattern": "\\bGet started(?: › |\\/)Content design\\b"
+      "pattern": "\\bGet started(?: \u203a |\\/)Content design\\b"
     },
     {
       "not": "@/patterns",
@@ -721,12 +778,13 @@
     "classify its severity",
     "a direct fix leaves its commit",
     "the Foundations groups",
-    "Foundations › Brand › Content",
+    "Foundations \u203a Brand \u203a Content",
     "@/templates",
     "a --ds-* color token",
     "a --ds-* shadow or surface token",
     "a space, size, radius or template token",
-    "a text style"
+    "a text style",
+    "option isDisabled"
   ],
   "allowed": [
     {

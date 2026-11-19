@@ -85,7 +85,7 @@ describe('Section', () => {
     describe('loading', () => {
         it('swaps the header for skeleton bars and marks the section busy', () => {
             const { container } = render(
-                <Section title="Sessions" description="This week" loading>
+                <Section title="Sessions" description="This week" isLoading>
                     Body
                 </Section>,
             );
@@ -98,14 +98,14 @@ describe('Section', () => {
         });
 
         it('draws the skeleton before a title has arrived', () => {
-            const { container } = render(<Section loading>Body</Section>);
+            const { container } = render(<Section isLoading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
         });
 
         it('adds a bar for the rows under the title row', () => {
-            const { container, rerender } = render(<Section title="S" loading>Body</Section>);
+            const { container, rerender } = render(<Section title="S" isLoading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
-            rerender(<Section title="S" views={<div />} loading>Body</Section>);
+            rerender(<Section title="S" views={<div />} isLoading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(3);
         });
     });
@@ -395,7 +395,7 @@ describe('Section retired header props', () => {
     });
 
     it('draws the loading skeleton row for the three-row slots', () => {
-        const { container } = render(<Section title="S" views={<div />} loading>Body</Section>);
+        const { container } = render(<Section title="S" views={<div />} isLoading>Body</Section>);
         expect(container.querySelector('.plus-template-section-skeleton__row')).not.toBeNull();
     });
 });

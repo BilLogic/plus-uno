@@ -304,7 +304,7 @@ export const KeyLongLabel = {
 
 export const KeyLoading = {
     name: 'Key: Loading a list',
-    render: () => <Demo.PopupStage height={HEIGHT.load} side="end">{(mount) => <Demo.Menu mount={mount} loading />}</Demo.PopupStage>,
+    render: () => <Demo.PopupStage height={HEIGHT.load} side="end">{(mount) => <Demo.Menu mount={mount} isLoading />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
         await expect(within(layer).getByText('Loading options'), 'one row, no skeleton').toBeInTheDocument();
@@ -341,7 +341,7 @@ export const KeyFilterApplied = {
     name: 'Key: Filter applied',
     render: () => (
         <Demo.PopupStage height={96} side="end">
-            {(mount) => <Demo.FilterMenuLayer mount={mount} open={false} defaultValue={{ status: ['Upcoming'], subject: ['Math'] }} />}
+            {(mount) => <Demo.FilterMenuLayer mount={mount} isOpen={false} defaultValue={{ status: ['Upcoming'], subject: ['Math'] }} />}
         </Demo.PopupStage>
     ),
     play: async ({ canvas, canvasElement }) => {

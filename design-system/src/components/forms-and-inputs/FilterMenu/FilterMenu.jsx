@@ -55,7 +55,7 @@ const FilterMenu = ({
     placement = 'bottom-end',
     layout,
     width = '3-col',
-    open,
+    isOpen: isOpenProp,
     defaultOpen = false,
     onOpenChange,
     spacing = 'default',
@@ -70,7 +70,7 @@ const FilterMenu = ({
     // whoever opened it, so it is reset when `isOpen` turns true.
     const [draft, setDraft] = useState(applied);
     const { isOpen, setOpen } = useOpenState({
-        open,
+        isOpen: isOpenProp,
         defaultOpen,
         onOpenChange,
         onOpen: () => setDraft(applied),
@@ -135,7 +135,7 @@ const FilterMenu = ({
                 {categories.map((category) => (
                     <Fieldset key={category.id} legend={category.label} className="plus-filter-menu__category">
                         {(category.options ?? []).map((option) => {
-                            const { value: optionValue, label: optionLabel, disabled: isDisabled } = normalizeOption(option);
+                            const { value: optionValue, label: optionLabel, isDisabled } = normalizeOption(option);
                             return (
                                 <Checkbox
                                     key={optionValue}
@@ -162,7 +162,7 @@ const FilterMenu = ({
 FilterMenu.propTypes = {
     /** Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. */
     container: PropTypes.object,
-    /** The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. */
+    /** The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, isDisabled }`. Each category is a list of checkboxes; pick as many as apply. */
     categories: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
         label: PropTypes.node.isRequired,
@@ -172,7 +172,7 @@ FilterMenu.propTypes = {
             PropTypes.shape({
                 value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
                 label: PropTypes.node,
-                disabled: PropTypes.bool,
+                isDisabled: PropTypes.bool,
             }),
         ])).isRequired,
     })).isRequired,
@@ -193,8 +193,8 @@ FilterMenu.propTypes = {
     /** The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`. */
     width: PropTypes.oneOf(FILTER_MENU_WIDTHS),
     /** Whether the menu is open. Leave it out to let the trigger open and close it. */
-    open: PropTypes.bool,
-    /** Opens the menu on first render, when `open` is left out. */
+    isOpen: PropTypes.bool,
+    /** Opens the menu on first render, when `isOpen` is left out. */
     defaultOpen: PropTypes.bool,
     /** `(open)`. */
     onOpenChange: PropTypes.func,

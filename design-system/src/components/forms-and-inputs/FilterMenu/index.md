@@ -117,7 +117,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
-| `categories` | arrayOf (required) | `[]` | The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. |
+| `categories` | arrayOf (required) | `[]` | The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, isDisabled }`. Each category is a list of checkboxes; pick as many as apply. |
 | `value` | objectOf | — | The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own. |
 | `defaultValue` | objectOf | — | The values applied at first, when `value` is left out. |
 | `onApply` | func | — | `(value)`, called on Apply with every category, an empty list for a category with nothing picked. Nothing is called while boxes are ticked. |
@@ -126,8 +126,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placement` | enum | `'bottom-end'` | `bottom-end` (default) for a trigger at the end of a bar, `bottom-start` for one at its start. |
 | `layout` | enum | — | Leave it out to follow the count: two or three categories side by side, four or more stacked. Set `stacked` for a few categories with long lists. |
 | `width` | enum | `'3-col'` | The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`. |
-| `open` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
-| `defaultOpen` | bool | `false` | Opens the menu on first render, when `open` is left out. |
+| `isOpen` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
+| `defaultOpen` | bool | `false` | Opens the menu on first render, when `isOpen` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
 | `spacing` | enum | `'default'` | The Filter icon button's spacing: `default` draws 32, `compact` 24. |
 | `className` | string | `''` | Extra classes on the popup. |

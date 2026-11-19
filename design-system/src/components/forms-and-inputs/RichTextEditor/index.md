@@ -40,7 +40,7 @@ Don't: Long-form writing limited to the compact toolbar.
 
 ### Use read-only for content people read. {#use-read-only-for-content-people-read}
 
-Set `readOnly` on content people need to read: it stays in the tab order at full contrast, so it can be selected and copied. Keep `disabled` for an editor that is unavailable; it steps down and leaves the tab order.
+Set `isReadOnly` on content people need to read: it stays in the tab order at full contrast, so it can be selected and copied. Keep `isDisabled` for an editor that is unavailable; it steps down and leaves the tab order.
 
 ### Use the placeholder for a hint. {#use-the-placeholder-for-a-hint}
 
@@ -141,8 +141,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `value` | string | — | — |
 | `defaultValue` | string | `''` | — |
 | `spacing` | enum | `'default'` | `default` or `compact`. |
-| `readOnly` | bool | `false` | Shows the content without letting the user edit it, and disables the toolbar. |
-| `disabled` | bool | `false` | Prevents interaction, disables the toolbar and dims the editor. |
+| `isReadOnly` | bool | `false` | Shows the content without letting the user edit it, and disables the toolbar. |
+| `isDisabled` | bool | `false` | Prevents interaction, disables the toolbar and dims the editor. |
 | `minHeight` | number | — | Minimum height of the editing area, in pixels. |
 | `toolbarButtons` | arrayOf | — | — |
 | `toolbarPreset` | enum | `'compact'` | `compact` (default) is the short toolbar for messages; `full` is the extended set of formatting controls. Passing `toolbarButtons` uses the full toolbar with those buttons. |

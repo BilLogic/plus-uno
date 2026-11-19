@@ -400,7 +400,7 @@ export const TemporaryIdUntilConfirmed = {
 /** Read-only: the tags show on the read-only fill, with no × and no list. */
 export const ReadOnly = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} readOnly />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} isReadOnly />
     </div>
 );
 
@@ -425,7 +425,7 @@ export const Invalid = () => (
         <TagInput
             label="Topics"
             options={TOPICS}
-            required
+            isRequired
             isInvalid
             errorMessage="Pick at least one topic"
         />
@@ -458,7 +458,7 @@ Invalid.play = async ({ canvasElement }) => {
 /** Disabled: every tag is disabled, with no × and no entry. */
 export const Disabled = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} disabled />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} isDisabled />
     </div>
 );
 
@@ -779,20 +779,20 @@ export const Interactive = {
     args: {
         label: 'Topics',
         caption: '',
-        required: false,
+        isRequired: false,
         spacing: 'default',
-        disabled: false,
-        readOnly: false,
+        isDisabled: false,
+        isReadOnly: false,
         isInvalid: false,
         errorMessage: 'Pick at least one topic',
     },
     argTypes: {
         label: { control: 'text', table: { category: 'Content' } },
         caption: { control: 'text', table: { category: 'Content' } },
-        required: { control: 'boolean', table: { category: 'Content' } },
+        isRequired: { control: 'boolean', table: { category: 'Content' } },
         spacing: { control: 'radio', options: ['default', 'compact'], table: { category: 'Design' } },
-        disabled: { control: 'boolean', table: { category: 'Behavior' } },
-        readOnly: { control: 'boolean', table: { category: 'Behavior' } },
+        isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
+        isReadOnly: { control: 'boolean', table: { category: 'Behavior' } },
         isInvalid: { control: 'boolean', table: { category: 'Behavior' } },
         errorMessage: { control: 'text', table: { category: 'Content' } },
         onCreateSpy: { table: { disable: true } },
@@ -820,6 +820,6 @@ export const Focused = {
 };
 
 export const FieldDisabled = {
-    render: () => <div style={wrap}><TagInput id="taginput-ex-disabled" label="Topics" options={TOPICS} disabled /></div>,
+    render: () => <div style={wrap}><TagInput id="taginput-ex-disabled" label="Topics" options={TOPICS} isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };

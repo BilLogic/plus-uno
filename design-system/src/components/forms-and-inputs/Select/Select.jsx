@@ -55,7 +55,7 @@ const Select = ({
     isCreatable = false,
     onCreate,
     createOption,
-    open,
+    isOpen: isOpenProp,
     defaultOpen = false,
     onOpenChange,
     defaultSearchTerm = '',
@@ -114,7 +114,7 @@ const Select = ({
 
     // Closing, whoever closed it: the typed text goes, and staged picks land.
     const { isOpen, openList, closeList } = useOpenState({
-        open,
+        isOpen: isOpenProp,
         defaultOpen,
         onOpenChange,
         enabled: live,
@@ -534,7 +534,7 @@ Select.propTypes = {
         label: PropTypes.node,
         text: PropTypes.string,
         description: PropTypes.node,
-        disabled: PropTypes.bool,
+        isDisabled: PropTypes.bool,
         group: PropTypes.string,
     })),
     /** The picked id, or ids with `isMulti`. Pass it to control the field. */
@@ -554,10 +554,10 @@ Select.propTypes = {
     /**
      * Holds the list open or shut. Controlled: Escape, a press outside and a
      * pick ask through `onOpenChange`, and the list stays as it is until the
-     * parent changes `open`.
+     * parent changes `isOpen`.
      */
-    open: PropTypes.bool,
-    /** Whether the list starts open, when `open` is not controlling it. */
+    isOpen: PropTypes.bool,
+    /** Whether the list starts open, when `isOpen` is not controlling it. */
     defaultOpen: PropTypes.bool,
     /** `(open)`: the list asks to open or close. */
     onOpenChange: PropTypes.func,

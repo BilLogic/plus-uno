@@ -83,7 +83,7 @@ export default {
             options: ['single', 'split', 'subsections'],
             table: { category: 'Design' },
         },
-        loading: { control: 'boolean', table: { category: 'State' } },
+        isLoading: { control: 'boolean', table: { category: 'State' } },
         spacing: {
             control: 'select',
             options: ['default', 'compact', 'spacious'],
@@ -378,7 +378,7 @@ export const SearchInHeader = {
 export const LoadingDefault = {
     name: 'Loading',
     render: () => (
-        <Section title="Section title" description={description} loading>
+        <Section title="Section title" description={description} isLoading>
             {slotContent('Content slot')}
         </Section>
     ),
@@ -392,7 +392,7 @@ export const LoadingSearchAndFilters = {
             description={description}
             search={<HeaderSearch />}
             filters={[{ key: 'status', label: 'Status', text: 'All' }]}
-            loading
+            isLoading
         >
             {slotContent('Table')}
         </Section>
@@ -402,7 +402,7 @@ export const LoadingSearchAndFilters = {
 export const LoadingViews = {
     name: 'Loading, views',
     render: () => (
-        <Section title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} loading>
+        <Section title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} isLoading>
             {slotContent('Content slot')}
         </Section>
     ),
@@ -414,7 +414,7 @@ export const Interactive = {
         description,
         type: 'default',
         layout: 'single',
-        loading: false,
+        isLoading: false,
     },
     render: (args) => {
         const bottom = args.type === 'custom' ? { header: slotContent('Custom header') } : {};
@@ -425,7 +425,7 @@ export const Interactive = {
                 actions={<Actions />}
                 type={args.type}
                 layout={args.layout}
-                loading={args.loading}
+                isLoading={args.isLoading}
                 side={args.layout === 'split' ? slotContent('Side') : undefined}
                 {...bottom}
             >

@@ -88,6 +88,10 @@ A component names a before or after slot by what the slot accepts, so the right 
 
 `leadingVisual`, `trailingVisual` and a bare `leading` slot are retired; `npm run check:slot-names` fails on them.
 
+## Prop names
+
+A boolean state prop is `is…` (`isDisabled`, `isReadOnly`, `isRequired`, `isLoading`, `isSelected`, `isOpen`), and a component's look or kind is `appearance` or `type`; `variant` and `tone` are retired. `npm run check:prop-names` reads the generated component facts and fails on a bare name; the rules and the names still waiting to move are in `scripts/lib/prop-names.mjs`.
+
 ## Token usage
 
 Token legality, literal bans, motion rules and placement checks are enforced by `npm run check:ds-usage` (`npm run ds -- check`) — see `docs/engineering/ds-usage-rules.md` for the rule list and `design-system/guidelines/foundations/overview.md` § Token rules for tier selection (`design-system/agent-views/tokens/tokens.md` lists token names). Breakpoints switch modes at `@media (min-width: 1024px)` and `@media (min-width: 1440px)`.

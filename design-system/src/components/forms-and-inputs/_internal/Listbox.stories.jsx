@@ -179,7 +179,7 @@ export const DisabledRowsAreSkipped = () => {
         <div style={stack}>
             <Listbox
                 aria-label="Slot"
-                options={[{ value: 'am', label: 'Morning' }, { value: 'noon', label: 'Midday', disabled: true }, { value: 'pm', label: 'Afternoon' }]}
+                options={[{ value: 'am', label: 'Morning' }, { value: 'noon', label: 'Midday', isDisabled: true }, { value: 'pm', label: 'Afternoon' }]}
                 value={value}
                 onChange={setValue}
             />

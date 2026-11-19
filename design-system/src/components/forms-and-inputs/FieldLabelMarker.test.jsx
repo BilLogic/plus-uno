@@ -80,7 +80,7 @@ describe('Form label minority markers', () => {
                 <Select id="sel" label="Site" options={[{ value: 'a', label: 'Site A' }]} isRequired />
                 <Cascader id="cas" label="Location" options={[{ value: 'pgh', label: 'Pittsburgh' }]} isRequired />
                 <TreeSelect id="tree" label="Topic" options={[{ value: 'alg', label: 'Algebra' }]} isRequired />
-                <TagInput id="tags" label="Tags" options={['Math']} required />
+                <TagInput id="tags" label="Tags" options={['Math']} isRequired />
                 <Checkbox id="cb" label="Agree" isRequired />
                 <CheckboxGroup legend="Subjects" options={['Math', 'Reading']} isRequired />
                 <Radio id="rad" name="rad" value="1" label="Weekly" isRequired />
