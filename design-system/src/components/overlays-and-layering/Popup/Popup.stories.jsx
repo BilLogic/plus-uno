@@ -59,7 +59,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--stack-xl) * 4)', padding: 'var(--popup-clip-reach)', alignItems: 'center' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--stack-xl) * 4)', padding: 'var(--popup-clip-reach)', alignItems: 'center' }; /* 64px fixed demo gap */
 
 function PopupLayoutDemos() {
     return (

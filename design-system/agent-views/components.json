@@ -1923,10 +1923,10 @@
         "--ds-surface-raised",
         "--ds-text",
         "--ds-text-subtle",
+        "--inline-2xl",
         "--inline-lg",
         "--inline-md",
         "--page-stack-md",
-        "--section-stack-lg",
         "--section-stack-md",
         "--stack-sm"
       ]
@@ -5246,9 +5246,9 @@
         "--page-stack-sm",
         "--screen-pad-x",
         "--section-min-width-main",
-        "--section-stack-md",
         "--section-stack-sm",
         "--stack-sm",
+        "--stack-xl",
         "--type-size-150",
         "--type-size-200"
       ]

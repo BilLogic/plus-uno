@@ -85,7 +85,7 @@ function TooltipVariantsDemos() {
 }
 
 export const Placements = () => (
-    <div style={{ marginBottom: 'calc(var(--stack-xl) * 4)' }}>
+    <div style={{ marginBottom: 'calc(var(--stack-xl) * 4)' /* 64px fixed demo clearance */ }}>
         <TooltipVariantsDemos />
     </div>
 );
