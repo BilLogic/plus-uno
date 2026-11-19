@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
-import { Button, FooterActions } from '@/components';
+import { Button, FooterActions, LinkButton } from '@/components';
 import {
     PanelBody,
     PanelCloseAction,
@@ -109,12 +109,35 @@ export const ThreeButtons = {
     },
 };
 
-/** Subtle text button on the left: hugs the left content edge while filled actions take tracks 3 and 4. */
-export const TextButtonLeft = {
+/** "Not now" is a secondary button: `default`, in the left half beside the primary. */
+export const DeclineInLeftHalf = {
     render: () => (
         <div style={stageStyle}>
             <FooterActions>
-                <Button text="Skip" appearance="subtle" />
+                <Button text="Not now" />
+                <Button text="Turn on reminders" appearance="primary" />
+            </FooterActions>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const notNow = within(footer).getByRole('button', { name: 'Not now' });
+        const turnOn = within(footer).getByRole('button', { name: 'Turn on reminders' });
+        await expect(notNow, 'declining is a default secondary, not subtle').toHaveClass('plus-btn--default');
+        await expect(notNow, 'secondary fills its track').toHaveClass('plus-btn--fit-container');
+        await expect(rect(notNow).left, 'secondary starts at track 1').toBeCloseTo(tracks.track(1).left, 0);
+        await expect(rect(notNow).right, 'secondary ends at track 2').toBeCloseTo(tracks.track(2).right, 0);
+        await expect(rect(turnOn).left, 'primary starts at track 3').toBeCloseTo(tracks.track(3).left, 0);
+    },
+};
+
+/** A link that leaves the task hugs the left content edge while filled actions take tracks 3 and 4. */
+export const LinkLeft = {
+    render: () => (
+        <div style={stageStyle}>
+            <FooterActions>
+                <LinkButton text="View guidelines" href="#guidelines" />
                 <Button text="Save draft" />
                 <Button text="Schedule" appearance="primary" />
             </FooterActions>
@@ -123,11 +146,11 @@ export const TextButtonLeft = {
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const skip = within(footer).getByRole('button', { name: 'Skip' });
+        const guidelines = within(footer).getByRole('link', { name: 'View guidelines' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
         const schedule = within(footer).getByRole('button', { name: 'Schedule' });
-        await expect(rect(skip).left, 'hugs left content edge').toBeCloseTo(tracks.box.left, 0);
-        await expect(rect(skip).width, 'hugs label instead of filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
+        await expect(rect(guidelines).left, 'hugs left content edge').toBeCloseTo(tracks.box.left, 0);
+        await expect(rect(guidelines).width, 'hugs label instead of filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
         await expect(rect(draft).left, 'secondary in track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(draft).right, 'secondary in track 3').toBeCloseTo(tracks.track(3).right, 0);
         await expect(rect(schedule).left, 'primary in track 4').toBeCloseTo(tracks.track(4).left, 0);
@@ -135,8 +158,8 @@ export const TextButtonLeft = {
     },
 };
 
-/** Danger text-left "Delete session" button: hugs the left edge in danger text ink while filled buttons sit in tracks 3 and 4. */
-export const DangerTextButtonLeft = {
+/** A `danger` "Delete session" action hugs the left edge in danger text ink while filled buttons sit in tracks 3 and 4. */
+export const DangerLeft = {
     render: () => (
         <div style={stageStyle}>
             <FooterActions leadingAction={<Button text="Delete session" appearance="danger" />}>
@@ -162,12 +185,12 @@ export const DangerTextButtonLeft = {
     },
 };
 
-/** Edge case: a leading text button plus 3 filled buttons places the leading button in track 1 and the 3 filled buttons in tracks 2, 3 and 4. */
-export const TextLeftWithThreeFilled = {
+/** Edge case: a leading action plus 3 filled buttons places the leading action in track 1 and the 3 filled buttons in tracks 2, 3 and 4. */
+export const LeadingWithThreeFilled = {
     render: () => (
         <div style={stageStyle}>
             <FooterActions>
-                <Button text="Skip" appearance="subtle" />
+                <Button text="Delete draft" appearance="danger" />
                 <Button text="Discard" />
                 <Button text="Save draft" />
                 <Button text="Schedule" appearance="primary" />
@@ -177,12 +200,12 @@ export const TextLeftWithThreeFilled = {
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const skip = within(footer).getByRole('button', { name: 'Skip' });
+        const leading = within(footer).getByRole('button', { name: 'Delete draft' });
         const discard = within(footer).getByRole('button', { name: 'Discard' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
         const schedule = within(footer).getByRole('button', { name: 'Schedule' });
-        await expect(rect(skip).left, 'leading button starts at track 1 left').toBeCloseTo(tracks.track(1).left, 0);
-        await expect(rect(skip).right, 'leading button stays within track 1').toBeLessThanOrEqual(tracks.track(1).right);
+        await expect(rect(leading).left, 'leading action starts at track 1 left').toBeCloseTo(tracks.track(1).left, 0);
+        await expect(rect(leading).right, 'leading action stays within track 1').toBeLessThanOrEqual(tracks.track(1).right);
         await expect(rect(discard).left, 'first filled button in track 2').toBeCloseTo(tracks.track(2).left, 0);
         await expect(rect(discard).right, 'first filled button in track 2').toBeCloseTo(tracks.track(2).right, 0);
         await expect(rect(draft).left, 'second filled button in track 3').toBeCloseTo(tracks.track(3).left, 0);

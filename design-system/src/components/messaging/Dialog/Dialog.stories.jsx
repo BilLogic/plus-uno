@@ -447,7 +447,7 @@ export const FooterLayouts = {
                 body="Update the lesson goals before sharing with the family."
                 footer={(
                     <FooterActions>
-                        <Button appearance="subtle" text="Skip for now" />
+                        <Button appearance="danger" text="Delete plan" />
                         <Button text="Save draft" />
                         <Button appearance="primary" text="Publish plan" />
                     </FooterActions>
@@ -487,9 +487,9 @@ export const FooterLayouts = {
         const leadingDialog = canvas.getByTestId('dialog-footer-leading');
         const leadingFooter = leadingDialog.querySelector('.plus-footer-actions');
         const leadingTracks = footerTracks(leadingFooter);
-        const skip = within(leadingDialog).getByRole('button', { name: 'Skip for now' });
+        const skip = within(leadingDialog).getByRole('button', { name: 'Delete plan' });
         const draft = within(leadingDialog).getByRole('button', { name: 'Save draft' });
-        await expect(close(skip.getBoundingClientRect().left, leadingTracks.box.left), 'leading subtle button hugs left edge').toBe(true);
+        await expect(close(skip.getBoundingClientRect().left, leadingTracks.box.left), 'leading danger action hugs left edge').toBe(true);
         await expect(close(draft.getBoundingClientRect().left, leadingTracks.track(3).left), 'filled buttons sit in tracks 3 and 4').toBe(true);
 
         const destructiveDialog = canvas.getByTestId('dialog-footer-destructive');

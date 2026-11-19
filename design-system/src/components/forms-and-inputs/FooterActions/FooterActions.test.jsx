@@ -66,16 +66,16 @@ describe('FooterActions non-layout behavior', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('plus-btn--fit-container');
     });
 
-    it('renders all 4 buttons when a leading text button pairs with 3 filled buttons', () => {
+    it('renders all 4 buttons when a leading action pairs with 3 filled buttons', () => {
         render(
             <FooterActions>
-                <Button text="Skip" appearance="subtle" />
+                <Button text="Delete draft" appearance="danger" />
                 <Button text="Discard" />
                 <Button text="Save draft" />
                 <Button text="Schedule" appearance="primary" />
             </FooterActions>
         );
-        expect(screen.getByRole('button', { name: 'Skip' })).not.toHaveClass('plus-btn--fit-container');
+        expect(screen.getByRole('button', { name: 'Delete draft' })).not.toHaveClass('plus-btn--fit-container');
         expect(screen.getByRole('button', { name: 'Discard' })).toHaveClass('plus-btn--fit-container');
         expect(screen.getByRole('button', { name: 'Save draft' })).toHaveClass('plus-btn--fit-container');
         expect(screen.getByRole('button', { name: 'Schedule' })).toHaveClass('plus-btn--fit-container');

@@ -676,10 +676,17 @@ export const FooterLayouts = {
                 </FooterActions>
             </div>
             <div style={footerCardStyle}>
-                <p style={footerCaptionStyle}>Leading text action — hugs left edge; filled buttons take tracks 3 and 4</p>
+                <p style={footerCaptionStyle}>Declining action — "Not now" is a default secondary in the left half</p>
+                <FooterActions data-testid="footer-decline">
+                    <Button text="Not now" />
+                    <Button appearance="primary" text="Turn on reminders" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Leading action — a danger side action hugs the left edge; the two outcomes take tracks 3 and 4</p>
                 <FooterActions data-testid="footer-leading">
-                    <Button appearance="subtle" text="Not now" />
-                    <Button text="Keep draft" />
+                    <Button appearance="danger" text="Delete" />
+                    <Button text="Save draft" />
                     <Button appearance="primary" text="Publish" />
                 </FooterActions>
             </div>
@@ -730,10 +737,17 @@ export const FooterLayouts = {
 
         const leading = canvas.getByTestId('footer-leading');
         const leadingTracks = footerTracks(leading);
-        const notNow = within(leading).getByRole('button', { name: 'Not now' });
-        const keepDraft = within(leading).getByRole('button', { name: 'Keep draft' });
-        await expect(notNow).not.toHaveClass('plus-btn--fit-container');
-        await expect(close(notNow.getBoundingClientRect().left, leadingTracks.box.left), 'subtle action hugs left edge').toBe(true);
-        await expect(close(keepDraft.getBoundingClientRect().left, leadingTracks.track(3).left), 'filled pair starts at track 3').toBe(true);
+        const del = within(leading).getByRole('button', { name: 'Delete' });
+        const saveDraft = within(leading).getByRole('button', { name: 'Save draft' });
+        await expect(del).not.toHaveClass('plus-btn--fit-container');
+        await expect(close(del.getBoundingClientRect().left, leadingTracks.box.left), 'danger action hugs left edge').toBe(true);
+        await expect(close(saveDraft.getBoundingClientRect().left, leadingTracks.track(3).left), 'filled pair starts at track 3').toBe(true);
+
+        const decline = canvas.getByTestId('footer-decline');
+        const declineTracks = footerTracks(decline);
+        const notNow = within(decline).getByRole('button', { name: 'Not now' });
+        await expect(notNow, 'declining is a default secondary, not subtle').toHaveClass('plus-btn--default');
+        await expect(notNow).toHaveClass('plus-btn--fit-container');
+        await expect(close(notNow.getBoundingClientRect().left, declineTracks.span(1, 2).left), 'secondary starts at track 1').toBe(true);
     },
 };

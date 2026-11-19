@@ -30,7 +30,7 @@ const trackListFor = (count, { hasLeading }) => {
  *
  * Divides the footer into 4 equal tracks separated by `--inline-md`. Every
  * filled action button is cloned at `spacing="spacious"` (48) with
- * `shouldFitContainer`. A leading text or link action hugs the left edge
+ * `shouldFitContainer`. A leading `danger` or link action hugs the left edge
  * without taking a filled track, and containers up to 400 wide split a single
  * action across the full width via `@container (max-width: 400px)`.
  */

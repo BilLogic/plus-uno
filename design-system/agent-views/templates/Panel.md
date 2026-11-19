@@ -192,7 +192,7 @@ Picking the same row again closes it; Up and Down step through the rows.
 
 **Checked:** Review
 
-Discard (Default) and Save (Primary), full bleed; Close in the header dismisses, so no Cancel. Reading needs no footer.
+Discard (Default) and Save (Primary), full bleed; Close in the header dismisses, so no Cancel. A declining action such as "Keep editing" is Default, in the left half. Reading needs no footer.
 
 Do: Reading: a header and a body, nothing to save.
 Don't: A footer of buttons on a Panel that is only read.

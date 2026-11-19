@@ -43,6 +43,8 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | --- | --- | --- | --- |
 | The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
+| Decline or postpone: "Not now", "Skip", "Keep editing", "Save for later" | Default | Left half of a two-action footer, beside the Primary | "Not now" |
+| A side action that is not one of the footer's two outcomes | Danger, or a link | The leading slot, at the left edge | "Delete"; "View guidelines" |
 | Leave a page form or popup without saving | Subtle | After Primary on a page form; left of Primary in a popup | "Cancel"; a link is allowed |
 | Dismiss a Modal, Panel or Flag | Icon button | End of the header | Named "Close" |
 | Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
@@ -154,7 +156,7 @@ Close ends a layer and lives in its header, or by Save and exit in a multi-step 
 
 **Checked:** Automatic
 
-Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a full-bleed Modal or Panel footer every cell is a button, so the secondary action takes the Default fill to read as one.
+Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a full-bleed Modal or Panel footer every cell is a button, so the secondary action takes the Default fill to read as one. "Not now" is that secondary action, never Subtle and never in the leading slot.
 
 ### Say Reset in a menu and Reset filters everywhere else. {#say-reset-in-a-menu-and-reset-filters-everywhere-else}
 
