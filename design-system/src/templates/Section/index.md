@@ -178,6 +178,7 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 | --- | --- |
 | `title` · `description` · `actions` | The title row. |
 | `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
+| `tabs` · `toolbar` | Deprecated. Use `views` and `format` for the tab row, and `search` and `filters` for the toolbar row. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |

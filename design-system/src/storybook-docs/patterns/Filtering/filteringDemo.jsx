@@ -65,35 +65,6 @@ const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 /** A filter side's values, one flat list; the side counts each category. */
 const flat = (value) => Object.values(value).flat();
 
-/**
- * Tier 1: a "Field: value" trigger per category in the Section's third row,
- * each opening its own list from the trigger's end edge, applied as you pick.
- * The list is a Popup select, one value at a time; several at once is Planned
- * on it. The Section draws the trigger and hands it to the menu.
- */
-export const quickFilters = (categories, value, onPick, { mount, menuProps = () => ({}), placement = 'bottom-end' } = {}) => categories.map((category) => {
-    const picked = (value[category.id] ?? [])[0];
-    return {
-        key: category.id,
-        label: category.label,
-        text: picked ?? 'All',
-        isSelected: Boolean(picked),
-        menu: (trigger) => (
-            <PopupSelect
-                label={category.label}
-                options={category.options}
-                value={picked ?? null}
-                onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
-                isSearchable={false}
-                placement={placement}
-                {...menuProps(category.id)}
-                container={mount ?? undefined}
-                trigger={trigger}
-            />
-        ),
-    };
-});
-
 /** The Filter trigger of a tier 2 menu: one button in the third row, its count the values applied. */
 export const filterTrigger = (count, menu) => [{
     key: 'filters',
@@ -184,10 +155,10 @@ export const FilteredStudents = ({
         : {});
 
     // The Section draws row 3 itself: every tier hands it triggers, and a folded or side-less width opens the side. A menu a trigger opens is the trigger's `menu`.
-    const opensSide = (entries) => entries.map((entry) => ({ ...entry, onClick: () => setShowSide(true) }));
+    const opensSide = (entries) => entries.map(({ menu, ...entry }) => ({ ...entry, onClick: () => setShowSide(true) }));
     let filters;
     if (tier === '1') {
-        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : quickFilters(cats, value, pick, { mount, menuProps });
+        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : categoryFilters(cats, value, pick, { mount, menuProps });
     } else if (tier === '2a') {
         filters = oneListFilters({ category: cats[0], value, onPick: pick, menuProps: menuProps('filters'), mount });
     } else if (tier === '2b' || tier === '2c') {

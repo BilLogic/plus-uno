@@ -40,7 +40,7 @@ describe('DoDontPair and DoDontCard', () => {
             expect(well.classList.contains('sb-ds-dodont-card__well')).toBe(true);
             expect(well.style.backgroundColor).toBe('var(--ds-surface-sunken)');
             expect(well.style.borderRadius).toBe('var(--radius-lg)');
-            expect(well.style.minHeight).toBe('calc(var(--height-500) * 2)');
+            expect(well.style.minHeight).toBe('calc(var(--field-min-height-sm) * 2)');
             expect(caption.tagName).toBe('FIGCAPTION');
             expect(caption.classList.contains('sb-ds-dodont-caption')).toBe(true);
         }
