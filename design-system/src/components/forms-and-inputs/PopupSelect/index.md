@@ -121,7 +121,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
-| `options` | arrayOf | `[]` | Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. |
+| `options` | arrayOf | `[]` | Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes. |
 | `value` | string or number | — | The picked option's `value`. Leave it out to let the menu keep its own. |
 | `defaultValue` | string or number | — | The value it starts with, when `value` is left out. |
 | `onChange` | func | — | `(value, option)`, called the moment a row is picked. |

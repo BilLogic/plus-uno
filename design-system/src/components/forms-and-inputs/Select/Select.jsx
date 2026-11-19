@@ -534,7 +534,7 @@ Select.propTypes = {
         label: PropTypes.node,
         text: PropTypes.string,
         description: PropTypes.node,
-        disabled: PropTypes.bool,
+        isDisabled: PropTypes.bool,
         group: PropTypes.string,
     })),
     /** The picked id, or ids with `isMulti`. Pass it to control the field. */

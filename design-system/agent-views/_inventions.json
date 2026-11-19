@@ -309,6 +309,20 @@
         "PopupSelect.isOpen",
         "FilterMenu.isOpen"
       ]
+    },
+    {
+      "not": "DropdownMenu / Section loading",
+      "use": [
+        "DropdownMenu.isLoading",
+        "Section.isLoading"
+      ]
+    },
+    {
+      "not": "Select / PopupSelect / FilterMenu option disabled",
+      "use": [
+        "Select.isDisabled"
+      ],
+      "why": "on an option object too"
     }
   ],
   "tokens": [

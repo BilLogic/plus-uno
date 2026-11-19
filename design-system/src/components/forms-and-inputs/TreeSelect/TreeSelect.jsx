@@ -537,7 +537,7 @@ const optionShape = PropTypes.oneOfType([
         text: PropTypes.string,
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         children: PropTypes.array,
-        disabled: PropTypes.bool
+        isDisabled: PropTypes.bool
     })
 ]);
 

@@ -165,7 +165,7 @@ export const LoadingMenu = ({ band = 'shape' }) => {
                     isOpen
                     onOpenChange={noop}
                     container={mount}
-                    loading={band === 'shape'}
+                    isLoading={band === 'shape'}
                     hasError={band === 'over' && !retried}
                     onRetry={() => setRetried(true)}
                     trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />}

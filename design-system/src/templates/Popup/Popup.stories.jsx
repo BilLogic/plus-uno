@@ -304,7 +304,7 @@ export const KeyLongLabel = {
 
 export const KeyLoading = {
     name: 'Key: Loading a list',
-    render: () => <Demo.PopupStage height={HEIGHT.load} side="end">{(mount) => <Demo.Menu mount={mount} loading />}</Demo.PopupStage>,
+    render: () => <Demo.PopupStage height={HEIGHT.load} side="end">{(mount) => <Demo.Menu mount={mount} isLoading />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
         await expect(within(layer).getByText('Loading options'), 'one row, no skeleton').toBeInTheDocument();

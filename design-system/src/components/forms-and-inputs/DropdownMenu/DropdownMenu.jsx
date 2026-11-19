@@ -26,7 +26,7 @@ const DropdownMenu = ({
     placement = 'bottom-start',
     shouldFlip = true,
     spacing = 'default',
-    loading = false,
+    isLoading = false,
     hasError = false,
     onRetry,
     minWidth,
@@ -84,15 +84,15 @@ const DropdownMenu = ({
                         data-testid={testId}
                         className={clsx('plus-dropdown-menu', className)}
                         aria-labelledby={labelId}
-                        aria-busy={loading || undefined}
+                        aria-busy={isLoading || undefined}
                         onClick={handleRowPick}
                     >
-                        {hasError && !loading ? (
+                        {hasError && !isLoading ? (
                             <MenuGroup spacing={spacing} minWidth={minWidth}>
                                 <CustomItem elemBefore={<Icon name="circle-exclamation" />}>Couldn't load options</CustomItem>
                                 <ButtonItem onClick={onRetry} data-keep-open="true">Retry</ButtonItem>
                             </MenuGroup>
-                        ) : loading ? (
+                        ) : isLoading ? (
                             // `role="menu"` only owns menuitem/group children, so the
                             // Spinner's own `role="status"` is hidden from the tree
                             // entirely rather than left as a disallowed child;
@@ -131,7 +131,7 @@ DropdownMenu.propTypes = {
     /** `default` draws 32px rows, `compact` draws 24px. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Shows one "Loading options" row, with a spinner, in place of the menu's rows while its options load. Never skeleton rows. */
-    loading: PropTypes.bool,
+    isLoading: PropTypes.bool,
     /** Shows "Couldn't load options" with a Retry row in place of the menu's rows, after loading failed. */
     hasError: PropTypes.bool,
     /** Called when Retry is pressed. The menu stays open. */

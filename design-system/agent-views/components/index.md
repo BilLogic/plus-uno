@@ -63,6 +63,8 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `TagInput required / disabled / readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
 | `RichTextEditor readOnly / disabled` | `isReadOnly`, `isDisabled` |
 | `Select / PopupSelect / FilterMenu open` | `isOpen`, `PopupSelect isOpen`, `FilterMenu isOpen` |
+| `DropdownMenu / Section loading` | `isLoading`, `Section isLoading` |
+| `Select / PopupSelect / FilterMenu option disabled` | `isDisabled` (on an option object too) |
 
 **Tokens**
 

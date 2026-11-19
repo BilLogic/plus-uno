@@ -4651,7 +4651,7 @@
           "deprecated": null
         },
         {
-          "name": "loading",
+          "name": "isLoading",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -5981,7 +5981,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply.",
+          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, isDisabled }`. Each category is a list of checkboxes; pick as many as apply.",
           "deprecated": null
         },
         {
@@ -9878,7 +9878,7 @@
           "required": false,
           "default": "[]",
           "values": null,
-          "description": "Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes.",
+          "description": "Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes.",
           "deprecated": null
         },
         {
@@ -12478,7 +12478,7 @@
           "deprecated": null
         },
         {
-          "name": "loading",
+          "name": "isLoading",
           "type": "bool",
           "required": false,
           "default": "false",

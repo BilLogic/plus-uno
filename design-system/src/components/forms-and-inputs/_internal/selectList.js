@@ -37,7 +37,7 @@ export function selectList({
     const waitingForSearch = searchFirst && !filter;
 
     const atLimit = multi && maxSelections !== undefined && current.length >= maxSelections;
-    const limited = (option) => (atLimit && !current.includes(option.value) ? { ...option, disabled: true } : option);
+    const limited = (option) => (atLimit && !current.includes(option.value) ? { ...option, isDisabled: true } : option);
 
     let listOptions = all.map(limited);
     let listFilter = filter;
@@ -51,7 +51,7 @@ export function selectList({
 
     const q = filter.trim().toLowerCase();
     const matches = q ? all.filter((option) => labelOf(option).toLowerCase().includes(q)) : all;
-    const selectable = matches.filter((option) => !option.disabled);
+    const selectable = matches.filter((option) => !option.isDisabled);
     const offerSelectAll = multi && selectAll && live && maxSelections === undefined
         && selectable.length > 0 && selectable.length <= SEARCH_FIRST_ABOVE
         && !waitingForSearch;

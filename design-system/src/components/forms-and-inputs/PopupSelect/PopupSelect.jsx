@@ -151,7 +151,7 @@ const PopupSelect = ({
 PopupSelect.propTypes = {
     /** Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. */
     container: PropTypes.object,
-    /** Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. */
+    /** Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes. */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,
@@ -160,7 +160,7 @@ PopupSelect.propTypes = {
             label: PropTypes.node,
             text: PropTypes.string,
             description: PropTypes.node,
-            disabled: PropTypes.bool,
+            isDisabled: PropTypes.bool,
             group: PropTypes.string,
         }),
     ])),
