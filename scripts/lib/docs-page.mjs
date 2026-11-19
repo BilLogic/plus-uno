@@ -314,7 +314,7 @@ export function literalValue(text) {
     const out = {};
     for (const part of splitTop(t.slice(1, -1))) {
       const m = part.match(/^(?:["']([^"']+)["']|([A-Za-z_$][\w$]*))\s*:\s*([\s\S]+)$/);
-      const value = m && literalValue(m[3]);
+      const value = m ? literalValue(m[3]) : undefined;
       if (value === undefined) return undefined;
       out[m[1] ?? m[2]] = value;
     }

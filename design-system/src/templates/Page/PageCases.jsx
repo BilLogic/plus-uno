@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Button, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, Card, Section } from '@/templates';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { AddStudentAction, DemoPageHeader, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
+import { AddStudentAction, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
+import * as Example from './PageExamples.jsx';
+import examplesSource from './PageExamples.jsx?raw';
 
 /**
  * The live do and don't examples of the Page template page, built from
@@ -99,78 +102,30 @@ export const TwoTabSystems = () => {
     );
 };
 
+/** The Show code for each example that prints, read from `PageExamples.jsx`. */
+export const CODE = showCode(examplesSource, [
+    'HeaderIsTheH1',
+    'SectionsAsTitles',
+    'AreaPageTitleAlone',
+    'BreadcrumbOnAreaPage',
+    'OneLineDescription',
+    'ParagraphUnderTitle',
+]);
+
 /** The page header is the page's one h1; the Section under it opens at h2. */
-export const HeaderIsTheH1 = () => (
-    <InDocs>
-        <Page header={<PageHeader title="Students" titleAs="h4" />}>
-            <Section title="Sessions" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const HeaderIsTheH1 = () => <InDocs><Example.HeaderIsTheH1 /></InDocs>;
 
 /** Sections standing in for the title: two page-level headings and no page header. */
-export const SectionsAsTitles = () => (
-    <InDocs>
-        <Page>
-            <Section level="page" title="Students" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-            <Section level="page" title="Sessions" views={<StudentViews />}>
-                <SessionsTable status="past" />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const SectionsAsTitles = () => <InDocs><Example.SectionsAsTitles /></InDocs>;
 
 /** An area page: the title alone, with nothing above it. */
-export const AreaPageTitleAlone = () => (
-    <InDocs>
-        <Page header={<PageHeader title="Students" titleAs="h4" />}>
-            <Section title="Students" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const AreaPageTitleAlone = () => <InDocs><Example.AreaPageTitleAlone /></InDocs>;
 
 /** A breadcrumb on an area page, repeating the Sidebar's place. */
-export const BreadcrumbOnAreaPage = () => (
-    <InDocs>
-        <Page header={<DemoPageHeader breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Students' }]} title="Students" />}>
-            <Section title="Students" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const BreadcrumbOnAreaPage = () => <InDocs><Example.BreadcrumbOnAreaPage /></InDocs>;
 
 /** One detail line under the title. */
-export const OneLineDescription = () => (
-    <InDocs>
-        <Page header={<DemoPageHeader title="Students" description="Every student you tutor, with their next session." />}>
-            <Section title="Students" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const OneLineDescription = () => <InDocs><Example.OneLineDescription /></InDocs>;
 
 /** A paragraph under the title pushes the first Section down. */
-export const ParagraphUnderTitle = () => (
-    <InDocs>
-        <Page
-            header={(
-                <DemoPageHeader
-                    title="Students"
-                    description="Every student you tutor is listed here with their grade, their site and their next session. Open a row to see the full record, and use the views to switch between your students and the ones waiting for a tutor. Anything you change is saved as you go."
-                />
-            )}
-        >
-            <Section title="Students" views={<StudentViews />}>
-                <SessionsTable />
-            </Section>
-        </Page>
-    </InDocs>
-);
+export const ParagraphUnderTitle = () => <InDocs><Example.ParagraphUnderTitle /></InDocs>;

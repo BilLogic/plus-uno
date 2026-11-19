@@ -5,10 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
-import { CODE as PAGE_CODE } from './PageCaseCode.js';
-import { CODE as POPUP_CODE } from '../Popup/PopupCaseCode.js';
+import { CODE as POPUP_CODE } from '../Popup/PopupCases.jsx';
 import { CODE as FORMS_CODE } from '@/storybook-docs/patterns/Forms/FormsCaseCode.js';
-import { CODE as PANEL_CODE } from '../Panel/PanelCaseCode.js';
+import { CODE as PANEL_CODE } from '../Panel/PanelCases.jsx';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
 import {
@@ -16,6 +15,7 @@ import {
     AddTwice,
     AreaPageTitleAlone,
     BreadcrumbOnAreaPage,
+    CODE as PAGE_CODE,
     HeaderIsTheH1,
     OneLineDescription,
     OneTabSystem,
@@ -89,11 +89,11 @@ describe('Page live cases', () => {
 
     it('OneLineDescription keeps one short line under the title, while ParagraphUnderTitle runs long', () => {
         const r1 = render(<OneLineDescription />);
-        const short = document.querySelector('[data-part="description"]').textContent;
+        const short = document.querySelector('.plus-page-header p').textContent;
         r1.unmount();
 
         render(<ParagraphUnderTitle />);
-        const long = document.querySelector('[data-part="description"]').textContent;
+        const long = document.querySelector('.plus-page-header p').textContent;
         expect(short.length).toBeLessThan(80);
         expect(long.length).toBeGreaterThan(160);
     });
@@ -212,6 +212,7 @@ describe('Page docs match the code', () => {
     it('prints Show code that uses only the public PageHeader, not a docs-only helper', () => {
         Object.entries(PAGE_CODE).forEach(([name, code]) => {
             expect(code, name).not.toContain('DemoPageHeader');
+            expect(code, name).not.toMatch(/CaseSurface|InDocs|data-part/);
             expect(code, name).not.toMatch(/<PageHeader[^>]*\sdescription=/);
         });
     });

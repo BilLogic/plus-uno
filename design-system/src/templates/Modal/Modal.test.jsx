@@ -4,8 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import Modal, { MODAL_HEIGHTS, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from './Modal';
 import { subscribeOverlays } from '@/lib/overlay';
-import { FooterPinnedModal, ButtonInBodyModal, StepsFooterModal, TabsForStepsModal, ConfirmNarrow, ConfirmWide, ConfirmsInside, ModalOnModal } from './ModalCases';
-import { CODE as MODAL_CODE } from './ModalCaseCode.js';
+import { CODE as MODAL_CODE, FooterPinnedModal, ButtonInBodyModal, StepsFooterModal, TabsForStepsModal, ConfirmNarrow, ConfirmWide, ConfirmsInside, ModalOnModal } from './ModalCases';
 
 describe('Modal template', () => {
     const open = async (props = {}) => {

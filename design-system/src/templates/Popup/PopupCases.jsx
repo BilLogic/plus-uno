@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Button, ButtonItem, Dialog, FooterActions, Popup, TextField } from '@/components';
+import { Button, Dialog, FooterActions, Popup, TextField } from '@/components';
+import { OverlayContainer } from '@/lib/overlay';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { Content, Menu, MenuRows, PopupStage } from './popupDemo.jsx';
+import { PopupStage } from './popupDemo.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './PopupExamples.jsx';
+import examplesSource from './PopupExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Popup template page, composed from
@@ -11,13 +15,8 @@ import { Content, Menu, MenuRows, PopupStage } from './popupDemo.jsx';
 /** The height of the stage a held-open menu has room in. Docs geometry, px. */
 const MENU_STAGE = 230; // docs-literal
 
-/** A trigger wider than the 3-col step (328 at the widest screen), so the width rules show. Docs geometry, px. */
-const WIDE_TRIGGER = 360; // docs-literal
-
 /** The height of the stage a long read has room in. Docs geometry, px. */
 const LONG_READ_STAGE = 330; // docs-literal
-
-const wideTrigger = (size, text) => <Button text={text} spacing="compact" style={{ inlineSize: size }} />;
 
 /** Fields the person must finish sit in a Modal over a Blanket. */
 export const FieldsInModalCase = () => {
@@ -80,84 +79,45 @@ export const FormInPopupCase = () => {
     );
 };
 
-/** More sits at the end of the bar, so its menu aligns to its end edge and grows into the page. */
-export const EndAligned = () => (
-    <PopupStage height={MENU_STAGE} side="end">
-        {(mount) => <Menu mount={mount} placement="bottom-end" />}
+/** The Show code for each example, read from `PopupExamples.jsx`. */
+export const CODE = showCode(examplesSource, [
+    'EndAligned',
+    'StartAlignedAtEnd',
+    'AsWideAsTrigger',
+    'NarrowerThanTrigger',
+    'AtCap',
+    'LongReadInPopup',
+    'OneFlatMenu',
+    'PopupBesidePopup',
+]);
+
+/** A stage that holds the example's layer open inside its own box, with room under the trigger. */
+const Held = ({ side, height = MENU_STAGE, children }) => (
+    <PopupStage height={height} side={side}>
+        {(mount) => <OverlayContainer container={mount} boundary={null}>{children}</OverlayContainer>}
     </PopupStage>
 );
+
+/** More sits at the end of the bar, so its menu aligns to its end edge and grows into the page. */
+export const EndAligned = () => <Held side="end"><Example.EndAligned /></Held>;
 
 /** An end trigger with a start-aligned menu: it runs off the edge of the page. */
-export const StartAlignedAtEnd = () => (
-    <PopupStage height={MENU_STAGE} side="end">
-        {(mount) => <Menu mount={mount} placement="bottom-start" />}
-    </PopupStage>
-);
+export const StartAlignedAtEnd = () => <Held side="end"><Example.StartAlignedAtEnd /></Held>;
 
 /** The Popup is at least as wide as the trigger it hangs off, so their edges line up. */
-export const AsWideAsTrigger = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => <Content mount={mount} width="auto" trigger={wideTrigger(WIDE_TRIGGER, 'Session notes')} />}
-    </PopupStage>
-);
+export const AsWideAsTrigger = () => <Held><Example.AsWideAsTrigger /></Held>;
 
 /** A 3-col step under a wider trigger: the Popup ends short of it. */
-export const NarrowerThanTrigger = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => <Content mount={mount} width="3-col" trigger={wideTrigger(WIDE_TRIGGER, 'Session notes')} />}
-    </PopupStage>
-);
+export const NarrowerThanTrigger = () => <Held><Example.NarrowerThanTrigger /></Held>;
 
 /** A content Popup at 4-col, the cap. */
-export const AtCap = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => <Content mount={mount} width="4-col" />}
-    </PopupStage>
-);
+export const AtCap = () => <Held><Example.AtCap /></Held>;
 
 /** A long read in a Popup: three paragraphs at the cap. */
-export const LongReadInPopup = () => (
-    <PopupStage height={LONG_READ_STAGE}>
-        {(mount) => (
-            <Popup show triggerType="manual" container={mount} width="4-col" placement="bottom-start" title="Session notes" trigger={<Button text="Notes" spacing="compact" />}>
-                <p style={{ margin: 0 }}>Notes stay with the session. The tutor sees them first, and parents never see them.</p>
-                <p style={{ margin: 0 }}>Each note keeps the date it was written and who wrote it, so a later session can see what changed and why.</p>
-                <p style={{ margin: 0 }}>A note can be edited for a day after it is saved. After that it is locked, and a correction is a new note.</p>
-            </Popup>
-        )}
-    </PopupStage>
-);
+export const LongReadInPopup = () => <Held height={LONG_READ_STAGE}><Example.LongReadInPopup /></Held>;
 
 /** One flat menu: a choice with two forms is two rows. */
-export const OneFlatMenu = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => <Menu mount={mount} placement="bottom-start" />}
-    </PopupStage>
-);
+export const OneFlatMenu = () => <Held><Example.OneFlatMenu /></Held>;
 
 /** A menu row that opens a second Popup beside it: two layers off one trigger. */
-export const PopupBesidePopup = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => (
-            <Menu
-                mount={mount}
-                placement="bottom-start"
-                rows={(
-                    <>
-                        <ButtonItem>Reschedule</ButtonItem>
-                        <Popup
-                            show
-                            triggerType="manual"
-                            container={mount}
-                            placement="right-start"
-                            trigger={<ButtonItem>Export notes</ButtonItem>}
-                        >
-                            Choose a format.
-                        </Popup>
-                        <ButtonItem>Cancel session</ButtonItem>
-                    </>
-                )}
-            />
-        )}
-    </PopupStage>
-);
+export const PopupBesidePopup = () => <Held><Example.PopupBesidePopup /></Held>;

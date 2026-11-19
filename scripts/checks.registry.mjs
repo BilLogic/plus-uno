@@ -657,6 +657,14 @@ export const CHECKS = [
     guards: 'every Do and Don\'t figure being a live PLUS component or kit drawing with no inline style, one sentence under it, and stacked only with a reason.',
   },
   {
+    name: 'check:show-code',
+    script: 'node scripts/check-show-code.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-show-code.mjs',
+    guards: 'a template docs example\'s Show code being printed from its own source, with no hand-typed code string and no docs-only wrapper in an examples module.',
+  },
+  {
     name: 'check:docs-landing',
     script: 'node scripts/check-docs-landing.mjs',
     pkg: 'root',

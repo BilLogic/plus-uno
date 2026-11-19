@@ -57,7 +57,7 @@ Frame reads these motion tokens and no literal duration or curve.
 
 **Checked:** Review
 
-The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off.
+The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off. The page places the footer along the bottom today; the Frame's `bar` slot is Planned.
 
 Do: The steps as rows in the inner sidebar; the Page holds only the task.
 Don't: The steps drawn again inside the Page: two lists for one task.

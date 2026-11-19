@@ -4,8 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
-import { CODE } from './FrameCaseCode.js';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
 import { FRAME_LAYOUT } from './frameLayout.js';
 import { readFileSync as readSource } from 'node:fs';
 
@@ -46,14 +45,23 @@ describe('Frame Show code', () => {
         const both = panelAlone + FRAME_LAYOUT.sidebarWidth;
         expect([panelAlone, both, FRAME_LAYOUT.dockMin]).toEqual([1168, 1408, 1024]);
         const here = (file) => readSource(join(__dirname, file), 'utf8');
-        for (const file of ['Frame.mdx', 'FrameCaseCode.js', 'FrameCases.jsx']) {
+        for (const file of ['Frame.mdx', 'FrameCases.jsx', 'FrameExamples.jsx']) {
             expect(here(file), `${file} names the old 1200 dock`).not.toMatch(/(under|or more|from|at) 1200\b(?! with)/);
         }
-        expect(CODE.AiPanelDocked).toContain(String(panelAlone));
-        expect(CODE.AiPanelFloating).toContain(String(panelAlone));
         expect(frameMdx).toContain(String(both));
         expect(frameMdx).toContain(String(panelAlone));
         expect(frameMdx).not.toMatch(/docked wherever it shows/);
+    });
+});
+
+describe('Frame Show code source', () => {
+    it('prints each example from FrameExamples.jsx, with none of the docs staging', () => {
+        const examples = readSource(join(__dirname, 'FrameExamples.jsx'), 'utf8');
+        for (const [key, code] of Object.entries(CODE)) {
+            expect(code, key).toContain(`const ${key} =`);
+            expect(code, key).not.toMatch(/CaseSurface|FitStage|BrowserWindow|InAppFrame|InWindow/);
+            expect(examples, key).toContain(code.split('\n\n').pop());
+        }
     });
 });
 
@@ -91,8 +99,9 @@ describe('Frame live cases', () => {
     });
 
     it('has Show code source for every live pair in Frame.mdx', () => {
-        ['BarInOrder', 'BarScrambled', 'MultiStepInnerSidebar', 'MultiStepStepsInPage', 'AiPanelDocked', 'AiPanelFloating', 'BareColumn', 'BareWithSidebar']
-            .forEach((key) => expect(CODE[key].length).toBeGreaterThan(20));
+        const keys = [...frameMdx.matchAll(/(?:do|dont)Code=\{CODE\.(\w+)\}/g)].map(([, key]) => key);
+        expect(keys.length).toBeGreaterThan(0);
+        keys.forEach((key) => expect(CODE[key]?.length, key).toBeGreaterThan(20));
     });
 
     it('links TypeCard anchors to unique ComponentExample and heading ids in Frame.mdx', () => {
