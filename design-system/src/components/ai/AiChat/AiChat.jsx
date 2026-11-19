@@ -13,14 +13,16 @@ import {
     PromptInput,
     PromptStarters,
 } from '@/components';
+// The template modules, not the barrel (docs/engineering/coding.md § Imports): this file loads while the components barrel does, and
+// the barrel would pull every template (and the components they read at load) in ahead of the components.
+import Frame from '@/templates/Frame';
 import {
-    Frame,
     PanelBody,
     PanelContainer,
     PanelFooter,
     PanelHeader,
     PanelHostContext,
-} from '@/templates';
+} from '@/templates/Panel';
 import {
     AI_CHAT_FULLSCREEN_BELOW,
     AI_CHAT_MODES,
@@ -259,17 +261,14 @@ const Launcher = () => {
  *   full screen.
  * - The mode is remembered for the tab in sessionStorage (and an open Panel).
  * - Under 768 the popup is shown full screen.
- * - `variant="storybook"` is the Storybook docs' chat: the same chat, with
- *   its mode remembered under its own key.
  * - The conversation moves with the mode and is kept for the tab (the last
  *   50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
  *   A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
  */
 const AiChat = ({
-    variant = 'app',
     defaultMode = 'popup',
     defaultOpen = false,
-    storageKey = variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY,
+    storageKey = AI_CHAT_STORAGE_KEY,
     launcher = true,
     linkTarget,
     resolveHref,
@@ -348,8 +347,8 @@ const AiChat = ({
     }, [onFeedback]);
 
     const value = useMemo(() => ({
-        variant, title, placeholder, emptyText, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, resolveHref, rate,
-    }), [variant, launcher, linkTarget, resolveHref, title, placeholder, emptyText, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
+        title, placeholder, emptyText, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, resolveHref, rate,
+    }), [launcher, linkTarget, resolveHref, title, placeholder, emptyText, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -368,13 +367,11 @@ const AiChat = ({
 };
 
 AiChat.propTypes = {
-    /** `storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same. */
-    variant: PropTypes.oneOf(['app', 'storybook']),
     /** The mode a tab with nothing remembered starts in. */
     defaultMode: PropTypes.oneOf(AI_CHAT_MODES),
     /** Whether chat starts open when the tab has nothing remembered. */
     defaultOpen: PropTypes.bool,
-    /** The sessionStorage key the mode and the conversation are kept under (the Storybook variant has its own); null keeps nothing. */
+    /** The sessionStorage key the mode and the conversation are kept under (the Storybook docs' chat passes its own); null keeps nothing. */
     storageKey: PropTypes.string,
     /** `false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`. */
     launcher: PropTypes.bool,

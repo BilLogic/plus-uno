@@ -463,10 +463,7 @@ const preview = {
                 "AI message",
                 "AI sources",
                 "AI feedback"
-              ]
-            ],
-            "Templates",
-            [
+              ],
               "AI chat"
             ]
           ],

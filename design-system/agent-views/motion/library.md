@@ -89,6 +89,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Search | pattern | shrink | Swap content in place | `--ds-motion-spatial-fast` |  |
 | Search | pattern | panel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
+| AiChat | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| AiChat | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |  |
 | AiMessage | component | ready | Load content | `--ds-motion-appearance-fast` | `sound.ai.ready` on land: the feedback took over 1 s, so a Spinner showed |
 | AiMessage | component | strong | Load content | `--ds-motion-appearance-fast` | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |

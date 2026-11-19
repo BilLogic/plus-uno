@@ -306,6 +306,18 @@
       "use": [
         "Section.views"
       ]
+    },
+    {
+      "not": "Rating variant",
+      "use": [
+        "Rating.type"
+      ]
+    },
+    {
+      "not": "CloseButton tone",
+      "use": [
+        "CloseButton.appearance"
+      ]
     }
   ],
   "tokens": [

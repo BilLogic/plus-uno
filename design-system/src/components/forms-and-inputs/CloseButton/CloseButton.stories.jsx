@@ -25,12 +25,12 @@ export default {
     },
     argTypes: {
         label: { control: 'text', description: '"Close" for a surface that blocks; "Dismiss {what}" for a message', table: { category: 'Content' } },
-        tone: { control: 'inline-radio', options: ['default', 'inverse'], description: '`default` on neutral surfaces; `inverse` only on the declared colored and dark grounds', table: { category: 'Design' } },
+        appearance: { control: 'inline-radio', options: ['default', 'inverse'], description: '`default` on neutral surfaces; `inverse` only on the declared colored and dark grounds', table: { category: 'Design' } },
         spacing: { control: 'inline-radio', options: ['default', 'compact'], table: { category: 'Design' } },
         onClick: { table: { disable: true } },
         className: { control: false, table: { disable: true, category: 'Development' } },
     },
-    args: { label: 'Close', tone: 'default', spacing: 'default' },
+    args: { label: 'Close', appearance: 'default', spacing: 'default' },
 };
 
 function tokenColor(canvasElement, token) {
@@ -85,10 +85,10 @@ export const Tones = {
                 <CloseButton label="Dismiss default example" />
             </div>
             <div style={inverseGround}>
-                <CloseButton tone="inverse" label="Dismiss inverse example on a dark ground" />
+                <CloseButton appearance="inverse" label="Dismiss inverse example on a dark ground" />
             </div>
             <div style={primaryGround}>
-                <CloseButton tone="inverse" label="Dismiss inverse example on a colored ground" />
+                <CloseButton appearance="inverse" label="Dismiss inverse example on a colored ground" />
             </div>
         </div>
     ),
@@ -118,7 +118,7 @@ export const Focus = {
                 <CloseButton label="Close default focus example" />
             </div>
             <div style={inverseGround}>
-                <CloseButton tone="inverse" label="Close inverse focus example" />
+                <CloseButton appearance="inverse" label="Close inverse focus example" />
             </div>
         </div>
     ),
@@ -144,7 +144,7 @@ export const InverseGrounds = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
             {INVERSE_GROUNDS.map((ground) => (
                 <div key={ground} data-ground={ground} style={{ ...row, padding: 'var(--pad-x-lg)', borderRadius: 'var(--radius-md)', background: `var(${ground})` }}>
-                    <CloseButton tone="inverse" label={`Dismiss example on ${ground.replace('--ds-background-', '')}`} />
+                    <CloseButton appearance="inverse" label={`Dismiss example on ${ground.replace('--ds-background-', '')}`} />
                 </div>
             ))}
         </div>
@@ -171,7 +171,7 @@ export const InverseGrounds = {
 
 export const Interactive = {
     render: (args) => (
-        <div style={args.tone === 'inverse' ? inverseGround : row}>
+        <div style={args.appearance === 'inverse' ? inverseGround : row}>
             <CloseButton {...args} />
         </div>
     ),
