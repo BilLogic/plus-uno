@@ -259,7 +259,7 @@ test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
 test('the overlay material is the ground of every floating shell, and a standalone Panel is on the page ground', () => {
   const read = (file) => fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
   // A standalone Panel sits in Layer 1 like a docked one; only a floating Panel is on the overlay material.
-  assert.match(read('design-system/src/components/layout-and-structure/Panel/Panel.scss'), /^\.plus-panel \{[^}]*background: var\(--ds-surface\);/m);
+  assert.match(read('design-system/src/patterns/Panel/Panel.scss'), /^\.plus-panel \{[^}]*background: var\(--ds-surface\);/m);
   // Each floating shell keeps a visible edge in the material's border color, which forced colors preserve.
   const frame = read('design-system/src/patterns/Frame/Frame.scss');
   assert.match(frame, /\.plus-frame__sidebar--raised \{[^}]*outline: var\(--border-width-default\) solid var\(--ds-border-material\)/);

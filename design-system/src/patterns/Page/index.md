@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Frame` · `Modal` · `PatternCard` · `PatternSection` · `Table`
+Same group: `AiChat` · `Frame` · `Modal` · `Panel` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 

@@ -94,7 +94,7 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - `ProgressIndicator`: use when displaying step indicators below the stage.
 - [Card](?path=/docs/templates-card--docs): use when laying out a few items side by side in a grid so nothing is hidden and nothing moves.
 
-Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
+Same group: `Accordion` · `PageHeader` · `ScrollBar`
 
 ## Parts
 

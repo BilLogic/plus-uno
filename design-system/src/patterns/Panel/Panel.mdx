@@ -49,7 +49,7 @@ import {
 
 <div className="sb-ds-doc-section">
 
-Import the Panel component from `@/components`. This template documents its layout within the Frame.
+Import the Panel and its parts from `@/patterns`. This template documents the parts and its layout within the Frame.
 
 ## Types
 
@@ -163,8 +163,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/patterns';
 ```
 
 The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
@@ -211,6 +210,49 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - For a queue page, use `Panel` docked beside the list; the record opens on demand.
 - For a short aside off a control, use `Popup`.
 - For complex or multistep work, give the record its own page with `Frame` · focused.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
+3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
+4. **Body** (`PanelBody`). The main content, which scrolls.
+5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The page ground with a leading edge.</td></tr>
+<tr><td>Hovered</td><td>Nothing changes on the panel.</td></tr>
+<tr><td>Pressed</td><td>Nothing changes on the panel.</td></tr>
+<tr><td>Focused</td><td>Not focusable. Focus goes to the fixed actions and the content.</td></tr>
+<tr><td>Disabled</td><td>A panel has no disabled state. Disable the controls in it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Ground and edge</td><td><code>--ds-surface</code>; <code>--ds-border</code> at <code>--border-width-default</code> on the leading edge.</td></tr>
+<tr><td>Header</td><td>Padding <code>--panel-pad-y</code> and <code>--panel-pad</code>; <code>--panel-inline-md</code> between its parts; <code>--border-width-default</code> rule below.</td></tr>
+<tr><td>Action group</td><td><code>--panel-inline-sm</code> between actions.</td></tr>
+<tr><td>Subheader</td><td>Padding <code>--panel-subheader-pad-y</code> and <code>--panel-pad</code>; <code>--border-width-default</code> rule below.</td></tr>
+<tr><td>Body</td><td>Padding <code>--panel-pad</code>.</td></tr>
+<tr><td>Footer</td><td>Padding <code>--panel-pad-y</code> and <code>--panel-pad</code>, <code>--panel-inline-lg</code> between its parts; rule above; disclaimer in <code>--body-sm</code>, <code>--ds-text-subtle</code>.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

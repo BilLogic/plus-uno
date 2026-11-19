@@ -11,10 +11,6 @@ import {
     Heading,
     IconButton,
     NotificationItem,
-    PanelBody,
-    PanelCloseAction,
-    PanelContainer,
-    PanelHeader,
     SectionMessage,
     Sidebar,
     StaticTable,
@@ -22,7 +18,15 @@ import {
     Tabs,
     Tile,
 } from '@/components';
-import { Frame, Page, PatternSection } from '@/patterns';
+import {
+    Frame,
+    Page,
+    PatternSection,
+    PanelBody,
+    PanelCloseAction,
+    PanelContainer,
+    PanelHeader,
+} from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';

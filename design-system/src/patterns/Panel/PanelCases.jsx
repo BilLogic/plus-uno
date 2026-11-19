@@ -1,15 +1,13 @@
 import React from 'react';
+import { Button, FooterActions, StatusTag } from '@/components';
 import {
-    Button,
-    FooterActions,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
     PanelFooter,
     PanelHeader,
     PanelSubheader,
-    StatusTag,
-} from '@/components';
+} from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 

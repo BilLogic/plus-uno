@@ -8,6 +8,18 @@ import {
     FilterButton,
     Icon,
     IconButton,
+    PopupSelect,
+    SearchField,
+    StatusTag,
+    TextField,
+    Toggle,
+    Tabs as TabsComponent,
+} from '@/components';
+import {
+    PANEL_STORAGE_KEY,
+    PatternCard,
+    PatternSection,
+    SECTION_DETAIL_FLOOR,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
@@ -16,14 +28,7 @@ import {
     PanelHeader,
     PanelSubheader,
     PanelUpAction,
-    PopupSelect,
-    SearchField,
-    StatusTag,
-    TextField,
-    Toggle,
-    Tabs as TabsComponent,
-} from '@/components';
-import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
+} from '@/patterns';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
 import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../Page/pageDemo.jsx';

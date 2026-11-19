@@ -220,7 +220,7 @@ test('group indexes carry a generated chooser from each page\'s Usage and Altern
     assert.match(forms, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
   }
   const layout = fs.readFileSync('design-system/src/components/layout-and-structure/index.md', 'utf8');
-  for (const name of ['PageHeader', 'Panel']) {
+  for (const name of ['PageHeader', 'ScrollBar']) {
     assert.match(layout, new RegExp(`\\*\\*\\[${name}\\]\\(`), name);
   }
 });

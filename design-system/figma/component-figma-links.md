@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-57 docs-page links + 65 style/variant entries across 62 components.
+56 docs-page links + 64 style/variant entries across 61 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -43,7 +43,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Object | `20630:28` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-28) |
 | Components | PageHeader | `20455:2827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2827) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
-| Components | Panel | `20630:44` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-44) |
 | Components | Popup | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
 | Components | ProgressBar | `3497:19483` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19483) |
 | Components | Radio | `14876:12005` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005) |
@@ -111,7 +110,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Object | Object | `20630:40` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40) | verified |
 | Components | PageHeader | Page header | `20622:81` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20622-81) | verified |
 | Components | Pagination | Pagination | `20095:11283` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11283) | verified |
-| Components | Panel | Panel | `20630:52` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-52) | verified |
 | Components | Popup | Popup | `20871:3153` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3153) | verified |
 | Components | ProgressBar | _Progress Bar | `20095:7780` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7780) | verified |
 | Components | ProgressBar | Progress bar | `20117:5127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127) | verified |

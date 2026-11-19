@@ -9341,10 +9341,10 @@
     },
     {
       "name": "Panel",
-      "kind": "component",
-      "import": "import { Panel } from '@/components';",
-      "group": "layout-and-structure",
-      "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
+      "kind": "pattern",
+      "import": "import { Panel } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Panel/Panel.jsx",
       "summary": "PanelContainer: the panel's own surface, at a fixed or the provider's width.",
       "props": [
         {
@@ -9353,7 +9353,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead.",
+          "description": "The Frame\\'s own width, in px.",
           "deprecated": null
         },
         {
@@ -9377,14 +9377,16 @@
       ],
       "implementedAs": "PanelContainer",
       "stories": [
-        "FullComposition",
-        "MinimalHeaderAndBody",
-        "WidthFromProvider",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused"
+        "TypeDetails",
+        "TypeNotifications",
+        "AnatomyDetails",
+        "AnatomyNotifications",
+        "ResponsiveWidth",
+        "WidthDocked",
+        "WidthFloating",
+        "KeyEditing",
+        "KeyRecordGone",
+        "KeyUnder1024"
       ],
       "tokens": [
         "--body-sm",

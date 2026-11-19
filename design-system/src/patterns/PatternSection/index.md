@@ -147,7 +147,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - Filtering: use when picking a filter tier for the header.
 - Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
-Same group: `AiChat` · `Frame` · `Modal` · `Page` · `PatternCard` · `Table`
+Same group: `AiChat` · `Frame` · `Modal` · `Page` · `Panel` · `PatternCard` · `Table`
 
 ## Types
 

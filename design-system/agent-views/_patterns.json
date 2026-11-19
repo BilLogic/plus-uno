@@ -27,6 +27,11 @@
       "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
     },
     {
+      "group": "Panel",
+      "name": "Panel",
+      "use": "A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`."
+    },
+    {
       "group": "Overlays",
       "name": "Modal",
       "use": "The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`."

@@ -12,12 +12,14 @@ import {
     Popup,
     PromptInput,
     PromptStarters,
+} from '@/components';
+import {
     PanelBody,
     PanelContainer,
     PanelFooter,
     PanelHeader,
     PanelHostContext,
-} from '@/components';
+} from '../Panel';
 import Frame from '../Frame';
 import {
     AI_CHAT_FULLSCREEN_BELOW,

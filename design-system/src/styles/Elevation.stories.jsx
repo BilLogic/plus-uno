@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, DynamicTable, HeadingContextProvider, PanelBody, PanelContainer, PanelHeader, Popup, Select, StaticTable, Tooltip } from '@/components';
-import { Modal, PatternCard, PatternSection } from '@/patterns';
+import { Button, DynamicTable, HeadingContextProvider, Popup, Select, StaticTable, Tooltip } from '@/components';
+import { Modal, PatternCard, PatternSection, PanelBody, PanelContainer, PanelHeader } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';

@@ -78,11 +78,12 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
 | Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
 | Table | [`Table`](../../src/patterns/Table/Table.mdx) | `import { Table } from '@/patterns';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
+| Panel | [`Panel`](../../src/patterns/Panel/Panel.mdx) | `import { Panel } from '@/patterns';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
 | Overlays | [`Modal`](../../src/patterns/Modal/Modal.mdx) | `import { Modal } from '@/patterns';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (93)
+## UI components (92)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/ai/AiIcon/index.md)
@@ -137,7 +138,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [Object](../../src/components/images-and-icons/Object/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
-- [Panel](../../src/components/layout-and-structure/Panel/index.md)
 - [Popup](../../src/components/overlays-and-layering/Popup/index.md)
 - [PopupSelect](../../src/components/forms-and-inputs/PopupSelect/index.md)
 - [ProgressBar](../../src/components/loading/ProgressBar/index.md)

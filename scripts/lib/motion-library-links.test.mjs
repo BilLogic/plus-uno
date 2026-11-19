@@ -95,9 +95,9 @@ test('deriveMotionLibraryLinks resolves <Meta of={...}> and <Meta title="..."> f
   });
 });
 
-test('live repo links match all 79 MotionSection tags across the 78 docs pages', () => {
+test('live repo links match all 78 MotionSection tags across the 77 docs pages', () => {
   const links = deriveMotionLibraryLinks();
-  assert.equal(Object.keys(links).length, 79);
+  assert.equal(Object.keys(links).length, 78);
   assert.equal(links['template:Blanket'], '?path=/docs/templates-modal--docs#blanket-motion');
   assert.equal(links['template:Modal'], '?path=/docs/templates-modal--docs#motion');
 });

@@ -153,8 +153,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Pagination | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Panel | component | enter | Dock and undock a panel | `--ds-motion-spatial-slow` |  |
-| Panel | component | exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Popup | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Popup | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | PopupSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |

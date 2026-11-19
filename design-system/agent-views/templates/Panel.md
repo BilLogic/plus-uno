@@ -4,7 +4,7 @@
 
 A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
-Import the Panel component from `@/components`. This template documents its layout within the Frame.
+Import the Panel and its parts from `@/patterns`. This template documents the parts and its layout within the Frame.
 
 **Kind:** Template
 
@@ -63,8 +63,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/patterns';
 ```
 
 The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
@@ -90,6 +89,35 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - For a queue page, use `Panel` docked beside the list; the record opens on demand.
 - For a short aside off a control, use `Popup`.
 - For complex or multistep work, give the record its own page with `Frame` · focused.
+
+## Parts
+
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
+3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
+4. **Body** (`PanelBody`). The main content, which scrolls.
+5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The page ground with a leading edge. |
+| Hovered | Nothing changes on the panel. |
+| Pressed | Nothing changes on the panel. |
+| Focused | Not focusable. Focus goes to the fixed actions and the content. |
+| Disabled | A panel has no disabled state. Disable the controls in it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ground and edge | `--ds-surface`; `--ds-border` at `--border-width-default` on the leading edge. |
+| Header | Padding `--panel-pad-y` and `--panel-pad`; `--panel-inline-md` between its parts; `--border-width-default` rule below. |
+| Action group | `--panel-inline-sm` between actions. |
+| Subheader | Padding `--panel-subheader-pad-y` and `--panel-pad`; `--border-width-default` rule below. |
+| Body | Padding `--panel-pad`. |
+| Footer | Padding `--panel-pad-y` and `--panel-pad`, `--panel-inline-lg` between its parts; rule above; disclaimer in `--body-sm`, `--ds-text-subtle`. |
 
 ## Content guidelines
 

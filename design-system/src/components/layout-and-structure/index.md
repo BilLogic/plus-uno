@@ -2,7 +2,7 @@
 
 # Layout and structure
 
-5 components. Each row links to the generated facts; the three columns after it are the
+4 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -14,9 +14,6 @@ authored half, counted rather than assumed.
   - For a short guided tour of a new feature, use `Spotlight`.
 - **[PageHeader](PageHeader/index.md)** — Use `PageHeader` once per page layout, at the top of the Page template's body, to carry the page's title and primary action or page-level actions. Pass a `Breadcrumb` in `breadcrumbs` above the title, page-level controls in `actions` at the end of the title row, and `Tabs` or a filter bar in `bottomBar` below it. `disableTitleStyles` lets a custom node such as `InlineEdit` replace the default heading wrapper.
   - For a heading inside a region of the page rather than the page itself, use `Heading`.
-- **[Panel](Panel/index.md)** — Use `Panel` for context or a focused task beside the page's main content — a detail view opened from a list, a filter set, a secondary thread — where leaving the page behind, as a `Modal` does, would lose that context. Compose it from `PanelHeader`, `PanelSubheader`, `PanelBody` and `PanelFooter` inside `PanelContainer`.
-  - For something that must be decided before the page continues, use `Modal`.
-  - For the page's persistent navigation rail, use `Sidebar`.
 - **[ScrollBar](ScrollBar/index.md)** — Use `ScrollBar` when a region has to scroll inside a page that does not — a long list in a fixed panel, a wide table in a narrow column. It caps the height, turns on overflow, and applies the design system's thin scrollbar so the region does not draw the platform's default one.
   - For a long list that should page rather than scroll, use `Pagination`.
   - For content the user opens rather than scrolls past, use `Accordion`.
@@ -26,10 +23,9 @@ authored half, counted rather than assumed.
 | [Accordion](Accordion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Carousel](Carousel/index.md) | 10 | ✅ | ✅ | ✅ |
 | [PageHeader](PageHeader/index.md) | 8 | ✅ | ✅ | ✅ |
-| [Panel](Panel/index.md) | 3 | ✅ | ✅ | ✅ |
 | [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 5/5 (100%) · Correct/incorrect 5/5 (100%) · Accessibility 5/5 (100%)
+**Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

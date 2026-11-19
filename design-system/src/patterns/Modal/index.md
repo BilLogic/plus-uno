@@ -117,7 +117,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternSection` · `Table`
+Same group: `AiChat` · `Frame` · `Page` · `Panel` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 

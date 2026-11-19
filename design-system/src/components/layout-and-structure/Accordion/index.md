@@ -114,7 +114,7 @@ border.
 - `Tabs`: use when switching between mutually exclusive views of the same area.
 - [Section](?path=/docs/templates-section--docs): use when every section should stay visible at once so people can compare them without opening and closing rows.
 
-Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
+Same group: `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Parts
 

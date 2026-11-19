@@ -37,9 +37,6 @@ import {
     NotificationItem,
     PageHeader,
     Pagination,
-    Panel,
-    PanelBody,
-    PanelHeader,
     Popup,
     PopupSelect,
     ProgressBar,
@@ -70,6 +67,7 @@ import {
     TreeSelect,
     TreeTable,
 } from '@/components';
+import { Panel, PanelBody, PanelHeader } from '@/patterns';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 

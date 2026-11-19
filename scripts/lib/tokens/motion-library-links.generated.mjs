@@ -31,7 +31,6 @@ export const MOTION_LIBRARY_LINKS = Object.freeze({
   "component:NotificationItem": "?path=/docs/components-messaging-notification-item--docs#motion",
   "component:PageHeader": "?path=/docs/components-layout-and-structure-page-header--docs#motion",
   "component:Pagination": "?path=/docs/components-navigation-pagination--docs#motion",
-  "component:Panel": "?path=/docs/components-layout-and-structure-panel--docs#motion",
   "component:Popup": "?path=/docs/components-overlays-and-layering-popup--docs#motion",
   "component:PopupSelect": "?path=/docs/components-forms-and-inputs-popup-select--docs#motion",
   "component:ProgressBar": "?path=/docs/components-loading-progress-bar--docs#motion",

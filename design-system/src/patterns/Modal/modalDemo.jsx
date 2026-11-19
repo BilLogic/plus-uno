@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, FooterActions, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
+import { Button, FooterActions, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
+import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
 import Modal from './Modal.jsx';
 import PatternSection from '../PatternSection';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';

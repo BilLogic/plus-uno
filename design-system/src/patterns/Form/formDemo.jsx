@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 
-import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
+import { Button, Fieldset, SectionMessage, Select, Skeleton, TextField } from '@/components';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Modal, PatternSection } from '@/patterns';
+import { Modal, PatternSection, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';

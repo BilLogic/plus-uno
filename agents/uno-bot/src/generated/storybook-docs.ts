@@ -198,11 +198,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-layout-and-structure-page-header--docs"
   ],
   [
-    "design-system/src/components/layout-and-structure/Panel/",
-    "Panel",
-    "components-layout-and-structure-panel--docs"
-  ],
-  [
     "design-system/src/components/layout-and-structure/ScrollBar/",
     "ScrollBar",
     "components-layout-and-structure-scrollbar--docs"

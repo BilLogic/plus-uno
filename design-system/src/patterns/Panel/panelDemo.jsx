@@ -5,6 +5,15 @@ import {
     Button,
     EmptyState,
     Heading,
+    PopupSelect,
+    StaticTable,
+    StatusTag,
+    TextArea,
+    TextField,
+    VisuallyHidden,
+} from '@/components';
+import {
+    PatternSection,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
@@ -14,14 +23,7 @@ import {
     PanelMoreAction,
     PanelSubheader,
     PanelUpAction,
-    PopupSelect,
-    StaticTable,
-    StatusTag,
-    TextArea,
-    TextField,
-    VisuallyHidden,
-} from '@/components';
-import { PatternSection } from '@/patterns';
+} from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';

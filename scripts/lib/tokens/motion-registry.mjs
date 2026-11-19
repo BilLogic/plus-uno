@@ -464,14 +464,6 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'Panel',
-    tier: 'component',
-    events: {
-      enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow', note: 'Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Blanket.' },
-      exit: { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Floating panels leave on spatial.fast.' },
-    },
-  },
-  {
     name: 'Sidebar',
     tier: 'component',
     events: {

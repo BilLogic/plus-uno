@@ -54,8 +54,8 @@ const ROLES = {
   // Tooltip: a flat label, no shadow, the fill and text flip with the mode
   tooltipSurface: ['--ds-background-neutral-bold', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   tooltipText: ['--ds-text-inverse', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  panelSurface: ['--ds-surface-overlay', 'components/layout-and-structure/Panel/Panel.scss'],
-  panelEdge: ['--ds-border', 'components/layout-and-structure/Panel/Panel.scss'],
+  panelSurface: ['--ds-surface-overlay', 'patterns/Panel/Panel.scss'],
+  panelEdge: ['--ds-border', 'patterns/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
   panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
   modalSurface: ['--ds-surface-overlay', 'components/messaging/Dialog/Dialog.scss'],

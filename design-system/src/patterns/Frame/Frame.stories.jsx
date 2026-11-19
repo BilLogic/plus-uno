@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, FooterActions, IconButton, Logo, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, FooterActions, IconButton, Logo, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';

@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
-    Banner, Button, EmptyState, FooterActions, PageHeader,
-    PanelBody, PanelContainer, PanelFooter, PanelHeader, SearchField, StaticTable, StatusTag, TextField,
+    Banner,
+    Button,
+    EmptyState,
+    FooterActions,
+    PageHeader,
+    SearchField,
+    StaticTable,
+    StatusTag,
+    TextField,
 } from '@/components';
-import { Frame, Page, PatternSection, Table, usePanelControl } from '@/patterns';
+import {
+    Frame,
+    Page,
+    PatternSection,
+    Table,
+    usePanelControl,
+    PanelBody,
+    PanelContainer,
+    PanelFooter,
+    PanelHeader,
+} from '@/patterns';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 

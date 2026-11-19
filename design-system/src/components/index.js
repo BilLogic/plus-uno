@@ -69,7 +69,6 @@ export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
-export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelHostContext, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 
 export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/loading/ProgressBar';
