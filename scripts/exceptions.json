@@ -400,6 +400,14 @@
         {
           "at": "design-system/figma/knowledge-audit.json",
           "reason": "A generated record, not authored."
+        },
+        {
+          "at": "design-system/agent-views/_inventions.json",
+          "reason": "The retirement list itself, which names every retired path it keeps out."
+        },
+        {
+          "at": "design-system/agent-views/ds-index.json",
+          "reason": "Generated from the retirement list, so it quotes every retired path the list keeps out."
         }
       ]
     },

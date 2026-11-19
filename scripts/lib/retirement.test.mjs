@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_NAME_TAIL } from '../../design-system/src/lib/tokens.mjs';
 import { checkInventions } from './inventions.mjs';
 import { glossaryAvoid, listProblems, loadRetirement } from './retirement.mjs';
 import { DOC_ROOTS } from '../check-ads-language.mjs';
@@ -162,4 +163,41 @@ test('the retirement rule is written where engineering conventions live, and the
   assert.match(coding, /### Retiring a name/);
   assert.match(coding, /every use of a retired name is replaced in the same change/);
   assert.match(list.$about, /docs\/engineering\/coding\.md § Retiring a name/);
+});
+
+/* ─── the three lists the checks used to keep for themselves ───────────────── */
+
+const spellingsOf = (rule) => retirement.ofKind('spelling').filter((row) => row.rule === rule);
+
+test('the retired path shapes, the old token reads and the reference phrases are rows of the list', () => {
+  assert.deepEqual(
+    spellingsOf('path:old').map((row) => row.not),
+    ['docs/project/', 'docs/foundations/', 'docs/design-system/', 'docs/product-and-service/conventions/', '.agent/', 'bot-skills/', '/uno:', 'docs/product-and-service/design-system', 'design-system/docs/', 'design-system/agent-views/pages/'],
+  );
+  assert.equal(spellingsOf('read:old-token').length, 1);
+  assert.ok(spellingsOf('phrase:token-intent').length >= 24);
+  for (const rule of ['path:old', 'read:old-token', 'phrase:token-intent']) {
+    for (const row of spellingsOf(rule)) assert.doesNotThrow(() => new RegExp(row.pattern), row.not);
+  }
+});
+
+test('the old-token row reads a name through var() and holds to the token grammar', () => {
+  const [row] = spellingsOf('read:old-token');
+  assert.ok(row.pattern.includes(TOKEN_NAME_TAIL), 'the row spells the grammar the token module owns');
+  const reads = (text) => [...text.matchAll(new RegExp(row.pattern, 'g'))].map((m) => m[1]);
+  assert.deepEqual(reads('a { b: var(--color-text); c: var( --size-100 ); d: var(--font-size-custom); e: var(--ds-text) }'), ['--color-text', '--size-100']);
+  assert.deepEqual(reads('@theme { --color-text: red; }'), [], 'a definition is not a read');
+});
+
+test('a retired path shape is a substring of a line, and a current path is not', () => {
+  const hit = (line) => spellingsOf('path:old').some((row) => new RegExp(row.pattern).test(line));
+  assert.ok(hit('see `docs/project/notes.md`'));
+  assert.ok(hit('run /uno:research'));
+  assert.ok(!hit('see `docs/conventions/writing.md`'));
+});
+
+test('the phrase rows and the path rows are another check\'s families, so the maintenance sweep skips them', () => {
+  for (const row of [...spellingsOf('phrase:token-intent'), ...spellingsOf('path:old'), ...spellingsOf('read:old-token')]) {
+    assert.ok(row.rule.includes(':'), `${row.not} has a kind:name rule, so it is not a plain family or a maintenance spelling`);
+  }
 });

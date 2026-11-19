@@ -144,6 +144,7 @@ import {
 } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -410,11 +411,15 @@ export function findings(source, index) {
 // data, not styling. A hex that genuinely belongs in the chrome goes in a
 // comment-justified declaration of its own and is read in review.
 
-/** Retired names, as consumed through `var()`. Definitions (Tailwind's `@theme`) are not uses. */
-export const OLD_VOCABULARY = new RegExp(
-  `var\\(\\s*(--(?:color|size|element|layout)-${TOKEN_NAME_TAIL}|--font-line-height-${TOKEN_NAME_TAIL}|--font-(?:size|family|weight)-(?:body\\d|h\\d|headline|header|code|title|normal|bold|medium|semibold-\\d))`,
-  'g',
-);
+let oldTokenRead;
+/**
+ * Retired names, as consumed through `var()`: the retirement list's `read:old-token`
+ * spelling row, whose first group is the name. Definitions (Tailwind's `@theme`) are not uses.
+ */
+export const oldTokenReads = () => {
+  oldTokenRead ??= loadRetirement(REPO_ROOT).ofKind('spelling').find((row) => row.rule === 'read:old-token').pattern;
+  return new RegExp(oldTokenRead, 'g');
+};
 const CHROME_HEX_CSS = /#[0-9a-f]{3,8}\b/gi;
 /** In a component a hex is a literal anywhere in a string or class (`bg-[#fff]`, `1px solid #ccc`); `href="#add"` has no digit-or-hex run of 3+ ending at a word edge after a quote or space only. */
 const CHROME_HEX_STRING = /(?:['"`\s\[(])#(?=[0-9a-f]*\d)[0-9a-f]{3,8}\b/gi;
@@ -475,7 +480,7 @@ export function chromeFindings(source, { css, kit = false }) {
       found.push({ line, literal: m[0], kind: re === CHROME_DIMENSION ? 'dimension' : 'color-fn' });
     }
   }
-  for (const m of text.matchAll(OLD_VOCABULARY)) {
+  for (const m of text.matchAll(oldTokenReads())) {
     found.push({ line: lineOf(m.index), literal: m[1], kind: 'old-token' });
   }
   if (kit) found.push(...kitFindings(text, lineOf));

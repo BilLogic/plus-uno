@@ -58,6 +58,7 @@ import { fileURLToPath } from 'node:url';
 import { documents, links, GENERATED_BUNDLE } from './lib/corpus.mjs';
 import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -133,19 +134,15 @@ const requiredIndexes = (repoRoot) => [
   'skills/uno-research/references/patterns-index.json',
 ];
 
-/** Retired shapes. `design-system/docs/` went in #170, four homes into one. */
-const OLD_PATTERNS = [
-  'docs/project/',
-  'docs/foundations/',
-  'docs/design-system/',
-  'docs/product-and-service/conventions/',
-  '.agent/',
-  'bot-skills/',
-  '/uno:',
-  'docs/product-and-service/design-system',
-  'design-system/docs/',
-  'design-system/agent-views/pages/',
-];
+/**
+ * Retired path shapes: the retirement list's `path:old` spelling rows. `design-system/docs/`
+ * went in #170, four homes into one.
+ */
+const oldPaths = () =>
+  loadRetirement(REPO_ROOT)
+    .ofKind('spelling')
+    .filter((row) => row.rule === 'path:old')
+    .map((row) => ({ path: row.not, pattern: new RegExp(row.pattern) }));
 
 /**
  * Paths that are not active files: history keeps the words it was written in, and a
@@ -331,11 +328,11 @@ const inputs = byRoot((repoRoot) => {
       .map((line) => `${rel}:${line}`),
   );
 
-  for (const pattern of OLD_PATTERNS) {
+  for (const { path: oldPath, pattern } of oldPaths()) {
     const hits = activeLines.filter(
-      (line) => line.includes(pattern) && !skips.some((skip) => line.includes(skip)),
+      (line) => pattern.test(line) && !skips.some((skip) => line.includes(skip)),
     );
-    if (hits.length) fail(`[stale] ${hits.length} references to old path pattern: ${pattern}`);
+    if (hits.length) fail(`[stale] ${hits.length} references to old path pattern: ${oldPath}`);
   }
 
   return { found, notes };

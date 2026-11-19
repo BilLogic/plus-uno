@@ -739,6 +739,378 @@
       "rule": "class:plus-btn",
       "caseSensitive": true,
       "pattern": "plus-btn--(?:filled|tonal|outline|ghost|text|small|medium|large)"
+    },
+    {
+      "not": "(e.g. semantic badges, status pills, callout chips)",
+      "use": [
+        "(e.g. a StatusTag or CountTag)"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "\\(e\\.g\\. semantic badges, status pills, callout chips\\)"
+    },
+    {
+      "not": "(e.g. status pills, callout chips)",
+      "use": [
+        "(e.g. a StatusTag)"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "\\(e\\.g\\. status pills, callout chips\\)"
+    },
+    {
+      "not": "lozenges and badges",
+      "use": [
+        "status tags and count tags"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "lozenges and badges"
+    },
+    {
+      "not": "lozenges",
+      "use": [
+        "status tags"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "lozenges"
+    },
+    {
+      "not": "such as Jira cards in columns",
+      "use": [
+        "such as cards in board columns"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "such as Jira cards in columns"
+    },
+    {
+      "not": "such as Jira cards on a Kanban board",
+      "use": [
+        "such as cards on a board"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "such as Jira cards on a Kanban board"
+    },
+    {
+      "not": "selected Editor blocks",
+      "use": [
+        "selected blocks in a RichTextEditor"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "selected Editor blocks"
+    },
+    {
+      "not": "deletion of Editor block elements",
+      "use": [
+        "deleting a block in a RichTextEditor"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "deletion of Editor block elements"
+    },
+    {
+      "not": "close buttons on toasts, chips on bold fills",
+      "use": [
+        "close buttons on flags, tags on bold fills"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "close buttons on toasts, chips on bold fills"
+    },
+    {
+      "not": "Subject tag and chip fill",
+      "use": [
+        "Subject tag fill"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "Subject tag and chip fill"
+    },
+    {
+      "not": "subject chip",
+      "use": [
+        "subject tag"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "subject chip"
+    },
+    {
+      "not": "a filled badge",
+      "use": [
+        "a filled tag"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "a filled badge"
+    },
+    {
+      "not": "modals, dialogs, dropdown menus",
+      "use": [
+        "modals, menus"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "modals, dialogs, dropdown menus"
+    },
+    {
+      "not": "the opened state of a dropdown trigger",
+      "use": [
+        "the opened state of a Select trigger"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "the opened state of a dropdown trigger"
+    },
+    {
+      "not": "side panel dividers",
+      "use": [
+        "Panel dividers"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "side panel dividers"
+    },
+    {
+      "not": "modal dialogs",
+      "use": [
+        "a Modal"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "modal dialogs"
+    },
+    {
+      "not": "menus, popovers, tooltips",
+      "use": [
+        "menus, popups, tooltips"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "menus, popovers, tooltips"
+    },
+    {
+      "not": "The Surface pattern's 1px edge",
+      "use": [
+        "A container's 1px edge"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "The Surface pattern's 1px edge"
+    },
+    {
+      "not": "visualisation",
+      "use": [
+        "visualization"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "visualisation"
+    },
+    {
+      "not": "'to-do' statues",
+      "use": [
+        "'to-do' statuses"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "'to-do' statues"
+    },
+    {
+      "not": "sit on top of they UI",
+      "use": [
+        "sit on top of the UI"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "sit on top of they UI"
+    },
+    {
+      "not": "used in error handing",
+      "use": [
+        "used in error handling"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "used in error handing"
+    },
+    {
+      "not": "success section messaged",
+      "use": [
+        "success section messages"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "success section messaged"
+    },
+    {
+      "not": "such in error",
+      "use": [
+        "such as in error"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "such in error"
+    },
+    {
+      "not": "For backgrounds",
+      "use": [
+        "Backgrounds"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "^For backgrounds"
+    },
+    {
+      "not": "Vibrant for backgrounds",
+      "use": [
+        "Vibrant backgrounds"
+      ],
+      "why": "reference wording; a token's intent says it in PLUS words",
+      "caseSensitive": true,
+      "rule": "phrase:token-intent",
+      "pattern": "^Vibrant for backgrounds"
+    },
+    {
+      "not": "docs/project/",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "docs/project/"
+    },
+    {
+      "not": "docs/foundations/",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "docs/foundations/"
+    },
+    {
+      "not": "docs/design-system/",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "docs/design-system/"
+    },
+    {
+      "not": "docs/product-and-service/conventions/",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "docs/product-and-service/conventions/"
+    },
+    {
+      "not": ".agent/",
+      "use": [
+        "skills/ and agents/"
+      ],
+      "why": "a retired path; it is now skills/ and agents/, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "\\.agent/"
+    },
+    {
+      "not": "bot-skills/",
+      "use": [
+        "agents/uno-bot/skills/"
+      ],
+      "why": "a retired path; it is now agents/uno-bot/skills/, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "bot-skills/"
+    },
+    {
+      "not": "/uno:",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "/uno:"
+    },
+    {
+      "not": "docs/product-and-service/design-system",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "docs/product-and-service/design-system"
+    },
+    {
+      "not": "design-system/docs/",
+      "use": [
+        "design-system/guidelines/"
+      ],
+      "why": "a retired path; it is now design-system/guidelines/, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "design-system/docs/"
+    },
+    {
+      "not": "design-system/agent-views/pages/",
+      "use": [
+        "its current home"
+      ],
+      "why": "a retired path; its contents moved, and the old path may not come back in an active file",
+      "caseSensitive": true,
+      "rule": "path:old",
+      "pattern": "design-system/agent-views/pages/"
+    },
+    {
+      "not": "a retired token family read through var()",
+      "use": [
+        "a --ds-* color token",
+        "a space, size, radius or template token",
+        "a text style"
+      ],
+      "why": "the --color-*, --size-*, --element-*, --layout-* and old --font-* names are gone; a var() that reads one is a retired name still in use",
+      "caseSensitive": true,
+      "rule": "read:old-token",
+      "pattern": "var\\(\\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-line-height-[a-z0-9-]+|--font-(?:size|family|weight)-(?:body\\d|h\\d|headline|header|code|title|normal|bold|medium|semibold-\\d))"
     }
   ],
   "outside": [
@@ -784,7 +1156,37 @@
     "a --ds-* shadow or surface token",
     "a space, size, radius or template token",
     "a text style",
-    "option isDisabled"
+    "option isDisabled",
+    "(e.g. a StatusTag or CountTag)",
+    "(e.g. a StatusTag)",
+    "status tags and count tags",
+    "status tags",
+    "such as cards in board columns",
+    "such as cards on a board",
+    "selected blocks in a RichTextEditor",
+    "deleting a block in a RichTextEditor",
+    "close buttons on flags, tags on bold fills",
+    "Subject tag fill",
+    "subject tag",
+    "a filled tag",
+    "modals, menus",
+    "the opened state of a Select trigger",
+    "Panel dividers",
+    "a Modal",
+    "menus, popups, tooltips",
+    "A container's 1px edge",
+    "visualization",
+    "'to-do' statuses",
+    "sit on top of the UI",
+    "used in error handling",
+    "success section messages",
+    "such as in error",
+    "Backgrounds",
+    "Vibrant backgrounds",
+    "its current home",
+    "skills/ and agents/",
+    "agents/uno-bot/skills/",
+    "design-system/guidelines/"
   ],
   "allowed": [
     {
