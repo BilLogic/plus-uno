@@ -238,7 +238,7 @@ test('a modal is never taller than the screen less the overlay pad above and bel
 test('no new token name uses a banned word', () => {
   const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad'];
   for (const name of names) {
-    assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
+    assert.doesNotMatch(name, /margin|shell|slot|viewport/, name);
   }
 });
 

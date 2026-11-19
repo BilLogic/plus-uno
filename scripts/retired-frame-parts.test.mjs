@@ -9,7 +9,9 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const RETIRED = /top ?bar|focused[ -](view|frame|type|page)|frame-focused|focusedFrame/i;
+const RETIRED = /(?<![a-z])top[ _-]?bar|focused[ _-](view|frame|type|page)|frame-focused|focusedFrame/i;
+
+const SELF = 'scripts/retired-frame-parts.test.mjs';
 
 const ROOTS = ['design-system', 'docs', 'scripts', 'agents', 'GLOSSARY.md'];
 
@@ -24,12 +26,9 @@ const HISTORY = [
   'design-system/figma/node-types.json',
   'design-system/figma/registry-audit.md',
   'design-system/src/styles/Grid.mdx',
-  'design-system/src/styles/Spacing.mdx',
   'design-system/agent-views/foundations/Grid.md',
-  'design-system/agent-views/foundations/Spacing.md',
   'design-system/agent-views/ds-index.json', // embeds the Grid guide until its rewrite regenerates it
   'docs/knowledge/figma-clipping-audit-2026-11-12.md',
-  'scripts/retired-frame-parts.test.mjs',
 ];
 
 const trackedFiles = () =>
@@ -38,6 +37,7 @@ const trackedFiles = () =>
     .split('\0')
     .filter(Boolean)
     .filter((f) => !HISTORY.some((h) => f === h || (h.endsWith('/') && f.startsWith(h))))
+    .filter((f) => f !== SELF)
     .filter((f) => !/\.(png|jpe?g|webp|svg|woff2?|mp3|wav|ogg|ico|gif)$/i.test(f));
 
 test('no live doc or source file names a top bar or the Frame focused type', () => {
@@ -56,5 +56,14 @@ test('the pattern catches each retired shape', () => {
   for (const s of ['the top bar', 'Topbar', 'plus-frame__topbar', 'Frame focused type', 'focused view', 'frame-focused', 'focused-page-pad-x', 'focusedFrame']) {
     assert.match(s, RETIRED, s);
   }
-  for (const s of ['focused search', 'border-focused', 'a view bar']) assert.doesNotMatch(s, RETIRED, s);
+  for (const s of ['focused search', 'border-focused', 'a view bar', 'desktop bar']) assert.doesNotMatch(s, RETIRED, s);
+});
+
+test('every exemption still names a file or folder that exists and still earns its place', () => {
+  for (const h of HISTORY) {
+    const full = path.join(REPO_ROOT, h);
+    assert.ok(fs.existsSync(full), `${h} is exempt but does not exist`);
+    if (h.endsWith('/')) continue;
+    assert.match(fs.readFileSync(full, 'utf8'), RETIRED, `${h} no longer needs its exemption`);
+  }
 });
