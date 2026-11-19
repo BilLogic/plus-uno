@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, Dialog, FooterActions, ProgressTracker, TextField } from '@/components';
 import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ConfirmInside, ModalStage, SCREEN, TwoCells } from './modalDemo.jsx';
 
 /**
  * The live do and don't examples on the Modal template page, composed from
@@ -142,3 +144,37 @@ export const TabsForStepsModal = () => {
         </CaseBlanket>
     );
 };
+
+const confirmBody = <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>This removes Thursday's session for Ana and her tutor.</p>;
+
+/** The stand-in screen, scaled to the example's card so the Modal's width step reads against it. */
+const OnScreen = ({ children }) => <FitStage width={SCREEN.width} reflow={false}>{children}</FitStage>;
+
+const ConfirmAt = ({ width }) => (
+    <OnScreen><ModalStage width={width} screenHeight={300} title="Delete session?" footer={<TwoCells secondary="Keep session" action="Delete session" appearance="danger" />}>
+        {confirmBody}
+    </ModalStage></OnScreen>
+);
+
+/** A confirm at the narrow step: the title, one line and two buttons. */
+export const ConfirmNarrow = () => <ConfirmAt width="4-col" />;
+
+/** The same confirm at a wide step: empty width around one line. */
+export const ConfirmWide = () => <ConfirmAt width="10-col" />;
+
+/** One Modal that confirms inside itself, with a message and its own buttons. */
+export const ConfirmsInside = () => <OnScreen><ConfirmInside start="confirm" /></OnScreen>;
+
+/** A Modal opened on another Modal, a second Blanket dimming the first. */
+export const ModalOnModal = () => (
+    <OnScreen><div style={{ position: 'relative' }}>
+        <ModalStage screenHeight={300} title="Session details" footer={<TwoCells secondary="Keep session" action="Delete session" appearance="danger" />}>
+            {confirmBody}
+        </ModalStage>
+        <div style={{ position: 'absolute', inset: 0 }}>
+            <ModalStage width="4-col" screenHeight={300} title="Delete session?" footer={<TwoCells secondary="Back" action="Delete" appearance="danger" />}>
+                {confirmBody}
+            </ModalStage>
+        </div>
+    </div></OnScreen>
+);

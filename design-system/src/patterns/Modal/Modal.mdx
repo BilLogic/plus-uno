@@ -17,17 +17,16 @@ import {
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    ConfirmNarrow,
-    ConfirmsInside,
-    ConfirmWide,
-    ModalOnModal,
-} from '@/storybook-docs/illustrations/modal.jsx';
-import {
     ButtonInBodyModal,
     FooterPinnedModal,
     StepsFooterModal,
     TabsForStepsModal,
+    ConfirmNarrow,
+    ConfirmsInside,
+    ConfirmWide,
+    ModalOnModal,
 } from './ModalCases.jsx';
+import { CODE } from './ModalCaseCode.js';
 
 <Meta of={ModalStories} />
 
@@ -429,8 +428,10 @@ A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps 
 
 <DoDontPair
     doExample={<ConfirmNarrow />}
+    doCode={CODE.ConfirmNarrow}
     doCaption="A confirm at the narrow step: the title, one line and two buttons."
     dontExample={<ConfirmWide />}
+    dontCode={CODE.ConfirmWide}
     dontCaption="The same confirm at a wide step: empty width around one line, picked to make it look a certain way."
 />
 
@@ -442,8 +443,10 @@ Stacking holds the rule. The overlay module keeps a second Modal closed and call
 
 <DoDontPair
     doExample={<ConfirmsInside />}
+    doCode={CODE.ConfirmsInside}
     doCaption="One Modal that confirms inside itself, with a message and its own buttons."
     dontExample={<ModalOnModal />}
+    dontCode={CODE.ModalOnModal}
     dontCaption="A Modal opened on another Modal, a second Blanket dimming the first."
 />
 
