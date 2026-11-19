@@ -88,7 +88,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - For a decision that must happen before the page continues, use `Modal`.
 - For a queue page, use `Panel` docked beside the list; the record opens on demand.
 - For a short aside off a control, use `Popup`.
-- For complex or multistep work, give the record its own page with `Frame` · focused.
+- For complex or multistep work, give the record its own page with a multi-step task on `Frame`.
 
 ## Parts
 

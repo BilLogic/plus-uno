@@ -37,7 +37,7 @@ import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
  *
  *   Marks          the fields with their minority marker and their captions
  *   BoundInputs    a control that cannot be wrong, in place of a free one
- *   QuestionStep   one focal question per step on Frame · focused
+ *   QuestionStep   one focal question per step on Frame
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -277,7 +277,7 @@ const hasAnswer = (step, answer) => (
 );
 
 /**
- * One question per step inside the Forms pattern's In steps host (Frame · focused).
+ * One question per step inside the Forms pattern's In steps host (a task on Frame).
  * Under five steps, ProgressIndicator dots sit centered above the question;
  * at five or more, the host switches to its left step list. Continue stays
  * enabled and validates on press.

@@ -15,7 +15,7 @@ The place sets the footer. The fields are the same everywhere.
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.
 - **In a Panel.** Editing a record beside the page. A full-bleed footer, only while editing.
 - **In a Modal.** Fewer than five fields. A full-bleed footer, Primary furthest right.
-- **In steps.** a multi-step task with the form in the body. The footer carries Save and exit, Back and Next.
+- **In steps.** A multi-step task with the form in the body. The footer carries Save and exit, Back and Next.
 
 ## Anatomy
 
@@ -131,7 +131,7 @@ Form reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| focus | Update a value or state | `--ds-motion-appearance-fast` | A form in a page, a Panel or a Modal moves by its container; a form in steps is Frame, focused. A field's border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms. |
+| focus | Update a value or state | `--ds-motion-appearance-fast` | A form in a page, a Panel or a Modal moves by its container; a form in steps is a multi-step task on Frame. A field's border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms. |
 | error | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed. |
 
 ## Best practices

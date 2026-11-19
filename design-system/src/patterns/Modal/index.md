@@ -47,7 +47,7 @@ Modal reads these motion tokens and no literal duration or curve.
 - For the dialog panel itself with no Blanket or modal behavior, use `Dialog` (`@/components`).
 - For content read beside the page, use `Panel`.
 - For a short aside off a control, use `Popup`.
-- For a long or stepped task, use `Frame` · focused.
+- For a long or stepped task, use `Frame`.
 - For a passing notice, use `Flag`.
 
 ## Best practices

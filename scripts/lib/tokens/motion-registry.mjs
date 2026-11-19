@@ -45,7 +45,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       title: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops.' },
-      anchor: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks.' },
+      anchor: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control.' },
       'tabs-shadow': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The tabs\' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person\'s own scroll.' },
     },
   },
@@ -118,7 +118,7 @@ export const MOTION_REGISTRY = [
     name: 'Form',
     tier: 'template',
     events: {
-      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is Frame, focused. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
+      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is a multi-step task on Frame. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
       error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed.' },
     },
   },
