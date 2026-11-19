@@ -148,11 +148,11 @@ always a kit composition, so one-off SVGs and hand-drawn figures have no home.
 
 Every Do and Don't goes through `Do`, `Dont`, `DoDont` or `DoDontPair`, and the card owns the frame: ground, border, radius, padding, height and centering. A page passes a figure and a caption, nothing else.
 
-- The figure is a live PLUS component, or an illustration-kit drawing when the lesson holds with every word removed. No `style`, `<svg>`, `<img>` or hex color on a figure. Several parts sit in `FigureRow` or `FigureStack`; a region, a bold ground or a narrow screen is `FigureBox`, `FigureGround` or `FigureScreen`. A figure whose subject is the styling itself (a Foundations page) is a named figure component.
+- The figure is a live PLUS component, or an illustration-kit drawing when the lesson holds with every word removed. No `style`, `<svg>`, `<img>` or hex color on a figure. Several parts sit in `FigureRow` or `FigureStack`; a region, a bold ground or a narrow screen is `FigureBox`, `FigureGround` or `FigureScreen`. A figure whose subject is the styling itself (a Foundations page) is a named `*Figure` component, and only there may it carry an inline `style`; a pattern or component page has no such exemption.
 - The caption is one sentence under the figure, saying what to do or not do. Do and Don't show the same component, so only the point differs; where a swap is the lesson, the caption says so.
 - A pair sits side by side at docs width and stacks when narrow. `stacked` is for a figure that needs the full width, and its value says why.
 
-`npm run check:dodont-figures` fails on a figure with an inline style, an `<svg>`, an `<img>` or a hex color, on a missing or two-sentence caption, and on `stacked` with no reason.
+`npm run check:dodont-figures` follows a `<XFigure />` helper to its definition in the same file and fails on a figure (or helper) with an inline style (except in a named `*Figure` helper on a Foundations page), an `<svg>`, an `<img>` or a hex color, on a missing or two-sentence caption, and on `stacked` with no reason.
 
 ## Spacing
 
