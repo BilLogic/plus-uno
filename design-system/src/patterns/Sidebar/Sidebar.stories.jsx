@@ -259,10 +259,53 @@ export const Geometry = {
         await expect(centerX(canvasElement, close), 'Close all on the trailing column').toBeCloseTo(208, 0);
         const twist = within(nav(canvasElement)).getAllByRole('button', { name: /Hide .* tabs/ })[0];
         await expect(centerX(canvasElement, twist), 'the collapse angle on the icon column').toBeCloseTo(32, 0);
+        // The nav sits 12 under the logo row, the account row pads 8 over 16 and
+        // 12 around, and the two small corners stay 2: none of these may move.
+        await expect(px(getComputedStyle(nav(canvasElement)).marginTop), 'nav sits 12 under the logo row').toBeCloseTo(12, 0);
+        const account = getComputedStyle(canvasElement.querySelector('.plus-sidebar-account'));
+        await expect([px(account.paddingTop), px(account.paddingRight), px(account.paddingBottom), px(account.paddingLeft)], 'account row pad 8 16 12 12').toEqual([8, 16, 12, 12]);
+        await expect(px(account.marginTop), 'account row sits 8 under the nav').toBeCloseTo(8, 0);
         const measured = { ...grid, thread: threadX, toggle: centerX(canvasElement, toggle), help: centerX(canvasElement, help) };
         // The PR quotes these.
         // eslint-disable-next-line no-console
         console.info('[Sidebar geometry]', JSON.stringify(measured));
+    },
+};
+
+/**
+ * Group titles and the "Show n more" row open and close from the keyboard
+ * (Enter and Space) and report it in `aria-expanded`; the account button opens
+ * its menu the same way.
+ */
+export const KeyboardDisclosure = {
+    args: { tabSet: 'many' },
+    play: async ({ canvasElement }) => {
+        const title = within(nav(canvasElement)).getAllByRole('button', { name: 'Toolkit' })[0];
+        await expect(title).toHaveAttribute('aria-expanded', 'true');
+        const rowsBefore = nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length;
+        title.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(title).toHaveAttribute('aria-expanded', 'false');
+        await expect(nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length).toBeLessThan(rowsBefore);
+        await userEvent.keyboard(' ');
+        await expect(title).toHaveAttribute('aria-expanded', 'true');
+        await expect(nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length).toBe(rowsBefore);
+
+        const more = within(nav(canvasElement)).getByRole('button', { name: /^Show \d+ more$/ });
+        await expect(more).toHaveAttribute('aria-expanded', 'false');
+        more.focus();
+        await userEvent.keyboard('{Enter}');
+        const less = within(nav(canvasElement)).getByRole('button', { name: 'Show less' });
+        await expect(less).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.keyboard(' ');
+        await expect(within(nav(canvasElement)).getByRole('button', { name: /^Show \d+ more$/ })).toHaveAttribute('aria-expanded', 'false');
+
+        const account = within(canvasElement).getByRole('button', { name: /account menu/ });
+        account.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(account).toHaveAttribute('aria-expanded', 'true');
+        await waitFor(() => expect(within(document.body).getByRole('menuitem', { name: 'Sign out' })).toBeVisible());
+        await userEvent.keyboard('{Escape}');
     },
 };
 

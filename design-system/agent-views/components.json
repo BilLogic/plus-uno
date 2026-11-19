@@ -10316,6 +10316,7 @@
       "stories": [
         "Overview",
         "Geometry",
+        "KeyboardDisclosure",
         "Tutor",
         "PrototypeAreas",
         "OnboardingInProgress",
@@ -10376,7 +10377,6 @@
         "--pad-x-sm",
         "--pad-x-xs",
         "--radius-sm",
-        "--stack-lg",
         "--stack-md",
         "--type-weight-medium"
       ]
