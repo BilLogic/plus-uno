@@ -10,7 +10,7 @@ Also asked as: stars, score.
 
 **Source:** `design-system/src/components/forms-and-inputs/Rating/Rating.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender, Unrated, Rated, RatedNumeric, SelectedHovered, SelectedPressed, DisabledRated, Hovered, Focused, Required, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender, Unrated, Rated, Hovered, Pressed, SelectedHovered, SelectedPressed, Focused, Disabled, UnratedNumeric, RatedNumeric, HoveredNumeric, PressedNumeric, SelectedHoveredNumeric, SelectedPressedNumeric, FocusedNumeric, DisabledNumeric, RatedThumbsUp, Required
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
@@ -118,6 +118,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Selected | Every item up to the score takes a `--ds-background-selected-bold` fill with a filled icon in `--ds-icon-inverse`. Unselected items stay on the neutral circle with an outlined `--ds-icon-subtle` icon. |
 | Disabled | `--ds-background-disabled` fill and `--ds-icon-disabled` icon. Out of the tab order, still announced. |
 | Invalid, read-only | Not drawn. Validate the answer in the form and explain the error beside the rating. |
+
+The selected fill is the bold brand step because an item is a small filled control, the same ground Checkbox, Radio, Toggle, Range and Select draw when checked. The soft tint is for larger choice surfaces.
 
 ### Tokens
 
