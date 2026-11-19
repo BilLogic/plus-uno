@@ -88,7 +88,7 @@ Don't: A finished answer with no way to rate it.
 - `PromptInput`, which sends the message.
 - AI sources and AI feedback, which sit under a finished reply.
 
-Same group: `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
+Same group: `AiChat` · `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 
 ## Parts
 

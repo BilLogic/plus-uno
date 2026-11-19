@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, Modal, PANEL_STORAGE_KEY } from '@/templates';
+import { AiChat, AI_CHAT_STORAGE_KEY, Breadcrumb, Button, Sidebar } from '@/components';
+import { Modal, PANEL_STORAGE_KEY } from '@/templates';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
@@ -65,8 +65,7 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 
 export default {
     decorators: [settledLayout],
-    title: 'AI UI/Templates/AI chat',
-    id: 'ai-ai-chat',
+    title: 'AI UI/Components/AI chat',
     component: AiChat,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
@@ -77,7 +76,6 @@ export default {
     },
     render: (args) => <ChatPage {...args} />,
     argTypes: {
-        variant: { control: 'select', options: ['app', 'storybook'], table: { category: 'Design' } },
         defaultMode: { control: 'select', options: ['popup', 'panel', 'fullscreen'], table: { category: 'Design' } },
         withModal: {
             storyOnly: true,
@@ -139,15 +137,9 @@ export const Fullscreen = {
     args: { defaultMode: 'fullscreen', defaultOpen: true, storageKey: null, height: DOCS_HEIGHT },
 };
 
-/** Docs: the Storybook variant: the same chat, its mode remembered under its own key. */
-export const StorybookVariant = {
-    args: { variant: 'storybook', defaultOpen: true, storageKey: null, height: DOCS_HEIGHT },
-    parameters: { layout: 'padded' },
-};
-
 /** Docs: the playground. Chat starts open in the Panel, so every control works inline; nothing is remembered. */
 export const Interactive = {
-    args: { variant: 'app', defaultMode: 'panel', defaultOpen: true, title: 'AI chat', storageKey: null, height: DOCS_HEIGHT },
+    args: { defaultMode: 'panel', defaultOpen: true, title: 'AI chat', storageKey: null, height: DOCS_HEIGHT },
     parameters: { layout: 'padded' },
 };
 
@@ -267,20 +259,8 @@ export const PopupStaysAPopupAt768 = {
     }),
 };
 
-/** The Storybook variant carries the same header controls as the app. */
-export const StorybookVariantControls = {
-    args: { variant: 'storybook', defaultOpen: true },
-    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
-        const p = parts(canvasElement);
-        await waitFor(() => expect(p.popup()).not.toBeNull());
-        const names = within(p.popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'))
-            .filter((n) => ['Clear chat', 'Move to Panel', 'Move to popup', 'Full screen', 'More actions', 'Close chat'].includes(n));
-        await expect(names).toEqual(['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat']);
-    }),
-};
-
-/** The app variant carries every header control. */
-export const AppVariantControls = {
+/** The popup carries every header control. */
+export const HeaderControls = {
     args: { defaultOpen: true },
     play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
         const p = parts(canvasElement);

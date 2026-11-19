@@ -29,6 +29,24 @@ test('checkInventions names a missing component, prop, value or token', () => {
   ]);
 });
 
+test('checkInventions holds words, spellings and outside names to the manifests or to a named concept', () => {
+  const components = { components: [{ name: 'Flag', props: null }] };
+  const tokens = { tokens: [] };
+  const inventions = {
+    components: [],
+    props: [],
+    tokens: [],
+    concepts: ['Blanket'],
+    words: [{ not: 'scrim', use: ['Blanket'] }, { not: 'toast', use: ['Flag'] }],
+    spellings: [{ not: 'old', use: ['Nope'] }],
+    outside: [{ not: 'lozenge', use: ['StatusTag'] }],
+  };
+  assert.deepEqual(checkInventions(inventions, components, tokens), [
+    'old: Nope is not in components.json',
+    'lozenge: StatusTag is not in components.json',
+  ]);
+});
+
 test('the header renders a table per kind with the right-hand names, and the self-check ends on the checker', () => {
   const md = renderInventions({
     components: [{ not: 'Toast', use: ['Flag'], why: 'renamed' }],
@@ -36,7 +54,7 @@ test('the header renders a table per kind with the right-hand names, and the sel
     tokens: [{ not: '--space-050 (8px)', use: ['--stack-md'] }],
   });
   assert.match(md, /\| `Toast` \| `Flag` \(renamed\) \|/);
-  assert.match(md, /\| `Button variant` \| `Button appearance`, `Button appearance="default"` \|/);
+  assert.match(md, /\| `Button variant` \| `appearance`, `appearance="default"` \|/);
   assert.match(md, /\| `--space-050 \(8px\)` \| `--stack-md` \|/);
   assert.match(renderSelfCheck(), /npm run check:ds-usage/);
 });

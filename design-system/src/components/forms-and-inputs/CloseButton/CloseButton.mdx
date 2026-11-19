@@ -108,10 +108,10 @@ Use `CloseButton` wherever a surface closes as a whole, such as the corner of a 
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>No fill: the glyph alone, in either tone.</td></tr>
+<tr><td>Rest</td><td>No fill: the glyph alone, in either appearance.</td></tr>
 <tr><td>Hovered</td><td>Default: the neutral subtle hovered fill. Inverse: <code>--ds-interaction-inverse-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>Default: the neutral subtle pressed fill. Inverse: <code>--ds-interaction-inverse-pressed</code>.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>; <code>--ds-border-focused-inverse</code> for the inverse tone.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>; <code>--ds-border-focused-inverse</code> for the inverse appearance.</td></tr>
 <tr><td>Disabled</td><td>There is none. A close control is always available.</td></tr>
 </tbody>
 </DocsTable>
@@ -123,8 +123,8 @@ Use `CloseButton` wherever a surface closes as a whole, such as the corner of a 
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Fill, default tone</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps.</td></tr>
-<tr><td>Glyph, inverse tone</td><td><code>--ds-icon-inverse</code>; text <code>--ds-text-inverse</code>.</td></tr>
+<tr><td>Fill, default appearance</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps.</td></tr>
+<tr><td>Glyph, inverse appearance</td><td><code>--ds-icon-inverse</code>; text <code>--ds-text-inverse</code>.</td></tr>
 <tr><td>Size</td><td>32: <code>--control-md</code>. 24: <code>--control-sm</code>. Square.</td></tr>
 </tbody>
 </DocsTable>
@@ -156,13 +156,13 @@ Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goe
 
 ### Use inverse only on colored grounds.
 
-Inverse tone is for the declared colored and dark grounds. Neutral surfaces use default.
+The inverse appearance is for the declared colored and dark grounds. Neutral surfaces use default.
 
 <DoDontPair
     doExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></FigureBox>}
-    doCaption="Default tone on a neutral surface."
-    dontExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton tone="inverse" label="Dismiss update" /></FigureBox>}
-    dontCaption="Inverse tone on a neutral surface: the glyph disappears."
+    doCaption="Default appearance on a neutral surface."
+    dontExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton appearance="inverse" label="Dismiss update" /></FigureBox>}
+    dontCaption="Inverse appearance on a neutral surface: the glyph disappears."
 />
 
 ### Close a whole surface, not one item.
@@ -205,7 +205,7 @@ A close control stays available even while the surface it closes is loading or i
 
 - **A real, always-focusable button.** Reached with Tab and activated with Enter or Space, same as any `IconButton`.
 - **The accessible name is the whole contract.** The `xmark` glyph is decorative; `label` is the accessible name and hover title, so it must say what closes.
-- **Inverse tone preserves contrast** on dark or bold-colored surfaces.
+- **The inverse appearance preserves contrast** on dark or bold-colored surfaces.
 
 </div>
 

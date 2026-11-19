@@ -117,7 +117,7 @@ export const Spotlight = ({
     const dismissControl = dismissible && (
         <CloseButton
             label="Dismiss"
-            tone="inverse"
+            appearance="inverse"
             isTooltipDisabled
             className="plus-spotlight-dismiss-button"
             onClick={onDismiss}

@@ -49,7 +49,7 @@ Don't: The sparkle on an action that is not AI.
 - For any non-AI icon, use a Font Awesome Free glyph.
 - For the border that shows generation in progress, use `GenerativeBorder`.
 
-Same group: `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
+Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 
 ## Parts
 

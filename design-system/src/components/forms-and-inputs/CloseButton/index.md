@@ -2,7 +2,7 @@
 
 # CloseButton
 
-The one dismiss control for a surface that closes as a whole — Modal, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: "Close" for a surface that blocks (Modal), "Dismiss {what}" for a message. `tone="inverse"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.
+The one dismiss control for a surface that closes as a whole — Modal, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: "Close" for a surface that blocks (Modal), "Dismiss {what}" for a message. `appearance="inverse"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.
 
 **Import:** `import { CloseButton } from '@/components';`
 
@@ -50,10 +50,10 @@ Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goe
 
 ### Use inverse only on colored grounds. {#use-inverse-only-on-colored-grounds}
 
-Inverse tone is for the declared colored and dark grounds. Neutral surfaces use default.
+The inverse appearance is for the declared colored and dark grounds. Neutral surfaces use default.
 
-Do: Default tone on a neutral surface.
-Don't: Inverse tone on a neutral surface: the glyph disappears.
+Do: Default appearance on a neutral surface.
+Don't: Inverse appearance on a neutral surface: the glyph disappears.
 
 ### Close a whole surface, not one item. {#close-a-whole-surface-not-one-item}
 
@@ -70,7 +70,7 @@ A close control stays available even while the surface it closes is loading or i
 
 - **A real, always-focusable button.** Reached with Tab and activated with Enter or Space, same as any `IconButton`.
 - **The accessible name is the whole contract.** The `xmark` glyph is decorative; `label` is the accessible name and hover title, so it must say what closes.
-- **Inverse tone preserves contrast** on dark or bold-colored surfaces.
+- **The inverse appearance preserves contrast** on dark or bold-colored surfaces.
 
 ## Related
 
@@ -90,18 +90,18 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | No fill: the glyph alone, in either tone. |
+| Rest | No fill: the glyph alone, in either appearance. |
 | Hovered | Default: the neutral subtle hovered fill. Inverse: `--ds-interaction-inverse-hovered`. |
 | Pressed | Default: the neutral subtle pressed fill. Inverse: `--ds-interaction-inverse-pressed`. |
-| Focused | A 2px ring in `--ds-border-focused`; `--ds-border-focused-inverse` for the inverse tone. |
+| Focused | A 2px ring in `--ds-border-focused`; `--ds-border-focused-inverse` for the inverse appearance. |
 | Disabled | There is none. A close control is always available. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Fill, default tone | `--ds-background-neutral-subtle`, hovered and pressed steps. |
-| Glyph, inverse tone | `--ds-icon-inverse`; text `--ds-text-inverse`. |
+| Fill, default appearance | `--ds-background-neutral-subtle`, hovered and pressed steps. |
+| Glyph, inverse appearance | `--ds-icon-inverse`; text `--ds-text-inverse`. |
 | Size | 32: `--control-md`. 24: `--control-sm`. Square. |
 
 ## Content guidelines
@@ -117,14 +117,14 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | string | `'Close'` | "Close" for a surface that blocks; "Dismiss {what}" for a message |
-| `tone` | enum | `'default'` | `default` on neutral surfaces; `inverse` only on the declared colored and dark grounds |
+| `appearance` | enum | `'default'` | `default` on neutral surfaces; `inverse` only on the declared colored and dark grounds |
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
 | `onClick` | func | — | Called with the click event. The surface that owns the close button closes itself here. |
 | `className` | string | — | Extra class names added to the button beside the component's own. |
 
 ## Variants
 
-**`tone`** — `default` · `inverse`
+**`appearance`** — `default` · `inverse`
 
 **`spacing`** — `default` · `compact`
 

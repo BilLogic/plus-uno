@@ -25,7 +25,8 @@ function parse(target) {
 
 /**
  * Every target that names nothing real, as messages.
- * @param {{components: object[], props: object[], tokens: object[]}} inventions
+ * @param {{components: object[], props: object[], tokens: object[], words?: object[], spellings?: object[], outside?: object[], concepts?: string[]}} inventions
+ *   a words, spellings or outside row may also point at a named concept (`concepts`, e.g. Blanket) that is no component
  * @param {{components: {name: string, props: {name: string, values: string[]|null}[]|null}[]}} components
  * @param {{tokens: {name: string}[]}} tokens
  * @param {string[]} [templates]  template names (`_templates.json`), valid as a whole-name target
@@ -35,8 +36,11 @@ export function checkInventions(inventions, components, tokens, templates = []) 
   const templateNames = new Set(templates);
   const tokenNames = new Set(tokens.tokens.map((t) => t.name));
   const problems = [];
-  for (const row of [...inventions.components, ...inventions.props, ...inventions.tokens]) {
+  const concepts = new Set(inventions.concepts ?? []);
+  const rows = [...inventions.components, ...inventions.props, ...inventions.tokens, ...(inventions.words ?? []), ...(inventions.spellings ?? []), ...(inventions.outside ?? [])];
+  for (const row of rows) {
     for (const target of row.use) {
+      if (concepts.has(target)) continue;
       const t = parse(target);
       if (t.kind === 'token') {
         if (!tokenNames.has(t.name)) problems.push(`${row.not}: ${target} is not in tokens.json`);
@@ -99,22 +103,24 @@ export function tokenRowConflicts(inventions, retired) {
   return problems;
 }
 
-const show = (target) => {
+/** A target as shown; `own` is the component a props row is about, whose name a same-component target leaves off. */
+const show = (target, own = null) => {
   const t = parse(target);
   if (t.kind === 'token') return `\`${t.name}\``;
-  if (t.value) return `\`${t.component} ${t.prop}="${t.value}"\``;
-  return t.prop ? `\`${t.component} ${t.prop}\`` : `\`${t.component}\``;
+  const name = t.prop && t.component === own ? '' : `${t.component} `;
+  if (t.value) return `\`${name}${t.prop}="${t.value}"\``;
+  return t.prop ? `\`${name}${t.prop}\`` : `\`${t.component}\``;
 };
 
 /** The header table: what agents reach for, and what to write instead. */
 export function renderInventions(inventions) {
-  const row = (r) => `| ${r.not.startsWith('--') || /^[A-Z]/.test(r.not) ? `\`${r.not}\`` : r.not} | ${r.use.map(show).join(', ')}${r.why ? ` (${r.why})` : ''} |`;
-  const table = (title, rows) => (rows.length ? `**${title}**\n\n| Not here | Use instead |\n|---|---|\n${rows.map(row).join('\n')}\n\n` : '');
+  const row = (r, own) => `| ${r.not.startsWith('--') || /^[A-Z]/.test(r.not) ? `\`${r.not}\`` : r.not} | ${r.use.map((u) => show(u, own ? r.not.split(' ')[0] : null)).join(', ')}${r.why ? ` (${r.why})` : ''} |`;
+  const table = (title, rows, own = false) => (rows.length ? `**${title}**\n\n| Not here | Use instead |\n|---|---|\n${rows.map((r) => row(r, own)).join('\n')}\n\n` : '');
   return (
     `## Not here → use instead\n\n` +
     `Names agents reach for that this system does not have, or has retired. Write the right-hand name.\n\n` +
     table('Components', inventions.components) +
-    table('Props', inventions.props) +
+    table('Props (same component)', inventions.props, true) +
     table('Tokens', inventions.tokens)
   );
 }

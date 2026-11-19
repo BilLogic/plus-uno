@@ -1,5 +1,5 @@
 /**
- * The grounds `CloseButton tone="inverse"` is for — the same list as the
+ * The grounds `CloseButton appearance="inverse"` is for — the same list as the
  * `@grounds` line on `.plus-close-btn--inverse` in `CloseButton.scss`.
  *
  * The InverseGrounds story renders the button on each. A unit test

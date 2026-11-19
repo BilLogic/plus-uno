@@ -115,7 +115,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Card: use when one object has a shape already agreed.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
+Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
 
 ## Types
 
