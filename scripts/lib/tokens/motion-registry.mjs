@@ -114,14 +114,6 @@ export const MOTION_REGISTRY = [
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
     },
   },
-  {
-    name: 'Form',
-    tier: 'template',
-    events: {
-      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is a multi-step task on Frame. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
-      error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed.' },
-    },
-  },
   // Patterns: how a pattern composes transitions, from 06-patterns. One row per Patterns page; check:motion-registry requires it.
   {
     name: 'Filtering',

@@ -8,8 +8,6 @@ Also asked as: field group.
 
 **Import:** `import { Fieldset } from '@/components';`
 
-**Used in:** Form (`ds guide form`)
-
 **Governed by:** Forms (`ds guide forms`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Fieldset.jsx`

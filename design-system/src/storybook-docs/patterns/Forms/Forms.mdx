@@ -1,3 +1,4 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
@@ -5,7 +6,8 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
 import { ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
-import { PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
+import { PAGE_WIDTH } from './formHosts.jsx';
+import { EditInModal, EditInPanel, OneColumnFields, TwoColumnFields } from './formLayoutCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -17,11 +19,10 @@ import { CODE } from './FormsCaseCode.js';
     page="patterns-forms"
     eyebrow="Pattern"
     title="Forms"
-    purpose="How a form takes and checks what someone types: its host, when it validates, what a blocked submit does."
+    purpose="The kinds of form and how a form takes and checks what someone types: when it validates, what a blocked submit does."
     links={{
         label: 'Uses',
         items: [
-            { title: 'Form', href: './?path=/docs/templates-form--docs' },
             { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
             { title: 'Panel', href: './?path=/docs/templates-panel--docs' },
             { title: 'Section', href: './?path=/docs/templates-section--docs' },
@@ -38,28 +39,26 @@ import { CODE } from './FormsCaseCode.js';
 
 <div className="sb-ds-doc-section">
 
-## The hosts
+## The kinds of form
 
-Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template shows their layouts; this pattern guides host selection and form behavior.
+There is no Form component or template. A form is a `Fieldset` of fields inside a host, and the host owns the title and the footer. Pick the kind by the task; its host page has the layout, the footer and the sizes.
 
 <TypeGrid>
-<TypeCard of={FormsStories.HostPage} to="#in-a-page" title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group.</TypeCard>
-<TypeCard of={FormsStories.HostPanel} to="#in-a-panel" title="In a Panel" stage={STAGE}>A short edit beside the page, with a full-bleed footer.</TypeCard>
-<TypeCard of={FormsStories.HostModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields.</TypeCard>
-<TypeCard of={FormsStories.HostSteps} to="#in-steps" title="In steps" stage={STAGE}>A stepped task on Frame.</TypeCard>
+<TypeCard of={FormsStories.KindSettingsPage} to="#settings" title="Settings" stage={PAGE_WIDTH}>Values saved as a group, on their own page.</TypeCard>
+<TypeCard of={FormsStories.KindCreate} to="#create" title="Create" stage={STAGE}>A rare, critical task with fewer than five fields.</TypeCard>
+<TypeCard of={FormsStories.KindQuickEdit} to="#quick-edit" title="Quick edit" stage={STAGE}>A short edit of a row, with the page still in view.</TypeCard>
+<TypeCard of={FormsStories.KindSteps} to="#in-steps" title="In steps" stage={STAGE}>A long form someone works through.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={FormsStories.HostPage} title="In a page" description="Settings and anything saved as a group. Buttons left-aligned under the fields." />
+<ComponentExample of={FormsStories.KindSettingsPage} title="Settings" description={<>Hosted by the <DocsLink id="templates-section">Section</DocsLink> page header: its title is the page's h1 and a settings page with several groups uses subsections.</>} />
 
-<ComponentExample of={FormsStories.HostPanel} title="In a Panel" description="A short edit from a table, with the page in view. Discard and Save full bleed at the bottom, no Cancel." />
+<ComponentExample of={FormsStories.KindInstantSettings} title="Instant settings" description="Settings that apply at once sit in grouped SettingRows under section headings on the page, dividing rows with `--border-width-default` and no card per row: Toggle (with no own label), compact Select, and connection rows with StatusTag beside the label and Button at the end. Flipping a Toggle saves immediately and confirms with a Flag." />
 
-<ComponentExample of={FormsStories.HostModal} title="In a Modal" description="A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col." />
+<ComponentExample of={FormsStories.KindCreate} title="Create" description={<>Hosted by a <DocsLink id="templates-modal">Modal</DocsLink>, which owns its footer. A confirm on the way out stays in the same Modal.</>} />
 
-<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame: the Progress indicator above one question under five steps, or the left step list at five or more." />
+<ComponentExample of={FormsStories.KindQuickEdit} title="Quick edit" description={<>Hosted by a <DocsLink id="templates-panel">Panel</DocsLink>, which owns its footer and shows it only while editing.</>} />
 
-<ComponentExample of={FormsStories.SettingsInPage} title="Settings on a page" description="Settings that apply at once sit in grouped SettingRows under section headings on the page, dividing rows with `--border-width-default` and no card per row: Toggle (with no own label), compact Select, and connection rows with StatusTag beside the label and Button at the end. Flipping a Toggle saves immediately and confirms with a Flag." />
-
-<ComponentExample of={FormsStories.OneQuestionPerStep} title="One question per step" description="In steps, a multi-step task on Frame for sign-up, training check-ins and site setup: ProgressIndicator dots centered above the question under five steps (the host's left step list at five or more), a heading and one line, pictured RadioGroup or CheckboxGroup tiles, and Back (Subtle) and Continue (Primary) centered below. Continue stays enabled and validates on press." />
+<ComponentExample of={FormsStories.KindSteps} title="In steps" description={<>Hosted by the multi-step task on <DocsLink id="templates-frame">Frame</DocsLink>: one group of fields per step, under the steps in the Sidebar. The task owns the footer, one for every step, whatever the question.</>} />
 
 </div>
 
@@ -127,17 +126,18 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 
 <DocsTable>
 <thead>
-<tr><th>The form…</th><th>Host</th><th>Buttons</th></tr>
+<tr><th>The form…</th><th>Kind</th><th>Host</th></tr>
 </thead>
 <tbody>
-<tr><td>is saved as a group on its own page: settings, a profile</td><td>In a page</td><td>Left-aligned under the fields, Primary first, Cancel Subtle</td></tr>
-<tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel; a declining action is Default in the left half</td></tr>
-<tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Discard (Default) and the action (Primary), full bleed, no Cancel</td></tr>
-<tr><td>is long, or has sections someone works through</td><td>In steps, a multi-step task on Frame</td><td>Save and exit, Back and Next in the footer, no Cancel</td></tr>
-<tr><td>asks one big question per step (sign-up, check-in, site setup)</td><td>In steps, a multi-step task on Frame</td><td>Back (Subtle) and Continue (Primary) centered under the tiles</td></tr>
-<tr><td>asks for one value read far more than changed</td><td>Inline edit on the record</td><td>None; it saves on its own</td></tr>
+<tr><td>is saved as a group on its own page: settings, a profile</td><td>Settings</td><td><DocsLink id="templates-section">Section</DocsLink> page header on the Page</td></tr>
+<tr><td>is rare and critical, with fewer than five fields</td><td>Create</td><td><DocsLink id="templates-modal">Modal</DocsLink>, 8-col</td></tr>
+<tr><td>is a short edit of a row, with the page still in view</td><td>Quick edit</td><td><DocsLink id="templates-panel">Panel</DocsLink>, Details</td></tr>
+<tr><td>is long, or has sections someone works through</td><td>In steps</td><td>Multi-step task on <DocsLink id="templates-frame">Frame</DocsLink></td></tr>
+<tr><td>asks for one value read far more than changed</td><td>None: inline edit</td><td>The record, which saves on its own</td></tr>
 </tbody>
 </DocsTable>
+
+Where the buttons sit and in which look is each host's footer, and <DocsLink id="patterns-common-actions">Common actions</DocsLink> for the rules across them. A Popup never holds a form.
 
 </div>
 
@@ -213,7 +213,7 @@ A caption stays after the person types and is read by a screen reader with the f
 
 <RuleTag kind="automatic" />
 
-Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Save and exit keeps the answers and leaves; Back in the inner sidebar asks first if anything is unsaved.
+Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Back in the inner sidebar asks first if anything is unsaved.
 
 ### Prefer a bound input to a free one.
 
@@ -225,19 +225,42 @@ Up to five choices: `RadioGroup` or checkboxes, visible at once. Six or more: `S
 
 <RuleTag kind="review" />
 
-The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` legend, two or three words, a noun phrase. Labels are sentence case, one to three words, naming the field rather than what to do.
+The form's title is the page, Panel or Modal heading, never a generic "Form". Groups take a `Fieldset` legend, two or three words, a noun phrase. Labels are sentence case, one to three words, naming the field rather than what to do.
+
+### Keep a form to one column.
+
+<RuleTag kind="review" />
+
+Pair two fields side by side only when they belong together, such as first and last name, or date and time. Anything else reads down one column.
+
+<DoDontPair
+    doExample={<OneColumnFields />}
+    doCaption="One column, so the eye moves straight down."
+    dontExample={<TwoColumnFields />}
+    dontCaption="Unrelated fields scattered across two columns."
+/>
+
+### Keep a short edit beside the page.
+
+<RuleTag kind="review" />
+
+Editing a row opens a Panel so the person keeps the page in view. A Modal is for a rare, critical task with fewer than five fields.
+
+<DoDontPair
+    stacked="Each figure is a page with a table and a Panel beside it, too wide to halve."
+    doExample={<EditInPanel />}
+    doCode={CODE.EditInPanel}
+    doCaption="A short edit in a Panel, the rows still in view."
+    dontExample={<EditInModal />}
+    dontCode={CODE.EditInModal}
+    dontCaption="The same short edit in a Modal that covers the rows."
+/>
 
 ### Set autofill on every field the browser can fill.
 
 <RuleTag kind="automatic" />
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
-
-### Center the Progress indicator above a single-question step under five steps.
-
-<RuleTag kind="automatic" />
-
-When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center the `ProgressIndicator` above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
 
 </div>
 
@@ -282,12 +305,11 @@ When the In steps host asks one focal question per step with two to four picture
 <tr><th>Part</th><th>Component</th><th>Notes</th></tr>
 </thead>
 <tbody>
-<tr><td>Fields</td><td><a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
+<tr><td>Fields</td><td>`Fieldset`</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
 <tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
 <tr><td>Choices</td><td>`RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong; pictured tiles for one big question per step.</td></tr>
 <tr><td>Settings rows</td><td>`SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag`</td><td>Divided rows under section headings with no card per row; flipping a toggle confirms via Flag.</td></tr>
-<tr><td>Step progress</td><td>`ProgressIndicator`, `ProgressTracker`</td><td>Progress indicator centered above a single-question step under five steps; the left step list at five or more.</td></tr>
-<tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a></td><td>A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused.</td></tr>
+<tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-section--docs">Section</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>, <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a></td><td>A page (under its Section header, no Section around the fields), a Panel, a Modal, or the multi-step task on Frame. Each owns its footer.</td></tr>
 <tr><td>Confirm view</td><td>Modal</td><td>Swapped in place today. <PlannedTag /> A confirm view prop is Planned.</td></tr>
 </tbody>
 </DocsTable>
@@ -299,7 +321,7 @@ When the In steps host asks one focal question per step with two to four picture
 ## Related
 
 - <a target="_top" href="./?path=/docs/patterns-common-actions--docs">Common actions</a>: use for where the buttons sit and which look they take.
-- <a target="_top" href="./?path=/docs/templates-form--docs">Form</a>: use for how a form sits in each host.
+- <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>: use for each host's layout and footer.
 - <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for a form that is sending.
 - <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use for a submit that cannot run yet.
 - <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>: use for where a failed save shows.

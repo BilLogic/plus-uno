@@ -8,8 +8,6 @@ Also asked as: dots, carousel dots, step dots, slide marker.
 
 **Import:** `import { ProgressIndicator } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`)
-
 **Source:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx`
 
 **Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing, Rest, Hovered, Pressed, Focused, Decorative, SizeTokens, Timed, Clock, TimedInteractive
