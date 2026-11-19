@@ -2,7 +2,7 @@
 
 # Rating
 
-Rating component with 5 stars, supporting two variants: 1. With "Comments" label below 2. With numeric labels (1-5) above each star
+Rating component with 5 stars, supporting two types: 1. With "Comments" label below 2. With numeric labels (1-5) above each star
 
 Also asked as: stars, score.
 
@@ -18,7 +18,7 @@ Also asked as: stars, score.
 
 ## Usage
 
-Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `variant` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
+Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `type` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
 
 ## Motion
 
@@ -104,8 +104,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 1. **Label.** Text above the row that names the rating. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 2. **Items.** Five 32 circles, each drawing a 16 icon. Items up to the score are filled.
-3. **Number.** In the numeric variant, 1 to 5 above each item.
-4. **Caption.** In the comments variant, one line under the row.
+3. **Number.** In the numeric type, 1 to 5 above each item.
+4. **Caption.** In the comments type, one line under the row.
 
 ### States
 
@@ -147,9 +147,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
 | `isRequired` | bool | `false` | Marks the radiogroup required (`aria-required`). Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `value` | number | `0` | Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. |
-| `variant` | enum | `'comments'` | `comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon. |
-| `showCommentsLabel` | bool | `true` | Shows `commentsLabel` under the stars. Applies to the `comments` variant only. |
-| `commentsLabel` | node | `'Comments'` | Text under the stars in the `comments` variant. Defaults to "Comments". |
+| `type` | enum | `'comments'` | `comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon. |
+| `showCommentsLabel` | bool | `true` | Shows `commentsLabel` under the stars. Applies to the `comments` type only. |
+| `commentsLabel` | node | `'Comments'` | Text under the stars in the `comments` type. Defaults to "Comments". |
 | `isDisabled` | bool | `false` | Disables every icon so no rating can be picked. |
 | `onChange` | func | — | Called with the new rating (1 to 5) when the user picks a different star. |
 | `className` | string | `''` | Extra class on the wrapper around the label and stars. |
@@ -160,7 +160,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 **`labelMarker`** — `required` · `optional`
 
-**`variant`** — `comments` · `numeric`
+**`type`** — `comments` · `numeric`
 
 **`icon`** — `star` · `thumbs-up`
 
@@ -176,7 +176,7 @@ Implemented as `RatingItem`.
 |------|------|---------|-------------|
 | `value` | number (required) | — | The rating this item stands for, 1 to 5. It is the value `onChange` reports when the item is picked. |
 | `selected` | bool | — | Filled — true for every item up to the rating. |
-| `variant` | enum | — | `numeric` prints the value above the icon; `comments` shows the icon alone. |
+| `type` | enum | — | `numeric` prints the value above the icon; `comments` shows the icon alone. |
 | `icon` | enum | — | The glyph for the item: `star` (default) or `thumbs-up`. |
 | `disabled` | bool | — | Disables the item. Rating passes its `isDisabled` here. |
 | `className` | string | — | Extra class on the item circle, beside `plus-rating-item`. |

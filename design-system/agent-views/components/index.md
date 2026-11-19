@@ -51,6 +51,9 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button appearance="secondary"` | `Button appearance="default"` |
 | `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
 | `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
+| `Rating variant` | `Rating type` |
+| `CloseButton tone` | `CloseButton appearance` |
+| `AiChat variant` | `AiChat storageKey` |
 
 **Tokens**
 

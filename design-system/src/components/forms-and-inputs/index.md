@@ -108,7 +108,7 @@ authored half, counted rather than assumed.
   - For an exact numeric value, use `TextField` with `type="number"`.
   - For a five-point satisfaction score, use `Rating`.
   - For a choice among a few discrete options, use `RadioGroup` or `Select`.
-- **[Rating](Rating/index.md)** — Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `variant` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
+- **[Rating](Rating/index.md)** — Use `Rating` for a five-point satisfaction score given in one gesture, such as end-of-session feedback. Five items is the whole scale; there is no other length. `type` is `comments` (one caption below the row) or `numeric` (1 to 5 above each item); `icon` is `star` or `thumbs-up`.
   - For a continuous or wider numeric span, use `Range`.
   - For a labeled Likert scale or mutually exclusive options, use `RadioGroup`.
   - For the written feedback that accompanies a score, use `TextArea`.

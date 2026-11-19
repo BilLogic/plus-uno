@@ -14,7 +14,7 @@ const RATING_VALUES = [1, 2, 3, 4, 5];
 
 /**
  * Rating Component
- * Rating component with 5 stars, supporting two variants:
+ * Rating component with 5 stars, supporting two types:
  * 1. With "Comments" label below
  * 2. With numeric labels (1-5) above each star
  *
@@ -28,7 +28,7 @@ const Rating = ({
     labelMarker,
     isRequired = false,
     value = 0,
-    variant = 'comments', // 'comments' or 'numeric'
+    type = 'comments', // 'comments' or 'numeric'
     showCommentsLabel = true,
     commentsLabel = 'Comments',
     isDisabled = false,
@@ -100,7 +100,7 @@ const Rating = ({
                             <RatingItem
                                 value={starValue}
                                 selected={selected}
-                                variant={variant}
+                                type={type}
                                 icon={icon}
                                 disabled={isDisabled}
                                 style={itemStyle}
@@ -109,7 +109,7 @@ const Rating = ({
                     );
                 })}
             </BaseRadioGroup>
-            {variant === 'comments' && showCommentsLabel && (
+            {type === 'comments' && showCommentsLabel && (
                 <div className="plus-rating-comments-label">
                     {commentsLabel}
                 </div>
@@ -132,10 +132,10 @@ Rating.propTypes = {
     /** Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. */
     value: PropTypes.number,
     /** `comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon. */
-    variant: PropTypes.oneOf(['comments', 'numeric']),
-    /** Shows `commentsLabel` under the stars. Applies to the `comments` variant only. */
+    type: PropTypes.oneOf(['comments', 'numeric']),
+    /** Shows `commentsLabel` under the stars. Applies to the `comments` type only. */
     showCommentsLabel: PropTypes.bool,
-    /** Text under the stars in the `comments` variant. Defaults to "Comments". */
+    /** Text under the stars in the `comments` type. Defaults to "Comments". */
     commentsLabel: PropTypes.node,
     /** Disables every icon so no rating can be picked. */
     isDisabled: PropTypes.bool,
@@ -156,7 +156,7 @@ Rating.propTypes = {
 const RatingItem = ({
     value,
     selected = false,
-    variant = 'comments',
+    type = 'comments',
     icon = 'star',
     disabled = false,
     className = '',
@@ -177,7 +177,7 @@ const RatingItem = ({
 
     return (
         <div className="plus-rating-item-wrapper">
-            {variant === 'numeric' && (
+            {type === 'numeric' && (
                 <div className="plus-rating-item-label">
                     {value}
                 </div>
@@ -209,7 +209,7 @@ RatingItem.propTypes = {
     /** Filled — true for every item up to the rating. */
     selected: PropTypes.bool,
     /** `numeric` prints the value above the icon; `comments` shows the icon alone. */
-    variant: PropTypes.oneOf(['comments', 'numeric']),
+    type: PropTypes.oneOf(['comments', 'numeric']),
     /** The glyph for the item: `star` (default) or `thumbs-up`. */
     icon: PropTypes.oneOf(['star', 'thumbs-up']),
     /** Disables the item. Rating passes its `isDisabled` here. */

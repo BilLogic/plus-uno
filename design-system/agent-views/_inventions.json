@@ -229,6 +229,24 @@
         "Heading.size=lg"
       ],
       "why": "sizes match the tokens, xxl to xxs"
+    },
+    {
+      "not": "Rating variant",
+      "use": [
+        "Rating.type"
+      ]
+    },
+    {
+      "not": "CloseButton tone",
+      "use": [
+        "CloseButton.appearance"
+      ]
+    },
+    {
+      "not": "AiChat variant",
+      "use": [
+        "AiChat.storageKey"
+      ]
     }
   ],
   "tokens": [

@@ -2900,7 +2900,7 @@
       "import": "import { CloseButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx",
-      "summary": "The one dismiss control for a surface that closes as a whole — Modal, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: \"Close\" for a surface that blocks (Modal), \"Dismiss {what}\" for a message. `tone=\"inverse\"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.",
+      "summary": "The one dismiss control for a surface that closes as a whole — Modal, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: \"Close\" for a surface that blocks (Modal), \"Dismiss {what}\" for a message. `appearance=\"inverse\"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.",
       "props": [
         {
           "name": "label",
@@ -2912,7 +2912,7 @@
           "deprecated": null
         },
         {
-          "name": "tone",
+          "name": "appearance",
           "type": "enum",
           "required": false,
           "default": "'default'",
@@ -11447,7 +11447,7 @@
       "import": "import { Rating } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Rating/Rating.jsx",
-      "summary": "Rating component with 5 stars, supporting two variants: 1. With \"Comments\" label below 2. With numeric labels (1-5) above each star",
+      "summary": "Rating component with 5 stars, supporting two types: 1. With \"Comments\" label below 2. With numeric labels (1-5) above each star",
       "props": [
         {
           "name": "id",
@@ -11507,7 +11507,7 @@
           "deprecated": null
         },
         {
-          "name": "variant",
+          "name": "type",
           "type": "enum",
           "required": false,
           "default": "'comments'",
@@ -11524,7 +11524,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "Shows `commentsLabel` under the stars. Applies to the `comments` variant only.",
+          "description": "Shows `commentsLabel` under the stars. Applies to the `comments` type only.",
           "deprecated": null
         },
         {
@@ -11533,7 +11533,7 @@
           "required": false,
           "default": "'Comments'",
           "values": null,
-          "description": "Text under the stars in the `comments` variant. Defaults to \"Comments\".",
+          "description": "Text under the stars in the `comments` type. Defaults to \"Comments\".",
           "deprecated": null
         },
         {
@@ -11641,7 +11641,7 @@
               "description": "Filled — true for every item up to the rating."
             },
             {
-              "name": "variant",
+              "name": "type",
               "type": "enum",
               "required": false,
               "default": null,
