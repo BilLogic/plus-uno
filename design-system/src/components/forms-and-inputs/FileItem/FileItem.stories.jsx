@@ -49,6 +49,8 @@ export default {
             table: { category: 'Design' },
         },
         fileType: {
+            // The prop is any string; the options are the file kinds that have an icon.
+            optionsUnchecked: true,
             control: 'select',
             options: ['file', 'pdf', 'video', 'audio', 'image', 'archive', 'word', 'spreadsheet', 'presentation', 'code', 'text'],
             table: { category: 'Design' },

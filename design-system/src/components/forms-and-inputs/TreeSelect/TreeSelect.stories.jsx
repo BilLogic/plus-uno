@@ -18,10 +18,17 @@ export default {
         },
     },
     argTypes: {
-        children: { storyOnly: true, table: { disable: true } },
-        onClick: { storyOnly: true, table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         style: { table: { disable: true } },
-        contentPreset: { storyOnly: true,
+        contentPreset: {
+            storyOnly: true,
             control: 'select',
             options: ['empty', 'preselected'],
             table: { disable: true },

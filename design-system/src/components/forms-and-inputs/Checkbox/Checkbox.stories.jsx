@@ -21,7 +21,10 @@ export default {
         },
     },
     argTypes: {
-        children: { storyOnly: true, table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         label: {

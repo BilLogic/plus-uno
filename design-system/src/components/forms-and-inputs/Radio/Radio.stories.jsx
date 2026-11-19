@@ -22,19 +22,24 @@ export default {
         },
     },
     argTypes: {
-        children: { storyOnly: true, table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         label: {
             control: 'text',
             table: { category: 'Content' },
         },
-        secondLabel: { storyOnly: true,
+        secondLabel: {
+            storyOnly: true,
             control: 'text',
             description: 'Label text for the second option',
             table: { category: 'Content' },
         },
-        thirdLabel: { storyOnly: true,
+        thirdLabel: {
+            storyOnly: true,
             control: 'text',
             description: 'Label text for the third option',
             table: { category: 'Content' },

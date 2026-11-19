@@ -146,8 +146,14 @@ export default {
     render: (args) => <Live {...args} />,
     args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, lessonsLeft: 0, label: 'Main', storageKey: SIDEBAR_SECTIONS_STORAGE_KEY },
     argTypes: {
-        view: { storyOnly: true, control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Story' } },
-        tabSet: { storyOnly: true, control: 'inline-radio', options: ['none', 'few', 'many'], table: { category: 'Story' } },
+        view: {
+            storyOnly: true,
+            control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Story' },
+        },
+        tabSet: {
+            storyOnly: true,
+            control: 'inline-radio', options: ['none', 'few', 'many'], table: { category: 'Story' },
+        },
         user: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Content' } },
         groups: { control: false, table: { category: 'Content' } },
         tabs: { control: false, table: { category: 'Content' } },
@@ -174,7 +180,10 @@ export default {
         onSignOut: { table: { disable: true } },
         onHome: { table: { disable: true } },
         onToggle: { table: { disable: true } },
-        boxHeight: { storyOnly: true, table: { disable: true } },
+        boxHeight: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         id: { table: { disable: true } },
         className: { table: { disable: true } },
         style: { table: { disable: true } },

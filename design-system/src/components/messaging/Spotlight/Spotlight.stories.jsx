@@ -32,8 +32,14 @@ export default {
         onDismiss: { table: { disable: true } },
         isOpen: { table: { disable: true } },
         className: { table: { disable: true } },
-        primaryActionText: { storyOnly: true, name: 'Primary action (demo)', control: 'text', table: { category: 'Demo' } },
-        secondaryActionText: { storyOnly: true, name: 'Secondary action (demo)', control: 'text', table: { category: 'Demo' } },
+        primaryActionText: {
+            storyOnly: true,
+            name: 'Primary action (demo)', control: 'text', table: { category: 'Demo' },
+        },
+        secondaryActionText: {
+            storyOnly: true,
+            name: 'Secondary action (demo)', control: 'text', table: { category: 'Demo' },
+        },
     },
 };
 

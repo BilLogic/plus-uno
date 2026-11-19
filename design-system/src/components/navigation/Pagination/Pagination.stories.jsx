@@ -18,9 +18,18 @@ export default {
         }
     },
     argTypes: {
-        children: { storyOnly: true, table: { disable: true } },
-        onClick: { storyOnly: true, table: { disable: true } },
-        style: { storyOnly: true, table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        style: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         navigator: {
             control: 'select',
             options: ['icon', 'text'],

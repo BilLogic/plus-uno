@@ -84,6 +84,8 @@ export default {
             table: { category: 'Content' }
         },
         iconBefore: {
+            // The prop takes any glyph name or node; the options are example glyphs.
+            optionsUnchecked: true,
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,
@@ -91,6 +93,8 @@ export default {
             table: { category: 'Content' }
         },
         iconAfter: {
+            // The prop takes any glyph name or node; the options are example glyphs.
+            optionsUnchecked: true,
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,

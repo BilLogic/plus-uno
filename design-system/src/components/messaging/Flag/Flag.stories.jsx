@@ -26,7 +26,10 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { storyOnly: true, table: { disable: true } },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         appearance: {
             control: 'select',
             options: FLAG_APPEARANCES,
@@ -36,7 +39,8 @@ export default {
             control: false,
             table: { category: 'Design' }
         },
-        position: { storyOnly: true,
+        position: {
+            storyOnly: true,
             control: 'select',
             options: ['top-start', 'top-center', 'top-end', 'bottom-start', 'bottom-end'],
             table: { category: 'Layout' }

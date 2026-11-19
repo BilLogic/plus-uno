@@ -17,7 +17,10 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { storyOnly: true, table: { disable: true } },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         style: { table: { disable: true } },
         // DESIGN
         maxHeight: {

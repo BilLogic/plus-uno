@@ -136,15 +136,58 @@ test('props-parity: an argType that names no prop, and options that disagree wit
   assert.deepEqual(check(mdx(), { props, storiesSource: green }), []);
 });
 
-test('props-parity: numeric options are read, a spread constant resolves from the component, an unresolvable one is skipped', () => {
-  const props = [{ name: 'size', values: [24, 32, 40] }, { name: 'tone', values: ['a', 'b'] }, { name: 'preset', values: ['x', 'y'] }];
+const parity = (stories, props, component = '', lookup = null) =>
+  check(mdx(), { props, storiesSource: `export default { argTypes: { ${stories} } };`, componentSource: component, lookup });
+
+test('props-parity: numeric and boolean options are read, a spread constant resolves from the component', () => {
+  const props = [{ name: 'size', values: [24, 32, 40] }, { name: 'tone', values: ['a', 'b'] }, { name: 'on', type: 'bool' }];
   const component = "export const TONES = ['a', 'b'];";
-  const stories = `export default { argTypes: { size: { options: [24, 32] }, tone: { options: [undefined, ...TONES] }, preset: { options: [...Object.keys(P)] } } };`;
-  const found = check(mdx(), { props, storiesSource: stories, componentSource: component });
+  const found = parity("size: { options: [24, 32] }, tone: { options: [undefined, ...TONES] }, on: { options: [undefined, true, false] }", props, component);
   assert.deepEqual(rulesOf(found), ['props-parity']);
   assert.match(found[0].message, /`size` options \[24, 32\] differ from the prop's values \[24, 32, 40\]/);
-  const wrongTone = `export default { argTypes: { tone: { options: [...TONES, 'c'] } } };`;
-  assert.deepEqual(rulesOf(check(mdx(), { props, storiesSource: wrongTone, componentSource: component })), ['props-parity']);
+  assert.deepEqual(rulesOf(parity("tone: { options: [...TONES, 'c'] }", props, component)), ['props-parity']);
+});
+
+test('props-parity: Object.keys of a const object literal is read, from the stories, the component or the lookup', () => {
+  const props = [{ name: 'radius', values: ['sm', 'md'] }];
+  const component = "export const RADII = { sm: 2, 'md': 4 };";
+  assert.deepEqual(parity('radius: { options: Object.keys(RADII) }', props, component), []);
+  assert.deepEqual(parity('radius: { options: Object.keys(RADII) }', props, '', (n) => (n === 'RADII' ? component : null)), []);
+  const wrong = [{ name: 'radius', values: ['sm', 'lg'] }];
+  assert.deepEqual(rulesOf(parity('radius: { options: Object.keys(RADII) }', wrong, component)), ['props-parity']);
+});
+
+test('props-parity: options the check cannot read are a finding, not a skip', () => {
+  const props = [{ name: 'tone', values: ['a', 'b'] }];
+  for (const [what, options, component] of [
+    ['a spread found in no source', '[...NOWHERE]', ''],
+    ['a bare name found in no source', 'NOWHERE', ''],
+    ['a list with a call', "['a', fn('b')]", ''],
+    ['a nested spread cycle', '[...ONE]', 'const ONE = [...TWO]; const TWO = [...ONE];'],
+    ['Object.keys of a name found nowhere', 'Object.keys(NOWHERE)', ''],
+  ]) {
+    const found = parity(`tone: { options: ${options} }`, props, component);
+    assert.deepEqual(rulesOf(found), ['props-parity'], what);
+    assert.match(found[0].message, /options cannot be read/, what);
+  }
+});
+
+test('props-parity: options on a prop whose values are empty or unreadable are a finding', () => {
+  const found = parity("icon: { options: ['star'] }", [{ name: 'icon', values: null, type: 'oneOfType' }]);
+  assert.deepEqual(rulesOf(found), ['props-parity']);
+  assert.match(found[0].message, /values are empty or unreadable/);
+});
+
+test('props-parity: optionsUnchecked leaves a list out when a comment above it gives the reason, and only then', () => {
+  const props = [{ name: 'icon', values: null, type: 'oneOfType' }];
+  const noted = "icon: {\n // The prop takes any glyph name.\n optionsUnchecked: true,\n options: ['star'] }";
+  assert.deepEqual(parity(noted, props), []);
+  const bare = "icon: { optionsUnchecked: true, options: ['star'] }";
+  const found = parity(bare, props);
+  assert.deepEqual(rulesOf(found), ['props-parity']);
+  assert.match(found[0].message, /no comment above it giving the reason/);
+  // The unchecked list does not even have to be readable.
+  assert.deepEqual(parity("icon: {\n // Any glyph.\n optionsUnchecked: true,\n options: pick('x') }", props), []);
 });
 
 test('props-parity: storyOnly marks an arg with no prop; marking a real prop story-only is named', () => {
@@ -157,12 +200,18 @@ test('props-parity: storyOnly marks an arg with no prop; marking a real prop sto
   assert.match(found[0].message, /`title` is marked storyOnly but names a prop/);
 });
 
+test('storyOnly counts only as a top-level key of the argType', () => {
+  const props = [{ name: 'title' }];
+  const nested = "itemCount: { control: 'number', table: { storyOnly: true } }, hint: { description: 'storyOnly: true' }";
+  assert.deepEqual(parity(nested, props).map((f) => f.message.match(/`(\w+)`/)[1]), ['itemCount', 'hint']);
+});
+
 test('argTypesOf reads the meta argTypes, skipping strings and nested objects', () => {
   const src = `const x = { argTypes: 'no' };\nexport default {\n  argTypes: {\n    a: { table: { category: 'C' } },\n    'b-c': { options: ["x", 'y'] },\n    d: { description: "{" },\n  },\n};`;
   assert.deepEqual(argTypesOf(src), [
-    { name: 'a', options: null, storyOnly: false },
-    { name: 'b-c', options: ['x', 'y'], storyOnly: false },
-    { name: 'd', options: null, storyOnly: false },
+    { name: 'a', options: null, readable: true, storyOnly: false, unchecked: false, noted: false },
+    { name: 'b-c', options: ['x', 'y'], readable: true, storyOnly: false, unchecked: false, noted: false },
+    { name: 'd', options: null, readable: true, storyOnly: false, unchecked: false, noted: false },
   ]);
   assert.deepEqual(argTypesOf('export default { title: "X" };'), []);
 });
