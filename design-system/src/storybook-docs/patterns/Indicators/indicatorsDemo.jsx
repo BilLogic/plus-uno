@@ -70,7 +70,7 @@ export const STATUSES = [
 
 /** The three tags, one job each: a state, how many, how much it moved. */
 export const Tags = () => (
-    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <div style={line}>
             <span style={subtle}>State</span>
             {STATUSES.map(([appearance, label]) => <StatusTag key={appearance} appearance={appearance}>{label}</StatusTag>)}

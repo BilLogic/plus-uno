@@ -93,7 +93,7 @@ const pad = { padding: 'var(--card-pad)', display: 'flex', flexDirection: 'colum
  * examples. Every logo is the real Logo component.
  */
 export const LogoExpressions = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Expression
                 tagLetter="A"

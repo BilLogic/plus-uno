@@ -9,7 +9,7 @@
 .principle-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr));
-    gap: var(--section-stack-md);
+    gap: var(--grid-gutter);
 }
 
 .principle-card {
@@ -191,7 +191,7 @@
 .principle-reel {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr));
-    gap: var(--section-stack-md);
+    gap: var(--grid-gutter);
 }
 .principle-reel figure {
     margin: 0;

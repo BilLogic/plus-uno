@@ -167,7 +167,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
     const contrast = usePageContrast();
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             <div role="group" aria-label="Color mode for these examples" style={{ display: 'inline-flex', gap: 'var(--inline-sm)' }}>
                 {MODES.map((m) => (
                     <Button
@@ -196,7 +196,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 'var(--section-stack-sm)',
+                            gap: 'var(--stack-md)',
                             padding: 'var(--card-pad)',
                             borderRadius: 'var(--card-radius)',
                             background: 'var(--ds-surface-sunken)',

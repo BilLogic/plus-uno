@@ -5246,7 +5246,7 @@
         "--page-stack-sm",
         "--screen-pad-x",
         "--section-min-width-main",
-        "--section-stack-sm",
+        "--stack-md",
         "--stack-sm",
         "--stack-xl",
         "--type-size-150",

@@ -161,7 +161,7 @@ export const TierSectionCase = () => {
                     title="All students"
                     views={<ViewPills views={['All students', 'Paused']} activeView={view} onViewChange={setView} />}
                 >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                         <Banner appearance="warning">Two of six students have no guardian contact on file.</Banner>
                         <StudentsTable
                             sortable
