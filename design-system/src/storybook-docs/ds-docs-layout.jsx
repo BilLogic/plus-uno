@@ -341,6 +341,9 @@ export function DoDontCard({ tone, children, caption, code }) {
                 // Subgrid rows: both cards in a pair share the well row and the
                 // caption row, so wells and captions line up across the pair.
                 display: 'grid',
+                // One column as wide as the card: an implicit column sizes to
+                // its widest content, so opened code would push the card wide.
+                gridTemplateColumns: 'minmax(0, 1fr)',
                 gridTemplateRows: 'subgrid',
                 gridRow: code ? 'span 3' : 'span 2',
                 rowGap: 'var(--section-stack-md)',
