@@ -200,7 +200,7 @@ test('on the real repo every Foundations › Expression › Motion page is serve
   assert.ok(served.length >= 6, `expected the six Foundations › Expression › Motion pages, found ${served.length}`);
   const popup = fs.readFileSync(path.join(root, 'design-system/src/components/overlays-and-layering/Popup/index.md'), 'utf8');
   assert.match(popup, /^## Motion$/m);
-  assert.match(popup, /--ds-motion-spatial-fast/);
+  assert.match(popup, /--ds-motion-appearance-fast/);
 });
 
 test('a Foundations › Expression › Sound page without the manifest tag is named', () => {

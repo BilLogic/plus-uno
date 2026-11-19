@@ -267,7 +267,7 @@ const treeMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     await expect(child.isConnected).toBe(true);
     await waitFor(() => expect(child.isConnected).toBe(false));
     const surface = parent.closest('.plus-tree-select-menu');
-    await expectOverlayExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), reduced);
+    await expectOverlayExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), reduced, true);
 };
 export const MotionOpenClose = { render: () => <TreeSelect label="Student" options={motionTreeOptions} />, play: treeMotionPlay() };
 export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: treeMotionPlay(true) };

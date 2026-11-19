@@ -455,7 +455,7 @@ const listboxMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'Pick student' }));
     const list = await canvas.findByRole('listbox');
-    await expectOverlayExit(list.closest('.plus-listbox'), () => canvas.getByRole('button', { name: 'Pick student' }).click(), reduced);
+    await expectOverlayExit(list.closest('.plus-listbox'), () => canvas.getByRole('button', { name: 'Pick student' }).click(), reduced, true);
 };
 export const MotionOpenClose = { render: MotionListbox, play: listboxMotionPlay() };
 export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: listboxMotionPlay(true) };

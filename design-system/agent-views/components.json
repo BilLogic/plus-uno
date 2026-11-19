@@ -4764,6 +4764,7 @@
         "Interactive",
         "Default",
         "Open",
+        "OpensWithAFade",
         "CompactRows",
         "DisabledRow",
         "DisabledRowWithReason",
@@ -6145,6 +6146,7 @@
       ],
       "stories": [
         "Overview",
+        "OpensWithAFade",
         "Staging",
         "Stacked",
         "Placement",
@@ -9843,10 +9845,9 @@
         "WidthAuto",
         "WidthAutoCaps",
         "WidthColumns",
-        "OpensWithAClip",
+        "OpensWithAFade",
         "KeyboardOpenIsInstant",
         "OpensAndCloses",
-        "OpensOnTheMotionTokens",
         "ReducedMotion",
         "BodyOnly",
         "TriggerClick",
@@ -10053,6 +10054,7 @@
       ],
       "stories": [
         "Overview",
+        "OpensWithAFade",
         "Keyboard",
         "Placement",
         "Searchable",
@@ -17563,8 +17565,7 @@
       ],
       "tokens": [
         "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
-        "--plus-popup-reach"
+        "--ds-motion-spatial-fast-duration"
       ]
     },
     {

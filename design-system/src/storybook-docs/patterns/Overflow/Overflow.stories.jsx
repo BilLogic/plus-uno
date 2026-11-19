@@ -167,7 +167,8 @@ export const FoldedTagGroup = {
         await fitsCanvas(canvasElement);
 
         await userEvent.click(fold());
-        await expect(await canvas.findByRole('menuitem', { name: 'History' })).toBeVisible();
+        const history = await canvas.findByRole('menuitem', { name: 'History' });
+        await waitFor(() => expect(history).toBeVisible());
         await userEvent.keyboard('{Escape}');
     },
 };

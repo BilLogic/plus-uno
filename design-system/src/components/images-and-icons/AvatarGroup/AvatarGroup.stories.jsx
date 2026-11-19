@@ -68,7 +68,8 @@ Group.play = async ({ canvasElement }) => {
     await userEvent.click(more);
     await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
     for (const name of PEOPLE.slice(4)) {
-        await expect(await within(document.body).findByText(name)).toBeVisible();
+        const person = await within(document.body).findByText(name);
+        await waitFor(() => expect(person).toBeVisible());
     }
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'false'));

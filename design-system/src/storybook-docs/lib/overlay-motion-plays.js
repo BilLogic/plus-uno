@@ -4,12 +4,38 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 export const withReducedMotion = (Story) => React.createElement(MotionPreferenceContext.Provider, { value: true }, React.createElement(Story));
 
-/** Assert the public surface stays for its exit, then leaves the document. */
-export async function expectOverlayExit(surface, close, reduced) {
+const seconds = (raw) => {
+    const value = raw.trim();
+    return parseFloat(value) / (value.endsWith('ms') ? 1000 : 1);
+};
+
+/**
+ * The menu family (Popup, Select, DropdownMenu, FilterMenu, PopupSelect,
+ * TreeSelect) enters and exits on the same fade: `plus-overlay-fade` in,
+ * `plus-overlay-fade-out` out, both on `--ds-motion-appearance-fast`, and the
+ * open state applies no clip-path, transform, translate or scale.
+ */
+export async function expectMenuFade(surface, phase = 'enter') {
+    const style = getComputedStyle(surface);
+    const root = getComputedStyle(surface.ownerDocument.documentElement);
+    const fast = seconds(root.getPropertyValue('--ds-motion-appearance-fast-duration'));
+    const names = style.animationName.split(',').map((n) => n.trim());
+    await expect(names, `${phase}: one fade and nothing else`).toEqual([phase === 'enter' ? 'plus-overlay-fade' : 'plus-overlay-fade-out']);
+    await expect(seconds(style.animationDuration), `${phase}: on appearance.fast`).toBeCloseTo(fast, 3);
+    await expect(style.clipPath, `${phase}: no clip`).toBe('none');
+    await expect(style.transform, `${phase}: no transform`).toBe('none');
+    await expect(style.translate, `${phase}: no translate`).toBe('none');
+    await expect(style.scale, `${phase}: no scale`).toBe('none');
+}
+
+/** Assert the public surface stays for its exit, then leaves the document. A menu (`menu`) is held to the fade both ways. */
+export async function expectOverlayExit(surface, close, reduced, menu = false) {
     if (!reduced) await expect(getComputedStyle(surface).animationName).not.toBe('none');
+    if (menu && !reduced) await expectMenuFade(surface, 'enter');
     await waitFor(() => expect(surface).toBeVisible());
     close();
     if (!reduced) await expect(surface.isConnected).toBe(true);
+    if (menu && !reduced) await expectMenuFade(surface, 'exit');
     await waitFor(() => expect(surface.isConnected).toBe(false));
 }
 
@@ -19,7 +45,7 @@ export const selectMotionPlay = (reduced = false) => async ({ canvasElement }) =
     const list = await within(canvasElement.ownerDocument.body).findByRole('listbox');
     const surface = list.closest('.plus-listbox');
     if (reduced) await expect(getComputedStyle(surface).animationName).toBe('none');
-    await expectOverlayExit(surface, () => fireEvent.keyDown(field, { key: 'Escape' }), reduced);
+    await expectOverlayExit(surface, () => fireEvent.keyDown(field, { key: 'Escape' }), reduced, true);
     await expect(field).toHaveAttribute('aria-expanded', 'false');
 };
 

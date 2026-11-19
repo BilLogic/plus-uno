@@ -329,10 +329,12 @@ export const KeyFlipped = {
     play: async ({ canvas, canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
         const trigger = rect(canvas.getByRole('button', { name: 'More' }));
-        await expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
         const stage = canvasElement.querySelector('[data-popup-stage]');
         const scale = rect(stage).width / stage.offsetWidth;
-        await expect((rect(stage).bottom - rect(layer).bottom) / scale, 'and stays clear of the edge').toBeGreaterThanOrEqual(0);
+        await waitFor(() => {
+            expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
+            expect((rect(stage).bottom - rect(layer).bottom) / scale, 'and stays clear of the edge').toBeGreaterThanOrEqual(0);
+        });
     },
 };
 

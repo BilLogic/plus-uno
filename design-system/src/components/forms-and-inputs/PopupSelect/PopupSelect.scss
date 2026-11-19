@@ -1,7 +1,7 @@
 /*
  * Popup select: Select's list inside a Popup. The Popup draws the surface,
  * the width (auto: at least the trigger, 160 to 320) and the motion: it
- * clips open from the trigger's corner and fades on close, so a pick reads
+ * fades in place, in and out, so a pick reads
  * as the row's color change and then the fade. This file only sets the
  * menu's inner spacing: rows inset Popup/pad-menu 4, as every menu, and a
  * list that scrolls past Popup/max-height-menu 320.

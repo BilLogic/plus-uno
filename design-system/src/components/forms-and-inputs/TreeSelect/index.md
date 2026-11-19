@@ -12,7 +12,7 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -24,8 +24,8 @@ TreeSelect reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
-| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Opens as a Popup: a fade in place. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter; stays mounted until the exit completes. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 
 ## Alternatives
@@ -172,7 +172,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--plus-popup-reach`
+`--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration`
 
 From `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.scss`. Override these through the token layer, never with a literal.
 

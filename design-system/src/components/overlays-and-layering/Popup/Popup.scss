@@ -36,11 +36,10 @@
 // unless the trigger is wider still. The column steps span 3 or 4 screen-grid
 // columns plus the pad, worked out by the same mixin as Modal's widths.
 //
-// MOTION. It opens by clipping out from the trigger's corner on the side it
-// opens on (`data-side` + `data-align`) and folds back to it on the way out,
-// with a fade both ways; the tokens are the Popup row of the motion registry.
-// Only clip-path and opacity move; the width never animates. A keyboard open
-// (`data-instant="click"`) is instant, and reduced motion is the fade alone.
+// MOTION. It fades in place on appearance.fast, in and out, like every menu;
+// the tokens are the Popup row of the motion registry. Only opacity moves; the
+// width never animates. A keyboard open (`data-instant="click"`) is instant,
+// and reduced motion keeps the same fade.
 .plus-popup {
     display: flex;
     flex-direction: column;
@@ -76,13 +75,8 @@
     }
 
     // ----- Motion -----
-    // The clip starts collapsed onto the edge that faces the trigger, at the
-    // corner the popup is aligned to (the middle of that edge when centered).
-    // The edges that stay put sit out past the shadow, so the shadow is
-    // never cut while the clip opens.
-    @include trigger-clip;
-
-    @include overlay-motion(plus-popup-clip-open, plus-popup-clip-close, $fade-in: plus-popup-fade);
+    // A fade in place on appearance.fast, in and out; nothing travels.
+    @include menu-fade;
 
     // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
     .plus-popup-title {

@@ -12,7 +12,7 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast` · change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -24,7 +24,7 @@ Cascader reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Opens as a Popup: a fade in place. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 | change | Expand and collapse | `--ds-motion-spatial-fast` | Columns and branches expand. |
 

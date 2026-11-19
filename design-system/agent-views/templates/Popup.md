@@ -135,8 +135,8 @@ Popup reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place; no clip, no travel. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place, the same as the enter. |
 
 ## Best practices
 

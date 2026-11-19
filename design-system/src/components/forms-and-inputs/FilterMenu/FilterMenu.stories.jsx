@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from './FilterMenu';
 
 const SIDE_BY_SIDE = [
@@ -116,6 +117,19 @@ export const Overview = {
         await expect(canvas.getByText('Lincoln Middle with Maya')).toBeInTheDocument();
         const counted = canvas.getByRole('button', { name: 'Filters, 2 applied' });
         await waitFor(() => expect(counted).toHaveFocus());
+    },
+};
+
+/** It opens and closes with a plain fade on appearance.fast: no clip, scale or travel. */
+export const OpensWithAFade = {
+    render: () => <SessionsBar />,
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Filters' }));
+        const menu = await openMenu(canvasElement);
+        await expectMenuFade(menu, 'enter');
+        await userEvent.keyboard('{Escape}');
+        await expectMenuFade(menu, 'exit');
+        await menuClosed(canvasElement);
     },
 };
 

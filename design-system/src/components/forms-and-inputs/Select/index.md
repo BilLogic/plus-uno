@@ -18,7 +18,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -40,8 +40,8 @@ Select reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
-| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Clips back to the trigger and fades; stays mounted until the exit completes. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter; stays mounted until the exit completes. |
 
 ## Alternatives
 
