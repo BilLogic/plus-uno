@@ -227,7 +227,7 @@ const REGIONS = [
         value: 'wales',
         children: [
             { label: 'Cardiff', value: 'cardiff' },
-            { label: 'Swansea', value: 'swansea', disabled: true },
+            { label: 'Swansea', value: 'swansea', isDisabled: true },
         ],
     },
 ];

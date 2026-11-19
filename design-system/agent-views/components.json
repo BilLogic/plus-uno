@@ -4656,7 +4656,7 @@
           "deprecated": null
         },
         {
-          "name": "loading",
+          "name": "isLoading",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -5986,7 +5986,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply.",
+          "description": "The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, isDisabled }`. Each category is a list of checkboxes; pick as many as apply.",
           "deprecated": null
         },
         {
@@ -6071,7 +6071,7 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
@@ -6085,7 +6085,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Opens the menu on first render, when `open` is left out.",
+          "description": "Opens the menu on first render, when `isOpen` is left out.",
           "deprecated": null
         },
         {
@@ -7797,12 +7797,12 @@
           "deprecated": null
         },
         {
-          "name": "required",
+          "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Sets `aria-required` on the field.",
           "deprecated": null
         },
         {
@@ -9880,7 +9880,7 @@
           "required": false,
           "default": "[]",
           "values": null,
-          "description": "Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes.",
+          "description": "Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes.",
           "deprecated": null
         },
         {
@@ -9959,7 +9959,7 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
@@ -9973,7 +9973,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Opens the menu on first render, when `open` is left out.",
+          "description": "Opens the menu on first render, when `isOpen` is left out.",
           "deprecated": null
         },
         {
@@ -11769,7 +11769,7 @@
           "deprecated": null
         },
         {
-          "name": "readOnly",
+          "name": "isReadOnly",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -11778,7 +11778,7 @@
           "deprecated": null
         },
         {
-          "name": "disabled",
+          "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -12480,7 +12480,7 @@
           "deprecated": null
         },
         {
-          "name": "loading",
+          "name": "isLoading",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -12991,12 +12991,12 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`.",
+          "description": "Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `isOpen`.",
           "deprecated": null
         },
         {
@@ -13005,7 +13005,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the list starts open, when `open` is not controlling it.",
+          "description": "Whether the list starts open, when `isOpen` is not controlling it.",
           "deprecated": null
         },
         {
@@ -15728,7 +15728,7 @@
           "deprecated": null
         },
         {
-          "name": "required",
+          "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -15803,7 +15803,7 @@
           "deprecated": null
         },
         {
-          "name": "disabled",
+          "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -15812,7 +15812,7 @@
           "deprecated": null
         },
         {
-          "name": "readOnly",
+          "name": "isReadOnly",
           "type": "bool",
           "required": false,
           "default": "false",

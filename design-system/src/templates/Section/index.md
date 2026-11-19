@@ -179,7 +179,7 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 | `title` · `description` · `actions` | The title row. |
 | `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
 | `header` · `type` | With `type="custom"` the `header` slot replaces the title and description; `title` stays as the visually hidden heading. `type` is `default` or `custom`, and is read from the slots when left off. |
-| `loading` | Swaps the header for skeleton bars while the Section loads. |
+| `isLoading` | Swaps the header for skeleton bars while the Section loads. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `onClearAll` · `onMoreFilters` · `onOpenFilters` | Clear all, More filters, and the Filter button of a narrow Section. |
@@ -232,7 +232,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `onClearAll` | func | — | Runs when "Clear all" is pressed. The button shows once a filter is applied. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
 | `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
-| `loading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |
+| `isLoading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |
 | `layout` | enum | `'single'` | Body layout: the content alone, content beside `side`, or stacked subsections |
 | `side` | node | — | Side column of `layout="split"` |
 | `footer` | node | — | Footer, for "View all" or paging only; aligned to the end |

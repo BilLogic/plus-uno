@@ -21,7 +21,7 @@ import './Section.scss';
  * HEADER. `default` is the title row: title, description and an actions slot.
  * `custom` swaps title and description for a free-form `header` slot, and the
  * title stays in the markup as its heading, visually hidden, so assistive tech
- * still has it. `loading` swaps the header for skeleton bars while the section
+ * still has it. `isLoading` swaps the header for skeleton bars while the section
  * loads.
  *
  * ROWS. Under the title row a header can carry two more, all on one 32 line.
@@ -219,7 +219,7 @@ const Section = ({
     onClearAll,
     onMoreFilters,
     onOpenFilters,
-    loading = false,
+    isLoading = false,
     layout = 'single',
     side,
     footer,
@@ -251,7 +251,7 @@ const Section = ({
 
     const type = typeProp ?? inferType({ header });
     const custom = type === 'custom';
-    const hasHeader = loading || title || description || actions || hasRows || (custom && header);
+    const hasHeader = isLoading || title || description || actions || hasRows || (custom && header);
 
     const parentLevel = useHeadingLevel();
     const isPage = rankProp === 'page';
@@ -268,7 +268,7 @@ const Section = ({
     );
 
     const renderHeader = () => {
-        if (loading) {
+        if (isLoading) {
             return (
                 <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                     {titleNode && <div className="visually-hidden">{titleNode}</div>}
@@ -406,7 +406,7 @@ const Section = ({
             id={id}
             className={classes}
             style={style}
-            aria-busy={loading ? 'true' : undefined}
+            aria-busy={isLoading ? 'true' : undefined}
             aria-labelledby={labelled ? titleId : undefined}
             {...props}
         >
@@ -477,7 +477,7 @@ Section.propTypes = {
     /** Runs when the Filter button of a narrow Section is pressed. */
     onOpenFilters: PropTypes.func,
     /** Swaps the header for skeleton bars and marks the section busy */
-    loading: PropTypes.bool,
+    isLoading: PropTypes.bool,
     /** Body layout: the content alone, content beside `side`, or stacked subsections */
     layout: PropTypes.oneOf(SECTION_LAYOUTS),
     /** Side column of `layout="split"`

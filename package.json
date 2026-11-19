@@ -76,6 +76,7 @@
     "check:glossary": "node scripts/check-glossary.mjs",
     "check:ads-language": "node scripts/check-ads-language.mjs",
     "check:slot-names": "node scripts/check-slot-names.mjs",
+    "check:prop-names": "node scripts/check-prop-names.mjs",
     "check:old-system": "node scripts/check-old-system.mjs",
     "check:state-mixin": "node scripts/check-state-mixin.mjs",
     "check:inline-jsx-tokens": "node scripts/check-inline-jsx-tokens.mjs",

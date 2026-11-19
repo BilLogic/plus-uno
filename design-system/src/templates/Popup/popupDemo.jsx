@@ -84,7 +84,7 @@ export const Menu = ({ mount, rows, ...props }) => (
 /** Select list: one category, picked as you go. */
 export const SelectList = ({ mount, ...props }) => (
     <PopupSelect
-        open
+        isOpen
         onOpenChange={noop}
         container={mount}
         label="Status"
@@ -109,7 +109,7 @@ export const STACKED = [
 
 /** Filter menu: categories held until Apply, off the Filter icon at the end of the bar. */
 export const FilterMenuLayer = ({ mount, categories = SIDE_BY_SIDE, defaultValue, ...props }) => (
-    <FilterMenu open onOpenChange={noop} container={mount} categories={categories} defaultValue={defaultValue} {...props} />
+    <FilterMenu isOpen onOpenChange={noop} container={mount} categories={categories} defaultValue={defaultValue} {...props} />
 );
 
 /** Profile menu: who is signed in, then links and Sign out. */

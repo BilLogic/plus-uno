@@ -11,7 +11,7 @@
  *   label: *,
  *   text: string,
  *   description?: *,
- *   disabled: boolean,
+ *   isDisabled: boolean,
  *   children: Array,
  *   group?: string,
  *   elemBefore?: *,
@@ -28,7 +28,7 @@ export function normalizeOption(option, index) {
             value: option,
             label: option,
             text: String(option),
-            disabled: false,
+            isDisabled: false,
             children: [],
             index,
             source: option,
@@ -42,7 +42,7 @@ export function normalizeOption(option, index) {
         label,
         text,
         description: option.description,
-        disabled: Boolean(option.disabled),
+        isDisabled: Boolean(option.isDisabled),
         children: Array.isArray(option.children) ? option.children : [],
         group: option.group,
         elemBefore: option.elemBefore,
@@ -67,6 +67,6 @@ export const getOptionText = (option) => normalizeOption(option).text;
 export const getOptionChildren = (option) => normalizeOption(option).children;
 
 /** Whether the option is disabled. */
-export const isOptionDisabled = (option) => normalizeOption(option).disabled;
+export const isOptionDisabled = (option) => normalizeOption(option).isDisabled;
 
 export default normalizeOption;
