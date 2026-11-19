@@ -1,5 +1,5 @@
 import React from 'react';
-import { DynamicTable, SearchField, Skeleton, Spinner, Tabs } from '@/components';
+import { CustomItem, DropdownMenu, DynamicTable, IconButton, SearchField, Skeleton, Spinner, Tabs } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { Section } from '@/templates';
 
@@ -60,4 +60,24 @@ export const SpinnerInBlank = () => (
             <Spinner size={24} label="Loading students" />
         </div>
     </Section>
+);
+
+const menuTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />;
+
+export const MenuOneRow = () => (
+    <DropdownMenu isOpen loading placement="bottom-start" minWidth="var(--menu-group-min-width)" trigger={menuTrigger} />
+);
+
+export const MenuSkeletonRows = () => (
+    <DropdownMenu isOpen placement="bottom-start" minWidth="var(--menu-group-min-width)" trigger={menuTrigger}>
+        <CustomItem aria-label="Loading option 1">
+            <Skeleton shape="text" width="85%" isShimmering={false} />
+        </CustomItem>
+        <CustomItem aria-label="Loading option 2">
+            <Skeleton shape="text" width="70%" isShimmering={false} />
+        </CustomItem>
+        <CustomItem aria-label="Loading option 3">
+            <Skeleton shape="text" width="55%" isShimmering={false} />
+        </CustomItem>
+    </DropdownMenu>
 );

@@ -1,70 +1,42 @@
 import React from 'react';
-import { ButtonItem, IconButton, Select, Tooltip } from '@/components';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
-import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './DisabledExamples.jsx';
+import examplesSource from './DisabledExamples.jsx?raw';
 
 /**
- * The live do and don't examples on the Disabled pattern page, composed from
- * `Select`, `Tooltip`, `LiveMenu`, `ButtonItem`, `IconButton`, `CaseSurface`
- * and `DocsOverlayBoundary`.
+ * The live do and don't examples on the Disabled pattern page: each one is an
+ * example from `DisabledExamples.jsx`, staged here on a `CaseSurface` or in a
+ * `DocsOverlayBoundary` that holds a layer open, and Show code prints the
+ * example's own source.
  */
 
-const noop = () => {};
+export const CODE = showCode(examplesSource, ['ReasonInCaption', 'ReasonInTooltip', 'LeftOutOfMenu', 'DimmedInMenu']);
+
+/** A held-open menu centered in a boundary that gives its layer room. */
+const MenuStage = ({ children }) => (
+    <DocsOverlayBoundary fit={false} containHeight>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>{children}</div>
+    </DocsOverlayBoundary>
+);
 
 /** Do: the reason sits in visible caption text under the disabled field, at full contrast. */
 export const ReasonInCaptionCase = () => (
-    <CaseSurface>
-        <Select
-            label="Group"
-            options={[]}
-            value={null}
-            onChange={noop}
-            isDisabled
-            caption="Choose a school first."
-        />
-    </CaseSurface>
+    <CaseSurface><Example.ReasonInCaption /></CaseSurface>
 );
 
 /** Don't: the reason hides inside a tooltip on a disabled field, which never opens on touch. */
 export const ReasonInTooltipCase = () => (
     <DocsOverlayBoundary fit={false} containHeight>
         <CaseSurface style={{ minBlockSize: 'calc(var(--control-lg) * 3)' }}>
-            {/* Pinned open with `show` because the disabled Select inside receives no hover or focus events, so an uncontrolled tooltip could never open to show the anti-pattern. */}
-            <Tooltip text="Choose a school first." placement="bottom" show>
-                <div style={{ inlineSize: '100%' }}>
-                    <Select
-                        label="Group"
-                        options={[]}
-                        value={null}
-                        onChange={noop}
-                        isDisabled
-                    />
-                </div>
-            </Tooltip>
+            <Example.ReasonInTooltip />
         </CaseSurface>
     </DocsOverlayBoundary>
 );
 
 /** Do: actions a role can never take are left out of the menu. */
-export const LeftOutOfMenuCase = () => (
-    <LiveMenu
-        minWidth="var(--menu-group-min-width)"
-        trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />}
-    >
-        <ButtonItem onClick={noop}>Edit</ButtonItem>
-        <ButtonItem onClick={noop}>Remove from group</ButtonItem>
-    </LiveMenu>
-);
+export const LeftOutOfMenuCase = () => <MenuStage><Example.LeftOutOfMenu /></MenuStage>;
 
 /** Don't: dimming an action a role can never take leaves a dead row in the menu. */
-export const DimmedInMenuCase = () => (
-    <LiveMenu
-        minWidth="var(--menu-group-min-width)"
-        trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />}
-    >
-        <ButtonItem onClick={noop}>Edit</ButtonItem>
-        <ButtonItem onClick={noop}>Remove from group</ButtonItem>
-        <ButtonItem isDisabled onClick={noop}>Delete school</ButtonItem>
-    </LiveMenu>
-);
+export const DimmedInMenuCase = () => <MenuStage><Example.DimmedInMenu /></MenuStage>;

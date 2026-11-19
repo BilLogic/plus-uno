@@ -4,12 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ReadOnlyStories from './ReadOnly.stories.jsx';
 import { CARD_STAGE } from './readOnlyDemo.jsx';
-import {
-    FadedNoReasonCase,
-    FieldForFixedValueCase,
-    PlainValueCase,
-    ReadableWithReasonCase,
-} from './ReadOnlyCases.jsx';
+import { CODE, FadedNoReasonCase, FieldForFixedValueCase, PlainValueCase, ReadableWithReasonCase } from './ReadOnlyCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -130,8 +125,10 @@ It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` 
 
 <DoDontPair
     doExample={<ReadableWithReasonCase />}
+    doCode={CODE.ReadableWithReason}
     doCaption='Read-only at full contrast, with "Set by your supervisor" in the caption.'
     dontExample={<FadedNoReasonCase />}
+    dontCode={CODE.FadedNoReason}
     dontCaption="A faded value with no reason: out of the tab order and hard to read."
 />
 
@@ -149,8 +146,10 @@ A field promises an input. A value nobody changes here is a label and a value in
 
 <DoDontPair
     doExample={<PlainValueCase />}
+    doCode={CODE.PlainValue}
     doCaption="A value nobody changes here is plain text."
     dontExample={<FieldForFixedValueCase />}
+    dontCode={CODE.FieldForFixedValue}
     dontCaption="A field for a value that was never editable: it promises an input."
 />
 

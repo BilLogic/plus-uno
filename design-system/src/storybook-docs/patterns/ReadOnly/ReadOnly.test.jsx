@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
+    CODE,
     FadedNoReasonCase,
     FieldForFixedValueCase,
     PlainValueCase,
@@ -35,6 +36,14 @@ describe('ReadOnly live cases and TypeCard links', () => {
         render(<FieldForFixedValueCase />);
         expect(screen.getAllByRole('textbox')).toHaveLength(2);
         expect(screen.getByLabelText('School')).toHaveAttribute('readonly');
+    });
+
+    it('prints each example from its own source', () => {
+        expect(Object.keys(CODE)).toEqual(['ReadableWithReason', 'FadedNoReason', 'PlainValue', 'FieldForFixedValue']);
+        expect(CODE.ReadableWithReason).toContain('isReadOnly caption="Set by your supervisor."');
+        expect(CODE.FadedNoReason).toContain('const column');
+        expect(CODE.PlainValue).toContain("import { Section } from '@/templates';");
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in ReadOnly.mdx', () => {

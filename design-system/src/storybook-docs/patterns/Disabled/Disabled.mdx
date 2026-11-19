@@ -4,12 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as DisabledStories from './Disabled.stories.jsx';
 import { CARD_STAGE } from './disabledDemo.jsx';
-import {
-    DimmedInMenuCase,
-    LeftOutOfMenuCase,
-    ReasonInCaptionCase,
-    ReasonInTooltipCase,
-} from './DisabledCases.jsx';
+import { CODE, DimmedInMenuCase, LeftOutOfMenuCase, ReasonInCaptionCase, ReasonInTooltipCase } from './DisabledCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -150,8 +145,10 @@ A disabled control gets no events and is absent on touch, so a tooltip would nev
 
 <DoDontPair
     doExample={<ReasonInCaptionCase />}
+    doCode={CODE.ReasonInCaption}
     doCaption='The reason as the caption: "Choose a school first".'
     dontExample={<ReasonInTooltipCase />}
+    dontCode={CODE.ReasonInTooltip}
     dontCaption="The reason in a tooltip on a faded field: it never opens on touch."
 />
 
@@ -163,8 +160,10 @@ An action a tutor can never take, such as deleting a school, is left out, not di
 
 <DoDontPair
     doExample={<LeftOutOfMenuCase />}
+    doCode={CODE.LeftOutOfMenu}
     doCaption="An action a tutor can never take is left out of the menu."
     dontExample={<DimmedInMenuCase />}
+    dontCode={CODE.DimmedInMenu}
     dontCaption='A faded "Delete school" that a tutor will never be able to press.'
 />
 

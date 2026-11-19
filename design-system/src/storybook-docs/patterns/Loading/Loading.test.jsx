@@ -28,11 +28,12 @@ describe('Loading live cases and TypeCard links', () => {
         expect(screen.getByText('Loading students')).toBeInTheDocument();
     });
 
-    it('prints the two table examples from their own source', () => {
-        expect(Object.keys(CODE)).toEqual(['SkeletonInShape', 'SpinnerInBlank']);
+    it('prints every example from their own source', () => {
+        expect(Object.keys(CODE)).toEqual(['SkeletonInShape', 'SpinnerInBlank', 'MenuOneRow', 'MenuSkeletonRows']);
         expect(CODE.SkeletonInShape).toContain("import { LoadThenReveal } from '@/lib/loadRevealMotion';");
         expect(CODE.SkeletonInShape).toContain('const SkeletonRows');
         expect(CODE.SpinnerInBlank).toContain('<Spinner size={24} label="Loading students" />');
+        expect(CODE.MenuOneRow).toContain('<DropdownMenu isOpen loading');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
