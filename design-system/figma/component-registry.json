@@ -11,7 +11,7 @@
   "components": {
     "Accordion": {
       "code": {
-        "import": "@/components/layout-and-structure",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Accordion/Accordion.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Accordion",
@@ -35,7 +35,7 @@
     },
     "Avatar": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Avatar/Avatar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Avatar",
@@ -89,7 +89,7 @@
     },
     "AvatarGroup": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/AvatarGroup",
@@ -134,7 +134,7 @@
     },
     "Breadcrumb": {
       "code": {
-        "import": "@/components/navigation",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Breadcrumb",
@@ -158,7 +158,7 @@
     },
     "Button": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Button/Button.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Button",
@@ -226,7 +226,7 @@
     },
     "Calendar": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Calendar",
@@ -251,7 +251,7 @@
     },
     "Carousel": {
       "code": {
-        "import": "@/components/layout-and-structure",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Carousel/Carousel.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Carousel",
@@ -276,7 +276,7 @@
     },
     "Checkbox": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -300,7 +300,7 @@
     },
     "CheckboxGroup": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/CheckboxGroup",
@@ -323,7 +323,7 @@
     },
     "ChoiceGrid": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -358,7 +358,7 @@
     },
     "Comment": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Comment/Comment.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Comment",
@@ -383,7 +383,7 @@
     },
     "CountTag": {
       "code": {
-        "import": "@/components/labels",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/labels/CountTag/CountTag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/CountTag",
@@ -434,7 +434,7 @@
     },
     "DatePicker": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker",
@@ -459,7 +459,7 @@
     },
     "DateTimePicker": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DateTimePicker",
@@ -484,7 +484,7 @@
     },
     "Dialog": {
       "code": {
-        "import": "@/components/messaging",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Dialog/Dialog.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Dialog",
@@ -509,7 +509,7 @@
     },
     "DynamicTable": {
       "code": {
-        "import": "@/components/text-and-data-display",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
@@ -534,7 +534,7 @@
     },
     "FileItem": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileItem/FileItem.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileItem",
@@ -557,7 +557,7 @@
     },
     "FileUpload": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileUpload",
@@ -582,7 +582,7 @@
     },
     "Flag": {
       "code": {
-        "import": "@/components/messaging",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Flag/Flag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Flag",
@@ -606,7 +606,7 @@
     },
     "Heading": {
       "code": {
-        "import": "@/components/text-and-data-display",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/Heading/Heading.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Heading",
@@ -634,7 +634,7 @@
     },
     "IconButton": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/IconButton",
@@ -699,7 +699,7 @@
     },
     "Illustration": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Illustration/Illustration.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Illustration",
@@ -743,7 +743,7 @@
     },
     "Image": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Image/Image.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Image",
@@ -767,7 +767,7 @@
     },
     "InlineEdit": {
       "code": {
-        "import": "@/components/text-and-data-display",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/InlineEdit",
@@ -793,7 +793,7 @@
     },
     "LabelAndCaption": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LabelAndCaption.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -826,7 +826,7 @@
     },
     "Link": {
       "code": {
-        "import": "@/components/navigation",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Link/Link.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Link",
@@ -850,7 +850,7 @@
     },
     "LinkButton": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LinkButton/LinkButton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/LinkButton",
@@ -916,7 +916,7 @@
     },
     "LinkIconButton": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/LinkIconButton",
@@ -1028,7 +1028,7 @@
     },
     "NotificationItem": {
       "code": {
-        "import": "@/components/messaging",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/NotificationItem/NotificationItem.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/NotificationItem",
@@ -1051,7 +1051,7 @@
     },
     "Object": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Object/Object.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Object",
@@ -1075,7 +1075,7 @@
     },
     "PageHeader": {
       "code": {
-        "import": "@/components/layout-and-structure",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/PageHeader",
@@ -1100,7 +1100,7 @@
     },
     "Pagination": {
       "code": {
-        "import": "@/components/navigation",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Pagination/Pagination.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Pagination",
@@ -1124,7 +1124,7 @@
     },
     "Popup": {
       "code": {
-        "import": "@/components/overlays-and-layering",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/overlays-and-layering/Popup/Popup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Popup",
@@ -1149,7 +1149,7 @@
     },
     "ProgressBar": {
       "code": {
-        "import": "@/components/loading",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/ProgressBar/ProgressBar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressBar",
@@ -1183,7 +1183,7 @@
     },
     "ProgressRing": {
       "code": {
-        "import": "@/components/loading",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/ProgressRing/ProgressRing.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressRing",
@@ -1206,7 +1206,7 @@
     },
     "Radio": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio/Radio.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1230,7 +1230,7 @@
     },
     "RadioGroup": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1254,7 +1254,7 @@
     },
     "Range": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Range/Range.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1278,7 +1278,7 @@
     },
     "Rating": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Rating/Rating.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1302,7 +1302,7 @@
     },
     "RichTextEditor": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
@@ -1326,7 +1326,7 @@
     },
     "ScrollBar": {
       "code": {
-        "import": "@/components/layout-and-structure",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/ScrollBar",
@@ -1352,7 +1352,7 @@
     },
     "SectionMessage": {
       "code": {
-        "import": "@/components/messaging",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/SectionMessage/SectionMessage.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/SectionMessage",
@@ -1377,7 +1377,7 @@
     },
     "SettingRow": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/SettingRow/SettingRow.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/SettingRow",
@@ -1400,7 +1400,7 @@
     },
     "Sidebar": {
       "code": {
-        "import": "@/components/navigation",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Sidebar/Sidebar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Sidebar",
@@ -1425,7 +1425,7 @@
     },
     "Skeleton": {
       "code": {
-        "import": "@/components/loading",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/Skeleton/Skeleton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Skeleton",
@@ -1479,7 +1479,7 @@
     },
     "Spinner": {
       "code": {
-        "import": "@/components/loading",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/Spinner/Spinner.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Spinner",
@@ -1504,7 +1504,7 @@
     },
     "Spotlight": {
       "code": {
-        "import": "@/components/messaging",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Spotlight/Spotlight.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Spotlight",
@@ -1529,7 +1529,7 @@
     },
     "StaticTable": {
       "code": {
-        "import": "@/components/text-and-data-display",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
@@ -1583,7 +1583,7 @@
     },
     "Suggestion": {
       "code": {
-        "import": "@/components/ai",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/ai/Suggestion/Suggestion.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/Suggestion",
@@ -1618,7 +1618,7 @@
     },
     "Tabs": {
       "code": {
-        "import": "@/components/navigation",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Tabs/Tabs.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Tabs",
@@ -1643,7 +1643,7 @@
     },
     "Tag": {
       "code": {
-        "import": "@/components/labels",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/labels/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Tag",
@@ -1703,7 +1703,7 @@
     },
     "TagGroup": {
       "code": {
-        "import": "@/components/labels",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/labels/TagGroup/TagGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/TagGroup",
@@ -1748,7 +1748,7 @@
     },
     "TagInput": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1799,7 +1799,7 @@
     },
     "TextArea": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TextArea",
@@ -1824,7 +1824,7 @@
     },
     "TextField": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TextField/TextField.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TextField",
@@ -1849,7 +1849,7 @@
     },
     "Tile": {
       "code": {
-        "import": "@/components/images-and-icons",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Tile/Tile.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Tile",
@@ -1922,7 +1922,7 @@
     },
     "TimePicker": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TimePicker",
@@ -1947,7 +1947,7 @@
     },
     "Toggle": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
@@ -1971,7 +1971,7 @@
     },
     "Tooltip": {
       "code": {
-        "import": "@/components/overlays-and-layering",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Tooltip",
@@ -1997,7 +1997,7 @@
     },
     "TreeTable": {
       "code": {
-        "import": "@/components/text-and-data-display",
+        "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",

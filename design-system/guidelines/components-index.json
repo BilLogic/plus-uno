@@ -7,7 +7,6 @@
     "design-system/src/dataviz"
   ],
   "export_entrypoints": [
-    "design-system/src/index.js",
     "design-system/src/components/index.js"
   ],
   "storybook_story_globs": [

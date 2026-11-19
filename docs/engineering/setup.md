@@ -33,9 +33,7 @@ import { Button, SectionMessage, Modal, TextField, Select, Checkbox } from '@/co
 import '@/styles/main.scss';
 ```
 
-**Entry points:**
-- `design-system/src/index.js`
-- `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
+**Entry point:** `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
 
 **Files import from the barrel** — see `coding.md` § Imports for the full rule.
 
