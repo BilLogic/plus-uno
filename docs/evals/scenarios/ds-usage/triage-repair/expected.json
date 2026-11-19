@@ -35,7 +35,7 @@
       "section": "Details",
       "pages": [
         "design-system/agent-views/templates/Panel.md",
-        "design-system/agent-views/templates/Form.md"
+        "design-system/agent-views/patterns/Forms.md"
       ],
       "guides": ["panel", "form"],
       "scoring": "judge",

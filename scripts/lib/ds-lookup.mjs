@@ -1047,7 +1047,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   const topics = () => index.topics;
   const topicText = (rel) => index.guides[rel];
-  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The nine templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
+  const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The eight templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
   const isBriefGuide = (rel) =>
     rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
     rel.startsWith(`${AGENT_VIEWS}/templates/`) ||

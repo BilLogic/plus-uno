@@ -6,7 +6,7 @@ import Modal from './Modal.jsx';
 import Section from '../Section';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
-import { FormFields, FILLED } from '../Form/formDemo.jsx';
+import { FormFields, FILLED } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 
 /**
  * The Modal template's examples: the real PLUS parts, placed the way each type

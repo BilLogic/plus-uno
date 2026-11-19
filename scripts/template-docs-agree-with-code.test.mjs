@@ -29,7 +29,7 @@ test('a long task with steps names the Sidebar inner mode and FooterActions, not
 
 test('no page keeps a form or a Cancel in a Popup', () => {
   const pages = [
-    'design-system/src/templates/Form/Form.mdx',
+    'design-system/src/storybook-docs/patterns/Forms/Forms.mdx',
     'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx',
     'design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx',
     'design-system/src/components/forms-and-inputs/Button/Button.mdx',

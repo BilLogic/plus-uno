@@ -199,11 +199,11 @@ test('generated template slot JSDoc carries the governing pattern where source r
   for (const line of toolbar.split('\n').filter((l) => l.includes('@ds-context'))) assert.ok(line.length <= 400);
 });
 
-test('the template index lists the nine current templates and their overview', async () => {
+test('the template index lists the eight current templates and their overview', async () => {
   const fs = await import('node:fs');
   const text = fs.readFileSync('design-system/agent-views/templates/index.md', 'utf8');
-  for (const name of ['Form', 'Frame', 'Page', 'Panel', 'Card', 'Modal', 'Section', 'Table', 'Popup', 'Overview']) assert.ok(text.includes(`[${name}](`));
-  assert.equal(text.split('\n').filter((line) => line.startsWith('- [')).length, 10);
+  for (const name of ['Frame', 'Page', 'Panel', 'Card', 'Modal', 'Section', 'Table', 'Popup', 'Overview']) assert.ok(text.includes(`[${name}](`));
+  assert.equal(text.split('\n').filter((line) => line.startsWith('- [')).length, 9);
 });
 
 test('group indexes carry a generated chooser from each page\'s Usage and Alternatives, replacing guidelines/components/*.md', async () => {

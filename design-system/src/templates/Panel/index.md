@@ -10,13 +10,13 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Import:** `import { Panel } from '@/templates';`
 
-**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
+**Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Search (`ds guide search`)
 
 **Source:** `design-system/src/templates/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused
 
 **Motion:** docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default` · floating-enter `spatial.default` · floating-exit `spatial.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 

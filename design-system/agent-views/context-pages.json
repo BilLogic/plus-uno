@@ -112,13 +112,6 @@
     "componentName": null
   },
   {
-    "file": "design-system/src/templates/Form/Form.mdx",
-    "title": "Templates/Form",
-    "categoryRoot": "Templates",
-    "componentSource": null,
-    "componentName": null
-  },
-  {
     "file": "design-system/src/templates/Frame/Frame.mdx",
     "title": "Templates/Frame",
     "categoryRoot": "Templates",

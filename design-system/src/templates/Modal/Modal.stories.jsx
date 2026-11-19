@@ -10,7 +10,8 @@ import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { FormInModal } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import * as Demo from './modalDemo.jsx';
@@ -971,6 +972,32 @@ export const KeyLoading = {
         await settleAnimations(canvasElement);
         await expect(canvasElement.querySelector('.plus-dialog-body .plus-skeleton'), 'the body shows its content’s own loading state').not.toBeNull();
         await expect(canvas.getByRole('heading', { level: 1, name: 'Session history' }), 'the title stays real').toBeInTheDocument();
+    },
+};
+
+/** With a form: the fields in the body, the Modal's own footer, and a blocked submit that keeps the Modal open. */
+export const KeyWithForm = {
+    name: 'Key state: With a form',
+    render: () => <FitStage width={1024} scrollable><FormInModal /></FitStage>, // docs-literal
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const discard = within(footer).getByRole('button', { name: 'Discard' });
+        const save = within(footer).getByRole('button', { name: 'Save session' });
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the title is the dialog’s h1').toBeInTheDocument();
+        await expect(rect(footer).height, 'the Modal’s footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        await userEvent.click(save);
+        await expect(canvas.getAllByRole('dialog'), 'a blocked submit keeps the one Modal open').toHaveLength(1);
+        await expect(await canvas.findByText('Enter the student’s name.'), 'the field says what to fix').toBeInTheDocument();
+        const student = canvas.getByLabelText(/Student/);
+        await expect(student, 'the field is marked invalid').toHaveAttribute('aria-invalid', 'true');
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 

@@ -148,7 +148,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - Frame: use when the question is the AI panel, which is a Frame region.
 - Section: use when a row or card opens in place inside its Section.
 - Modal: use when the task needs full attention.
-- Form: use when the Panel edits a record.
+- Forms: use when the Panel edits a record.
 - Patterns: use when you need the rules around a Panel: Navigation, Empty, Notifications.
 
 ## Motion

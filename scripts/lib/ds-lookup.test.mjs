@@ -263,7 +263,6 @@ test('guide answers pattern, template and foundation topics and situation aliase
     ['card', 'design-system/src/templates/Card/index.md'],
     ['table', 'design-system/src/templates/Table/index.md'],
     ['modal', 'design-system/src/templates/Modal/index.md'],
-    ['form', 'design-system/agent-views/templates/Form.md'],
     ['panel', 'design-system/agent-views/templates/Panel.md'],
     ['popup', 'design-system/agent-views/templates/Popup.md'],
     ['foundations', 'design-system/agent-views/foundations/FoundationsOverview.md'],

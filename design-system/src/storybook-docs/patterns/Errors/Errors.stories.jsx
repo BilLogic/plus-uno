@@ -6,7 +6,7 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
-import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
+import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../Forms/formHosts.jsx';
 import { BackgroundJob, FieldError, FlagOnPage, InPage, LoadFailure, MenuError, NoAccess, PLACE_STAGE, PageCondition, STAGE } from './errorsDemo.jsx';
 
 /**

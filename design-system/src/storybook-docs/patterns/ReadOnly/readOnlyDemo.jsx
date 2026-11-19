@@ -57,7 +57,7 @@ const PAGE_HEIGHT = 420; // docs-literal
 
 /**
  * A whole form someone else owns, in a page: drawn in the Frame with the Sidebar
- * docked, straight on the Page like the Form template. The title is the page's
+ * docked, straight on the Page like a page form. The title is the page's
  * h1 and the fields follow it, every one read-only, one caption on the group, no Save.
  */
 export const OwnedForm = () => (

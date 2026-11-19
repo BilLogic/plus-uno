@@ -12,7 +12,6 @@ const TEMPLATE_IDS = [
     'templates-section',
     'templates-card',
     'templates-table',
-    'templates-form',
     'templates-modal',
     'templates-panel',
     'templates-popup',

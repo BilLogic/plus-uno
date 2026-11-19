@@ -8,7 +8,7 @@ Also asked as: summary card, object card.
 
 **Import:** `import { Card } from '@/templates';`
 
-**Used in:** Card (`ds guide card`); Form (`ds guide form`); Section (`ds guide section`); Table (`ds guide table`)
+**Used in:** Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
 

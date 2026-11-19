@@ -7,7 +7,7 @@ import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { CODE as PAGE_CODE } from './PageCaseCode.js';
 import { CODE as POPUP_CODE } from '../Popup/PopupCaseCode.js';
-import { CODE as FORM_CODE } from '../Form/FormCaseCode.js';
+import { CODE as FORMS_CODE } from '@/storybook-docs/patterns/Forms/FormsCaseCode.js';
 import { CODE as PANEL_CODE } from '../Panel/PanelCaseCode.js';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
@@ -142,9 +142,9 @@ describe('Show code on live pairs', () => {
     it('every live pair folds its source behind Show code, and each page passes code for every example it makes live', () => {
         render(<DoDontPair doExample={<i />} doCaption="Do" doCode="<a />" dontExample={<i />} dontCaption="Don't" dontCode="<b />" />);
         expect(screen.getAllByText('Show code')).toHaveLength(2);
-        const counts = { Page: Object.keys(PAGE_CODE).length, Popup: Object.keys(POPUP_CODE).length, Form: Object.keys(FORM_CODE).length, Panel: Object.keys(PANEL_CODE).length };
-        expect(counts).toEqual({ Page: 6, Popup: 8, Form: 2, Panel: 6 });
-        [PAGE_CODE, POPUP_CODE, FORM_CODE, PANEL_CODE].forEach((code) => Object.values(code).forEach((src) => expect(src.length).toBeGreaterThan(20)));
+        const counts = { Page: Object.keys(PAGE_CODE).length, Popup: Object.keys(POPUP_CODE).length, Forms: Object.keys(FORMS_CODE).length, Panel: Object.keys(PANEL_CODE).length };
+        expect(counts).toEqual({ Page: 6, Popup: 8, Forms: 4, Panel: 6 });
+        [PAGE_CODE, POPUP_CODE, FORMS_CODE, PANEL_CODE].forEach((code) => Object.values(code).forEach((src) => expect(src.length).toBeGreaterThan(20)));
     });
 });
 
