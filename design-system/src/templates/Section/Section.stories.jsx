@@ -1039,7 +1039,6 @@ export const ManyFilters = {
             filters={[
                 ...STATUS_FILTERS,
                 { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
-                { key: 'tutor', label: 'Tutor', text: 'Any', onClick: () => {} },
             ]}
             onMoreFilters={() => {}}
         >
@@ -1049,8 +1048,11 @@ export const ManyFilters = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Group: All' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: 'Grade: All' }), 'the fourth trigger is folded').toBeNull();
-        await expect(canvas.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+        await expect(canvas.getByRole('button', { name: /More filters/ }), 'one filter sits behind it').toHaveTextContent('1');
     },
 };
 
@@ -1110,9 +1112,8 @@ export const RowsSelected = {
         await expect(rowsIn(canvasElement), 'the header keeps its rows').toHaveLength(2);
         await expect(head.getByText('3 selected')).toBeInTheDocument();
         await expect(head.getByRole('checkbox', { name: 'Select all rows' })).toBePartiallyChecked();
-        await expect(head.getByRole('button', { name: 'Call off' })).toBeInTheDocument();
-        await expect(head.getByRole('button', { name: 'Export' })).toBeInTheDocument();
-        await expect(head.getByRole('button', { name: 'More actions' }), 'the rest sit behind the ellipsis').toBeInTheDocument();
+        await expect(head.getAllByRole('button').map((button) => button.getAttribute('aria-label') ?? button.textContent), 'the whole bar: three actions, then the ellipsis').toEqual(['Call off', 'Export', 'Move to group', 'More actions']);
+        await expect(head.queryByRole('button', { name: 'Remove from group' }), 'the fourth action sits behind the ellipsis').toBeNull();
         await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Clear: the checkboxes clear it').toBeNull();
         await expect(Math.round(canvasElement.querySelector('thead tr').getBoundingClientRect().height), 'the head row keeps its 40').toBe(40);
         await expect(canvasElement.querySelectorAll('tbody tr[aria-selected="true"]')).toHaveLength(3);

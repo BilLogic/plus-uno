@@ -115,3 +115,35 @@ export const TwoFloatingPanels = () => (
         <FloatingPanel />
     </FloatStage>
 );
+
+/** The docked AI panel: a Panel at the end of the stage, on the page and not floating. */
+const DockedAiPanel = () => (
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0, zIndex: 1, display: 'flex', maxInlineSize: '100%' }}>
+        <HeadingLevelContext.Provider value={4}>
+            <PanelContainer>
+                <PanelHeader title="Assistant" actions={<PanelCloseAction onClick={() => {}} />} />
+                <PanelBody>
+                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                        Ben has missed two Thursday sessions. Want a note for his tutor?
+                    </p>
+                </PanelBody>
+            </PanelContainer>
+        </HeadingLevelContext.Provider>
+    </div>
+);
+
+/** The floating Panel sits beside the docked AI panel, both fully visible. */
+export const BesideAiPanel = () => (
+    <FloatStage>
+        <DockedAiPanel />
+        <FloatingPanel inset="var(--panel-width-default)" />
+    </FloatStage>
+);
+
+/** The floating Panel drawn over the docked AI panel, hiding part of it. */
+export const CoversAiPanel = () => (
+    <FloatStage>
+        <DockedAiPanel />
+        <FloatingPanel inset={SECOND_OFFSET} />
+    </FloatStage>
+);

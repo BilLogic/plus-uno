@@ -25,4 +25,22 @@ export const CODE = {
     </div>
     ${PANEL.replace(/\n/g, '\n    ')}
 </>`,
+    BesideAiPanel: `<>
+    <SessionsBehind />
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0 }}>
+        <PanelContainer>{/* Assistant */}</PanelContainer>
+    </div>
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 'var(--panel-width-default)', boxShadow: 'var(--ds-shadow-overlay)' }}>
+        <DetailsPanel />
+    </div>
+</>`,
+    CoversAiPanel: `<>
+    <SessionsBehind />
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0 }}>
+        <PanelContainer>{/* Assistant */}</PanelContainer>
+    </div>
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 48, boxShadow: 'var(--ds-shadow-overlay)' }}>
+        <DetailsPanel />
+    </div>
+</>`,
 };

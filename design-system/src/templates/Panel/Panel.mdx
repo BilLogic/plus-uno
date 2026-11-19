@@ -6,6 +6,8 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PanelStories from './Panel.stories.jsx';
 import {
+    BesideAiPanel,
+    CoversAiPanel,
     FloatsNoBlanket,
     OneFloatingPanel,
     PanelOnBlanket,
@@ -23,7 +25,6 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import { BesideAiPanel, CoversAiPanel } from '@/storybook-docs/illustrations/panel.jsx';
 
 <Meta title="Templates/Panel" tags={['manifest']} />
 
@@ -334,12 +335,15 @@ Discard (Default) and Save (Primary), full bleed; Close in the header dismisses,
 
 A floating Panel and the docked AI panel sit side by side. The AI panel is never covered. This pair is Planned.
 
-Drawn, not live: the docked AI panel's placement beside a floating Panel is not built yet, so there is nothing to render.
+The docked AI panel here is a second Panel in the docked slot; its own placement beside a floating Panel is not built yet.
 
 <DoDontPair
+    stacked="Each figure is a full page with two Panels, too wide to halve."
     doExample={<BesideAiPanel />}
+    doCode={CODE.BesideAiPanel}
     doCaption="The floating Panel beside the docked AI panel, both fully visible."
     dontExample={<CoversAiPanel />}
+    dontCode={CODE.CoversAiPanel}
     dontCaption="The floating Panel drawn over the AI panel, hiding part of it."
 />
 
