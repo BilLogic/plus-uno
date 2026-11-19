@@ -801,7 +801,7 @@ const TASK_STEPS = [
 /**
  * A session opens its stages in an inner sidebar; Back returns to the main
  * Sidebar with the session as one open row under Sessions. The page stays put,
- * so the story keeps its own `data-page` marker that nothing here changes.
+ * so the story keeps its own `data-page` element that nothing here changes.
  */
 const InnerSession = ({ startInner = true, ...args }) => {
     const [inner, setInner] = useState(startInner);
@@ -810,7 +810,7 @@ const InnerSession = ({ startInner = true, ...args }) => {
     const tabs = { sessions: SESSION_TABS.slice(0, 2) };
     return (
         <Box height={520}>
-            <span data-page="session" hidden />
+            <div data-page="session" style={{ position: 'absolute', insetBlockStart: 0, insetInlineEnd: 0 }}>Session page</div>
             <Sidebar
                 groups={groups('tutor')}
                 account={TUTOR}
@@ -922,8 +922,18 @@ export const InnerSwapInAndBack = {
     args: { onBack: fn() },
     play: async ({ canvasElement, args }) => {
         await expect(within(innerNav(canvasElement)).queryByRole('button', { name: 'Sessions' }), 'the main Sidebar shows first').toBeInTheDocument();
+        const page = canvasElement.querySelector('[data-page="session"]');
+        const stillPage = () => {
+            const look = getComputedStyle(page);
+            return { transform: look.transform, transition: look.transitionDuration, opacity: look.opacity };
+        };
+        const before = stillPage();
+        await expect(page, 'the page is on screen').toBeVisible();
+        await expect(before.transform, 'the page has no transform at rest').toBe('none');
         await userEvent.click(tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/));
+        await expect(stillPage(), 'the page does not animate as the swap starts').toEqual(before);
         await waitFor(() => expect(backButton(canvasElement)).toBeVisible());
+        await expect(stillPage().transform, 'the page does not move during the swap').toBe('none');
         await settled(canvasElement);
         await expect(within(canvasElement).queryByRole('list', { name: 'Open Sessions' }), 'the main content has left').toBeNull();
         await expect(backButton(canvasElement), 'focus lands on Back').toHaveFocus();

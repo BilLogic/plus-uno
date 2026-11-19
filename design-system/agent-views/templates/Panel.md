@@ -125,6 +125,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 | Title Details with the record: "Ana Ruiz · Thu 4:00 PM". | "Details". |
 | Name the filter by what it keeps: "Unread". | "Filter". |
 | Give the empty state a way back: "Back to sessions". | "Nothing here". |
+| Keep the disclaimer to one line. | Put instructions in the footer that belong in the body. |
 | Name the footer's actions: "Discard" and "Save". | "OK" and "Done". |
 
 ## Accessibility
@@ -133,6 +134,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - Escape closes the Panel unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
+- **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.
 
 ## Related
@@ -211,6 +213,15 @@ If the person must not look at anything outside it, it is a Modal.
 **Checked:** Review
 
 Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
+
+### Give the Panel room to read. {#give-the-panel-room-to-read}
+
+**Checked:** Review
+
+Below its default width the title wraps and the body stops being scannable.
+
+Do: Default width.
+Don't: Squeezed to a narrow strip.
 
 ### Keep the header to one cue. {#keep-the-header-to-one-cue}
 

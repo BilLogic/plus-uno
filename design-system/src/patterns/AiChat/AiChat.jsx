@@ -14,13 +14,13 @@ import {
     PromptStarters,
 } from '@/components';
 import {
+    Frame,
     PanelBody,
     PanelContainer,
     PanelFooter,
     PanelHeader,
     PanelHostContext,
-} from '../Panel';
-import Frame from '../Frame';
+} from '@/patterns';
 import {
     AI_CHAT_FULLSCREEN_BELOW,
     AI_CHAT_MODES,

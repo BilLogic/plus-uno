@@ -4,7 +4,7 @@
     {
       "group": "Templates",
       "name": "Frame",
-      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width=\"reading\"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`."
+      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer."
     },
     {
       "group": "Page",

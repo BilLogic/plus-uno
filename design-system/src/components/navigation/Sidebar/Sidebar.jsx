@@ -13,10 +13,7 @@ import Icon from '../../images-and-icons/Icon';
 import IconButton from '../../forms-and-inputs/IconButton';
 import Logo from '../../images-and-icons/Logo';
 import Tooltip from '../../overlays-and-layering/Tooltip';
-// The pattern's own folder, not the patterns barrel: the components barrel loads
-// this file, and pulling every pattern (and its stylesheet) in here would
-// reorder the cascade for every component that loads after it.
-import { useSidebarControl } from '../../../patterns/Frame/SidebarControl';
+import { useSidebarControl } from '@/lib/sidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { clearOpenTabs, SIDEBAR_RECENT_TABS, useOpenTabs } from './openTabs';
 import { sidebarGroups } from './sidebarConfig';

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const RETIRED = /(?<![a-z])top[ _-]?bar|focused[ _-](view|frame|type|page)|frame-focused|focusedFrame/i;
+const RETIRED = /(?<![a-z])top[ _-]?bar|focused[ _-](view|frame|type|page|template)|frame-focused|focusedFrame/i;
 
 const SELF = 'scripts/retired-frame-parts.test.mjs';
 
@@ -53,7 +53,7 @@ test('no live doc or source file names a top bar or the Frame focused type', () 
 });
 
 test('the pattern catches each retired shape', () => {
-  for (const s of ['the top bar', 'Topbar', 'plus-frame__topbar', 'Frame focused type', 'focused view', 'frame-focused', 'focused-page-pad-x', 'focusedFrame']) {
+  for (const s of ['the top bar', 'Topbar', 'plus-frame__topbar', 'Frame focused type', 'focused view', 'the focused template', 'frame-focused', 'focused-page-pad-x', 'focusedFrame']) {
     assert.match(s, RETIRED, s);
   }
   for (const s of ['focused search', 'border-focused', 'a view bar', 'desktop bar']) assert.doesNotMatch(s, RETIRED, s);

@@ -7,7 +7,7 @@ import { useMotionReduced } from '@/lib/motionPreference';
 import { AreaStage } from '@/lib/navigationMotion';
 import { IconButton } from '@/components';
 import { PanelHostContext } from '../Panel';
-import { SidebarControlContext } from './SidebarControl';
+import { SidebarControlContext } from '@/lib/sidebarControl';
 import { PanelControlContext } from './PanelControl';
 import PanelSplitter from './PanelSplitter';
 import { useOwnWidth } from './useOwnWidth';

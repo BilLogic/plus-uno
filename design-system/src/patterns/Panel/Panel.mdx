@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PanelStories from './Panel.stories.jsx';
-import { ReadingNoFooter, ReadingWithFooter } from './PanelCases.jsx';
+import { ReadingNarrow, ReadingNoFooter, ReadingWithFooter } from './PanelCases.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -329,6 +329,19 @@ If the person must not look at anything outside it, it is a Modal.
 
 Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
 
+### Give the Panel room to read.
+
+<RuleTag kind="review" />
+
+Below its default width the title wraps and the body stops being scannable.
+
+<DoDontPair
+    doExample={<ReadingNoFooter />}
+    doCaption="Default width."
+    dontExample={<ReadingNarrow />}
+    dontCaption="Squeezed to a narrow strip."
+/>
+
 ### Keep the header to one cue.
 
 <RuleTag kind="review" />
@@ -382,6 +395,7 @@ For the step up when the quick look is not enough.
 <tr><td>Title Details with the record: "Ana Ruiz · Thu 4:00 PM".</td><td>"Details".</td></tr>
 <tr><td>Name the filter by what it keeps: "Unread".</td><td>"Filter".</td></tr>
 <tr><td>Give the empty state a way back: "Back to sessions".</td><td>"Nothing here".</td></tr>
+<tr><td>Keep the disclaimer to one line.</td><td>Put instructions in the footer that belong in the body.</td></tr>
 <tr><td>Name the footer's actions: "Discard" and "Save".</td><td>"OK" and "Done".</td></tr>
 </tbody>
 </DocsTable>
@@ -396,6 +410,7 @@ For the step up when the quick look is not enough.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - Escape closes the Panel unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
+- **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.
 
 </div>

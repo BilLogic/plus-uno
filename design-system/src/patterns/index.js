@@ -4,7 +4,7 @@
 
 export { default as Page } from './Page';
 export { default as Frame } from './Frame';
-export { useSidebarControl } from './Frame/SidebarControl';
+export { useSidebarControl } from '@/lib/sidebarControl';
 export { usePanelControl } from './Frame/PanelControl';
 export { PANEL_STORAGE_KEY } from './Frame';
 export { default as PatternCard } from './PatternCard';
