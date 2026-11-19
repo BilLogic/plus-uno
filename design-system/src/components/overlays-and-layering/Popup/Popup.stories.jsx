@@ -59,7 +59,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section-stack-md) * 4)', padding: 'var(--popup-clip-reach)', alignItems: 'center' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--stack-xl) * 4)', padding: 'var(--popup-clip-reach)', alignItems: 'center' }; /* 64px fixed demo gap */
 
 function PopupLayoutDemos() {
     return (
@@ -346,7 +346,7 @@ export const WidthAutoCaps = {
  */
 export const WidthColumns = {
     render: () => (
-        <div style={{ padding: 'calc(var(--pad-x-lg) * 16) calc(var(--pad-x-lg) * 4)', display: 'flex', gap: 'calc(var(--section-stack-md) * 4)' /* 64px fixed */, justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--pad-x-lg) * 16) calc(var(--pad-x-lg) * 4)', display: 'flex', gap: 'calc(var(--inline-xl) * 4)' /* 64px fixed */, justifyContent: 'center' }}>
             {['3-col', '4-col'].map((width) => (
                 <Popup
                     key={width}

@@ -50,7 +50,7 @@ export const MultiStepStepsInPage = () => (
         <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
             <div style={{ height: '100%' }}>
                 <Frame surfaceDirect sidebar={<Sidebar user="tutor" activeTabId="home" account={ACCOUNT} />}>
-                    <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', padding: 'var(--page-pad)' }}>
+                    <div style={{ display: 'flex', gap: 'var(--inline-2xl)', padding: 'var(--page-pad)' }}>
                         <ProgressTracker label="Steps" orientation="vertical" items={stepItems(STEP_LABELS, 1, () => {})} />
                         <Skeleton preset="text" lines={4} />
                     </div>
@@ -92,7 +92,7 @@ export const AiPanelFloating = () => <PanelWindow stage={DOCKED_STAGE} />;
 const SignInColumn = () => {
     const [email, setEmail] = useState('');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--section-stack-lg)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--stack-2xl)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--stack-2xl)' }}>
             <Logo />
             <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             <Button text="Sign in" appearance="primary" onClick={() => {}} />

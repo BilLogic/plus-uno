@@ -225,7 +225,7 @@ const FramedTableCase = () => (
 /** A second row of filters and a count between the Section header and the head row, repeating what the header's own rows carry. */
 const SecondToolbarCase = () => (
     <InSection>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                 <FilterButton label="Tutor" text="All" onClick={() => {}} />
                 <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>12 records</span>
@@ -238,7 +238,7 @@ const SecondToolbarCase = () => (
 /** Two tables share one Section and one header. */
 const TwoTablesCase = () => (
     <InSection>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             {studentTable}
             {studentTable}
         </div>

@@ -1520,7 +1520,7 @@ export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docke
 /** A page body made of placeholder bars, so the Frame's own structure is what reads. */
 const SkeletonSection = ({ title }) => (
     <Section title={title}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <Skeleton preset="text" lines={3} />
         </div>
     </Section>
@@ -1658,7 +1658,7 @@ const BareSignIn = () => {
     return (
         <BrowserWindow address="app.plus.org/sign-in" height={WINDOW_HEIGHT}>
             <Frame surfaceDirect>
-                <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--section-stack-lg)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: '48px' /* token gap: 48px */ }}>
+                <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--stack-2xl)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: '48px' /* token gap: 48px */ }}>
                     <Logo />
                     <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <Button text="Sign in" appearance="primary" onClick={() => {}} />

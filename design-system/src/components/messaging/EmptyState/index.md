@@ -132,7 +132,7 @@ Same group: `Banner` · `Dialog` · `Flag` · `InlineMessage` · `NotificationIt
 | Header | `--heading-md` (default), `--heading-sm` (compact), `--ds-text` |
 | Description | `--body-default`, `--ds-text-subtle` |
 | Icon | `--ds-icon-subtle` |
-| Spacing | `--stack-sm`, `--inline-md`, `--section-stack-sm`, `--section-stack-md`, `--page-stack-sm`, `--page-stack-md`, `--page-stack-lg` |
+| Spacing | `--stack-sm`, `--inline-md`, `--section-stack-sm`, `--stack-xl`, `--page-stack-sm`, `--page-stack-md`, `--page-stack-lg` |
 | Width | `--section-min-width-main` |
 
 ## Content guidelines
@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-sm` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm` · `--type-size-150` · `--type-size-200`
+`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-sm` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-sm` · `--stack-sm` · `--stack-xl` · `--type-size-150` · `--type-size-200`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 

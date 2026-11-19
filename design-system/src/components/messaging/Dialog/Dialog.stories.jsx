@@ -68,11 +68,11 @@ export default {
     },
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', alignItems: 'flex-start' };
 const contentVariantGrid = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' /* token gap: 360px */,
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl) var(--inline-2xl)',
     width: '100%',
 };
 

@@ -50,7 +50,7 @@ const containerStyle = {
 };
 
 const blockStyle = {
-    margin: 'var(--page-stack-lg) calc(var(--section-stack-md) * 4)',
+    margin: 'var(--page-stack-lg) calc(var(--inline-xl) * 4)',
 };
 
 function TooltipVariantsDemos() {
@@ -85,7 +85,7 @@ function TooltipVariantsDemos() {
 }
 
 export const Placements = () => (
-    <div style={{ marginBottom: 'calc(var(--section-stack-md) * 4)' }}>
+    <div style={{ marginBottom: 'calc(var(--stack-xl) * 4)' /* 64px fixed demo clearance */ }}>
         <TooltipVariantsDemos />
     </div>
 );

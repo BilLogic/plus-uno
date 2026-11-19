@@ -204,7 +204,7 @@ export const Interactive = {
 export const Elevation = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--inline-2xl)', flexWrap: 'wrap' }}>
             <Card title="Sunken" minWidth={200 /* token gap: 200px */}>
                 <div data-surface-probe="sunken" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
                     {bodyCopy}
@@ -530,7 +530,7 @@ export const Dragging = {
 /** Every surface keeps a 1px border width so forced colors draw its edge. */
 export const ForcedColors = {
     render: () => (
-        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--inline-2xl)', flexWrap: 'wrap' }}>
             <Card surface="sunken" title="Sunken" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
             <Card surface="default" title="Default" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
             <Card surface="raised" title="Raised" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
