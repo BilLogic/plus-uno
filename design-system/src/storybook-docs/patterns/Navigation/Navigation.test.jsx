@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { BreadcrumbCase } from './NavigationCases.jsx';
+import { BreadcrumbCase, CODE } from './NavigationCases.jsx';
 import {
     OpenItemsDont,
     OpenItemsPicture,
@@ -31,6 +31,13 @@ describe('Navigation live cases and links', () => {
         expect(areaNav).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { level: 4, name: 'Students' })).toBeInTheDocument();
+    });
+
+    it('prints the breadcrumb examples from their own source', () => {
+        expect(Object.keys(CODE)).toEqual(['BreadcrumbOnRecordPage', 'BreadcrumbOnAreaPage']);
+        expect(CODE.BreadcrumbOnRecordPage).toContain("import { Breadcrumb, DynamicTable, PageHeader } from '@/components';");
+        expect(CODE.BreadcrumbOnAreaPage).toContain('const Table');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('OpenItemsPicture and OpenItemsDont render interactive, non-inert Sidebar open items', async () => {

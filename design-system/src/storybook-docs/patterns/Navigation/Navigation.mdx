@@ -4,7 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NavigationStories from './Navigation.stories.jsx';
-import { BreadcrumbCase } from './NavigationCases.jsx';
+import { BreadcrumbCase, CODE } from './NavigationCases.jsx';
 import {
     OpenItemsDont,
     OpenItemsPicture,
@@ -155,8 +155,10 @@ Never on an area page or a multi-step task. It sits above the title in the page 
 
 <DoDontPair
     doExample={<BreadcrumbCase record />}
+    doCode={CODE.BreadcrumbOnRecordPage}
     doCaption="A breadcrumb on the record page, parents only."
     dontExample={<BreadcrumbCase record={false} />}
+    dontCode={CODE.BreadcrumbOnAreaPage}
     dontCaption="A breadcrumb on an area page: there is nothing to climb out of."
 />
 
