@@ -328,7 +328,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
       ref={root}
       data-reorder-root
       data-phase={phase}
-      style={{ position: 'relative', display: 'flex', gap: 'var(--space-100)', padding: 'var(--space-200)', background: PAINT.sectionSubtleSurface, borderRadius: CORNER_TOKEN.section }}
+      style={{ position: 'relative', display: 'flex', gap: 'var(--inline-xl)', padding: 'var(--stack-3xl)', background: PAINT.sectionSubtleSurface, borderRadius: CORNER_TOKEN.section }}
     >
       {listIds.map((list) => (
         <ul

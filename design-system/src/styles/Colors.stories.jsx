@@ -360,8 +360,11 @@ const useResolvedTokens = () => {
     return { values, modes };
 };
 
+/* token gap: demo canvas size, no role token */
+const DEMO_SIZE = { swatchMinHeight: '48px' };
+
 const swatchBase = {
-    minHeight: 'var(--space-300)',
+    minHeight: DEMO_SIZE.swatchMinHeight,
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--pad-x-md)',
     display: 'flex',
@@ -404,9 +407,9 @@ export const Modes = () => {
             style={{
                 background: 'var(--ds-surface)',
                 color: 'var(--ds-text)',
-                padding: 'var(--space-100)',
+                padding: 'var(--stack-xl)',
                 display: 'grid',
-                gap: 'var(--space-100)',
+                gap: 'var(--stack-xl)',
                 font: 'var(--body-default)',
             }}
         >
@@ -417,7 +420,7 @@ export const Modes = () => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-                    gap: 'var(--space-100)',
+                    gap: 'var(--inline-xl)',
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (

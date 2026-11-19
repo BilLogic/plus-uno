@@ -117,7 +117,7 @@ export const Content = () => (
 );
 
 export const Styles = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>INVALID</DemoLabel>
             <FileUpload
@@ -146,7 +146,7 @@ export const Styles = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <FileUpload

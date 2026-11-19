@@ -18,7 +18,7 @@ import { Modal } from '@/templates';
  * waited for rather than asserted.
  */
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', alignItems: 'flex-start' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', alignItems: 'flex-start' };
 
 /** The overlay is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
