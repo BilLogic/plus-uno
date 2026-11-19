@@ -72,7 +72,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
 | Choices | `RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker` | A control that cannot be wrong; pictured tiles for one big question per step. |
 | Settings rows | `SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag` | Divided rows under section headings with no card per row; flipping a toggle confirms via Flag. |
-| Step progress | `ProgressIndicator`, `ProgressTracker` | Dots centered above a single-question step under five steps; the left step list at five or more. |
+| Step progress | `ProgressIndicator`, `ProgressTracker` | Progress indicator centered above a single-question step under five steps; the left step list at five or more. |
 | Hosts | Frame, Panel, Modal | A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused. |
 | Confirm view | Modal | Swapped in place today. A confirm view prop is Planned. |
 
@@ -163,11 +163,11 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
 
-### Center dots above a single-question step under five steps. {#center-dots-above-a-single-question-step-under-five-steps}
+### Center the Progress indicator above a single-question step under five steps. {#center-the-progress-indicator-above-a-single-question-step-under-five-steps}
 
 **Checked:** Automatic
 
-When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center `ProgressIndicator` dots above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
+When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center the `ProgressIndicator` above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
 
 ## In code
 

@@ -102,7 +102,7 @@ Filtering reads these motion tokens and no literal duration or curve.
 | count-change | Update a value or state | `--ds-motion-appearance-fast` | The Filter count grows to the left; a changed number fades to its new value. |
 | reset | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The count fades out, then the icon narrows back. |
 | search | Update a value or state | `--ds-motion-spatial-fast` | Search grows to the left, right edge fixed, so the pills and the primary never move. Escape, or an empty blur, shrinks it back the same way; fast stays fast on exit. |
-| chip | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip being added or removed is Add or remove. |
+| tag | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A tag being added or removed is Add or remove. |
 | results | Swap content in place | `--ds-motion-appearance-fast` | The results swap in place, a clean fade, once per Apply. Typing in Search filters the list the same way. |
 | results-load | Load content | `--ds-motion-appearance-fast` | When the fetch is slow, the results are Load. |
 

@@ -50,7 +50,7 @@ const RAW = import.meta.glob(
  * Eager, and with the sibling test files excluded — both deliberate.
  *
  * Eager: a lazy glob hides these modules from Vite's pre-run dependency scan,
- * so `react-bootstrap/Alert` and friends were optimized mid-run, which reloads
+ * so a component's own dependencies were optimized mid-run, which reloads
  * the page and aborts the file. That is the flake `vite.config.js` documents
  * under `optimizeDeps.include`. Every other story file imports its component
  * statically; this one has to look the same to the scanner.

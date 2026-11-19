@@ -49,16 +49,9 @@ function deriveImportPath(mdxAbsPath) {
   const withoutMdx = rel.replace(/\.mdx$/, '');
   const parts = withoutMdx.split('/');
 
-  // `_internal` is a source-layout folder, not an import surface — components in
-  // it are re-exported from the public barrel. Reporting `@/components/_internal`
-  // would hand agents a private path that reads as off-limits; point at the
-  // barrel they are actually meant to import from.
-  if (parts[0] === 'components' && parts[1] === '_internal') return '@/components';
-  if (parts[0] === 'components' && parts.length >= 2) return `@/components/${parts[1]}`;
-  // No `forms` branch: the 2026-07 IA reorg folded `src/forms/` into
-  // `src/components/forms-and-inputs/`, so form components fall through the
-  // `components` branch above and import from `@/components/forms-and-inputs`
-  // like every other component. `@/forms/...` resolves to nothing.
+  // Every component, whatever its group folder, imports from the one barrel;
+  // a group folder is a source-layout detail, not an import surface.
+  if (parts[0] === 'components' && parts.length >= 2) return '@/components';
   if (parts[0] === 'DataViz' && parts.length >= 3) {
     return `@/DataViz/${parts.slice(1, -1).join('/')}/${parts[parts.length - 1]}`;
   }

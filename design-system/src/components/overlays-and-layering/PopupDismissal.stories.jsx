@@ -6,21 +6,12 @@ import { Modal } from '@/templates';
 /**
  * Getting a `Popup` shut again.
  *
- * WHY THIS FILE EXISTS (#321). react-bootstrap's `Overlay` defaults `rootClose`
- * to false, and `Popup` passed no value for it. A click-triggered popup —
- * the default trigger — therefore stayed open until the trigger itself was
- * clicked a second time: not on a click elsewhere, and not on Escape.
- *
- * A caller could not fix it from outside either. Extra props are spread onto
- * the overlay's CONTENT, not onto `OverlayTrigger`, so `rootClose` passed to
- * this component landed on the popup panel and did nothing there. The
- * behavior was unreachable from the public API in both directions.
- *
- * This is #209's defect class in a second component: something that opens,
- * looks right in a screenshot, and cannot be closed by the route everyone
- * expects. A render assertion cannot see it — an open popup renders
- * identically whether or not a click away will dismiss it — so the cover has to
- * be an interaction.
+ * A click-triggered popup, the default trigger, has to close on a click
+ * elsewhere and on Escape, and a manual one (`show` set by the caller) has to
+ * ignore both. Something that opens, looks right in a screenshot, and cannot be
+ * closed by the route everyone expects is a defect a render assertion cannot
+ * see: an open popup renders identically whether or not a click away will
+ * dismiss it, so the cover has to be an interaction.
  *
  * The popup portals out of the story canvas, so these queries run against the
  * document. The exit transition keeps the node for a frame, so disappearance is
@@ -43,19 +34,14 @@ export default {
         docs: {
             description: {
                 component:
-                    'Interaction cover for #321: a click-triggered popup has to close on a '
+                    'Interaction cover: a click-triggered popup has to close on a '
                     + 'click away and on Escape, and a manual one has to ignore both.',
             },
         },
     },
 };
 
-/**
- * The two routes out that a click popup advertises by being a click popup.
- *
- * Both assertions fail before the fix, for the same reason: `rootClose` was off,
- * and it is what binds the outside click AND the Escape key.
- */
+/** The two routes out that a click popup advertises by being a click popup: a click elsewhere and Escape. */
 export const ClickAwayAndEscape = () => (
     <div style={stack}>
         <Popup trigger={<Button appearance="primary" text="Session 12" />} title="Session 12">
@@ -120,22 +106,15 @@ ManualIgnoresRootClose.play = async ({ canvasElement }) => {
 };
 
 /**
- * What the TRIGGER says — the other half of #321.
+ * What the TRIGGER says, apart from what the panel does.
  *
- * The issue listed two more gaps beside the dismissal one, and both are about
- * the trigger rather than the panel:
+ * A trigger announces that a panel exists and whether it is open (`aria-haspopup`,
+ * `aria-expanded`), and a string trigger is a real control with a role and an
+ * accessible name, not a bare span: a keyboard tab stop that does nothing on
+ * Enter is silent to a screen reader.
  *
- *   · nothing announced that a panel existed, or that it had opened. No
- *     `aria-haspopup`, no `aria-expanded`. react-bootstrap adds
- *     `aria-describedby` while the popup is shown, which points AT the
- *     content once it is open and says nothing before that.
- *   · a STRING trigger became `<span className="d-inline-block" tabIndex="0">`
- *     — a tab stop with no role and no accessible name. Reachable by keyboard,
- *     inert on Enter, and silent to a screen reader.
- *
- * Both are invisible to a render assertion and to a screenshot: the span looked
- * exactly like the text it wrapped, and a trigger with no `aria-expanded` looks
- * exactly like one that has it.
+ * Both are invisible to a render assertion and to a screenshot: a trigger with
+ * no `aria-expanded` looks exactly like one that has it.
  */
 export const TriggerSemantics = () => (
     <div style={stack}>

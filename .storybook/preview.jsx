@@ -114,12 +114,6 @@ if (addons.hasChannel?.()) {
   globalThis.__PLUS_COLOR_MODE_HANDLER__ = fromChannel;
 }
 
-// Cleanup functions - using dummy no-ops as legacy components are being phased out or moved
-const cleanupFunctions = {
-  clearAllToasts: () => { },
-  destroyAllTooltips: () => { },
-};
-
 /** @type { import('@storybook/react-vite').Preview } */
 const preview = {
   parameters: {

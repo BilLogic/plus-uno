@@ -26,9 +26,7 @@
  * a compound suffix (`.stories.jsx`, `.test.jsx`) is not a component and is
  * left alone.
  *
- * EVERY COMPONENT GETS ITS OWN LINE, ONE HOP FROM ITS FOLDER — even in a group
- * that also has its own `index.js` (today, only `forms-and-inputs`, kept for
- * the handful of callers that import it directly). A group re-export
+ * EVERY COMPONENT GETS ITS OWN LINE, ONE HOP FROM ITS FOLDER. A group re-export
  * (`export * from '@/components/<group>'`) is a second hop through that
  * file's own `export { default as X } from './X'` lines, and a star re-export
  * chained two deep lost Button's and IconButton's default binding under this

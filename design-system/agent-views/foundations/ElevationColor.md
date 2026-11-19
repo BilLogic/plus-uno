@@ -13,7 +13,7 @@ Each layer has its surface color. A surface tone separates before any shadow; Su
 | Token | Behavior |
 | --- | --- |
 | `-hovered · -pressed` | Every surface has both. A clickable surface changes tone on hover and press; a clickable Sunken card lifts to Raised on hover instead. Never both at once. |
-| `--ds-background-neutral` | Translucent: darkens in light, lightens in dark. For a fill that must adapt to whatever surface it sits on (a button, a chip). Not a container. |
+| `--ds-background-neutral` | Translucent: darkens in light, lightens in dark. For a fill that must adapt to whatever surface it sits on (a button, a tag). Not a container. |
 
 ## Colored surfaces
 

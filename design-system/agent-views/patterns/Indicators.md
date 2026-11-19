@@ -34,7 +34,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | How much it moved | Change tag | Signed value, arrow, tone from the good direction; neutral when there is no judgment | "+3 vs last week" |
 | A category, a subject, a person | Tag | Outline and text; a leading visual is optional | "Lincoln Middle" |
 | Setup or compliance steps left to finish | Checklist (`Card` + `Section` + `Progress bar`) | Header count and bar aligned to one 128 action column; open steps above done steps | "2 of 5 done" |
-| The shape of a trend | Sparkline (Planned) | A word-sized line beside the number | Attendance over eight weeks |
+| The shape of a trend | Sparkline | A word-sized line beside the number | Attendance over eight weeks |
 
 ## Alternatives
 

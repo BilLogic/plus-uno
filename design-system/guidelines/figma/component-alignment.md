@@ -98,7 +98,7 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 
 | Check | Command / tool |
 |-------|----------------|
-| Figma library changed | `npm run figma:poll` (also opens a PRD and posts to Slack) |
+| Figma library changed | dispatch `figma-snapshot-refresh.yml` (or `npm run snapshot:figma-components` with `FIGMA_ACCESS_TOKEN`); it opens a draft PR with the diff |
 | Snapshots gone stale | `npm run check:figma-snapshots` reports the age; `npm run snapshot:figma-components` and `npm run snapshot:figma-variables` re-record them |
 | Token drift | re-export the Figma JSON under `tokens/source/`, `npm run generate:tokens`, compare |
 | Code compliance | `bash skills/uno-review/scripts/run-review-checks.sh <prototype>/src` |
