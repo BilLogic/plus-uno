@@ -7,7 +7,8 @@ ${body}
 const SIDEBAR = `<Sidebar user="tutor" activeTabId="home" account={account} />`;
 
 const BAR = (second) => `<CaseSurface border="top" padding="sm">
-    <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" />}>
+    <FooterActions>
+        <Button text="Save and exit" spacing="default" />
         <Button text="${second}" spacing="default" />
         <Button text="Next" appearance="primary" spacing="default" />
     </FooterActions>
