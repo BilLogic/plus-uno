@@ -71,6 +71,28 @@ A radio group asks one question and offers a set of radio answers, one of which 
 
 <ComponentExample of={RadioGroupStories.Soft} title="Soft options" description="`appearance=&quot;soft&quot;` draws neutral option rows without a visible radio dot; selection is carried by the selected fill, 1px selected border, and trailing check." />
 
+<ComponentExample of={RadioGroupStories.SoftRest} title="Soft rest" description="Neutral fill, no edge, no check." />
+
+<ComponentExample of={RadioGroupStories.SoftHovered} title="Soft hovered" description="Unselected row steps to the hovered neutral fill." />
+
+<ComponentExample of={RadioGroupStories.SoftPressed} title="Soft pressed" description="Unselected row steps to the pressed neutral fill." />
+
+<ComponentExample of={RadioGroupStories.SoftSelected} title="Soft selected" description="Selected fill, 1px selected edge, and the trailing check." />
+
+<ComponentExample of={RadioGroupStories.SoftSelectedHovered} title="Soft selected hovered" description="Selected row steps to the hovered selected fill and keeps its edge and check." />
+
+<ComponentExample of={RadioGroupStories.SoftFocused} title="Soft focused" description="Keyboard focus draws the 2px focus ring around the row." />
+
+<ComponentExample of={RadioGroupStories.SoftInvalid} title="Soft invalid" description="One group error under the rows, with every unselected row edged in danger." />
+
+<ComponentExample of={RadioGroupStories.SoftInvalidSelected} title="Soft invalid, selected" description="The selected row keeps its fill and check but takes the danger edge." />
+
+<ComponentExample of={RadioGroupStories.SoftReadOnly} title="Soft read-only" description="Selected answer and check stay visible, no hover, still focusable, and the answer is locked." />
+
+<ComponentExample of={RadioGroupStories.SoftDisabled} title="Soft disabled" description="Disabled fill and edge on every row, the check in the disabled icon color, and out of the tab order." />
+
+<ComponentExample of={RadioGroupStories.SoftMixedFlow} title="Soft choice flow" description="Soft single-select questions in the majority; the multi-select question keeps its visible checkboxes." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -188,13 +210,14 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>As Radio; in <code>soft</code>, <code>--ds-background-neutral</code> fill with no edge and no radio dot.</td></tr>
 <tr><td>Hovered</td><td>As Radio. Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge (or <code>--ds-background-neutral-hovered</code> in <code>soft</code>). Selected: the hovered step of the selected bold fill (or <code>--ds-background-selected-hovered</code> in <code>soft</code>).</td></tr>
 <tr><td>Selected</td><td>As Radio: <code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; in <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing <code>fa-solid fa-check</code> icon in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own in plain/card; in <code>soft</code>, an unselected option steps to <code>--ds-background-neutral-pressed</code> and a selected option steps to <code>--ds-background-selected-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the one tab stop (around the row in <code>soft</code> and <code>tile</code>).</td></tr>
 <tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code> (and in <code>soft</code>, selected options do too), with one message for the group.</td></tr>
-<tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on the group; unchecked radios take the <code>--ds-background-neutral</code> fill and the answer does not change.</td></tr>
-<tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on the group; unchecked radios take the <code>--ds-background-neutral</code> fill and the answer does not change. In <code>soft</code>, the selected row keeps <code>--ds-background-selected</code>, its <code>--ds-border-selected</code> edge and the trailing check in <code>--ds-icon-selected</code>; unselected rows stay <code>--ds-background-neutral</code>, with no hover or pressed step and a default cursor.</td></tr>
+<tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order. In <code>soft</code>, every row takes <code>--ds-background-disabled</code> and a <code>--ds-border-disabled</code> edge; a selected row keeps its trailing check, in <code>--ds-icon-disabled</code>.</td></tr>
 </tbody>
 </DocsTable>
 

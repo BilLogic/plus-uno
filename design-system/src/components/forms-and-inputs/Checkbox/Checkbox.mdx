@@ -167,8 +167,8 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 <tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the check is <code>--ds-icon-inverse</code>. In <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing check in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Mixed</td><td>The same fill and edge as selected; the mark is a dash in <code>--ds-icon-inverse</code> (or <code>fa-solid fa-minus</code> in <code>--ds-icon-selected</code> in <code>soft</code>).</td></tr>
 <tr><td>Invalid</td><td>The unselected box or tile takes <code>--ds-border-danger</code> (in <code>soft</code>, both unselected and selected rows take <code>--ds-border-danger</code>).</td></tr>
-<tr><td>Read-only</td><td>Full contrast, in the tab order, <code>aria-readonly</code>, no hover; an unchecked box takes the <code>--ds-background-neutral</code> fill. Ignores clicks and Space.</td></tr>
-<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> mark. Out of the tab order.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, <code>aria-readonly</code>, no hover; an unchecked box takes the <code>--ds-background-neutral</code> fill. Ignores clicks and Space. In <code>soft</code>, a checked row keeps its selected fill, edge and trailing check.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> mark. Out of the tab order. In <code>soft</code>, the row takes the disabled fill and edge, with the check in <code>--ds-icon-disabled</code>.</td></tr>
 </tbody>
 </DocsTable>
 
