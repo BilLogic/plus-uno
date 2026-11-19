@@ -291,14 +291,11 @@ export const TOKEN_LADDER = [
 
   // ─── Templates / Popup ───────────────────────────────────────────────
   { tier: 'templates', group: 'Popup', new: '--popup-pad', old: '--popup-pad', use: 'Padding inside a Popup.' },
-  { tier: 'templates', group: 'Popup', new: '--popup-width-sm', old: '--popup-width-sm', use: 'Width of a small Popup.' },
-  { tier: 'templates', group: 'Popup', new: '--popup-width-md', old: '--popup-width-md', use: 'Width of a default Popup.' },
-  { tier: 'templates', group: 'Popup', new: '--popup-width-lg', old: '--popup-width-lg', use: 'Width of a large Popup.' },
   { tier: 'templates', group: 'Popup', new: '--flag-width', old: '--flag-width', use: 'Width of a Flag.' },
   { tier: 'templates', group: 'Popup', new: '--flag-stack', old: '--flag-stack', use: 'Vertical gap between stacked Flags.' },
   { tier: 'templates', group: 'Popup', new: '--popup-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a Popup.' },
-  { tier: 'templates', group: 'Popup', new: '--popup-width-3-col', old: null, ref: '200px', at: { '(min-width: 1024px)': '264px', '(min-width: 1440px)': '328px' }, note: '3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440', use: 'Width of a 3-column Popup, such as a short picker.' },
-  { tier: 'templates', group: 'Popup', new: '--popup-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, use: 'Width of a 4-column Popup, such as a date picker or a menu with descriptions.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-3-col', old: null, ref: '200px', at: { '(min-width: 1024px)': '264px', '(min-width: 1440px)': '328px' }, note: '3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440', use: 'Width of a 3-column Popup: a filter menu or the profile menu.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, use: 'Width of a 4-column Popup: content, or a stacked filter menu. The widest a Popup goes.' },
   { tier: 'templates', group: 'Popup', new: '--dropdown-menu-pad', old: '--dropdown-menu-pad', use: 'Padding inside a DropdownMenu or listbox.' },
   { tier: 'templates', group: 'Popup', new: '--dropdown-menu-min-width', old: '--dropdown-menu-min-width', use: 'Narrowest a DropdownMenu or listbox may shrink.' },
   { tier: 'templates', group: 'Popup', new: '--dropdown-menu-max-width', old: '--dropdown-menu-max-width', use: 'Widest a DropdownMenu or listbox may grow.' },
@@ -425,6 +422,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spotlight', new: '--spotlight-gap', old: null, ref: 'var(--space-100)', use: 'Gap between blocks inside a Spotlight (header, media, body and footer).' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-footer-stack', old: null, ref: 'var(--space-150)', use: 'Vertical gap above a Spotlight footer.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
+  { tier: 'components', group: 'Popup', new: '--popup-width-range', old: null, ref: 'var(--width-2500)', use: 'Width of the range picker\'s Popup: the presets beside the calendar.' },
   { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
@@ -527,6 +525,9 @@ export const RETIRED_RENAMES = {
   '--layout-sidebar-width': '--frame-sidebar-width',
   '--card-radius-sm': '--card-radius',
   '--layout-calendar-nav': '--control-sm',
+  '--popup-width-sm': '--popup-width-3-col',
+  '--popup-width-md': '--popup-width-4-col',
+  '--popup-width-lg': '--popup-width-4-col',
 };
 
 /**

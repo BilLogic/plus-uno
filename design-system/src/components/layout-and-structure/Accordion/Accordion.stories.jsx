@@ -21,8 +21,14 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        style: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         // DESIGN
         flush: {
             control: 'boolean',

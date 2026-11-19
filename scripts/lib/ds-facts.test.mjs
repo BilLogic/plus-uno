@@ -195,7 +195,7 @@ const DATA = {
   'agent-views/components.json': MANIFEST,
   'agent-views/tokens.json': { tokens: [{ name: '--stack-md', tier: 'semantic', group: 'Spacing', value: '8px', intent: null }] },
   'agent-views/_inventions.json': { components: [{ not: 'Toast', use: ['Flag'], why: 'renamed' }], props: [], tokens: [] },
-  'agent-views/_patterns.json': { patterns: [] },
+  'agent-views/_templates.json': { templates: [] },
   'src/components/index.js': [
     "export { default as Button, BUTTON_APPEARANCES } from './Button';",
     "export { default as Logo } from '../brand/Logo';",

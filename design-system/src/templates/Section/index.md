@@ -2,9 +2,9 @@
 
 # Section
 
-Section: a span of the page grid under one heading, with its header, toolbar and tabs.
+Section: a span of the page grid under one heading, with its title row, views, search and filters.
 
-Also asked as: page section, toolbar, section header, block, region.
+Also asked as: page section, section header, block, region.
 
 **Import:** `import { Section } from '@/templates';`
 
@@ -60,7 +60,7 @@ Don't: A Section whose heading repeats its only card's title: two headings for o
 
 **Checked:** Automatic
 
-The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
 
 Do: The title row first, the header rows under it, sharing one left edge.
 Don't: The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go.
@@ -78,7 +78,7 @@ Don't: Add students in the title row and again in the views row: one action, two
 
 **Checked:** Review
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line and scrolls sideways when the pills do not fit. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
 ### Order the header: actions, then views and format, then Search and filters. {#order-the-header-actions-then-views-and-format-then-search-and-filters}
 
@@ -178,7 +178,14 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 | --- | --- |
 | `title` · `description` · `actions` | The title row. |
 | `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
+| `header` · `type` | With `type="custom"` the `header` slot replaces the title and description; `title` stays as the visually hidden heading. `type` is `default` or `custom`, and is read from the slots when left off. |
+| `loading` | Swaps the header for skeleton bars while the Section loads. |
+| `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
+| `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
+| `onClearAll` · `onMoreFilters` · `onOpenFilters` | Clear all, More filters, and the Filter button of a narrow Section. |
+| `onAddView` · `addViewLabel` | The Add view button at the end of the views, and its label. |
 | `tabs` · `toolbar` | Deprecated. Use `views` and `format` for the tab row, and `search` and `filters` for the toolbar row. |
+| `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |

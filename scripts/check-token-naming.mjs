@@ -14,6 +14,7 @@
  *      that single constant to `true` once the warning list reaches zero.
  */
 
+import { retiredRenames } from './lib/tokens/plan.mjs';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -208,6 +209,9 @@ export function checkTokenNaming(
       }
 
       const actualToken = parseWebCodeSyntax(rawSyntax);
+      // A variable the Figma file still holds under a name the plan has retired in code waits for a
+      // Figma pass; the retired-token map is the record of that, so it is not an unknown token.
+      if (actualToken && !scssTokens.has(actualToken) && retiredRenames().has(actualToken)) continue;
       if (!actualToken || !scssTokens.has(actualToken)) {
         findings.push({
           kind: 'unknown-token',

@@ -314,9 +314,6 @@
       "Popup/radius": "var(--popup-radius)",
       "Popup/width-3-col": "var(--popup-width-3-col)",
       "Popup/width-4-col": "var(--popup-width-4-col)",
-      "Popup/width-lg": "var(--popup-width-lg)",
-      "Popup/width-md": "var(--popup-width-md)",
-      "Popup/width-sm": "var(--popup-width-sm)",
       "Section/min-width-main": "var(--section-min-width-main)",
       "Section/min-width-side": "var(--section-min-width-side)",
       "Section/stack-lg": "var(--section-stack-lg)",
@@ -1869,11 +1866,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1241,
+    "scssTokenCount": 1239,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1769,
-      "resolved": 1732,
+      "resolved": 1729,
       "percent": 98,
       "skippedCollections": [
         {
@@ -2185,6 +2182,30 @@
             "--frame-sidebar-docked"
           ],
           "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-lg",
+          "tried": [
+            "--popup-width-lg"
+          ],
+          "reason": "code syntax names a token the code does not have"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-md",
+          "tried": [
+            "--popup-width-md"
+          ],
+          "reason": "code syntax names a token the code does not have"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-sm",
+          "tried": [
+            "--popup-width-sm"
+          ],
+          "reason": "code syntax names a token the code does not have"
         },
         {
           "collection": "color / semantics",

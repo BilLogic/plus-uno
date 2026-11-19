@@ -15,7 +15,7 @@ import path from 'node:path';
 export const LIBRARY = 'design-system/src';
 export const TARGET = 'plus-ds';
 export const COMPONENT_INDEX = 'design-system/agent-views/components/index.md';
-export const PATTERN_INDEX = 'design-system/agent-views/_patterns.json';
+export const TEMPLATE_INDEX = 'design-system/agent-views/_templates.json';
 /** Foundation owns these folders of the library; a component imports them, so it depends on the foundation. */
 const FOUNDATION_DIRS = ['tokens', 'styles', 'lib'];
 const EXTS = ['', '.jsx', '.js', '.mjs', '.scss', '.css', '/index.jsx', '/index.js'];
@@ -206,10 +206,10 @@ export function ownerOf(file, units, foundation) {
 
 /** Templates, as the hand-kept index names them, each at the folder its barrel export comes from. */
 export function templateList(root) {
-  if (!isFile(root, PATTERN_INDEX) || !isFile(root, `${LIBRARY}/templates/index.js`)) return [];
+  if (!isFile(root, TEMPLATE_INDEX) || !isFile(root, `${LIBRARY}/templates/index.js`)) return [];
   const map = barrelMap(root, `${LIBRARY}/templates/index.js`);
   const items = new Map();
-  for (const { name } of JSON.parse(read(root, PATTERN_INDEX)).patterns) {
+  for (const { name } of JSON.parse(read(root, TEMPLATE_INDEX)).templates) {
     // A name the templates barrel does not export from its own folder is a component the index points at (Popup), already an item.
     const home = map.get(name);
     if (home?.spec.startsWith('@/templates/') && !items.has(name)) items.set(name, { name, dir: `${LIBRARY}/${home.spec.slice(2)}`, type: 'registry:component', title: name });

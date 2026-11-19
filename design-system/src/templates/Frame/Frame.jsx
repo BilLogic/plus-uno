@@ -402,8 +402,8 @@ const Frame = ({
 
     /**
      * Base UI reports each attempt to dismiss the Panel's dialog; the Frame
-     * keeps the rules. Only an overlay or a peek is dismissed, by a press on
-     * the Blanket or by Escape. A press inside an open modal, in
+     * keeps the rules. Only an overlay or a peek is dismissed, by a press
+     * outside it or by Escape. A press inside an open modal, in
      * a popup drawn outside the Frame, or on a trigger that controls the Panel
      * (which toggles it itself) leaves it open. So does Escape while a modal
      * is open, since that Escape is the modal's, and an Escape a control in
@@ -630,7 +630,7 @@ const Frame = ({
 
                 <div ref={rowRef} className="plus-frame__row">
                     {dockedPresent && hasSidebar ? sidebarPanel(false, !docked, dockedEnteringRef.current) : null}
-                    {/* Under an overlay Panel's Blanket the Page is out of reach for keyboards too. */}
+                    {/* With an overlay Panel open the Page is out of reach for keyboards too. */}
                     <SurfaceTag className="plus-frame__surface" inert={panelModal}>
                         {(() => {
                             const body = surfaceDirect ? children : (

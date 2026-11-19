@@ -21,9 +21,9 @@ authored half, counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Accordion](Accordion/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Carousel](Carousel/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Carousel](Carousel/index.md) | 12 | ✅ | ✅ | ✅ |
 | [PageHeader](PageHeader/index.md) | 8 | ✅ | ✅ | ✅ |
-| [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
+| [ScrollBar](ScrollBar/index.md) | 7 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
 

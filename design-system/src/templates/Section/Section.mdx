@@ -154,7 +154,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 ## Width behavior
 
-Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. Below 768 the Primary keeps only its icon. The title row and the header rows stay separate rows at every width.
+Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
 
 <DocsInteractivePlayground of={SectionStories.ResponsiveWidth} description="The width control sets the Section's own width." />
 
@@ -217,7 +217,14 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tbody>
 <tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row.</td></tr>
 <tr><td><code>views</code> · <code>format</code> · <code>search</code> · <code>filters</code> · <code>count</code></td><td>Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A <code>filters</code> entry takes an optional <code>menu</code>, <code>(trigger) =&gt; node</code>, that wraps its trigger in a Popup select or a Filter menu.</td></tr>
+<tr><td><code>header</code> · <code>type</code></td><td>With <code>type="custom"</code> the <code>header</code> slot replaces the title and description; <code>title</code> stays as the visually hidden heading. <code>type</code> is <code>default</code> or <code>custom</code>, and is read from the slots when left off.</td></tr>
+<tr><td><code>loading</code></td><td>Swaps the header for skeleton bars while the Section loads.</td></tr>
+<tr><td><code>level</code></td><td><code>page</code> makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it.</td></tr>
+<tr><td><code>named</code></td><td>Makes the Section a region named by its title, for one that stands apart as a landmark.</td></tr>
+<tr><td><code>onClearAll</code> · <code>onMoreFilters</code> · <code>onOpenFilters</code></td><td>Clear all, More filters, and the Filter button of a narrow Section.</td></tr>
+<tr><td><code>onAddView</code> · <code>addViewLabel</code></td><td>The Add view button at the end of the views, and its label.</td></tr>
 <tr><td><code>tabs</code> · <code>toolbar</code></td><td>Deprecated. Use <code>views</code> and <code>format</code> for the tab row, and <code>search</code> and <code>filters</code> for the toolbar row.</td></tr>
+<tr><td><code>id</code> · <code>className</code> · <code>style</code></td><td>Passed to the Section's root.</td></tr>
 <tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
 <tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
@@ -281,7 +288,7 @@ A Section earns its own heading, its own actions or its own place in the grid. W
 
 <RuleTag kind="automatic" />
 
-The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
 
 <DoDontPair
     doExample={<TitleRowAboveHeaderRows />}
@@ -307,7 +314,7 @@ Actions sit at the end of the title row, More then the labeled Primary, whether 
 
 <RuleTag kind="review" />
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line and scrolls sideways when the pills do not fit. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
 ### Order the header: actions, then views and format, then Search and filters.
 

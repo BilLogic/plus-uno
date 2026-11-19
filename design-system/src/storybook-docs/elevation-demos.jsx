@@ -1008,7 +1008,7 @@ export const ClipDemo = () => {
                 <div
                     style={{
                         position: 'relative',
-                        width: 'min(100%, var(--popup-width-sm))',
+                        width: 'min(100%, var(--popup-width-3-col))',
                         display: 'flex',
                         justifyContent: 'center',
                         clipPath: `inset(calc(-1 * ${reachLen}) calc(-1 * ${reachLen}) calc(${(1 - t) * 100}% - ${t} * ${reachLen}) calc(-1 * ${reachLen}))`,
@@ -1036,7 +1036,7 @@ export const ClipDemo = () => {
                     style={{
                         position: 'absolute',
                         insetBlock: 0,
-                        insetInline: `calc(50% - min(50%, var(--popup-width-sm) / 2) - ${reachLen})`,
+                        insetInline: `calc(50% - min(50%, var(--popup-width-3-col) / 2) - ${reachLen})`,
                         border: 'var(--border-width-default) dashed var(--ds-border-bold)',
                         borderRadius: 'var(--radius-md)',
                         pointerEvents: 'none',
