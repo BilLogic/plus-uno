@@ -79,8 +79,14 @@ export default {
     argTypes: {
         variant: { control: 'select', options: ['app', 'storybook'], table: { category: 'Design' } },
         defaultMode: { control: 'select', options: ['popup', 'panel', 'fullscreen'], table: { category: 'Design' } },
-        withModal: { table: { disable: true } },
-        height: { table: { disable: true } },
+        withModal: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        height: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         defaultOpen: { control: 'boolean', table: { category: 'Design' } },
         title: { control: 'text', table: { category: 'Design' } },
         respond: { table: { disable: true } },

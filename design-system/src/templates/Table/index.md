@@ -152,6 +152,9 @@ Row states are layered over each cell's fill, never swapped for it.
 | `empty` | bool | `false` | Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally |
 | `label` | string | — | The table's accessible name, kept on the empty state box when the table is replaced |
 | `className` | string | `''` | — |
+| `title` | node | — | The Section title above the table; passed to the Section |
+| `actions` | node | — | Actions slot in the Section's title row; passed to the Section |
+| `style` | object | — | Inline styles on the Section; passed to the Section |
 
 ## Variants
 

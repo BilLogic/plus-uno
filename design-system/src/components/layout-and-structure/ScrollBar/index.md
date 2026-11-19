@@ -136,6 +136,7 @@ Same group: `Accordion` · `Carousel` · `PageHeader`
 | `maxHeight` | string or number | `'var(--scroll-bar-max-height)'` | Maximum height before vertical scrolling begins (e.g., "240px") |
 | `horizontal` | bool | `false` | Scroll horizontally instead of vertically |
 | `id` | string | — | — |
+| `aria-label` | string | — | Names the scrollable region for assistive technology. Defaults to `Scrollable content`. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
