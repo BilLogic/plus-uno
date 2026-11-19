@@ -257,6 +257,14 @@ export const CHECKS = [
     guards: 'every backticked path and `path § Heading` in AGENTS.md and agents/**/*.md resolving, and each § Progressive loading trigger leading with its trigger.',
   },
   {
+    name: 'check:template-roster',
+    script: 'node scripts/check-template-roster.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-template-roster.mjs',
+    guards: 'six layers naming the eight templates the @/templates barrel exports, and no visible Storybook child title under one.',
+  },
+  {
     name: 'check:glossary',
     script: 'node scripts/check-glossary.mjs',
     pkg: 'root',
