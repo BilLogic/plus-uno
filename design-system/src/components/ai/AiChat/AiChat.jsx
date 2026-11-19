@@ -13,7 +13,7 @@ import {
     PromptInput,
     PromptStarters,
 } from '@/components';
-// The template modules, not the `@/templates` barrel: this file loads while the components barrel does, and
+// The template modules, not the barrel (docs/engineering/coding.md § Imports): this file loads while the components barrel does, and
 // the barrel would pull every template (and the components they read at load) in ahead of the components.
 import Frame from '@/templates/Frame';
 import {

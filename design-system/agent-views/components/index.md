@@ -53,7 +53,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
 | `Rating variant` | `Rating type` |
 | `CloseButton tone` | `CloseButton appearance` |
-| `AiChat variant` | `AiChat storageKey` |
+| `AiChat variant` |  (docs wrapper owns it) |
 
 **Tokens**
 

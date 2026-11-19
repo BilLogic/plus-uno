@@ -18445,9 +18445,8 @@
       },
       {
         "not": "AiChat variant",
-        "use": [
-          "AiChat.storageKey"
-        ]
+        "use": [],
+        "why": "docs wrapper owns it"
       }
     ],
     "tokens": [

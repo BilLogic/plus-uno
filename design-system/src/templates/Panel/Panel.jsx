@@ -117,11 +117,11 @@ export const PanelDisclaimer = ({ className, children, ...props }) => (
 
 PanelDisclaimer.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
-// `icon` is a name or a function returning the node: the node is made when the action renders, so this module
-// does not read `Icon` while the components barrel is still loading (AI chat, in that barrel, imports this module).
-const actionIconButton = (icon, label) => {
+// `icon` is an icon name, drawn at `size` when one is given. The Icon element is made when the action renders, so
+// this module does not read `Icon` while the components barrel is still loading (AI chat, in that barrel, imports it).
+const actionIconButton = (icon, label, size) => {
     const Action = ({ onClick, ...props }) => (
-        <IconButton icon={typeof icon === 'function' ? icon() : icon} label={label} spacing="compact" onClick={onClick} {...props} />
+        <IconButton icon={size ? <Icon name={icon} size={size} /> : icon} label={label} spacing="compact" onClick={onClick} {...props} />
     );
     Action.propTypes = { onClick: PropTypes.func };
     Action.displayName = `Panel${label.replace(/\s+/g, '')}Action`;
@@ -131,8 +131,8 @@ const actionIconButton = (icon, label) => {
 export const PanelBackAction = actionIconButton('arrow-left', 'Back');
 export const PanelCloseAction = actionIconButton('xmark', 'Close');
 export const PanelMoreAction = actionIconButton('ellipsis', 'More actions');
-export const PanelUpAction = actionIconButton(() => <Icon name="chevron-up" size={12} />, 'Previous');
-export const PanelDownAction = actionIconButton(() => <Icon name="chevron-down" size={12} />, 'Next');
+export const PanelUpAction = actionIconButton('chevron-up', 'Previous', 12);
+export const PanelDownAction = actionIconButton('chevron-down', 'Next', 12);
 export const PanelNewTabAction = actionIconButton('arrow-up-right-from-square', 'Open in new tab');
 export const PanelViewSwitcher = actionIconButton('table-columns', 'Switch view');
 
