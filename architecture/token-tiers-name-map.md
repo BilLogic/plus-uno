@@ -295,7 +295,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spotlight | `--spotlight-gap` |  |
 | Spotlight | `--spotlight-footer-stack` |  |
 | Menu group | `--menu-group-min-width` |  |
-| Popup | `--popup-range-width` |  |
+| Popup | `--popup-width-range` |  |
 | Popup | `--popup-min-width` |  |
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |

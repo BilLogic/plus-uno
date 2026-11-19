@@ -95,3 +95,11 @@ test('the Table page names the footer gap its styles use and when the count show
   assert.match(page, /once a filter is applied/);
   assert.doesNotMatch(page, /The count sits in the Section header,|Search, filters and the record count live/);
 });
+
+test('the Table and Dynamic table pages label the two footer gaps apart', () => {
+  for (const file of ['design-system/src/templates/Table/Table.mdx', 'design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx']) {
+    const page = read(file);
+    assert.match(page, /Footer slot \(Table template\)/, file);
+    assert.match(page, /Footer the shell draws \(Dynamic\/Tree\)/, file);
+  }
+});

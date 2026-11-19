@@ -1869,7 +1869,7 @@
     "scssTokenCount": 1240,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1766,
+      "total": 1769,
       "resolved": 1729,
       "percent": 98,
       "skippedCollections": [
@@ -2182,6 +2182,30 @@
             "--frame-sidebar-docked"
           ],
           "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-lg",
+          "tried": [
+            "--popup-width-lg"
+          ],
+          "reason": "code syntax names a token the code does not have"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-md",
+          "tried": [
+            "--popup-width-md"
+          ],
+          "reason": "code syntax names a token the code does not have"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Popup/width-sm",
+          "tried": [
+            "--popup-width-sm"
+          ],
+          "reason": "code syntax names a token the code does not have"
         },
         {
           "collection": "color / semantics",

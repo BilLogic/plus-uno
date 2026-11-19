@@ -3827,7 +3827,7 @@
         "--inline-md",
         "--pad-x-md",
         "--popup-pad",
-        "--popup-range-width",
+        "--popup-width-range",
         "--width-1000"
       ]
     },

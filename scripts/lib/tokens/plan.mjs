@@ -422,7 +422,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spotlight', new: '--spotlight-gap', old: null, ref: 'var(--space-100)', use: 'Gap between blocks inside a Spotlight (header, media, body and footer).' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-footer-stack', old: null, ref: 'var(--space-150)', use: 'Vertical gap above a Spotlight footer.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
-  { tier: 'components', group: 'Popup', new: '--popup-range-width', old: null, ref: 'var(--width-2500)', use: 'Width of the range picker\'s Popup: the presets beside the calendar.' },
+  { tier: 'components', group: 'Popup', new: '--popup-width-range', old: null, ref: 'var(--width-2500)', use: 'Width of the range picker\'s Popup: the presets beside the calendar.' },
   { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },

@@ -441,7 +441,7 @@ test('the Frame names its server-render width instead of writing 1440 bare', () 
 test('Popup widths are the column steps, and the old size words read as retired', async () => {
   const { TOKEN_LADDER } = await import('./lib/tokens/plan.mjs');
   const popupWidths = TOKEN_LADDER.filter((r) => /^--popup-width-/.test(r.new)).map((r) => r.new).sort();
-  assert.deepEqual(popupWidths, ['--popup-width-3-col', '--popup-width-4-col']);
+  assert.deepEqual(popupWidths, ['--popup-width-3-col', '--popup-width-4-col', '--popup-width-range']);
   const retired = retiredRenames();
   for (const size of ['sm', 'md', 'lg']) assert.ok(retired.has(`--popup-width-${size}`), `--popup-width-${size} is retired`);
   const use = (name) => TOKEN_LADDER.find((r) => r.new === name).use;

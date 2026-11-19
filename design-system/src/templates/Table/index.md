@@ -122,7 +122,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells, message rows, and empty-state wrapper text. |
 | `--table-pad-x-cell`, `--table-pad-y-cell` | length | Cell padding, message row padding, and plain empty-state wrapper padding. |
-| `--table-inline`, `--table-footer-height` | 8, 48 | The gap between the table and the footer slot, the gap between controls in the footer, and the footer row height. |
+| Footer slot (Table template): `--table-inline`, `--table-footer-height` | 8, 48 | The gap between the table and the footer slot, the gap between controls in the footer, and the footer row height. |
 | `--table-empty-surface`, `--table-empty-radius` | color, 16 | The sunken background and card-rounded corners of the empty state box. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
@@ -130,7 +130,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
 | `--row-height-md` | 40 | The least height of the message row. |
-| `--stack-md`, `--stack-sm` | 8, 4 | Gap between a Dynamic or Tree table and the footer it draws itself, and inside message and empty-state wrappers. |
+| Footer the shell draws (Dynamic/Tree): `--stack-md`, `--stack-sm` | 8, 4 | Gap between a Dynamic or Tree table and the footer it draws itself, and inside message and empty-state wrappers. |
 
 ## Content guidelines
 

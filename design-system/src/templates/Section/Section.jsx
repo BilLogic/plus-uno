@@ -191,8 +191,8 @@ const TITLE_LINE = {
 
 /**
  * The header while the section loads: a bar for the title row (half width,
- * the title's height), one for the description, and one for the tabs or
- * toolbar row when there is one. `tabs-only` draws only that last bar.
+ * the title's height), one for the description, and one for the views or
+ * filters row when there is one. `tabs-only` draws only that last bar.
  */
 const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
     <div className="plus-template-section-skeleton">

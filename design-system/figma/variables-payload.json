@@ -1328,10 +1328,10 @@
           }
         },
         {
-          "name": "Popup/range-width",
+          "name": "Popup/width-range",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--popup-range-width)"
+            "WEB": "var(--popup-width-range)"
           }
         },
         {

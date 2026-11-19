@@ -24,7 +24,7 @@
 
 .plus-popup.plus-date-range-popup,
 .plus-listbox.plus-date-range-popup {
-    width: var(--popup-range-width);
+    width: var(--popup-width-range);
     min-width: 0;
     max-width: none;
     padding: calc(var(--popup-pad) - var(--border-width-default));

@@ -195,7 +195,7 @@ Tokens one component owns, named for it.
 --popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
---popup-range-width  /* Width of the range picker's Popup: the presets beside the calendar. */
+--popup-width-range  /* Width of the range picker's Popup: the presets beside the calendar. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
