@@ -4,8 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FrameStories from './Frame.stories.jsx';
-import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
-import { CODE } from './FrameCaseCode.js';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -278,7 +277,7 @@ Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320
 
 <RuleTag kind="review" />
 
-The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off.
+The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off. The page places the footer along the bottom today; the Frame's `bar` slot is Planned.
 
 <DoDontPair
     doExample={<MultiStepInnerSidebar />}
@@ -312,10 +311,10 @@ The AI panel is a region of the Frame, not a floating Panel, so it stays put as 
 
 <DoDontPair
     doExample={<AiPanelDocked />}
-    doCode={CODE.AiPanelDocked}
+    doCode={CODE.AiPanel}
     doCaption="The panel docked at the right edge, the Page narrowing beside it."
     dontExample={<AiPanelFloating />}
-    dontCode={CODE.AiPanelFloating}
+    dontCode={CODE.AiPanel}
     dontCaption="The panel floating over the Page, hiding the rows beneath it."
 />
 

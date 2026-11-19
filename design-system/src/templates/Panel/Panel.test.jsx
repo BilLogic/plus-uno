@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { BesideAiPanel, CoversAiPanel, FloatsNoBlanket, OneFloatingPanel, PanelOnBlanket, ReadingNoFooter, ReadingWithFooter, TwoFloatingPanels } from './PanelCases.jsx';
+import { BesideAiPanel, CODE, CoversAiPanel, FloatsNoBlanket, OneFloatingPanel, PanelOnBlanket, ReadingNoFooter, ReadingWithFooter, TwoFloatingPanels } from './PanelCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -21,6 +21,16 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 });
 
 const panelMdx = readFileSync(join(__dirname, 'Panel.mdx'), 'utf8');
+
+describe('Panel Show code', () => {
+    it('prints each floating example as PLUS parts, with no docs helper or stage', () => {
+        expect(Object.keys(CODE)).toHaveLength(6);
+        Object.entries(CODE).forEach(([name, code]) => {
+            expect(code, name).not.toMatch(/panelDemo|CaseSurface|FloatStage/);
+            expect(code, name).toContain('<PanelContainer');
+        });
+    });
+});
 
 describe('Panel live cases', () => {
     it('ReadingNoFooter renders header and body with no footer button', () => {

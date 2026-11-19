@@ -498,3 +498,15 @@
     font: var(--body-default);
     color: var(--ds-text);
 }
+
+/*
+ * Two Modals shown open at once, each on its own inline Blanket: they share one
+ * cell, so the second Blanket dims the first as two fixed layers would.
+ */
+.sb-ds-modal-stack {
+    display: grid;
+}
+
+.sb-ds-modal-stack > .plus-modal-blanket-inline {
+    grid-area: 1 / 1;
+}
