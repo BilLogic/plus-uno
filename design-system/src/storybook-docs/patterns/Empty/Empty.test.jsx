@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
     BareStringCase,
+    CODE,
     HeaderOverNothingCase,
     ReplacedTableCase,
     WhatBelongsHereCase,
@@ -44,6 +45,14 @@ describe('Empty live cases and TypeCard links', () => {
         expect(screen.getByRole('table')).toBeInTheDocument();
         expect(screen.getAllByRole('columnheader')).toHaveLength(3);
         expect(screen.getByRole('navigation')).toBeInTheDocument();
+    });
+
+    it('prints each example from its own source', () => {
+        expect(Object.keys(CODE)).toEqual(['WhatBelongsHere', 'BareString', 'ReplacedTable', 'HeaderOverNothing']);
+        expect(CODE.WhatBelongsHere).toContain('header="No students in this group yet"');
+        expect(CODE.ReplacedTable).toContain('const rowsOf');
+        expect(CODE.HeaderOverNothing).toContain('<StaticTable');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Empty.mdx', () => {

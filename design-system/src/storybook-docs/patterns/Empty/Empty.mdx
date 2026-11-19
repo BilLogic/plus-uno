@@ -4,12 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as EmptyStories from './Empty.stories.jsx';
 import { STAGE, SMALL_STAGE, TYPE_STAGE } from './emptyDemo.jsx';
-import {
-    BareStringCase,
-    HeaderOverNothingCase,
-    ReplacedTableCase,
-    WhatBelongsHereCase,
-} from './EmptyCases.jsx';
+import { CODE, BareStringCase, HeaderOverNothingCase, ReplacedTableCase, WhatBelongsHereCase } from './EmptyCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -146,8 +141,10 @@ Never a blank area or a bare "No results": a blank reads as broken or still load
 
 <DoDontPair
     doExample={<WhatBelongsHereCase />}
+    doCode={CODE.WhatBelongsHere}
     doCaption="Say what belongs here and give the one action that fills it."
     dontExample={<BareStringCase />}
+    dontCode={CODE.BareString}
     dontCaption="A bare string in an empty box: broken, loading or empty, nobody can tell."
 />
 
@@ -165,8 +162,10 @@ No column headers and no footer while the table is empty; the Section's header r
 
 <DoDontPair
     doExample={<ReplacedTableCase />}
+    doCode={CODE.ReplacedTable}
     doCaption="The whole table replaced; the header rows stay."
     dontExample={<HeaderOverNothingCase />}
+    dontCode={CODE.HeaderOverNothing}
     dontCaption="Column headers and a footer over nothing, with a centered paragraph."
 />
 
