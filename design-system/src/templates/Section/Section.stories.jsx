@@ -620,7 +620,7 @@ const SessionCards = ({ items = SESSIONS }) => (
 
 /** Label and value pairs, in two columns. */
 const Facts = ({ pairs, columns = 2 }) => (
-    <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--stack-lg) var(--grid-gutter)' }}>
+    <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--stack-lg) var(--inline-xl)' }}>
         {pairs.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
@@ -850,7 +850,7 @@ export const TypeForm = {
                     </>
                 )}
             >
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-lg) var(--grid-gutter)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-lg) var(--inline-xl)' }}>
                     <TextField label="Guardian name" defaultValue="Dana Thompson" />
                     <TextField label="Phone" defaultValue="(412) 555-0148" />
                 </div>
