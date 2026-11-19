@@ -21,9 +21,16 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        style: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         triggerLabel: {
+            storyOnly: true,
             control: 'text',
             description: 'Button label used as the popup trigger',
             table: { category: 'Content' }
@@ -35,11 +42,13 @@ export default {
         },
         placement: {
             control: 'select',
-            options: ['top', 'bottom', 'left', 'right'],
+            options: ['auto', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'],
             description: 'Popup placement',
             table: { category: 'Layout' }
         },
         triggerType: {
+            // The prop also takes an array of triggers; the options add one example pair.
+            optionsUnchecked: true,
             control: 'select',
             options: ['click', 'hover', 'focus', ['hover', 'focus']],
             description: 'Trigger behavior',

@@ -78,6 +78,8 @@ export default {
             table: { category: 'Slots' },
         },
         width: {
+            // The prop also takes a number or a CSS length; the options are the named widths.
+            optionsUnchecked: true,
             control: 'inline-radio',
             options: MODAL_WIDTHS,
             table: { category: 'Design' },

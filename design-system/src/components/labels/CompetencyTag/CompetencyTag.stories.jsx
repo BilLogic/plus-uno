@@ -197,7 +197,9 @@ export const Interactive = {
         text: '',
     },
     argTypes: {
-        subject: { control: 'select', options: COMPETENCY_TAG_SUBJECTS },
+        subject: {
+            // Controls leave out the `socio-emotional` and `relationships` aliases the prop still accepts.
+            optionsUnchecked: true, control: 'select', options: COMPETENCY_TAG_SUBJECTS },
         spacing: { control: 'radio', options: COMPETENCY_TAG_SPACINGS },
     },
     render: ({ text, ...args }) => <CompetencyTag {...args} text={text || undefined} />,

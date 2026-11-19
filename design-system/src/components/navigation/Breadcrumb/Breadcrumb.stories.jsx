@@ -27,10 +27,17 @@ export default {
         },
     },
     argTypes: {
-        children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         style: { table: { disable: true } },
         pathPreset: {
+            storyOnly: true,
             control: 'select',
             options: ['short', 'standard', 'deep'],
             description: 'Preset breadcrumb depth for the interactive demo',

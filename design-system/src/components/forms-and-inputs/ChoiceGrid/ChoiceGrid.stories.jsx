@@ -19,8 +19,14 @@ export default {
         },
     },
     argTypes: {
-        children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        children: {
+            storyOnly: true,
+            table: { disable: true },
+        },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         style: { table: { disable: true } },
         type: {
             control: 'select',
@@ -35,11 +41,13 @@ export default {
             table: { disable: true, category: 'Development' },
         },
         rowCount: {
+            storyOnly: true,
             control: { type: 'range', min: 1, max: 4, step: 1 },
             description: 'Number of rows in the demo grid',
             table: { category: 'Content' },
         },
         columnCount: {
+            storyOnly: true,
             control: { type: 'range', min: 2, max: 4, step: 1 },
             description: 'Number of columns in the demo grid',
             table: { category: 'Content' },

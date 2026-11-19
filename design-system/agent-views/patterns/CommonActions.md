@@ -18,7 +18,7 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 
 - **In a page form.** Left-aligned under the fields, Primary first.
 - **In a Modal.** Full bleed across the footer: Discard left, Primary right, no Cancel.
-- **In a multi-step task.** Save and exit at the start; Back and Next at the end, on one 32 line.
+- **In a multi-step task.** Save and exit, Back and Next in tracks 2, 3 and 4, on one 32 line.
 - **In a card.** Subtle in the footer; clickable cards keep no inner buttons.
 
 ## Small actions

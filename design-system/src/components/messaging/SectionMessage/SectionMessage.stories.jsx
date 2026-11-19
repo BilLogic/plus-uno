@@ -43,13 +43,18 @@ picks by default.
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        onClick: {
+            storyOnly: true,
+            table: { disable: true },
+        },
         appearance: { table: { disable: true } },
         title: {
             control: 'text',
             table: { category: 'Content' },
         },
         icon: {
+            // The prop takes a boolean, any glyph name or a node; the options are examples.
+            optionsUnchecked: true,
             control: 'select',
             options: [true, false, 'bell', 'circle-question'],
             table: { category: 'Content', defaultValue: { summary: 'true' } },

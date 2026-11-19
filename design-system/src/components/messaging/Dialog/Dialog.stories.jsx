@@ -48,6 +48,8 @@ export default {
             table: { category: 'Behavior' },
         },
         width: {
+            // The prop also takes a number or a CSS length; the options are the named widths.
+            optionsUnchecked: true,
             control: 'select',
             options: DIALOG_WIDTHS,
             table: { category: 'Layout' },

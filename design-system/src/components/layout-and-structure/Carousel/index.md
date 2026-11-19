@@ -144,6 +144,8 @@ Same group: `Accordion` · `PageHeader` · `ScrollBar`
 | `onSlideChange` | func | — | Called with the new index whenever the slide changes. |
 | `className` | string | — | Extra class names on the root, beside `plus-carousel`. |
 | `style` | object | — | Inline styles on the root. |
+| `aria-label` | requireName | — | Names the carousel region. This or `aria-labelledby` is required. |
+| `aria-labelledby` | requireName | — | Names the carousel region by another element's id. This or `aria-label` is required. |
 
 ## Tokens touched
 
