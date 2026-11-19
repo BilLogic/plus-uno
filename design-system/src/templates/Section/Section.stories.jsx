@@ -30,7 +30,7 @@ import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS 
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import { FilterSide, FormatSwitch, STUDENTS, StudentsTable, ViewPills, filterStudentList } from '@/storybook-docs/lib/view-bar.jsx';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';

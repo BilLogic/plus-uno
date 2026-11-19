@@ -26,7 +26,7 @@ import {
 } from './pageDemo.jsx';
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { RECORD_CRUMBS, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { RECORD_CRUMBS, slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';

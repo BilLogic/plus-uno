@@ -5,7 +5,7 @@ import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-stat
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 const sampleItems = [
     { text: 'Home', href: '/' },

@@ -137,7 +137,7 @@ Hover, pressed and focus are the browser's own. A link button has no `ai`, disab
 | `rel` | string | — | The anchor `rel` attribute. Defaults to `noopener noreferrer` when `target` is `_blank`. |
 | `text` | string | — | The label as a string. Wins over `children`. |
 | `children` | node | — | The label, used when `text` is not given. |
-| `appearance` | oneOf | — | The button's look, the same seven as Button. Use `primary` for the one main navigation on a view and `default` or `subtle` for the rest. |
+| `appearance` | oneOf | — | The button's look, the same as Button. Use `primary` for the one main navigation on a view, `default` or `subtle` for the rest, and `link` for a text link that leaves. |
 | `spacing` | enum | — | `default` draws 32. `compact` draws 24. |
 | `iconBefore` | string or node | — | An icon before the label: a Font Awesome Free glyph name (`calendar`) or a node. |
 | `iconAfter` | string or node | — | An icon after the label: a Font Awesome Free glyph name (`arrow-right`) or a node. |
@@ -148,7 +148,7 @@ Hover, pressed and focus are the browser's own. A link button has no `ai`, disab
 
 ## Variants
 
-**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai`
+**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai` · `link` · `danger-link`
 
 **`spacing`** — `default` · `compact`
 

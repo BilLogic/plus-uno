@@ -6,7 +6,7 @@ import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import Popup from './Popup';
 import { Button } from '@/components';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 export default {
     title: 'Components/Overlays and layering/Popup',

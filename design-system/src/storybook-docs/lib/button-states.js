@@ -22,6 +22,12 @@ export const STATE_GROUNDS = {
     ai: ['--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed'],
 };
 
+/**
+ * The link appearances draw no fill: hover underlines the label and press
+ * darkens it, so their state reads from the label, not the ground.
+ */
+export const LINK_PRESSED_LABEL = { link: '--ds-link-pressed', 'danger-link': '--ds-text-danger-bolder' };
+
 /** Reads a background with the transition out of the way. */
 const readGround = (element, pseudo) => {
     element.style.transition = 'none';
@@ -32,12 +38,25 @@ const readGround = (element, pseudo) => {
 
 /** The ground under a forced `:hover` is the appearance's hovered step. */
 export const expectHovered = async (host, element, appearance, name = appearance) => {
+    if (LINK_PRESSED_LABEL[appearance]) {
+        element.style.transition = 'none';
+        // Read inside the callback: a computed style is live and the forced state ends when it returns.
+        const line = withForcedPseudo(element, ':hover', () => getComputedStyle(element).textDecorationLine);
+        await expect(line, `${name} hovered underline`).toBe('underline');
+        return;
+    }
     const [hovered] = STATE_GROUNDS[appearance];
     await expect(readGround(element, ':hover'), `${name} hovered`).toBe(tokenColor(host, hovered));
 };
 
 /** The ground under a forced `:active` is the appearance's pressed step. */
 export const expectPressed = async (host, element, appearance, name = appearance) => {
+    if (LINK_PRESSED_LABEL[appearance]) {
+        element.style.transition = 'none';
+        const color = withForcedPseudo(element, ':active', () => getComputedStyle(element).color);
+        await expect(color, `${name} pressed label`).toBe(tokenColor(host, LINK_PRESSED_LABEL[appearance]));
+        return;
+    }
     const [, pressed] = STATE_GROUNDS[appearance];
     await expect(readGround(element, ':active'), `${name} pressed`).toBe(tokenColor(host, pressed));
 };

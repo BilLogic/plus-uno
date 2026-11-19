@@ -31,7 +31,7 @@ const snippetButtons = (code) => [...code.matchAll(/<(?:Link)?Button text="([^"]
 
 /** The buttons a live case renders, in DOM order, as the same `text:appearance` strings. */
 const renderedButtons = (container) => [...container.querySelectorAll('.plus-btn')].map((button) => {
-    const appearance = ['primary', 'subtle', 'default'].find((a) => button.classList.contains(`plus-btn--${a}`));
+    const appearance = ['primary', 'subtle', 'link', 'danger-link', 'default'].find((a) => button.classList.contains(`plus-btn--${a}`));
     return `${button.textContent.trim()}:${appearance}`;
 });
 

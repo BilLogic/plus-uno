@@ -7,11 +7,15 @@ const isLeadingNode = (node, totalCount) => {
     if (!React.isValidElement(node)) return false;
     const { appearance, role, href } = node.props ?? {};
     if (node.props?.['data-footer-leading']) return true;
-    if (appearance === 'link') return true;
+    if (appearance === 'link' || appearance === 'danger-link') return true;
     if (role === 'link' || href != null) return true;
     if (appearance === 'danger' && totalCount >= 2) return true;
     return false;
 };
+
+/** A leading action is always text with no fill: a destructive one is a danger link, any other a link. */
+const leadingAppearance = (node) =>
+    node.props.appearance === 'danger' || node.props.appearance === 'danger-link' ? 'danger-link' : 'link';
 
 const trackListFor = (count, { hasLeading }) => {
     if (hasLeading) {
@@ -30,8 +34,9 @@ const trackListFor = (count, { hasLeading }) => {
  *
  * Divides the footer into 4 equal tracks separated by `--inline-md`. Every
  * filled action button is cloned at `spacing="spacious"` (48) with
- * `shouldFitContainer`. A leading `danger` or link action hugs the left edge
- * without taking a filled track, and containers up to 400 wide split a single
+ * `shouldFitContainer`. A leading action hugs the left edge without taking a
+ * filled track and is always drawn as a link (`link`, or `danger-link` for a
+ * destructive one), and containers up to 400 wide split a single
  * action across the full width via `@container (max-width: 400px)`.
  */
 export const FooterActions = ({
@@ -73,6 +78,7 @@ export const FooterActions = ({
         >
             {React.isValidElement(leadingNode)
                 ? React.cloneElement(leadingNode, {
+                      appearance: leadingAppearance(leadingNode),
                       spacing: leadingNode.props.spacing ?? 'spacious',
                       shouldFitContainer: false,
                       className: clsx(
@@ -98,7 +104,7 @@ export const FooterActions = ({
 };
 
 FooterActions.propTypes = {
-    /** Optional `danger` or link action hugging the left content edge without taking a filled track. */
+    /** Optional leading action hugging the left content edge without taking a filled track. It is drawn as a `link`, or a `danger-link` when it is a `danger` action. */
     leadingAction: PropTypes.node,
     /** Filled action buttons placed across the 4 tracks. */
     children: PropTypes.node,

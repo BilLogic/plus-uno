@@ -9,7 +9,7 @@ import './Button.scss';
 /** A bare `#` or empty `href` names no real destination; Enter still needs one to fire a click on an anchor. */
 const isTrivialHref = (href) => !href || href.trim() === '#';
 
-export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'];
+export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'link', 'danger-link'];
 export const BUTTON_SPACINGS = ['default', 'compact', 'spacious'];
 
 /** The icon slots and the label, in order. */
@@ -172,7 +172,7 @@ Button.propTypes = {
     title: PropTypes.string,
 
     // Appearance
-    /** The visual style. `primary` is for the main action on a page, `default` for secondary actions and `subtle` for low-emphasis ones. `warning` and `danger` mark risky or destructive actions, `discovery` points out something new, and `ai` is for AI actions and needs a text label. */
+    /** The visual style. `primary` is for the main action on a page, `default` for secondary actions and `subtle` for low-emphasis ones. `warning` and `danger` mark risky or destructive actions, `discovery` points out something new, `ai` is for AI actions and needs a text label, and `link` and `danger-link` draw as text with no fill: `link` for an action that leaves (Save and exit, Open profile), `danger-link` for a footer's leading destructive action (Delete, Discard). */
     appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
     /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. `spacious` draws 48, for modal and panel footers. */
     spacing: PropTypes.oneOf(BUTTON_SPACINGS),

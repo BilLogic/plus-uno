@@ -2,7 +2,7 @@
 @use '../../../styles/screen-grid' as *;
 
 /*
- * Popup Component Styles: the Popups pattern's Popup.
+ * Popup Component Styles: the Popup template's Popup.
  *
  * STRUCTURE:
  * .plus-popup (one surface: fill, border, radius, shadow, pad)
@@ -27,7 +27,7 @@
 }
 
 // ===== MAIN CONTAINER =====
-// The Popups pattern's Popup (Figma Pattern/Popup): one surface, no overlay
+// The Popup template's Popup (Figma Pattern/Popup): one surface, no overlay
 // blanket and no arrow. Pad 16 (`--popup-pad`), radius 12 (`--popup-radius`).
 // The title and body stack Element/stack-md 8 apart on the popup's own fill.
 //

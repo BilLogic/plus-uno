@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Icon from '../../images-and-icons/Icon';
-import Button, { BUTTON_SPACINGS } from './Button';
+import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 
 describe('Button', () => {
     it('carries no title while disabled or loading, and keeps it otherwise', () => {
@@ -34,13 +34,26 @@ describe('Button', () => {
         expect(button).not.toHaveClass('plus-btn--spacious');
     });
 
-    it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'])(
+    it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'link', 'danger-link'])(
         'draws the %s appearance',
         (appearance) => {
             render(<Button appearance={appearance} text={appearance} />);
             expect(screen.getByRole('button')).toHaveClass(`plus-btn--${appearance}`);
         },
     );
+
+    it('offers link and danger-link beside the filled appearances', () => {
+        expect(BUTTON_APPEARANCES).toEqual(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'link', 'danger-link']);
+    });
+
+    it('draws a link appearance on an anchor and keeps it disabled-aware', () => {
+        const { rerender } = render(<Button appearance="link" text="Save and exit" href="#exit" />);
+        expect(screen.getByRole('button', { name: 'Save and exit' })).toHaveClass('plus-btn--link');
+        rerender(<Button appearance="danger-link" text="Delete" isDisabled />);
+        const button = screen.getByRole('button', { name: 'Delete' });
+        expect(button).toHaveClass('plus-btn--danger-link');
+        expect(button).toBeDisabled();
+    });
 
     it('draws the sparkle before an AI label and ignores any other leading icon', () => {
         const { container, rerender } = render(<Button appearance="ai" text="Generate summary" />);

@@ -8,7 +8,7 @@ import {
 } from '@/components';
 import { Page, Card, Section } from '@/templates';
 import { Do, Dont, DoDont, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo';
 
 /**
  * Specimens for Foundations / Visual / Border: live PLUS fields, focus rings,
