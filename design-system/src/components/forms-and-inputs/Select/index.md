@@ -220,7 +220,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `label` | node | — | The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. |
 | `caption` | node | — | Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. |
 | `isMulti` | bool | `false` | Several values, shown as Tags in the field and checkboxes in the list. |
-| `options` | arrayOf (required) | `[]` | Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. |
+| `options` | arrayOf | `[]` | Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. |
 | `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
 | `defaultValue` | arrayOf | — | The picked id, or ids with `isMulti`, to start with when the field is uncontrolled. |
 | `placeholder` | string | `'Select...'` | The text shown when nothing is picked. It names the field when there is no label. |

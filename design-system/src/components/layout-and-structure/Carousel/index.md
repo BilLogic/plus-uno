@@ -134,7 +134,7 @@ Same group: `Accordion` · `PageHeader` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `slides` | arrayOf (required) | `[]` | The slides, in order. `media` is the card; `title` and `description` fill the caption and name the slide's dot. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). |
+| `slides` | arrayOf | `[]` | The slides, in order. `media` is the card; `title` and `description` fill the caption and name the slide's dot. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). |
 | `autoplay` | bool | `true` | Moves to the next slide on its own, with a play button to stop it. Off under reduced motion, where arrows show instead. Defaults to `true`. |
 | `interval` | number | `5000` | Milliseconds each slide shows before the next. Defaults to `5000`. |
 | `peek` | bool | `true` | Shows the neighbors at each side, smaller and faded. Off, only the current slide shows. Defaults to `true`. |

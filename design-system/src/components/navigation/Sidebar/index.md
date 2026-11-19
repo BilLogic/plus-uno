@@ -175,7 +175,7 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page
 | `modulesLeft` | number | `0` | Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. Supervisors are never locked. |
 | `lessonsLeft` | number | `0` | Assigned lessons a tutor has left; the `lessons` row counts it |
 | `countTags` | objectOf | — | The trailing slot by row id when using the role config: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
-| `account` | shape (required) | — | The signed-in person, for the account row. Their `id` keys the remembered sections. |
+| `account` | shape | — | The signed-in person, for the account row. Their `id` keys the remembered sections. |
 | `onProfile` | func | — | The account menu's Profile |
 | `onSignOut` | func | — | The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()` |
 | `helpHref` | string | — | Help Center, opened in a new tab |
@@ -183,7 +183,7 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page
 | `slackUrl` | string | — | Where Slack links in the role config; defaults to `SLACK_URL` |
 | `onHome` | func | — | Called on a plain click of the logo; the caller goes Home |
 | `onToggle` | func | — | Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state. |
-| `inner` | shape (required) | — | Swaps the content for an inner sidebar: the area's Back button, an optional context dropdown, then text-only rows. Omit it for the main Sidebar. |
+| `inner` | shape | — | Swaps the content for an inner sidebar: the area's Back button, an optional context dropdown, then text-only rows. Omit it for the main Sidebar. |
 | `onBack` | func | — | Called by the inner sidebar's Back; the caller shows the main Sidebar and leaves the page where it is |
 | `storageKey` | string | `SIDEBAR_SECTIONS_STORAGE_KEY` | The localStorage key collapsed sections are kept under, per account id; null keeps nothing |
 | `label` | string | `'Main'` | Accessible name of the `nav` landmark |
