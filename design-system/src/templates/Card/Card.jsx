@@ -26,7 +26,9 @@ import './Card.scss';
  *   content, like the header's `custom` type, for tabs or a toolbar.
  * - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius
  *   uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step),
- *   and the footer sits Card/stack-lg below. The footer is left-aligned.
+ *   and the footer sits Card/stack-lg below. The footer hugs the start: one action that
+ *   goes somewhere is a link (`appearance="link"`), two are a compact pair with no
+ *   Primary, and a card that is all one action is clickable with no buttons.
  * - The card hugs its content; in a row it stretches to the tallest card.
  * - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on
  *   hover in place and settles to the raised shadow while pressed; a clickable
@@ -128,7 +130,7 @@ Card.propTypes = {
     imageRatio: PropTypes.oneOf(['16:9', '4:3', '1:1']),
     /** Side image share. One half also steps the title up to Heading md. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
-    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
+    /** Footer slot: a link for one action that leaves, or a compact pair with no Primary, start-aligned, Card/stack-lg below the body
      * @ds-context Used in: Card.footer (ds guide card)
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */

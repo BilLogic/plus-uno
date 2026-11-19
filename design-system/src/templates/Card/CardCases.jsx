@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ProgressBar, Skeleton } from '@/components';
+import { LinkButton, ProgressBar, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Card } from '@/templates';
 
@@ -53,7 +53,7 @@ export const CardJobs = () => (
             title="Lincoln Middle · Thursday"
             description="4:30 to 5:15 PM"
             minWidth="var(--card-min-width-md)"
-            footer={<Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />}
+            footer={<LinkButton text="View session" href="#view-session" appearance="link" spacing="compact" onClick={(event) => event.preventDefault()} />}
         >
             <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
                 Tutor · Ana Ruiz

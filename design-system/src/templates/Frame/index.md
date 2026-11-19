@@ -10,7 +10,7 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Used in:** Card (`ds guide card`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Table (`ds guide table`)
 
-**Governed by:** Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 
 **Source:** `design-system/src/templates/Frame/Frame.jsx`
 

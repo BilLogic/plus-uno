@@ -4,7 +4,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { Card } from '@/templates';
-import { Skeleton, Button, IconButton, Image } from '@/components';
+import { Skeleton, Button, IconButton, Image, LinkButton } from '@/components';
 import { CardJobs } from './CardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -33,7 +33,8 @@ const sessionBody = (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
 );
 
-const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
+/** One action that goes somewhere is a link, hugging the start of the footer. */
+const viewSession = <LinkButton text="View session" href="#view-session" appearance="link" spacing="compact" onClick={(event) => event.preventDefault()} />;
 
 const imagePlaceholder = (ratio) => (
     <Image
@@ -620,7 +621,7 @@ export const Rows = {
         await expect(count('Medium'), 'Medium holds 2 md cards').toBe(2);
         await expect(count('Large'), 'Large holds 2 md cards').toBe(2);
         await expect(count('X-Large'), 'X-Large holds 3 md cards').toBe(3);
-        const firstAction = canvas.getAllByRole('button', { name: 'View session' })[0];
+        const firstAction = canvas.getAllByRole('link', { name: 'View session' })[0];
         firstAction.focus();
         await expect(firstAction).toHaveFocus();
     },

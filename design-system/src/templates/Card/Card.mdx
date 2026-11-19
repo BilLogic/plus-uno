@@ -104,7 +104,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={CardStories.BodyOnly} title="Body only" description="No header, for a body that carries its own title, such as a metric tile." />
 
-<ComponentExample of={CardStories.WithFooter} title="Actions and footer" description={<>Actions at the end of the header row, and a footer <code>--card-stack-lg</code> under the body for actions that commit.</>} />
+<ComponentExample of={CardStories.WithFooter} title="Actions and footer" description={<>Actions at the end of the header row, and a footer <code>--card-stack-lg</code> under the body: a link for one action that leaves, a compact pair for two.</>} />
 
 <ComponentExample of={CardStories.CustomHeader} title="Custom header" description={<><code>header</code> replaces the title, the description and the actions, for tabs or a toolbar.</>} />
 
@@ -230,7 +230,7 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, `imageRatio` (16:9 default, 4:3 or 1:1) sets its height from the card width, rounded to a multiple of 4, and the picture crops to cover; beside the content it fills the full height at one third or one half of the width and crops to cover.
 2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xs at every heading level, stepping up to Heading md for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
-4. **Footer** (optional). A left-aligned slot for actions that commit a change.
+4. **Footer** (optional). A start-aligned slot for the card's actions: one link, or a compact pair with no Primary.
 
 The image sits above (or, in a side layout, beside) a padded frame, and the header, body and footer sit inside it.
 
@@ -314,9 +314,9 @@ A card's fill and edge are its own object boundary. Group related cards in a Sec
     dontCaption="A bare loading line takes the card away; the row collapses and everything below it moves."
 />
 
-### Put commit actions in the footer.
+### Let the footer's job pick its buttons.
 
-A card that holds actions that commit a change gets a footer, and its actions start on the left, under the content. Only a modal footer aligns right.
+A card's footer actions hug the start, under the content. One action that goes somewhere, such as View session, is a link. Two actions are a compact Default pair with no Primary. A card that is all one action is clickable and has no buttons. Only a Modal or Panel footer, on <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>, fills tracks and ends in a Primary. The whole rule: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
 
 </div>
 

@@ -6,7 +6,7 @@ Link: an inline navigation anchor.
 
 **Import:** `import { Link } from '@/components';`
 
-**Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`)
+**Used in:** Card (`ds guide card`); Frame (`ds guide frame`); Modal (`ds guide modal`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Notifications (`ds guide notifications`)
 

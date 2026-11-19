@@ -6,6 +6,10 @@ FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's
 
 **Import:** `import { FooterActions } from '@/components';`
 
+**Used in:** Card (`ds guide card`)
+
+**Governed by:** Common actions (`ds guide common-actions`)
+
 **Source:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.stories.jsx` — OneButton, TwoButtons, ThreeButtons, DeclineInLeftHalf, SubtleFillsTrack, LinkLeft, DangerLeft, LeadingWithThreeFilled, DestructiveSplit, Steps, NarrowPanel, Interactive
@@ -15,6 +19,8 @@ FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's
 ## Usage
 
 Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+
+What the footer finishes picks its layout, and this component is the answer for a Modal, a Panel and a multi-step task only. A form on a page, a Card and a Popup keep buttons that hug their labels; see the footer rule on Common actions. An action that leaves is a link and an action that does something is a button, so the leading slot is always a `link` or a `danger-link`, and Cancel never appears here.
 
 1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks separated by `--inline-md`; every filled track button is cloned with `spacing="spacious"` (`48` high) and `shouldFitContainer`.
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.

@@ -12,14 +12,26 @@ Which button, in which look, in which place, with which word. Cancel, Close, Res
 
 Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per area; one AI per region. The Button page holds every appearance and state; these are the places they go.
 
-## Placement
+## Footers
 
-The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
+One question picks the footer: what does it finish? An action that leaves is a link; an action that does something is a button.
 
+| Where | Footer |
+| --- | --- |
+| Modal, Panel | FooterActions: four equal tracks, filled buttons 48 high, Primary last, no Cancel (the corner Close dismisses). A side action leads as a link, or as a danger link when it destroys. "Not now", "Skip" and "Keep editing" are Default buttons in the left half, never the leading slot. |
+| Multi-step task (Frame) | The same FooterActions pinned under every step, one-question steps too: Save and exit as a link at the start, Back, then Next or Finish. No centered Back and Continue, no progress dots. |
+| A form on a page | Buttons hug their labels at 32, at the start under the last field, Primary first: Save, then Cancel or Reset. Never pinned or full bleed. |
+| Card | Buttons hug at the start. One action that goes somewhere is a link; two are a compact pair with no Primary; a card that is all one action is clickable and has no buttons. |
+| Popup (filter menu, date picker) | Compact 24 at the end: Clear (Subtle), Apply (Default). No Primary. |
+
+The place sets the alignment: a page form's buttons start under the fields; a layer's end where the eye does.
+
+- **In a Modal.** Four tracks: Discard left, Primary right, no Cancel.
+- **In a Modal, with a side action.** A danger link leads; a secondary and the Primary fill tracks 3 and 4.
+- **In a multi-step task.** Save and exit as a link at the left edge; Back and Next in the right half.
 - **In a page form.** Left-aligned under the fields, Primary first.
-- **In a Modal.** Full bleed across the footer: Discard left, Primary right, no Cancel.
-- **In a multi-step task.** Save and exit as a link at the left edge; Back and Next in the right half, on one 32 line.
-- **In a card.** Subtle in the footer; clickable cards keep no inner buttons.
+- **In a card.** A link for one action that leaves; a compact pair otherwise.
+- **In a Popup.** Clear (Subtle) and Apply (Default), compact, at the end.
 
 ## Small actions
 
@@ -44,10 +56,12 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
 | Decline or postpone: "Not now", "Skip", "Keep editing", "Save for later" | Default | Left half of a two-action footer, beside the Primary | "Not now" |
-| A side action that is not one of the footer's two outcomes | Danger, or a link | The leading slot, at the left edge | "Delete"; "Save and exit" |
+| A side action that is not one of the footer's two outcomes | Link when it leaves, danger link when it destroys | The leading slot, at the left edge | "Save and exit"; "Delete draft" |
 | Leave a page form without saving | Subtle | After Primary on a page form | "Cancel"; a link is allowed |
+| Go somewhere from a card | Link, compact | The card's footer, at the start | "Open session" |
+| Two actions on a card | Default pair, compact, no Primary | The card's footer, at the start | "Reschedule", "Add note" |
 | Dismiss a Modal, Panel or Flag | Icon button | End of the header | Named "Close" |
-| Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
+| Empty a Popup's choices | Subtle, compact, before Apply (Default) | The end of the Popup's footer, or the top of a filter side | "Clear" in a Popup; "Reset filters" everywhere else |
 | Empty one field | Icon button inside the field | End of the field | Named "Clear", "Clear search" |
 | Copy a value | Icon button | Beside the value | Named "Copy"; "Copied" in a tooltip after |
 | Change one value on a record | Inline edit on hover | On the value | Pencil named "Edit" |
@@ -88,9 +102,9 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 
 | Part | Component | Notes |
 | --- | --- | --- |
-| Action | Button | The nine appearances; `isLoading` swaps the label for a spinner and keeps the width. |
+| Action | Button | The nine appearances, `link` and `danger-link` among them; `isLoading` swaps the label for a spinner and keeps the width. |
 | Icon action | Icon button | Close, Copy, Edit and More; its `label` names it. |
-| Full-bleed footer | Modal footer | Composed from Button in fixed cells today. Planned as a footer prop on the Modal and the Panel. |
+| Modal, Panel and task footer | FooterActions | Four equal tracks; a leading action is a link or a danger link. |
 | Bulk bar | Section table head | The Dynamic table's head row, through `TableBulkActions`. |
 
 ## Related
@@ -131,14 +145,14 @@ On a page the Primary comes first, read in the same direction as the fields. In 
 Do: Primary first, then Cancel, left-aligned under the fields.
 Don't: The buttons at the far end of the page, away from the fields, with the Primary last.
 
-### Go full bleed in a Modal footer and keep it 48 high. {#go-full-bleed-in-a-modal-footer-and-keep-it-48-high}
+### Fill the four tracks in a Modal footer and keep it 48 high. {#fill-the-four-tracks-in-a-modal-footer-and-keep-it-48-high}
 
 **Checked:** Automatic
 
-Buttons fill the footer, each a fraction of its width with a hairline between, losing their inner corners. One button takes the whole footer. The footer is the same 32 button plus 16 bottom pad a regular footer takes, so nothing inside changes its size. A Panel's editing footer and a card form's footer go full bleed the same way.
+FooterActions divides the footer into four equal tracks: filled buttons 48 high, Primary in the last track. One button takes the right half. A side action leads as a link and takes no track. A Panel's editing footer and a multi-step task's footer use the same component.
 
-Do: Two buttons filling the footer edge to edge.
-Don't: Small buttons inset at the end, with spare footer around them.
+Do: Two buttons filling the footer's four tracks.
+Don't: Small buttons inset at the end, hand-built, with spare footer around them.
 
 ### Keep the footer where it is. {#keep-the-footer-where-it-is}
 
@@ -150,13 +164,13 @@ Header and footer stay pinned while the body scrolls. A blocked submit, a server
 
 **Checked:** Automatic
 
-Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. A page form has no Close, so it keeps a subtle Cancel. A Popup holds no form, so it has no Cancel.
+Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. A page form has no Close, so it keeps a subtle Cancel. A Popup holds no form, so it has no Cancel; Escape or a click outside dismisses it.
 
 ### Make Cancel Subtle on page forms. {#make-cancel-subtle-on-page-forms}
 
 **Checked:** Automatic
 
-Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a full-bleed Modal or Panel footer every cell is a button, so the secondary action takes the Default fill to read as one. "Not now" is that secondary action, never Subtle and never in the leading slot.
+Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a Modal or Panel footer every filled track is a button, so the secondary action takes the Default fill to read as one. "Not now", "Skip" and "Keep editing" are that secondary action, never Subtle and never in the leading slot.
 
 ### Say Reset in a menu and Reset filters everywhere else. {#say-reset-in-a-menu-and-reset-filters-everywhere-else}
 
@@ -188,11 +202,11 @@ Active: it can be undone, Discard (or a real alternative) and a Primary. Active 
 
 The bar and its words: Section › Turn the head row into the bulk bar when rows are selected.
 
-### Keep a card's main action Subtle in its footer. {#keep-a-card-s-main-action-subtle-in-its-footer}
+### Link one action in a card, and pair two. {#link-one-action-in-a-card-and-pair-two}
 
 **Checked:** Review
 
-A clickable card has no inner buttons; the whole card is the action. When a card does carry a button, it is Subtle in the footer, and inside tiles it spans the full width when in doubt.
+A card's buttons hug the start of its footer. One action that goes somewhere is a link; two actions are a compact Default pair with no Primary. A card that is all one action is clickable instead and has no inner buttons.
 
 ## In code
 
