@@ -263,24 +263,6 @@ export const TableHero = () => {
     );
 };
 
-export const FormHero = () => {
-    const col = { x: 75, y: -20, w: 150, h: 200 };
-    const x = col.x + 16;
-    const w = col.w - 32;
-    const half = (w - 8) / 2;
-    return (
-        <HeroDrawing>
-            <PageFill {...col} ring />
-            <Field x={x} y={2} w={w} />
-            <Field x={x} y={38} w={w} />
-            <Field x={x} y={74} w={half} />
-            <Field x={x + half + 8} y={74} w={half} />
-            <ButtonShape x={x + w - 34 - 4 - 34} y={130} w={34} />
-            <ButtonShape x={x + w - 34} y={130} w={34} appearance="primary" />
-        </HeroDrawing>
-    );
-};
-
 export const ModalHero = () => (
     <HeroDrawing>
         {/* The page behind: rows across the whole frame. */}

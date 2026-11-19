@@ -161,3 +161,11 @@ test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
     from: 'templates-modal-backdrop', to: 'templates-modal', anchor: '#blanket',
   });
 });
+
+test('the retired Form template id lands on the Forms pattern', () => {
+  assert.deepEqual(rules.find((r) => r.from === 'templates-form'), {
+    from: 'templates-form', to: 'patterns-forms', anchor: undefined,
+  });
+  assert.ok(ids.has('patterns-forms'));
+  assert.ok(!ids.has('templates-form'));
+});

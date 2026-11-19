@@ -10,8 +10,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Blanket | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Card | template | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Card | template | milestone | Load content | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, achievement claimed; goal reached is shared, so the student hears it |
-| Form | template | focus | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Form | template | error | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Frame | template | sidebar-open | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Frame | template | sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Frame | template | panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` |  |

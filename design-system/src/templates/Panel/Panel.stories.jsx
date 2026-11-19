@@ -5,6 +5,7 @@ import { Button } from '@/components';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
@@ -12,6 +13,7 @@ import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/st
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { FormInPanel } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from './Panel';
@@ -298,6 +300,29 @@ export const KeyEditing = {
         await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await userEvent.click(save);
         await waitFor(() => expect(canvasElement.querySelector('[data-probe="footer"]'), 'reading shows no footer').toBeNull());
+    },
+};
+
+/** With a form: a short edit of a row, the page still in view, the Panel's own footer under the fields. */
+export const KeyWithForm = {
+    name: 'Key state: With a form',
+    render: () => <FitStage width={1024} scrollable><FormInPanel /></FitStage>, // docs-literal
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const discard = within(footer).getByRole('button', { name: 'Discard' });
+        const save = within(footer).getByRole('button', { name: 'Save' });
+        await expect(rect(footer).height, 'the Panel’s footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'Close in the header dismisses, so no Cancel').toBeNull();
+        await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        await expect(canvas.getByText('Sessions'), 'the page stays in view beside the edit').toBeVisible();
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 

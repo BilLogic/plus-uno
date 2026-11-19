@@ -10,8 +10,8 @@ import { ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 /**
  * The Errors pattern's examples: where a failure shows, drawn with the real
  * TextField, EmptyState, Flag and Banner. A blocked and a rejected submit are
- * the Form template's own demos (formDemo.jsx), reused on the page so the
- * pattern and the template show one thing. Every picture is drawn in the state
+ * the Forms pattern's host demos (formHosts.jsx), reused on the page so the
+ * two pages show one thing. Every picture is drawn in the state
  * its heading names, through initial-state props.
  *
  *   FieldError      one field after blur, its message under it
