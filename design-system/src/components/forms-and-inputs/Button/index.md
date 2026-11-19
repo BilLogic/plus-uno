@@ -30,7 +30,7 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 | --- | --- |
 | Default | Most actions that are not the main call to action of a page or area, and the secondary half of a footer. Draws a soft neutral fill with no outline. Example: "Reschedule session". |
 | Primary | The main call to action or a form submission. One per page or area. Example: "Book session". |
-| Subtle | Secondary actions in headers, toolbars and button groups. Example: "Cancel" on a page form. Never "Not now": a declining action is a Default secondary in the left half of a footer. |
+| Subtle | Secondary actions in headers, toolbars and button groups. Example: "Cancel" in a Popup. Never "Not now": a declining action is a Default secondary in the left half of a footer. |
 | Warning | Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week". |
 | Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". |
 | Link | An action that leaves: text in the brand color with no fill, underlined on hover. It fills a footer's leading slot. Use it on a `LinkButton` to leave the page, or on a `Button` to leave the task. Examples: "Save and exit", "Open profile". |

@@ -24,6 +24,8 @@ $btn-appearances: (
     'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', 'transparent'),
     'discovery': ('--ds-background-discovery-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-discovery-bold-hovered', '--ds-background-discovery-bold-pressed', 'transparent'),
     'ai': ('--ds-ai-background-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed', 'transparent'),
+    // The link rows draw no fill: their ground and hovered and pressed slots are inert
+    // (`--ds-background-neutral-subtle` is clear), and the pressed label lives in `$btn-link-pressed`.
     'link': ('--ds-background-neutral-subtle', '--ds-link', '--ds-icon-brand', '--ds-background-neutral-subtle', '--ds-background-neutral-subtle', 'transparent'),
     'danger-link': ('--ds-background-neutral-subtle', '--ds-text-danger', '--ds-icon-danger', '--ds-background-neutral-subtle', '--ds-background-neutral-subtle', 'transparent'),
     'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', '--ds-border-selected')

@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Breadcrumb, Button, Sidebar } from '@/components';
 import { AiChat, AI_CHAT_STORAGE_KEY, Modal, PANEL_STORAGE_KEY } from '@/templates';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
-import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
 import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
