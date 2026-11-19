@@ -30,6 +30,9 @@
  * `Pattern*` names). It is banned as a JSX tag or import, and a check that wants
  * more asks for the kind. A token is retired when the token plan retired
  * it; the token rows the table lists are names agents invent.
+ *
+ * Retiring a name replaces every use in the same change
+ * (`docs/engineering/coding.md` § Retiring a name); this list only stops it coming back.
  */
 
 import fs from 'node:fs';

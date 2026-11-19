@@ -161,3 +161,9 @@ test('renames is the token plan\'s old name to new, a copy', () => {
   renames.clear();
   assert.ok(retirement.renames().size > 0);
 });
+test('the retirement rule is written where engineering conventions live, and the list points at it', () => {
+  const coding = fs.readFileSync(path.join(REPO_ROOT, 'docs/engineering/coding.md'), 'utf8');
+  assert.match(coding, /### Retiring a name/);
+  assert.match(coding, /every use is replaced in the same change/);
+  assert.match(list.$about, /docs\/engineering\/coding\.md § Retiring a name/);
+});
