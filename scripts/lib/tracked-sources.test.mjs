@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, before, test } from 'node:test';
 
-import { trackedFiles, trackedSources } from './tracked-sources.mjs';
+import { REPO_ROOT, documents, text } from './corpus.mjs';
+import { inCheckout, trackedFiles, trackedSources } from './tracked-sources.mjs';
 
 let root;
 const put = (rel, text) => {
@@ -33,4 +34,54 @@ test('trackedFiles lists every tracked file, under the roots when given', () => 
 
 test('trackedSources reads matching tracked files, skipping deleted and untracked ones', () => {
   assert.deepEqual(trackedSources(root, ['src'], /\.js$/), [{ path: 'src/a.js', text: 'a' }]);
+});
+
+test('untracked: true adds the files git would not ignore, and still skips the ignored ones', () => {
+  put('.gitignore', 'ignored.js\n');
+  put('src/ignored.js', 'i');
+  assert.deepEqual(trackedFiles(root, ['src'], { untracked: true }).sort(), ['src/a.js', 'src/b.scss', 'src/untracked.js']);
+  assert.deepEqual(trackedFiles(root, ['src']).sort(), ['src/a.js', 'src/b.scss', 'src/gone.js']);
+});
+
+test('untracked: true leaves out a tracked file deleted on disk', () => {
+  assert.equal(trackedFiles(root, ['src']).includes('src/gone.js'), true);
+  assert.equal(trackedFiles(root, ['src'], { untracked: true }).includes('src/gone.js'), false);
+});
+
+test('skipHidden drops node_modules and dot folders below the root, not the root itself', () => {
+  put('.dot/a.js', 'x');
+  put('src/.cache/b.js', 'x');
+  put('src/node_modules/c.js', 'x');
+  assert.deepEqual(trackedFiles(root, ['src'], { untracked: true, skipHidden: true }).sort(), ['src/a.js', 'src/b.scss', 'src/untracked.js']);
+  assert.deepEqual(trackedFiles(root, ['.dot'], { untracked: true, skipHidden: true }), ['.dot/a.js']);
+});
+
+test('outside a git checkout, the files on disk stand in for the tracked list', () => {
+  const bare = fs.mkdtempSync(path.join(os.tmpdir(), 'tracked-sources-bare-'));
+  try {
+    for (const rel of ['prototypes/a/src/App.jsx', 'prototypes/a/node_modules/x.js', 'prototypes/.hidden/b.jsx', 'src/c.scss', 'top.md']) {
+      fs.mkdirSync(path.join(bare, path.dirname(rel)), { recursive: true });
+      fs.writeFileSync(path.join(bare, rel), rel);
+    }
+    assert.equal(inCheckout(bare), false);
+    assert.deepEqual(trackedFiles(bare, ['prototypes', 'src', 'missing']), ['prototypes/a/src/App.jsx', 'src/c.scss']);
+    assert.deepEqual(trackedFiles(bare, ['top.md']), ['top.md']);
+    assert.deepEqual(trackedFiles(bare), ['prototypes/a/src/App.jsx', 'src/c.scss', 'top.md']);
+    assert.deepEqual(trackedSources(bare, ['src'], /\.scss$/), [{ path: 'src/c.scss', text: 'src/c.scss' }]);
+  } finally {
+    fs.rmSync(bare, { recursive: true, force: true });
+  }
+});
+
+test('inside a checkout, inCheckout says so', () => {
+  assert.equal(inCheckout(root), true);
+});
+
+test('no check, and no reader a check calls, walks the file system itself', () => {
+  const readers = ['scripts/lib/docs-page.mjs', 'scripts/lib/storybook-pages.mjs'];
+  const checks = documents('scripts', { ext: ['.mjs'], root: REPO_ROOT }).filter((f) => /^scripts\/check-[^/]+\.mjs$/.test(f) && !f.endsWith('.test.mjs'));
+  assert.ok(checks.length > 40, `only ${checks.length} checks read`);
+  for (const file of [...checks, ...readers]) {
+    assert.equal(/\b(?:readdirSync|opendirSync|globSync)\b/.test(text(file)), false, `${file} walks the file system itself`);
+  }
 });

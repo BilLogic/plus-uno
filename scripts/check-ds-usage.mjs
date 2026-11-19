@@ -49,6 +49,7 @@ import { contextFrom, docLink, escapesIn, isDsStyle, pagesOf } from './lib/ds-us
 import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { inCheckout, trackedFiles } from './lib/tracked-sources.mjs';
 import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
 import { definitions } from './undefined-tokens.mjs';
 import { exampleFences, isTokenTierPage } from './doc-identifiers.mjs';
@@ -66,37 +67,6 @@ const git = (repoRoot, args) =>
   execFileSync('git', ['-C', repoRoot, ...args], { encoding: 'utf8', maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
 
 const lines = (out) => out.split('\n').map((l) => l.trim()).filter(Boolean);
-
-/** Whether repoRoot is inside a git work tree (an archive copy is not). */
-function inCheckout(repoRoot) {
-  try {
-    return git(repoRoot, ['rev-parse', '--is-inside-work-tree']).trim() === 'true';
-  } catch {
-    return false;
-  }
-}
-
-/**
- * The files under `roots`, repo-relative: tracked files by `git ls-files`, or,
- * outside a git checkout (an archive copy, as the usage eval builds in), every
- * file on disk under them, `node_modules` and dot folders skipped.
- */
-export function filesUnder(repoRoot, roots) {
-  if (inCheckout(repoRoot)) return lines(git(repoRoot, ['ls-files', ...roots]));
-  const out = [];
-  const walk = (rel) => {
-    const abs = path.join(repoRoot, rel);
-    if (!fs.existsSync(abs)) return;
-    for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-      const child = `${rel}/${entry.name}`; // repo-relative paths are POSIX, as git prints them
-      if (entry.isDirectory()) walk(child);
-      else if (entry.isFile()) out.push(child);
-    }
-  };
-  for (const root of roots) walk(root);
-  return out.sort();
-}
 
 /** Whether a repo-relative path is one this check reads. */
 const docsPage = (rel) => /^design-system\/src\/.+\.mdx$/.test(rel);
@@ -119,7 +89,7 @@ function freeIconLists(repoRoot) {
 /** The design-system facts and every declared custom property, read once per repo root. */
 export const contextOf = byRoot((repoRoot) => {
   const facts = loadFacts(repoRoot);
-  const declaring = filesUnder(repoRoot, DEFINITION_ROOTS)
+  const declaring = trackedFiles(repoRoot, DEFINITION_ROOTS)
     .filter((rel) => /\.(scss|css|jsx|tsx|js)$/.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
     .map((rel) => read(repoRoot, rel));
   return contextFrom({
@@ -136,7 +106,7 @@ export const contextOf = byRoot((repoRoot) => {
 });
 
 /** Every tracked file in scope. */
-export const scopeFiles = (repoRoot) => filesUnder(repoRoot, SCOPE).filter(inScope);
+export const scopeFiles = (repoRoot) => trackedFiles(repoRoot, SCOPE).filter(inScope);
 
 /** Files changed against main: committed on this branch, staged, unstaged and untracked. */
 export function changedFiles(repoRoot) {
@@ -156,26 +126,25 @@ export function changedFiles(repoRoot) {
   return [...changed].filter((f) => inScope(f) && fs.existsSync(path.join(repoRoot, f))).sort();
 }
 
-/** Paths as given: a file is read as is; a directory contributes every searched file under it. */
+/**
+ * Paths as given: a file is read as is; a directory contributes every searched
+ * file under it, tracked or not yet (it is the working copy the reader wants),
+ * with `node_modules` and dot folders below it skipped.
+ */
 export function expandPaths(repoRoot, given) {
   const out = new Set();
-  const walk = (abs) => {
-    for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-      const child = path.join(abs, entry.name);
-      if (entry.isDirectory()) walk(child);
-      else {
-        const rel = path.relative(repoRoot, child).split(path.sep).join('/');
-        if (SEARCHED.test(rel) && (!SKIPPED.test(rel) || docsStory(rel))) out.add(rel);
-      }
-    }
-  };
   for (const p of given) {
     const abs = path.resolve(repoRoot, p);
     if (!fs.existsSync(abs)) throw new Error(`check:ds-usage: no such path: ${p}`);
-    if (path.relative(repoRoot, abs).startsWith('..')) throw new Error(`check:ds-usage: ${p} is outside the repository`);
-    if (fs.statSync(abs).isDirectory()) walk(abs);
-    else out.add(path.relative(repoRoot, abs).split(path.sep).join('/'));
+    const rel = path.relative(repoRoot, abs).split(path.sep).join('/');
+    if (rel.startsWith('..')) throw new Error(`check:ds-usage: ${p} is outside the repository`);
+    if (!fs.statSync(abs).isDirectory()) {
+      out.add(rel);
+      continue;
+    }
+    for (const file of trackedFiles(repoRoot, rel === '' ? [] : [rel], { untracked: true, skipHidden: true })) {
+      if (SEARCHED.test(file) && (!SKIPPED.test(file) || docsStory(file))) out.add(file);
+    }
   }
   return [...out].sort();
 }

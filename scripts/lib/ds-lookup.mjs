@@ -516,7 +516,8 @@ export function buildDsIndex(root) {
     referenceScreens: JSON.parse(readIf(path.join(root, REFERENCE_SCREENS)) ?? '[]'),
     barrels: Object.fromEntries(BARRELS.map((spec) => [spec, [...facts.barrels[spec]].sort()])),
     inventions,
-    tokens: facts.manifests.tokens.tokens,
+    // The lookup answers what a token is for; the dark value is the docs' and stays out of the index.
+    tokens: facts.manifests.tokens.tokens.map((record) => Object.fromEntries(Object.entries(record).filter(([key]) => key !== 'dark'))),
     vocabulary: facts.vocabulary,
     topics,
     guides,

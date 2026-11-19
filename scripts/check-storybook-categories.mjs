@@ -52,12 +52,12 @@
  * is adding its folder, its taxonomy group and its sort entry together.
  */
 
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { byRoot, main } from './lib/findings.mjs';
+import { trackedFiles } from './lib/tracked-sources.mjs';
 
 import { readStorybookPage } from './lib/storybook-pages.mjs';
 export { storyMetaTitle as metaTitle, storybookTitle as docsTitle } from './lib/storybook-pages.mjs';
@@ -96,6 +96,9 @@ export const RETIRED_PATHS = ['actions', 'status-and-loading', 'overlays'].map((
   folder,
   re: new RegExp(`(?:design-system/src/|@/)components/${folder}(?![\\w-])`),
 }));
+
+/** Where the component folders live, as a tracked path prefix. */
+const COMPONENTS_DIR = 'design-system/src/components/';
 
 /** Story files under `components/`, so a walk that stopped matching finds nothing. */
 export const MIN_FILES = 90;
@@ -143,14 +146,9 @@ function sortGroups(taxonomy) {
 
 const inputs = byRoot((repoRoot) => {
   const taxonomy = JSON.parse(fs.readFileSync(path.join(repoRoot, 'storybook.taxonomy.json'), 'utf8'));
-  const componentsDir = path.join(repoRoot, 'design-system', 'src', 'components');
-  const folders = fs
-    .readdirSync(componentsDir, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
-  const tracked = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' })
-    .split('\n')
-    .filter(Boolean);
+  const tracked = trackedFiles(repoRoot);
+  // A component folder is a folder that holds a tracked file: git tracks no empty directory.
+  const folders = [...new Set(tracked.filter((rel) => rel.startsWith(COMPONENTS_DIR)).map((rel) => rel.slice(COMPONENTS_DIR.length).split('/')).filter((parts) => parts.length > 1).map(([folder]) => folder))].sort();
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
     .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));

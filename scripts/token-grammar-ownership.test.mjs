@@ -48,3 +48,30 @@ test('every declaration and var() pattern in the named checks comes from the gra
     );
   }
 });
+
+/**
+ * The scripts that matched a token name with a pattern of their own now
+ * compose the grammar module's. A command-line flag is not a token, so
+ * script-reach and generate-check-scripts keep a flag pattern of their own. A spelling like `--[\w-]+` or `--[a-z0-9-]+`
+ * in one of them is a second grammar: change the naming scheme and it would not
+ * follow.
+ */
+const MATCHERS = [
+  'check-docs-token-literals.mjs',
+  'check-font-size-literals.mjs',
+  'export-kit-art.mjs',
+  'lib/ds-usage.mjs',
+  'lib/manager-theme.mjs',
+  'lib/tokens/retire.mjs',
+  'lib/retirement.mjs',
+];
+
+test('no script spells the token-name pattern itself', () => {
+  for (const file of MATCHERS) {
+    // A Font Awesome icon name is not a token, and ds-usage reads those with its own tail.
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\\bfa-\(\[a-z0-9-\]\+\)/g, '');
+    assert.equal(/--\[(?:\\w|a-z)/.test(src), false, `${file} writes a token-name character class after the dashes`);
+    assert.equal(/\[a-z0-9-\]/.test(src), false, `${file} writes the token tail itself`);
+    assert.match(src, /design-system\/src\/lib\/tokens\.mjs/, `${file} does not import the grammar module`);
+  }
+});

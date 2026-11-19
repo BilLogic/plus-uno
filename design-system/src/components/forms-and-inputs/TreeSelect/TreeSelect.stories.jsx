@@ -149,6 +149,11 @@ export const MultiSelect = () => {
         </div>
     );
 };
+MultiSelect.play = async ({ canvasElement }) => {
+    // Its picks read as one line of text, so the field stays at the control height however many are picked.
+    const box = within(canvasElement).getByRole('combobox', { name: 'Topics' }).closest('.plus-field');
+    await expect(box.getBoundingClientRect().height).toBe(40);
+};
 
 export const SpacingDefault = () => (
     <div style={fieldWrap}>

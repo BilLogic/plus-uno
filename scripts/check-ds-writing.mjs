@@ -69,7 +69,6 @@
  *   npm run check:ds-writing -- --counts   warnings per rule; exit 0
  */
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -77,6 +76,7 @@ import { byRoot, main, report } from './lib/findings.mjs';
 import { createPageFinder, readDocsPage, topLevelEntries } from './lib/docs-page.mjs';
 import { lineOf, readJson, readText, withoutCode, withoutFences } from './lib/ds-check-helpers.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
+import { trackedFiles } from './lib/tracked-sources.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST = 'design-system/agent-views/components.json';
@@ -211,18 +211,7 @@ function staleIn(text) {
 const staleFindings = (page) => staleIn([page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n'));
 
 /** Every markdown file under the design-system guidelines, repo-relative. */
-function guidelineFiles(root) {
-  const out = [];
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
-      const rel = `${dir}/${e.name}`;
-      if (e.isDirectory()) walk(rel);
-      else if (e.name.endsWith('.md')) out.push(rel);
-    }
-  };
-  if (fs.existsSync(path.join(root, GUIDELINES))) walk(GUIDELINES);
-  return out.sort();
-}
+const guidelineFiles = (root) => trackedFiles(root, [GUIDELINES]).filter((file) => file.endsWith('.md')).sort();
 
 /** The text between the bracket at `open` and its match, strings skipped; null when unbalanced. */
 function bracketBody(src, open) {
@@ -429,15 +418,9 @@ export function gradeFindings(raw, { strict, enforce }) {
 
 /** For a constant name, the source of the design-system file that exports it, or undefined; the files are read once per repo root. */
 const constLookup = byRoot((repoRoot) => {
-  const files = [];
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(path.join(repoRoot, dir), { withFileTypes: true })) {
-      const rel = `${dir}/${e.name}`;
-      if (e.isDirectory()) walk(rel);
-      else if (/\.(?:jsx?|mjs)$/.test(e.name) && !/\.(?:stories|test)\./.test(e.name)) files.push(readText(repoRoot, rel));
-    }
-  };
-  if (fs.existsSync(path.join(repoRoot, DS_SRC))) walk(DS_SRC);
+  const files = trackedFiles(repoRoot, [DS_SRC])
+    .filter((rel) => /\.(?:jsx?|mjs)$/.test(rel) && !/\.(?:stories|test)\./.test(rel))
+    .map((rel) => readText(repoRoot, rel));
   const cache = new Map();
   return (name) => {
     if (!cache.has(name)) cache.set(name, files.find((f) => f.includes(`export const ${name} =`)));

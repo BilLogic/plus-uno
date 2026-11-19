@@ -11599,9 +11599,21 @@
         "Unrated",
         "Rated",
         "Hovered",
+        "Pressed",
+        "SelectedHovered",
+        "SelectedPressed",
         "Focused",
-        "Required",
-        "Disabled"
+        "Disabled",
+        "UnratedNumeric",
+        "RatedNumeric",
+        "HoveredNumeric",
+        "PressedNumeric",
+        "SelectedHoveredNumeric",
+        "SelectedPressedNumeric",
+        "FocusedNumeric",
+        "DisabledNumeric",
+        "RatedThumbsUp",
+        "Required"
       ],
       "tokens": [
         "--body-default",
@@ -11609,8 +11621,12 @@
         "--ds-background-disabled",
         "--ds-background-neutral",
         "--ds-background-neutral-hovered",
+        "--ds-background-neutral-pressed",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-bold-pressed",
         "--ds-icon-disabled",
-        "--ds-icon-selected",
+        "--ds-icon-inverse",
         "--ds-icon-subtle",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -12853,7 +12869,7 @@
       "import": "import { Select } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Select/Select.jsx",
-      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle \"Clear\" action (in the tab order) while a value is set.",
+      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`). They wrap by default, so the field is as tall as its tag rows; `lineWrap={false}` keeps one row that scrolls sideways, and `truncate` collapses them into \"+n\" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle \"Clear\" action (in the tab order) while a value is set.",
       "props": [
         {
           "name": "id",
@@ -13026,7 +13042,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "`text` display mode only: wrap onto more lines.",
+          "description": "With `isMulti`: wrap the picks onto more rows (the default). `false` keeps one row that scrolls sideways.",
           "deprecated": null
         },
         {
@@ -13035,7 +13051,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "`text` display mode only: clip the row with a fade.",
+          "description": "With `isMulti`: the tags collapse into a \"+n\" count until the field is focused. With `displayMode=\"text\"` the row clips with a fade.",
           "deprecated": null
         },
         {
@@ -13277,6 +13293,10 @@
         "Empty",
         "Filled",
         "Multi",
+        "MultiRows",
+        "OverflowWrap",
+        "OverflowNowrap",
+        "OverflowTruncate",
         "Searchable",
         "Marker",
         "NotSearchable",

@@ -158,8 +158,137 @@ export const Filled = {
     render: () => <div style={field}><Select label="Site" defaultValue="lincoln" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
+/* ---- Multi: measuring the field against its tags ---- */
+
+const half = (rect) => rect.top + rect.height / 2;
+const boxOf = (canvasElement, name) => within(canvasElement).getByRole('combobox', { name }).closest('.plus-field');
+const tagsIn = (box) => [...box.querySelectorAll('.plus-tag-group__item:not(.plus-tag-group__item--hidden)')];
+
+/** The field's rows: one tag row's height plus the wrap gap, from the tags themselves. */
+const rowStep = (box) => {
+    const gap = parseFloat(getComputedStyle(box.querySelector('.plus-field__content')).rowGap);
+    return tagsIn(box)[0].getBoundingClientRect().height + gap;
+};
+
+/** The clear × and the caret sit on the first row's center, as TextField's trailing slot does. */
+const expectTrailingOnFirstRow = async (box) => {
+    const first = tagsIn(box)[0].getBoundingClientRect();
+    const clear = box.querySelector('.plus-field-clear').getBoundingClientRect();
+    const caret = box.querySelector('.plus-select-caret').getBoundingClientRect();
+    await expect(Math.abs(half(clear) - half(first))).toBeLessThanOrEqual(1);
+    await expect(Math.abs(half(caret) - half(first))).toBeLessThanOrEqual(1);
+};
+
 export const Multi = {
-    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['lincoln', 'roosevelt']} placeholder="Select sites" /></div>,
+    render: () => (
+        <div style={field}>
+            <Select label="Site" options={sampleOptions} defaultValue="lincoln" />
+            <Select label="Sites" isMulti options={sampleOptions} defaultValue={['lincoln', 'roosevelt']} placeholder="Select sites" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const single = boxOf(canvasElement, 'Site');
+        const box = boxOf(canvasElement, 'Sites');
+        // Two short tags are one row: the field is as tall as a single select, with no blank line under them.
+        await expect(box.getBoundingClientRect().height).toBe(single.getBoundingClientRect().height);
+        const input = box.querySelector('.plus-select-input').getBoundingClientRect();
+        const last = tagsIn(box).at(-1).getBoundingClientRect();
+        await expect(Math.abs(input.top - last.top)).toBeLessThanOrEqual(1);
+        await expectTrailingOnFirstRow(box);
+    },
+};
+
+const longTags = sampleOptions.map((o) => o.value);
+const narrow = { width: 'var(--width-2000)' };
+
+/** A set of tags that does not fit one row: the field grows by whole tag rows and the typing input shares the last one. */
+export const MultiRows = {
+    render: () => (
+        <div style={narrow}>
+            <Select label="One site" options={sampleOptions} defaultValue="lincoln" />
+            <Select label="Many sites" isMulti options={sampleOptions} defaultValue={longTags} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const single = within(canvasElement).getByRole('combobox', { name: 'One site' }).closest('.plus-field').getBoundingClientRect().height;
+        const box = boxOf(canvasElement, 'Many sites');
+        const height = box.getBoundingClientRect().height;
+        const step = rowStep(box);
+        // Whole tag rows past the first, never a blank trailing row.
+        await expect(height).toBeGreaterThan(single);
+        const rows = (height - single) / step;
+        await expect(Math.abs(Math.round(rows) * step - (height - single))).toBeLessThanOrEqual(1);
+        const input = box.querySelector('.plus-select-input').getBoundingClientRect();
+        const last = tagsIn(box).at(-1).getBoundingClientRect();
+        const content = box.querySelector('.plus-field__content').getBoundingClientRect();
+        const room = content.right - last.right;
+        // The input joins the last tag row when 4ch or more is left on it; otherwise it starts the next one.
+        const joined = Math.abs(input.top - last.top) <= 1;
+        const fourCh = parseFloat(getComputedStyle(box.querySelector('.plus-select-input')).minWidth);
+        await expect(joined || room < fourCh + parseFloat(getComputedStyle(box.querySelector('.plus-field__content')).columnGap)).toBe(true);
+        // The box ends where its last row does: the same pad under the content as above it.
+        const edge = box.getBoundingClientRect();
+        await expect(Math.abs((edge.bottom - Math.max(input.bottom, last.bottom)) - (tagsIn(box)[0].getBoundingClientRect().top - edge.top))).toBeLessThanOrEqual(1);
+        await expectTrailingOnFirstRow(box);
+    },
+};
+
+/** The same long tag set in each overflow mode, for the Behavior › Multi examples. */
+const OverflowSet = (props) => (
+    <div style={narrow}>
+        <Select label="Many sites" isMulti options={sampleOptions} defaultValue={longTags} {...props} />
+    </div>
+);
+
+/** Wrap, the default: every tag shows and the field grows by rows. Pick it when the picks matter at a glance. */
+export const OverflowWrap = {
+    name: 'Overflow: wrap',
+    render: () => <OverflowSet />,
+    play: async ({ canvasElement }) => {
+        const box = boxOf(canvasElement, 'Many sites');
+        await expect(tagsIn(box)).toHaveLength(longTags.length);
+        await expect(box.querySelector('.plus-tag-group__overflow')).toBeNull();
+        await expect(box.getBoundingClientRect().height).toBeGreaterThan(40);
+        // The group stays a labeled list in the accessibility tree though its box is display: contents.
+        const list = within(box).getByRole('list', { name: 'Many sites' });
+        await expect(getComputedStyle(list).display).toBe('contents');
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(longTags.length);
+        await expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth);
+    },
+};
+
+/** No wrap: one row that scrolls sideways. Pick it when the field must stay one line and the picks are still all reachable. */
+export const OverflowNowrap = {
+    name: 'Overflow: nowrap',
+    render: () => <OverflowSet lineWrap={false} />,
+    play: async ({ canvasElement }) => {
+        const box = boxOf(canvasElement, 'Many sites');
+        const content = box.querySelector('.plus-field__content');
+        await expect(box.getBoundingClientRect().height).toBe(40);
+        await expect(tagsIn(box)).toHaveLength(longTags.length);
+        await expect(getComputedStyle(content).overflowX).toBe('auto');
+        await expect(content.scrollWidth).toBeGreaterThan(content.clientWidth);
+        const tops = new Set(tagsIn(box).map((t) => Math.round(t.getBoundingClientRect().top)));
+        await expect(tops.size).toBe(1);
+    },
+};
+
+/** Truncate: one row with a "+n" count until the field is focused, then every tag. Pick it for dense forms and filter bars. */
+export const OverflowTruncate = {
+    name: 'Overflow: truncate',
+    render: () => <OverflowSet truncate />,
+    play: async ({ canvasElement }) => {
+        const box = boxOf(canvasElement, 'Many sites');
+        await expect(box.getBoundingClientRect().height).toBe(40);
+        const count = box.querySelector('.plus-tag-group__overflow');
+        await expect(count).not.toBeNull();
+        await expect(count).toHaveTextContent(/^\+\d+$/);
+        await expectTrailingOnFirstRow(box);
+        await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Many sites' }));
+        await waitFor(() => expect(tagsIn(box)).toHaveLength(longTags.length));
+        await expect(box.querySelector('.plus-tag-group__overflow')).toBeNull();
+        await expect(box.getBoundingClientRect().height).toBeGreaterThan(40);
+    },
 };
 
 export const Searchable = {

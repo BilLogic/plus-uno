@@ -1,11 +1,15 @@
 /**
  * Which Foundations ▸ Tokens page each token is shown on, and in which section.
  *
- * ONE MAPPING. A token's collection (Color, Typography, Spacing and size,
- * Elevation and layers, Motion), tier (primitive or semantic) and scope
- * (global, components or templates) are derived here from its name and the
- * stylesheet that defines it, and nowhere else: the collection pages, the
- * Library page and the naming audit all read `placeToken`.
+ * ONE LIST, ONE MAPPING. Every docs token block reads the generated token table
+ * (`agent-views/tokens.json`: name, value, tier, intent, and the dark value
+ * where the dark mode changes it) through `tokenCollections`, which returns
+ * ordered collections. A token's collection (Color, Typography, Spacing and
+ * size, Elevation and layers, Motion), tier (primitive or semantic) and scope
+ * (global, components or templates) are derived here from its name and its
+ * record, and nowhere else: the collection pages, the Library page, the color
+ * and type blocks and the naming audit all read it. A token added to the source
+ * shows on its page once the table is regenerated, with no edit to a page.
  *
  * Templates are page-level tokens (page, section, frame and
  * frame layers); Components are card, modal, popup, table and every
@@ -15,7 +19,7 @@
  * Plain ESM with no Node-only import, so Vite bundles it for the pages and
  * `node --test` loads the same file.
  */
-import { readTokens, resolveToken } from '../../lib/tokens.mjs';
+import { resolveToken, tokenNamePattern } from '../../lib/tokens.mjs';
 
 export const COLLECTIONS = ['color', 'typography', 'spacing', 'elevation', 'motion'];
 export const TIERS = ['primitive', 'semantic'];
@@ -35,8 +39,13 @@ const TEMPLATE_PREFIXES = ['page', 'section', 'frame'];
 
 const place = (collection, tier, scope = null) => ({ collection, tier, scope: tier === 'primitive' ? null : scope });
 
-/** Collection, tier and scope of one token, or null when no rule claims it. */
-export function placeToken(name, file = '') {
+/**
+ * Collection, tier and scope of one token, or null when no rule claims it.
+ *
+ * @param {string} name
+ * @param {{tier?: string, group?: string}} [record] the token's row in the table
+ */
+export function placeToken(name, record = {}) {
   if (/^--palette-/.test(name)) return place('color', 'primitive');
   if (/^--ds-(shadow|opacity)-/.test(name)) return place('elevation', 'semantic', 'global');
   if (/^--ds-motion-/.test(name)) return place('motion', 'semantic', 'global');
@@ -61,62 +70,62 @@ export function placeToken(name, file = '') {
     return place('spacing', 'semantic', 'global');
   }
   // Card, modal, popup, table, blanket, panel and every per-component size
-  // (field, row, label, icon, image, button, tag ...) are Components.
-  if (/^--[a-z0-9-]+$/.test(name) && /(^|\/)(ladder\/_components|ladder\/_templates|_frame_layers|_scales)\.scss$/.test(file)) {
+  // (field, row, label, icon, image, button, tag ...) are Components: a token
+  // the ladder files own (a component or template token, a frame or layer
+  // token) or one of the scales.
+  if (tokenNamePattern().test(name) && (record.tier === 'component' || record.tier === 'template' || /^Scale /.test(record.group ?? ''))) {
     return place('spacing', 'semantic', 'components');
   }
   return null;
 }
 
 /**
- * The token table from raw stylesheet text, in the shape `tokenCorpus` returns
- * (name → {raw, value, file}), so a browser page and a node test share it.
+ * The docs token collections, in page order: Color, Typography, Spacing and
+ * size, Elevation and layers, Motion. Each is ordered sections: Primitives, then
+ * Semantics split into Global, Components and Templates, with the tokens of a
+ * section in the table's order, which is the stylesheet's: a z-index or size
+ * ladder reads small to large. A section with no tokens and a collection with
+ * no section are left out.
  *
- * @param {{file: string, text: string}[]} sources
- * @returns {Map<string, {raw: string, value: string, file: string}>}
+ * A token's value is its alias followed to a literal, as the page resolves it;
+ * `raw` is what the stylesheet says; `dark` is its dark-mode value, or null when
+ * the dark mode leaves it alone.
+ *
+ * @param {{name: string, value: string, tier?: string, group?: string, intent?: string, dark?: string}[]} records the rows of `agent-views/tokens.json`
+ * @returns {{collection: string, title: string, sections: {id: string, tier: string, scope: string|null, title: string, tokens: {name: string, raw: string, value: string, dark: string|null, intent: string}[]}[]}[]}
  */
-export function collectTokens(sources) {
-  const raw = new Map();
-  const files = new Map();
-  for (const { file, text } of sources) {
-    for (const [name, value] of readTokens(text)) {
-      if (raw.has(name)) continue;
-      raw.set(name, value);
-      files.set(name, file);
-    }
+export function tokenCollections(records) {
+  const raw = new Map(records.map((r) => [r.name, r.value]));
+  const order = [['primitive', null], ...SCOPES.map((s) => ['semantic', s])];
+  const buckets = new Map(COLLECTIONS.flatMap((c) => order.map(([tier, scope]) => [`${c}|${tier}|${scope}`, []])));
+  for (const record of records) {
+    const place = placeToken(record.name, record);
+    if (!place) continue;
+    buckets.get(`${place.collection}|${place.tier}|${place.scope}`).push({
+      name: record.name,
+      raw: record.value,
+      value: resolveToken(record.name, raw) ?? record.value,
+      dark: record.dark ?? null,
+      intent: record.intent ?? '',
+    });
   }
-  const out = new Map();
-  for (const [name, value] of raw) {
-    out.set(name, { raw: value, value: resolveToken(name, raw) ?? value, file: files.get(name) });
-  }
-  return out;
+  return COLLECTIONS.map((collection) => ({
+    collection,
+    title: COLLECTION_TITLES[collection],
+    sections: order
+      .map(([tier, scope]) => ({
+        id: tier === 'primitive' ? 'primitives' : `semantics-${scope}`,
+        tier,
+        scope,
+        title: tier === 'primitive' ? 'Primitives' : SCOPE_TITLES[scope],
+        tokens: buckets.get(`${collection}|${tier}|${scope}`),
+      }))
+      .filter((section) => section.tokens.length > 0),
+  })).filter((c) => c.sections.length > 0);
 }
 
-/**
- * One collection's tokens as ordered sections: Primitives, then Semantics split
- * into Global, Components and Templates. A section with no tokens is left out.
- *
- * @returns {{id: string, tier: string, scope: string|null, title: string, tokens: {name: string, value: string, raw: string, file: string}[]}[]}
- */
-export function groupBySection(corpus, collection) {
-  const buckets = new Map();
-  const order = [['primitive', null], ...SCOPES.map((s) => ['semantic', s])];
-  for (const [tier, scope] of order) buckets.set(`${tier}:${scope}`, []);
-  for (const [name, entry] of corpus) {
-    const p = placeToken(name, entry.file);
-    if (!p || p.collection !== collection) continue;
-    buckets.get(`${p.tier}:${p.scope}`).push({ name, value: entry.value, raw: entry.raw, file: entry.file });
-  }
-  return order
-    .map(([tier, scope]) => ({
-      id: tier === 'primitive' ? 'primitives' : `semantics-${scope}`,
-      tier,
-      scope,
-      title: tier === 'primitive' ? 'Primitives' : SCOPE_TITLES[scope],
-      tokens: buckets.get(`${tier}:${scope}`),
-    }))
-    .filter((s) => s.tokens.length > 0);
-}
+/** Every token of the collections as one list, in page order. */
+export const allTokens = (collections) => collections.flatMap((c) => c.sections.flatMap((s) => s.tokens));
 
 /* ─── The naming audit ─────────────────────────────────────────────────────── */
 
@@ -176,11 +185,12 @@ const AUDIT_RULES = [
  *
  * @returns {{token: string, collection: string, problem: string, proposed: string}[]}
  */
-export function tokenNamingAudit(corpus) {
+export function tokenNamingAudit(records) {
   const rows = [];
   const seen = new Set();
-  for (const [name, entry] of corpus) {
-    const p = placeToken(name, entry.file);
+  for (const record of records) {
+    const name = record.name;
+    const p = placeToken(name, record);
     if (!p) continue;
     for (const rule of AUDIT_RULES) {
       if (seen.has(name) || !rule.match(name)) continue;
