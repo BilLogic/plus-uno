@@ -66,7 +66,7 @@ import '@/styles/globals.scss';
 
 **Entry point:** `design-system/src/components/index.js`
 
-**One exception:** `AiChat` (a component) imports `@/templates/Frame` and `@/templates/Panel` by module, not the `@/templates` barrel. It loads while the components barrel does, and the templates barrel would load every template, and the components they read at load, ahead of the components. Frame and Panel read `@/components`, so they cannot move to a leaf module without leaving it. No other component deep-imports a template.
+**One exception:** `AiChat` (a component) imports `@/templates/Frame` and `@/templates/Panel` by module, the leaf form of the `@/templates` barrel. It loads while the components barrel does, and the templates barrel would load every template, and the components they read at load, ahead of the components. Frame and Panel read `@/components`, so they stay where they are and AiChat reaches them directly. AiChat is the only component that deep-imports a template.
 
 **Out of new files:** file-level and category-folder paths
 (`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
