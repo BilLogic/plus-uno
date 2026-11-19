@@ -77,7 +77,7 @@ Headings step down one size per nesting level; containers use a fixed title size
 | Card, popup and flag title | Heading/xsmall · 14 · one level below its section |
 | Group label (menu group, table head) | Heading/xxsmall · 12 · a group or head cell, never a heading tag |
 
-Every page has one `h1` (visually hidden when the topbar or tab strip replaces a visible page header). Card titles take the heading tag one level below their section.
+Every page has one `h1` (visually hidden when a tab strip replaces a visible page header). Card titles take the heading tag one level below their section.
 
 ## Labels
 

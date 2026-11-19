@@ -28,7 +28,7 @@ export const PLAN_KEYS = ['A', 'B'];
  */
 const PALETTE_ORDER = [
   'teal', 'blue', 'green', 'lime', 'yellow', 'orange', 'red', 'magenta', 'purple',
-  'neutral', 'darkNeutral', 'neutralAlpha', 'darkNeutralAlpha', 'lagoon', 'brown', 'shadow', 'blackAlpha',
+  'neutral', 'darkNeutral', 'neutralAlpha', 'darkNeutralAlpha', 'lagoon', 'brown', 'shadow', 'blackAlpha', 'whiteAlpha', 'overlayAlpha',
 ];
 
 /** Where a plan file lives, repo-relative. */
@@ -84,6 +84,10 @@ function accents({ recipe, vivid, families, ...rest }) {
   throw new Error(`unknown accent recipe ${JSON.stringify(recipe)}`);
 }
 
+/** Material alpha steps: slot -> percent. White carries the light material and the border in dark; the dark ground carries the dark material. */
+const MATERIAL_WHITE = { 14: 14, 50: 50, 74: 74, 94: 94 };
+const MATERIAL_DARK = { 50: 50, 72: 72, 94: 94 };
+
 const alphaSlots = (base, pcts) =>
   Object.fromEntries(Object.entries(pcts).map(([slot, pct]) => [slot, { base, a: pct / 100, pct, hex: withAlpha(base, pct / 100) }]));
 
@@ -104,6 +108,9 @@ export function buildPalette(plan) {
     neutralAlpha: alphaSlots(ink, plan.alpha.light),
     darkNeutralAlpha: alphaSlots(paper, plan.alpha.dark),
     shadow: plan.shadow,
+    // The floating material: white (light) and the dark overlay ground (dark) at the material alphas.
+    whiteAlpha: alphaSlots('#ffffff', MATERIAL_WHITE),
+    overlayAlpha: alphaSlots(dark[250].hex, MATERIAL_DARK),
     blackAlpha: Object.fromEntries(
       Object.entries(plan.blackAlpha).map(([slot, pct]) => [slot, { base: '#000000', a: pct / 100, hex: withAlpha('#000000', pct / 100) }]),
     ),

@@ -1,15 +1,13 @@
 import React from 'react';
+import { Button, FooterActions, StatusTag } from '@/components';
 import {
-    Button,
-    FooterActions,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
     PanelFooter,
     PanelHeader,
     PanelSubheader,
-    StatusTag,
-} from '@/components';
+} from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import Blanket from '@/patterns/Modal/Blanket';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
@@ -26,11 +24,11 @@ const FLOAT_STAGE = 440; // docs-literal
 /** How far a second Panel sits in from the first. Docs geometry, px. */
 const SECOND_OFFSET = 48; // docs-literal
 
-const ReadingPanel = ({ footer }) => (
+const ReadingPanel = ({ footer, inlineSize }) => (
     <CaseSurface
         padding="none"
         style={{
-            maxInlineSize: 'var(--panel-width-default)',
+            maxInlineSize: inlineSize ?? 'var(--panel-width-default)',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
         }}
@@ -52,6 +50,9 @@ const ReadingPanel = ({ footer }) => (
 
 /** Reading: a header and a body, nothing to save. */
 export const ReadingNoFooter = () => <ReadingPanel />;
+
+/** The same Panel squeezed to a third of its default width. */
+export const ReadingNarrow = () => <ReadingPanel inlineSize="calc(var(--panel-width-default) / 3)" />;
 
 /** A footer of buttons on a Panel that is only read. */
 export const ReadingWithFooter = () => (

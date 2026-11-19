@@ -221,7 +221,7 @@ test('the live Library links shared template/component names to their own pages 
   const live = motionLibraryOf();
   const find = (tier, name) => live.find((r) => r.tier === tier && r.name === name);
   assert.equal(find('template', 'Panel').href, '?path=/docs/templates-panel--docs#motion');
-  assert.equal(find('component', 'Panel').href, '?path=/docs/components-layout-and-structure-panel--docs#motion');
+  assert.equal(find('component', 'Panel'), undefined);
   assert.equal(find('template', 'Popup').href, '?path=/docs/templates-popup--docs#motion');
   assert.equal(find('component', 'Popup').href, '?path=/docs/components-overlays-and-layering-popup--docs#motion');
   assert.equal(find('template', 'Blanket').href, '?path=/docs/templates-modal--docs#blanket-motion');

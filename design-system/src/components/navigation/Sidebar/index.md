@@ -2,7 +2,7 @@
 
 # Sidebar
 
-The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
+The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting to `'tutor'`), the signed-in person's account row, and open tabs from `useOpenTabs()`. Pass `user` and `groups` together to add or override a prototype's own area(s) by `id` while keeping the role's navigation; pass `groups` without `user` (and/or `tabs`) to render custom groups directly. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip "Complete your assigned training to unlock the Toolkit" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` ("2 assigned lessons left"); `training: 'modules'` shows `modulesLeft` ("3 onboarding modules left"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then "Show n more". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner sidebar: one full-width Back button (`onBack`) with the area name centered, an optional full-width context dropdown (`inner.switcher`), then text-only rows (`inner.rows`: a record's stages, or a task's steps). The container, logo row and account row stay still; only the content swaps. The old content leaves at once and the new enters as one block, sliding 12 on `spatial.fast` from the end going in and from the start going back, and fading on `appearance.fast`, with no overshoot. Reduced motion keeps only the fade. Back shows the main Sidebar, where what was left sits as one open row (`tabs`) under its area. - **Account row**: `SidebarAccount`, under a divider. Content is data. Nothing here changes the URL.
 
 Also asked as: left nav, side nav.
 
@@ -10,11 +10,32 @@ Also asked as: left nav, side nav.
 
 **Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`)
 
-**Governed by:** Disabled (`ds guide disabled`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+**Governed by:** Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
-**Motion:** enter `spatial.default` · exit `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
+
+**Storybook page:** `design-system/src/components/navigation/Sidebar/Sidebar.mdx`
+
+**Motion:** enter `spatial.default` · exit `spatial.fast` · swap `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+
+## Usage
+
+Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the
+rail from the role's config (`user`), and a prototype passes `groups` to add
+or override its own areas by `id` while keeping the role's navigation. The
+Frame decides whether it docks, collapses or floats; this page covers what is
+inside it.
+
+A record with stages (a session) or a multi-step task swaps the Sidebar's
+content for an **inner sidebar**: pass `inner` (`areaLabel`, `rows`, and an
+optional `switcher`) and `onBack`. Only the content swaps; the logo row, the
+account row and the page stay where they are. A record without stages, such as
+a student, keeps the main Sidebar with a breadcrumb.
+
+Content is data. The Sidebar draws the `groups` it is given and never changes
+the URL: the caller handles `onSelect` and decides which groups a role sees.
 
 ## Motion
 
@@ -24,33 +45,152 @@ Sidebar reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Dock and undock a panel | `--ds-motion-spatial-default` | Slides in from its edge while the Page narrows on the same clock; the Page toggle fades out. |
 | exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Slides out to its edge and leaves nothing behind; the Page widens and its toggle fades in. |
+| swap | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The Sidebar container stays still and only its content swaps between the main and the inner sidebar. The old content leaves at once; the new enters as one block, no stagger, sliding 12 from the end going in and from the start going back, fading in, with no overshoot. The page does not animate. Reduced motion keeps only the fade. |
+
+## Alternatives
+
+- For switching between views of a single subject inside a page, use `Tabs`.
+- For showing position inside a deep hierarchy above the page title, use `Breadcrumb`.
+
+## Best practices
+
+### Mark one selected item at a time. {#mark-one-selected-item-at-a-time}
+
+The Sidebar marks one current page. `activeId` takes one id, so exactly one row or tab carries the selected fill and `aria-current="page"`.
+
+### Keep every row icon outlined. {#keep-every-row-icon-outlined}
+
+Rows draw regular-style icons in the one subtle icon color, and a selected row shows its fill with the selected icon color, never a solid icon. A brand mark such as Slack is the only exception: it keeps its brand glyph.
+
+### Highlight the ancestor without a fill when a child tab is selected. {#highlight-the-ancestor-without-a-fill-when-a-child-tab-is-selected}
+
+A parent of the current page shows it without competing: when one of a row's tabs is selected, the tab takes the fill and the row goes to ink without it.
+
+### Pass every open tab; the Sidebar folds them. {#pass-every-open-tab-the-sidebar-folds-them}
+
+Past three open tabs the rest go behind Show n more. The Sidebar does this for you; pass every open tab and let it fold them.
+
+### Name the area in a word or two. {#name-the-area-in-a-word-or-two}
+
+Do: Sessions and Students: one word each, read at a glance.
+Don't: A sentence for a label truncates and hides the area's name.
+
+### Lock the Toolkit during onboarding, never hide it. {#lock-the-toolkit-during-onboarding-never-hide-it}
+
+Do: The Toolkit shows, locked, so the tutor sees what training unlocks.
+Don't: With the Toolkit left out, nothing says it is coming.
+
+### Name a tab by when and who. {#name-a-tab-by-when-and-who}
+
+Do: The time and the teacher; the school is in the tooltip.
+Don't: Everything in the label, and the time is cut off.
+
+## Accessibility
+
+- The Sidebar is a `nav` named by `label`, Main by default. A titled group is a `group` named by its title.
+- The selected row or tab carries `aria-current="page"`, so selection never rests on the fill alone.
+- A section title is a button that reports whether its rows are expanded and points at them. It opens and closes with Enter and Space, as does "Show n more"; both are built on Base UI Collapsible, and the account button opens its menu on Base UI Menu.
+- A locked group's lock is focusable and named "Locked. Complete your assigned training to unlock the Toolkit".
+- Delete or Backspace closes the focused tab, and focus moves to the next tab, else the one before it, else the tab's row.
+- The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.
+- The account button is named by the person's name and role, then "account menu".
+- In the inner sidebar, focus lands on Back when it opens and returns to the open row when Back closes it. Back, then the context dropdown, then each row are reached with Tab; Enter picks a row.
+- The swap slides 12 and fades. With reduced motion it only fades.
 
 ## Related
 
+- Frame: use when docking, collapsing and floating the Sidebar beside the Page.
+- `SidebarTab`: use when configuring a single row inside a custom sidebar section.
+- `CountTag`: use when rendering a count on the trailing edge of a row.
+
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
+
+## Parts
+
+1. **Logo row.** The PLUS `Logo`, which goes Home, and the toggle at the end of the row.
+2. **Group.** Rows under an optional section title. A group without a title has no title row and never collapses.
+3. **Section title.** A full `--control-md` row in the subtlest text. On hover and focus the collapse angle shows after it.
+4. **Row.** An icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
+5. **Open tabs.** Records a person opened, such as a session or a student, under their row on a thread. Three show, then Show n more.
+6. **Account row.** The avatar, the name and the role, which open the account menu, and Help Center, under a divider.
+
+Every part sits on one grid: icon centers on x `32`, labels start on x `48`, trailing slots center on x `208`, and section titles start on x `20`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The row in `--ds-text-subtle`, with no fill. |
+| Hovered | The neutral hovered fill and ink text. A row with tabs swaps its icon for the collapse angle and its trailing slot for Close all; a tab swaps its live dot for Close. |
+| Pressed | The neutral pressed fill. |
+| Focused | Shows the focus ring inside the row's edge and the same swaps as hover; see Border. |
+| Disabled | Not used. A row the person cannot reach yet is locked instead. |
+| Selected | The selected fill, ink text and icon and the medium weight, with `aria-current="page"`. A selected tab takes the fill and its row goes to ink without it. |
+| Locked | While `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock and its rows take the subtlest text, with no hover and no press. |
+| Collapsed | A collapsed section hides its rows and turns its angle right. Collapsed sections are remembered per person under `storageKey`. |
+
+### Tokens
+
+The Sidebar's width, 240, belongs to the Frame: see Frame.
+
+| Part | Token |
+| --- | --- |
+| Pad | 12: `--frame-sidebar-pad`. |
+| Row | 32: `--control-md`; radius 8: `--frame-sidebar-row-radius`; 2 apart: `--frame-sidebar-row-gap`. |
+| Groups | 16 apart: `--frame-sidebar-group-gap`. |
+| Row text and icon | `--ds-text-subtle` and `--ds-icon-subtle`, at `--body-default`. |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `-pressed`. |
+| Selected | `--ds-background-selected` with hovered and pressed steps; `--ds-text-selected`, `--ds-icon-selected`. |
+| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-sm`. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
+| Account row divider | `--ds-border`. |
+
+Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page.
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name a row for its area in a word or two: "Sessions". | A sentence: "All of my tutoring sessions". |
+| Title a group in one word, in sentence case: "Training". | Title case or a phrase. |
+| Label a tab with its time and the teacher: "4:00 PM · Ms. Ortiz". | The whole record in the label. |
+| Use Font Awesome Free icons on rows. | Pro-only icons, which render as blanks. |
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `user` | enum | `'tutor'` | — |
-| `groups` | arrayOf | — | Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]` |
-| `account` | shape (required) | — | The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections |
-| `modulesLeft` | number | `0` | A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. |
-| `lessonsLeft` | number | `0` | A tutor's assigned lessons left; counted on the Lessons row |
-| `countTags` | objectOf | — | The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
+| `user` | enum | — | Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed |
+| `groups` | arrayOf | — | Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed |
+| `activeId` | string | — | Id of the selected row or tab; it carries `aria-current="page"` |
+| `activeTabId` | string | — | Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`) |
+| `onSelect` | func | — | Called with `(id, item)` when a row other than an external link is pressed |
 | `onHomeClick` | func | — | Home's press (the row and the logo); without it Home calls `onTabClick('home')` |
 | `onTabClick` | func | — | Called with the row id for every other row (external links excepted) |
 | `onOpenTabSelect` | func | — | Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed |
+| `tabs` | objectOf | — | Open tabs by row id, in the order they show; defaults to `useOpenTabs()` |
+| `onSelectTab` | func | — | Called with `(tab, item)` on a plain click of a tab |
+| `onCloseTab` | func | — | Called with `(tab, item)` by a tab's Close and by Delete or Backspace |
+| `onCloseAllTabs` | func | — | Called with `(item)` by a row's Close all |
+| `modulesLeft` | number | `0` | Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. Supervisors are never locked. |
+| `lessonsLeft` | number | `0` | Assigned lessons a tutor has left; the `lessons` row counts it |
+| `countTags` | objectOf | — | The trailing slot by row id when using the role config: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
+| `account` | shape (required) | — | The signed-in person, for the account row. Their `id` keys the remembered sections. |
 | `onProfile` | func | — | The account menu's Profile |
-| `onSignOut` | func | — | The account menu's Sign out, after the open tabs are cleared |
+| `onSignOut` | func | — | The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()` |
 | `helpHref` | string | — | Help Center, opened in a new tab |
-| `activeTabId` | string | — | Id of the row to show as selected (e.g. 'sessions', 'home') |
-| `slackUrl` | string | — | Where Slack links; defaults to `SLACK_URL` |
-| `label` | string | `'Main'` | Accessible name of the navigation landmark |
-| `visible` | bool | `true` | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `homeHref` | string | `'/'` | Where the logo goes |
+| `slackUrl` | string | — | Where Slack links in the role config; defaults to `SLACK_URL` |
+| `onHome` | func | — | Called on a plain click of the logo; the caller goes Home |
+| `onToggle` | func | — | Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state. |
+| `inner` | shape (required) | — | Swaps the content for an inner sidebar: the area's Back button, an optional context dropdown, then text-only rows. Omit it for the main Sidebar. |
+| `onBack` | func | — | Called by the inner sidebar's Back; the caller shows the main Sidebar and leaves the page where it is |
+| `storageKey` | string | `SIDEBAR_SECTIONS_STORAGE_KEY` | The localStorage key collapsed sections are kept under, per account id; null keeps nothing |
+| `label` | string | `'Main'` | Accessible name of the `nav` landmark |
+| `visible` | bool | `true` | Whether the Sidebar renders |
+| `id` | string | — | HTML id attribute on the Sidebar root element |
+| `className` | string | `''` | Additional CSS class names applied to the Sidebar root |
+| `style` | object | — | Inline styles applied to the Sidebar root |
 
 ## Variants
 
@@ -58,8 +198,14 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+## Tokens touched
 
-> No authored guidance yet: when to use, correct/incorrect, and accessibility
-> are unwritten for this component. Nothing above tells you whether
-> reaching for `Sidebar` is the right call, only what it accepts.
+`--body-default` · `--body-sm` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-lg` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-md` · `--type-weight-medium`
+
+From `design-system/src/components/navigation/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.
+
+## Figma
+
+- "Sidebar" node 19393:46573 in file zAecJNRdvJzAUOcjV32tRX
+
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

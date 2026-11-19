@@ -1,14 +1,13 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
+import { Button, FooterActions } from '@/components';
 import {
-    Button,
-    FooterActions,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
     PanelFooter,
     PanelHeader,
-} from '@/components';
+} from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 

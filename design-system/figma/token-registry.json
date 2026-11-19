@@ -107,6 +107,7 @@
       "Raised surface (cards)": "var(--ds-surface-raised)",
       "Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag)": "var(--ds-shadow-raised)",
       "Overlay surface (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Modal too)": "var(--ds-surface-overlay)",
+      "Overlay material (the floating Sidebar, the floating Panel and the Modal: translucent, no blur, solid under reduced transparency and increased contrast)": "var(--ds-surface-material-overlay)",
       "Overlay shadow (Popups, menus, listboxes, Flags, the floating Sidebar and Panel; the Tooltip takes none)": "var(--ds-shadow-overlay)",
       "Blocking shadow (the Modal on its Blanket, only)": "var(--ds-shadow-blocking)"
     }
@@ -283,20 +284,11 @@
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
-      "Focused page/inline-md": "var(--focused-page-inline-md)",
-      "Focused page/inline-sm": "var(--focused-page-inline-sm)",
-      "Focused page/pad-x": "var(--focused-page-pad-x)",
-      "Focused page/pad-y": "var(--focused-page-pad-y)",
-      "Focused page/stack-lg": "var(--focused-page-stack-lg)",
-      "Focused page/stack-md": "var(--focused-page-stack-md)",
-      "Focused page/stack-sm": "var(--focused-page-stack-sm)",
       "Frame/sidebar-group-gap": "var(--frame-sidebar-group-gap)",
       "Frame/sidebar-pad": "var(--frame-sidebar-pad)",
       "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
       "Frame/sidebar-row-radius": "var(--frame-sidebar-row-radius)",
       "Frame/sidebar-width": "var(--frame-sidebar-width)",
-      "Frame/sidebar-width-nav": "var(--frame-sidebar-width-nav)",
-      "Frame/topbar-height": "var(--frame-topbar-height)",
       "Modal/body-min-height": "var(--modal-body-min-height)",
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
@@ -1777,6 +1769,10 @@
       "color/chart/brown/bolder/hovered": "var(--chart-brown-bolder-hovered)",
       "color/chart/brown/boldest/default": "var(--chart-brown-boldest)",
       "color/chart/brown/boldest/hovered": "var(--chart-brown-boldest-hovered)",
+      "elevation/surface/material/media": "var(--ds-surface-material-media)",
+      "elevation/surface/material/control": "var(--ds-surface-material-control)",
+      "elevation/surface/material/overlay": "var(--ds-surface-material-overlay)",
+      "color/border/material": "var(--ds-border-material)",
       "color/interaction/dragged": "var(--ds-interaction-dragged)",
       "color/interaction/inverse/hovered": "var(--ds-interaction-inverse-hovered)",
       "color/interaction/inverse/pressed": "var(--ds-interaction-inverse-pressed)",
@@ -1867,11 +1863,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1224,
+    "scssTokenCount": 1225,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1768,
-      "resolved": 1731,
+      "total": 1763,
+      "resolved": 1726,
       "percent": 98,
       "skippedCollections": [
         {
@@ -1896,7 +1892,7 @@
         },
         {
           "collection": "archived / spacing / layout",
-          "count": 27
+          "count": 26
         },
         {
           "collection": "archived / color / patterns",

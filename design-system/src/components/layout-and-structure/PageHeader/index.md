@@ -103,7 +103,7 @@ title is a custom element already carrying its own heading semantics.
 - [Section](?path=/docs/templates-section--docs): use when heading a section inside a page.
 - `Breadcrumb`: use when rendering the hierarchy trail above the page title.
 
-Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
+Same group: `Accordion` · `Carousel` · `ScrollBar`
 
 ## Parts
 

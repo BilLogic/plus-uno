@@ -11,19 +11,24 @@ import {
     Heading,
     IconButton,
     NotificationItem,
-    PanelBody,
-    PanelCloseAction,
-    PanelContainer,
-    PanelHeader,
     SectionMessage,
+    Sidebar,
     StaticTable,
     StatusTag,
     Tabs,
     Tile,
 } from '@/components';
-import { Frame, Page, PatternSection, PatternSidebar } from '@/patterns';
+import {
+    Frame,
+    Page,
+    PatternSection,
+    PanelBody,
+    PanelCloseAction,
+    PanelContainer,
+    PanelHeader,
+} from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
-import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -330,15 +335,14 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
             <div ref={rootRef} style={{ position: 'relative', height: '100%' }}>
                 <Frame
                     sidebar={(
-                        <PatternSidebar
+                        <Sidebar
                             groups={buildSidebarGroups(unreadCount)}
                             activeId={open ? 'inbox' : 'sessions'}
                             onSelect={(id) => {
                                 if (id === 'inbox') setOpen((prev) => !prev);
                             }}
-                            account={{ name: 'Maya Chen', role: 'tutor' }}
+                            account={{ name: 'Maya Chen', role: 'Tutor' }}
                             storageKey={null}
-                            label="Main"
                         />
                     )}
                 >

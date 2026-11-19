@@ -46,7 +46,7 @@ Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form
 <TypeCard of={FormsStories.HostPage} to="#in-a-page" title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group.</TypeCard>
 <TypeCard of={FormsStories.HostPanel} to="#in-a-panel" title="In a Panel" stage={STAGE}>A short edit beside the page, with a full-bleed footer.</TypeCard>
 <TypeCard of={FormsStories.HostModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields.</TypeCard>
-<TypeCard of={FormsStories.HostSteps} to="#in-steps" title="In steps" stage={STAGE}>A stepped task on Frame · focused.</TypeCard>
+<TypeCard of={FormsStories.HostSteps} to="#in-steps" title="In steps" stage={STAGE}>A stepped task on Frame.</TypeCard>
 </TypeGrid>
 
 <ComponentExample of={FormsStories.HostPage} title="In a page" description="Settings and anything saved as a group. Buttons left-aligned under the fields." />
@@ -55,11 +55,11 @@ Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form
 
 <ComponentExample of={FormsStories.HostModal} title="In a Modal" description="A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col." />
 
-<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more." />
+<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame: dots above one question under five steps, or the left step list at five or more." />
 
 <ComponentExample of={FormsStories.SettingsInPage} title="Settings on a page" description="Settings that apply at once sit in grouped SettingRows under section headings on the page, dividing rows with `--border-width-default` and no card per row: Toggle (with no own label), compact Select, and connection rows with StatusTag beside the label and Button at the end. Flipping a Toggle saves immediately and confirms with a Flag." />
 
-<ComponentExample of={FormsStories.OneQuestionPerStep} title="One question per step" description="In steps on Frame · focused for sign-up, training check-ins and site setup: ProgressIndicator dots centered above the question under five steps (the host's left step list at five or more), a heading and one line, pictured RadioGroup or CheckboxGroup tiles, and Back (Subtle) and Continue (Primary) centered below. Continue stays enabled and validates on press." />
+<ComponentExample of={FormsStories.OneQuestionPerStep} title="One question per step" description="In steps, a multi-step task on Frame for sign-up, training check-ins and site setup: ProgressIndicator dots centered above the question under five steps (the host's left step list at five or more), a heading and one line, pictured RadioGroup or CheckboxGroup tiles, and Back (Subtle) and Continue (Primary) centered below. Continue stays enabled and validates on press." />
 
 </div>
 
@@ -133,8 +133,8 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 <tr><td>is saved as a group on its own page: settings, a profile</td><td>In a page</td><td>Left-aligned under the fields, Primary first, Cancel Subtle</td></tr>
 <tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel</td></tr>
 <tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Discard (Default) and the action (Primary), full bleed, no Cancel</td></tr>
-<tr><td>is long, or has sections someone works through</td><td>In steps on Frame · focused</td><td>Back and Next in the bar, no Cancel</td></tr>
-<tr><td>asks one big question per step (sign-up, check-in, site setup)</td><td>In steps on Frame · focused</td><td>Back (Subtle) and Continue (Primary) centered under the tiles</td></tr>
+<tr><td>is long, or has sections someone works through</td><td>In steps, a multi-step task on Frame</td><td>Save and exit, Back and Next in the footer, no Cancel</td></tr>
+<tr><td>asks one big question per step (sign-up, check-in, site setup)</td><td>In steps, a multi-step task on Frame</td><td>Back (Subtle) and Continue (Primary) centered under the tiles</td></tr>
 <tr><td>asks for one value read far more than changed</td><td>Inline edit on the record</td><td>None; it saves on its own</td></tr>
 </tbody>
 </DocsTable>
@@ -213,7 +213,7 @@ A caption stays after the person types and is read by a screen reader with the f
 
 <RuleTag kind="automatic" />
 
-Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close plays the opening backwards once the person confirms.
+Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Save and exit keeps the answers and leaves; Back in the inner sidebar asks first if anything is unsaved.
 
 ### Prefer a bound input to a free one.
 

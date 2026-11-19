@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
+import { withCliDistLock } from './lib/cli-dist-lock.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { distTag, registryHas, versionFromTag } from './lib/cli-release.mjs';
 import { PACKAGE_NAME } from '../packages/cli/src/constants.mjs';
@@ -61,7 +62,7 @@ test('every workflow action is pinned to a version and the file parses as steps 
 });
 
 test('npm publish --dry-run packs the package the tag will name', { timeout: 300_000 }, () => {
-  const out = execFileSync('npm', ['publish', '--dry-run', '--json'], { cwd: path.join(REPO_ROOT, 'packages/cli'), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const out = withCliDistLock(() => execFileSync('npm', ['publish', '--dry-run', '--json'], { cwd: path.join(REPO_ROOT, 'packages/cli'), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
   const info = JSON.parse(out.slice(out.indexOf('{')));
   assert.equal(info.name, PACKAGE_NAME);
   assert.ok(info.files.some((f) => f.path === 'bin/ds.mjs'));

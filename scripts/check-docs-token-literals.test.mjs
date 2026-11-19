@@ -47,7 +47,7 @@ const defs = new Map([
   ['--size-breakpoint-ish', { value: '768px', file: '_layout-ish.scss' }],
   ['--type-size-100', { value: '1rem', file: '_type.scss' }],
   // A family this check does not offer, holding a value the docs might use.
-  ['--frame-sidebar-width-nav', { value: '164px', file: 'ladder/_templates.scss' }],
+  ['--frame-sidebar-width', { value: '240px', file: 'ladder/_templates.scss' }],
 ]);
 const index = buildTokenIndex(defs);
 
@@ -209,9 +209,9 @@ test('10. a NEAR MISS is invisible, and that is written into the check', () => {
 });
 
 test('11. token families outside color / font-size / line-height / size are not offered', () => {
-  // `--frame-sidebar-width-nav` is 164px. A docs-chrome pixel equal to an app-shell
+  // `--frame-sidebar-width` is 240px. A docs-chrome pixel equal to an app-shell
   // grid measurement is a coincidence, not a token being ignored.
-  assert.deepEqual(literals(rule('  width: 164px;')), []);
+  assert.deepEqual(literals(rule('  width: 240px;')), []);
 });
 
 test('unit — the allowances and the fallback blanker', () => {

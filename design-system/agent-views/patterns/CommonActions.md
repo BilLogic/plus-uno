@@ -18,7 +18,7 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 
 - **In a page form.** Left-aligned under the fields, Primary first.
 - **In a Modal.** Full bleed across the footer: Discard left, Primary right, no Cancel.
-- **In a focused task.** Back and Next split 50/50 across the bar; Close in the title row.
+- **In a multi-step task.** Save and exit at the start; Back and Next at the end, on one 32 line.
 - **In a card.** Subtle in the footer; clickable cards keep no inner buttons.
 
 ## Small actions
@@ -44,7 +44,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
 | Leave a page form or popup without saving | Subtle | After Primary on a page form; left of Primary in a popup | "Cancel"; a link is allowed |
-| Dismiss a Modal, Panel or focused task | Icon button | Start of a focused title row; end of a Modal, Panel or Flag header | Named "Close" |
+| Dismiss a Modal, Panel or Flag | Icon button | End of the header | Named "Close" |
 | Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
 | Empty one field | Icon button inside the field | End of the field | Named "Clear", "Clear search" |
 | Copy a value | Icon button | Beside the value | Named "Copy"; "Copied" in a tooltip after |
@@ -120,7 +120,7 @@ The Primary is the main call to action or a form's submit. A second main action 
 Do: One Primary, with the other action Default beside it.
 Don't: Two Primary buttons in one row: neither reads as the next step.
 
-### Left-align buttons under a page form and right-align them in a Modal, a focused task or steps. {#left-align-buttons-under-a-page-form-and-right-align-them-in-a-modal-a-focused-task-or-steps}
+### Left-align buttons under a page form and right-align them in a Modal or a multi-step task. {#left-align-buttons-under-a-page-form-and-right-align-them-in-a-modal-or-a-multi-step-task}
 
 **Checked:** Automatic
 
@@ -148,7 +148,7 @@ Header and footer stay pinned while the body scrolls. A blocked submit, a server
 
 **Checked:** Automatic
 
-Close ends a layer and lives in its header, or at the start of a focused title row. In a Modal, Panel and focused task the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
+Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
 
 ### Make Cancel Subtle on page forms and popups. {#make-cancel-subtle-on-page-forms-and-popups}
 

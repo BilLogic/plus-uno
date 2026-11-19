@@ -67,6 +67,10 @@ A page worked item by item (Flags, Highlights, Feedback, Approvals, Escalations)
 **Section detail**:
 An inline expand inside a Section.
 
+**Inner sidebar**:
+The Sidebar's content while a record with stages (a session) or a multi-step task is open: a Back button with the area name, an optional context dropdown, then text-only rows. Back returns to the main Sidebar, where what you left sits as one open row under its area.
+_Avoid_: "sub-sidebar", "second sidebar"
+
 **Commit action**:
 The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
 

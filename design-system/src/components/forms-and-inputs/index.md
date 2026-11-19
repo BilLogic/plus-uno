@@ -74,7 +74,7 @@ authored half, counted rather than assumed.
 - **[FilterMenu](FilterMenu/index.md)** — Use `FilterMenu` when a section's content takes two or more filter categories staged and applied together from one Filter icon trigger.
   - For one category in a menu that applies as you pick, use `PopupSelect`.
   - For one to three quick filter triggers in a bar, use `FilterButton`.
-- **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the focused view to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+- **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
   - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
   - For connected view or mode buttons in a toolbar, use `ButtonGroup`.
 - **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.

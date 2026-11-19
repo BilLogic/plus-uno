@@ -41,7 +41,7 @@ Never a slide (which suggests the areas sit side by side) and never a cut. The S
 
 | Tells the person | When | Not | Breadcrumb | PLUS case |
 | --- | --- | --- | --- | --- |
-| You went one level deeper, and the way back is the way you came. | Opening one record or item from a list, card or overview, or opening a focused task. | A quick look that leaves the page in place is Open an overlay. | Gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill. | Session row in a tutor’s record; Log a session. Triggered by a row or button, the Breadcrumb, browser back. |
+| You went one level deeper, and the way back is the way you came. | Opening one record or item from a list, card or overview, or opening a task from its row. | A quick look that leaves the page in place is Open an overlay. | Gains a level going in, loses one coming back. A task opened from a row has no Breadcrumb; it still counts as a Drill. | Session row in a tutor’s record; Log a session. Triggered by a row or button, the Breadcrumb, browser back. |
 
 | What | Property | Token | Starts |
 | --- | --- | --- | --- |
@@ -56,9 +56,7 @@ PLUS is at most three levels deep (area, record, one record inside it), so the s
 
 Climbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page no longer on screen, fades in place with the Breadcrumb already shorter.
 
-**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. A button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.
-
-**Used in:** Record page, Table rows, PatternCard, Breadcrumb, focused tasks.
+**Used in:** Record page, Table rows, PatternCard, Breadcrumb.
 
 ### Switch views
 
@@ -87,7 +85,7 @@ Because the views are peers in a row, the bodies move sideways as a group withou
 
 The body moves on the same axis as the step list. Step states change in place on `appearance.fast`, the moment the body starts: the step just left becomes visited and the next becomes current, and nothing travels along the ProgressTracker. Placement (top for four steps or fewer, side for five or more) is set once, when the task opens, by the longest path the flow can take, so a branch never changes the slide axis mid-task. Fit can push top to side, never the reverse: four steps whose labels would truncate go down the side. The position label swaps on `appearance.fast`; the header, Sidebar and step list never move.
 
-**Used in:** Form steps, Table paging, Schedule weeks, Carousel, focused tasks.
+**Used in:** Form steps, Table paging, Schedule weeks, Carousel, multi-step tasks.
 
 ## Within a place
 

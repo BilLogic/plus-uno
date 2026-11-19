@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Dialog, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, Select, TextField } from '@/components';
+import { Dialog, Fieldset, Select, TextField } from '@/components';
+import { PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { Behind, FILLED, FormFields, FullBleedFooter } from './formDemo.jsx';

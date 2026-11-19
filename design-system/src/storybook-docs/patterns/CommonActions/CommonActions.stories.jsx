@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
-import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -17,7 +17,7 @@ import {
     Copy,
     EditOne,
     EditRecord,
-    FocusedBar,
+    MultiStepBar,
     ManyRows,
     ModalFooter,
     Page,
@@ -122,10 +122,10 @@ export const PlacementModal = {
     },
 };
 
-/** A focused task: Back and Next split 50/50 across the bar, 48 high. */
-export const PlacementFocused = {
-    name: 'Placement: In a focused task',
-    render: () => staged(<FocusedBar />),
+/** A multi-step task: Save and exit at the start, Back and Next at the end, on one 32 line in a 48 footer. */
+export const PlacementMultiStep = {
+    name: 'Placement: In a multi-step task',
+    render: () => staged(<MultiStepBar />, TASK_STAGE),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
@@ -136,11 +136,14 @@ export const PlacementFocused = {
         const back = canvas.getByRole('button', { name: 'Back' });
         const next = canvas.getByRole('button', { name: 'Next' });
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
-        await expect(rect(back).left, 'Back starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
-        await expect(rect(back).right, 'Back ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
-        await expect(rect(next).left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
-        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
-        await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
+        const save = canvas.getByRole('button', { name: 'Save and exit' });
+        await expect(rect(save).left, 'Save and exit starts the line').toBeLessThan(rect(back).left);
+        await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
+        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
+        await expect(rect(back).height, 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(rect(save).height, 'Save and exit is on the same 32 line').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(rect(save).top, 'one line: Save and exit and Back share a top').toBeCloseTo(rect(back).top, 0);
+        await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await userEvent.click(back);
         await waitFor(() => expect(back, 'Back disables on the first step').toBeDisabled());
         await userEvent.click(next);

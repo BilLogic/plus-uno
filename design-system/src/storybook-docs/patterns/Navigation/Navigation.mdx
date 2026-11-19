@@ -74,7 +74,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary in its Section's title row." />
 
-<ComponentExample of={NavigationStories.KeyFocusedTask} title="A focused task" description={<>A long task leaves the Sidebar: Close at the start of the title row, no breadcrumb, the steps down the left from five. Its layout is on <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>.</>} />
+<ComponentExample of={NavigationStories.KeyMultiStepTask} title="A multi-step task" description={<>A long task swaps the Sidebar's rows for its steps: Back at the top returns, no breadcrumb. Its layout is on <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>.</>} />
 
 </div>
 
@@ -98,7 +98,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 ## Usage
 
-Choose the navigation tier first; it sets the control, placement and motion. Navigation belongs in the Sidebar and page. There is no Topbar or global search.
+Choose the navigation tier first; it sets the control, placement and motion. Navigation belongs in the Sidebar and page. There is no global search.
 
 <DocsTable>
 <thead>
@@ -151,7 +151,7 @@ Least room to most. Pick the lowest step that fits. The picture is on <a target=
 
 <RuleTag kind="automatic" />
 
-Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned <PlannedTag />.
+Never on an area page or a multi-step task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned <PlannedTag />.
 
 <DoDontPair
     doExample={<BreadcrumbCase record />}
@@ -191,11 +191,11 @@ Only the selected indicator glides. Nothing slides between views.
 
 Expand the row, then Section detail, then the Details Panel, then a Modal, then its own page. Section detail and the Details Panel both stay: Section detail expands in place (see <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>), and the Details Panel docks beside the list on a queue page or opens from a table.
 
-### Give a long task its own focused Frame.
+### Give a long task its steps in the inner sidebar.
 
 <RuleTag kind="automatic" />
 
-Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, the title row and the bar sit is on <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>.
+The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. How the steps, the page and the footer sit is on <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>.
 
 ### Name an open item by when and who.
 
@@ -244,7 +244,7 @@ Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, t
 - The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
 - Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
 - The breadcrumb is a `nav` around an `ol`; the last item is plain text with `aria-current="page"`.
-- Leaving a focused task returns focus to the control that opened it <PlannedTag />.
+- Leaving a multi-step task returns focus to the control that opened it <PlannedTag />.
 
 </div>
 

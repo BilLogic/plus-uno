@@ -5,8 +5,7 @@ import { HERO_SIDEBAR_W } from './HeroDrawing.jsx';
 
 /**
  * The app frame as the real Frame lays it out: a window holding a docked Sidebar
- * on the sunken fill, the Page on the page surface running the full height (the
- * Frame has no top bar), and an optional docked Panel at a hairline. The parts
+ * on the sunken fill, the Page on the page surface running the full height, and an optional docked Panel at a hairline. The parts
  * are clipped to the window's corners, so the window's one radius rounds
  * whichever part reaches a corner. `ring` is the accent around the whole window.
  */

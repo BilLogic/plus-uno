@@ -42,8 +42,8 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --pad-y-md  /* Vertical padding inside a default control: a Button, a field, a menu item. */
 --pad-y-sm  /* Vertical padding inside a compact control, such as a compact Button or a Sidebar tab. */
 --radius-control-lg  /* Corner rounding for a control 40px high: a default field. */
---radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row. */
---radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row. */
+--radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row, a Sidebar row. */
+--radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip. */
 --radius-lg  /* Corner rounding for larger containers that are not a template, such as a tile or image. */
 --radius-md  /* Corner rounding for controls and small containers. */
 --radius-sm  /* Corner rounding for small marks: a checkbox, a small tag. */
@@ -89,8 +89,6 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
 --frame-sidebar-row-radius  /* Corner rounding of a Sidebar row. */
 --frame-sidebar-width  /* Width of the Frame's Sidebar at the current breakpoint. */
---frame-sidebar-width-nav  /* Fixed width of the side navigation inside the Frame. */
---frame-topbar-height  /* Height of the Frame's top bar. */
 --modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
@@ -264,7 +262,7 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
 --layer-modal  /* Stacking order of a Modal, above its Blanket. */
---layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
+--layer-navigation  /* Stacking order of the Frame's Sidebar and Panel. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
 --layer-tooltip  /* Stacking order of a Tooltip, above everything else. */
@@ -391,20 +389,12 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --dropdown-menu-pad  /* Padding inside a DropdownMenu or listbox. */
 --flag-stack  /* Vertical gap between stacked Flags. */
 --flag-width  /* Width of a Flag. */
---focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
---focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
---focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */
---focused-page-pad-y  /* Vertical padding of a focused page. */
---focused-page-stack-lg  /* Vertical gap between a focused page's header, body and actions. */
---focused-page-stack-md  /* Vertical gap between blocks on a focused page. */
---focused-page-stack-sm  /* Vertical gap between a focused page's title and its description. */
 --layer-frame-blanket
 --layer-frame-docked-edge
 --layer-frame-edge
 --layer-frame-panel-peek
 --layer-frame-sidebar
 --layer-frame-splitter
---layer-frame-topbar-start
 --modal-inline-lg  /* Horizontal gap between columns in a Modal. */
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
@@ -906,6 +896,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-input  /* Borders of form UI elements, such as text fields, checkboxes, and radio buttons */
 --ds-border-input-search  /* The border of search inputs */
 --ds-border-inverse  /* Borders on bold backgrounds */
+--ds-border-material  /* The 1px edge of a floating surface that wears material. Forced colors keep it. */
 --ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
 --ds-border-success  /* Borders communicating a favorable outcome, such as the borders on validated text fields */
 --ds-border-success-subtle  /* Decorative success borders that do not need to meet 3:1 contrast requirements */
@@ -972,6 +963,9 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-skeleton  /* Skeleton loading states */
 --ds-surface  /* The primary background for the UI */
 --ds-surface-hovered
+--ds-surface-material-control  /* A floating button, search or toolbar. Transparency only, no blur; solid under reduced transparency and increased contrast. */
+--ds-surface-material-media  /* A control or tag over an image or video. Transparency only, no blur; solid under reduced transparency and increased contrast. */
+--ds-surface-material-overlay  /* The ground of a floating Sidebar, a floating Panel and the Modal. Transparency only, no blur; solid under reduced transparency and increased contrast. */
 --ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered
 --ds-surface-overlay-pressed
@@ -1207,6 +1201,9 @@ The ramps the `--ds-` tokens alias. Never name one in a component; a plan swap c
 --palette-orange-800
 --palette-orange-850
 --palette-orange-900
+--palette-overlay-alpha-50
+--palette-overlay-alpha-72
+--palette-overlay-alpha-94
 --palette-purple-100
 --palette-purple-1000
 --palette-purple-1100
@@ -1250,6 +1247,10 @@ The ramps the `--ds-` tokens alias. Never name one in a component; a plan swap c
 --palette-teal-800
 --palette-teal-850
 --palette-teal-900
+--palette-white-alpha-14
+--palette-white-alpha-50
+--palette-white-alpha-74
+--palette-white-alpha-94
 --palette-yellow-100
 --palette-yellow-1000
 --palette-yellow-1100

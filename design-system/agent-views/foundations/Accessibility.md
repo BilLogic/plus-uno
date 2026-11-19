@@ -16,7 +16,7 @@ Each foundation page owns the rules for its subject: contrast in [Color](?path=/
 
 ## Heading levels
 
-Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the topbar still has an `h1`, hidden visually with `VisuallyHidden` (never `display: none`). [Typography](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels) and [Page](?path=/docs/templates-page--docs) own the outline rules.
+Every page's outline starts with one `h1`, and a heading's tag is its place in the outline, never its size. A page whose name sits only in the Sidebar or a tab strip still has an `h1`, hidden visually with `VisuallyHidden` (never `display: none`). [Typography](?path=/docs/foundations-visual-typography--docs#foundation-heading-levels) and [Page](?path=/docs/templates-page--docs) own the outline rules.
 
 ## Contrast
 

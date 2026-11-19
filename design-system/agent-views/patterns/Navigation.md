@@ -21,7 +21,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 ## Usage
 
-Choose the navigation tier first; it sets the control, placement and motion. Navigation belongs in the Sidebar and page. There is no Topbar or global search.
+Choose the navigation tier first; it sets the control, placement and motion. Navigation belongs in the Sidebar and page. There is no global search.
 
 | Tier | The move | Control | Motion |
 | --- | --- | --- | --- |
@@ -65,7 +65,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 - The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
 - Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
 - The breadcrumb is a `nav` around an `ol`; the last item is plain text with `aria-current="page"`.
-- Leaving a focused task returns focus to the control that opened it .
+- Leaving a multi-step task returns focus to the control that opened it .
 
 ## Related
 
@@ -95,7 +95,7 @@ Navigation reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned .
+Never on an area page or a multi-step task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned .
 
 Do: A breadcrumb on the record page, parents only.
 Don't: A breadcrumb on an area page: there is nothing to climb out of.
@@ -127,11 +127,11 @@ Only the selected indicator glides. Nothing slides between views.
 
 Expand the row, then Section detail, then the Details Panel, then a Modal, then its own page. Section detail and the Details Panel both stay: Section detail expands in place (see Section), and the Details Panel docks beside the list on a queue page or opens from a table.
 
-### Give a long task its own focused Frame. {#give-a-long-task-its-own-focused-frame}
+### Give a long task its steps in the inner sidebar. {#give-a-long-task-its-steps-in-the-inner-sidebar}
 
 **Checked:** Automatic
 
-Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, the title row and the bar sit is on Frame.
+The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. How the steps, the page and the footer sit is on Frame.
 
 ### Name an open item by when and who. {#name-an-open-item-by-when-and-who}
 

@@ -54,7 +54,7 @@ Don't: A bare verb leaves the scope unsaid, and the label is hidden.
 
 ### Pass compact in a bar. {#pass-compact-in-a-bar}
 
-A view bar or top bar holds 32-high controls, so pass `spacing="compact"`.
+A view bar holds 32-high controls, so pass `spacing="compact"`.
 
 ### Collapse only where the bar is tight. {#collapse-only-where-the-bar-is-tight}
 

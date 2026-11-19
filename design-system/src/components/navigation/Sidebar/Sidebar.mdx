@@ -38,8 +38,8 @@ The Sidebar, the app's side navigation: the logo row, the groups with their sect
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar"
-/>
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Sidebar"
+    />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
@@ -66,6 +66,12 @@ The Sidebar, the app's side navigation: the logo row, the groups with their sect
 <ComponentExample of={SidebarStories.TabsFew} title="A few tabs" description="Each open tab sits under its row on the thread, and only the last one turns." />
 
 <ComponentExample of={SidebarStories.TabsMany} title="Many tabs" description="Three tabs show, then Show n more, which takes the turn." />
+
+<ComponentExample of={SidebarStories.InnerSidebar} title="Inner sidebar" description="A record with stages (a session) or a multi-step task swaps the Sidebar's content: one full-width Back button with the area name centered, an optional context dropdown, then text-only rows." />
+
+<ComponentExample of={SidebarStories.InnerTaskOpenRow} title="Open row" description="Back shows the main Sidebar. What you left sits as one open row under its area, a task under Home with its progress. The page stays put." />
+
+<ComponentExample of={SidebarStories.InnerStepsDoneAndOff} title="Steps of a task" description="A done step ticks and stays pressable; a step past your answers is dimmed, does nothing, and says why in a tooltip. The layout around it is on Frame." />
 
 <ComponentExample of={SidebarStories.AccountRow} title="Account row" description="The initials avatar, the first name and the role open the account menu, beside Help Center." />
 
@@ -117,6 +123,12 @@ rail from the role's config (`user`), and a prototype passes `groups` to add
 or override its own areas by `id` while keeping the role's navigation. The
 Frame decides whether it docks, collapses or floats; this page covers what is
 inside it.
+
+A record with stages (a session) or a multi-step task swaps the Sidebar's
+content for an **inner sidebar**: pass `inner` (`areaLabel`, `rows`, and an
+optional `switcher`) and `onBack`. Only the content swaps; the logo row, the
+account row and the page stay where they are. A record without stages, such as
+a student, keeps the main Sidebar with a breadcrumb.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes
 the URL: the caller handles `onSelect` and decides which groups a role sees.
@@ -173,7 +185,7 @@ The Sidebar's width, 240, belongs to the Frame: see <a href="?path=/docs/templat
 </thead>
 <tbody>
 <tr><td>Pad</td><td>12: <code>--frame-sidebar-pad</code>.</td></tr>
-<tr><td>Row</td><td>32: <code>--control-md</code>; radius 6: <code>--frame-sidebar-row-radius</code>; 2 apart: <code>--frame-sidebar-row-gap</code>.</td></tr>
+<tr><td>Row</td><td>32: <code>--control-md</code>; radius 8: <code>--frame-sidebar-row-radius</code>; 2 apart: <code>--frame-sidebar-row-gap</code>.</td></tr>
 <tr><td>Groups</td><td>16 apart: <code>--frame-sidebar-group-gap</code>.</td></tr>
 <tr><td>Row text and icon</td><td><code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code>, at <code>--body-default</code>.</td></tr>
 <tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code>.</td></tr>
@@ -266,6 +278,8 @@ Past three open tabs the rest go behind Show n more. The Sidebar does this for y
 - Delete or Backspace closes the focused tab, and focus moves to the next tab, else the one before it, else the tab's row.
 - The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.
 - The account button is named by the person's name and role, then "account menu".
+- In the inner sidebar, focus lands on Back when it opens and returns to the open row when Back closes it. Back, then the context dropdown, then each row are reached with Tab; Enter picks a row.
+- The swap slides 12 and fades. With reduced motion it only fades.
 
 </div>
 

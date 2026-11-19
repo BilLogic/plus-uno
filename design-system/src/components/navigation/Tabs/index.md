@@ -8,7 +8,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Import:** `import { Tabs } from '@/components';`
 
-**Used in:** Modal (`ds guide modal`); Page (`ds guide page`); Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`)
 
 **Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 

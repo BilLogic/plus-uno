@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, FocusedNoSidebar, FocusedWithSidebar } from './FrameCases.jsx';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
 import { CODE } from './FrameCaseCode.js';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
@@ -24,26 +24,27 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const frameMdx = readFileSync(join(__dirname, 'Frame.mdx'), 'utf8');
 
 describe('Frame live cases', () => {
-    it('BarInOrder renders Back and Next in FooterActions without Cancel', () => {
+    it('BarInOrder renders Save and exit, Back and Next in FooterActions without Cancel', () => {
         render(<BarInOrder />);
+        expect(screen.getByRole('button', { name: 'Save and exit' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
     });
 
-    it('BarScrambled renders the anti-pattern Cancel beside Back and Next', () => {
+    it('BarScrambled renders the anti-pattern Cancel beside Save and exit and Next', () => {
         render(<BarScrambled />);
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save and exit' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
     });
 
     it.each([
-        ['FocusedNoSidebar', FocusedNoSidebar, false],
-        ['FocusedWithSidebar', FocusedWithSidebar, true],
+        ['MultiStepInnerSidebar', MultiStepInnerSidebar, true],
+        ['MultiStepStepsInPage', MultiStepStepsInPage, true],
         ['BareColumn', BareColumn, false],
         ['BareWithSidebar', BareWithSidebar, true],
-    ])('%s renders a live Frame, with a Sidebar only when it is the don\'t', (_name, Example, withSidebar) => {
+    ])('%s renders a live Frame, with its Sidebar', (_name, Example, withSidebar) => {
         const { container } = render(<Example />);
         expect(container.querySelector('.plus-frame')).not.toBeNull();
         expect(Boolean(container.querySelector('.plus-frame__sidebar'))).toBe(withSidebar);
@@ -56,7 +57,7 @@ describe('Frame live cases', () => {
     });
 
     it('has Show code source for every live pair in Frame.mdx', () => {
-        ['BarInOrder', 'BarScrambled', 'FocusedNoSidebar', 'FocusedWithSidebar', 'AiPanelDocked', 'AiPanelFloating', 'BareColumn', 'BareWithSidebar']
+        ['BarInOrder', 'BarScrambled', 'MultiStepInnerSidebar', 'MultiStepStepsInPage', 'AiPanelDocked', 'AiPanelFloating', 'BareColumn', 'BareWithSidebar']
             .forEach((key) => expect(CODE[key].length).toBeGreaterThan(20));
     });
 

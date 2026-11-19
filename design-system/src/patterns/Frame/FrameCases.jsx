@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Button, FooterActions, Logo, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import { Button, FooterActions, Logo, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
+import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { FocusedTask, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { MultiStepTaskType, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
@@ -12,23 +12,22 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
  * `FooterActions` and `Button`.
  */
 
-/** Back and the primary Next split the bar; Close in the title row leaves the task. */
+/** Save and exit at the start; Back and the primary Next at the end, on one 32 line. */
 export const BarInOrder = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions>
-            <Button text="Back" onClick={() => {}} />
-            <Button text="Next" appearance="primary" onClick={() => {}} />
+        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+            <Button text="Back" spacing="default" onClick={() => {}} />
+            <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
     </CaseSurface>
 );
 
-/** Cancel repeated in the bar beside Back and Next: two ways out of one task. */
+/** Cancel repeated in the footer beside Save and exit: two ways out of one task. */
 export const BarScrambled = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions>
-            <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-            <Button text="Back" onClick={() => {}} />
-            <Button text="Next" appearance="primary" onClick={() => {}} />
+        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+            <Button text="Cancel" spacing="default" onClick={() => {}} />
+            <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
     </CaseSurface>
 );
@@ -40,22 +39,26 @@ const PANEL_STAGE = 1440; // docs-literal: the X-Large stage
 
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
-const FocusedWindow = ({ withSidebar }) => (
+/** One task: the steps are the Sidebar's inner rows, so the Page holds only the task. */
+export const MultiStepInnerSidebar = () => <MultiStepTaskType />;
+
+const STEP_LABELS = ['Student', 'Schedule', 'Goals'];
+
+/** The steps drawn again in the Page, beside a Sidebar that still lists the main areas: two lists for one task. */
+export const MultiStepStepsInPage = () => (
     <FitStage width={DOCKED_STAGE} reflow={false}>
         <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
-            <FocusedTask
-                count={5}
-                {...(withSidebar ? { sidebar: <Sidebar user="tutor" activeTabId="home" account={ACCOUNT} /> } : {})}
-            />
+            <div style={{ height: '100%' }}>
+                <Frame surfaceDirect sidebar={<Sidebar user="tutor" activeTabId="home" account={ACCOUNT} />}>
+                    <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', padding: 'var(--page-pad)' }}>
+                        <ProgressTracker label="Steps" orientation="vertical" items={stepItems(STEP_LABELS, 1, () => {})} />
+                        <Skeleton preset="text" lines={4} />
+                    </div>
+                </Frame>
+            </div>
         </BrowserWindow>
     </FitStage>
 );
-
-/** The task fills the window: no Sidebar, nothing to invite the person away. */
-export const FocusedNoSidebar = () => <FocusedWindow />;
-
-/** The Sidebar left docked beside a focused task, one click from leaving it. */
-export const FocusedWithSidebar = () => <FocusedWindow withSidebar />;
 
 const RowsBehind = () => (
     <PatternSection title="Upcoming sessions">

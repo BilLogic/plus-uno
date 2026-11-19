@@ -2,7 +2,7 @@
 
 # FooterActions
 
-FooterActions — 4-track footer layout for Modal, Panel and Focused view. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
+FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
 
 **Import:** `import { FooterActions } from '@/components';`
 
@@ -14,7 +14,7 @@ FooterActions — 4-track footer layout for Modal, Panel and Focused view. Divid
 
 ## Usage
 
-Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the focused view to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
 
 1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks separated by `--inline-md`; every filled track button is cloned with `spacing="spacious"` (`48` high) and `shouldFitContainer`.
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
@@ -22,7 +22,7 @@ Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the focused view to 
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
 5. **Leading action.** A leading text, `link` or `subtle` action (or a link with `href`) hugs the left content edge only when it is the first child (of two or more) or is passed as `leadingAction`. A `danger` first child of two or more is also treated as leading, rendered in danger text ink on a subtle background. Filled actions then sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
-7. **No Cancel in footers.** `Modal`, `Panel` and the focused view already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
+7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
 
 ### Hug or fill
@@ -71,7 +71,7 @@ Don't: Danger placed first of two becomes a leading text action instead of the p
 
 ### Omit Cancel when the corner close button dismisses. {#omit-cancel-when-the-corner-close-button-dismisses}
 
-`Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
+`Modal` and `Panel` already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
 
 Do: Real verbs split equally across both halves of the footer.
 Don't: Default-height hugging buttons and a Cancel label that duplicates the corner close button.

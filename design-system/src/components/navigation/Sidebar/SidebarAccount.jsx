@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-    Avatar,
-    ButtonItem,
-    DropdownMenu,
-    Icon,
-    IconButton,
-    LinkIconButton,
-    Section,
-    initialsOf,
-} from '@/components';
+import Avatar, { initialsOf } from '../../images-and-icons/Avatar';
+import DropdownMenu, { ButtonItem, Section } from '../../forms-and-inputs/DropdownMenu';
+import Icon from '../../images-and-icons/Icon';
+import IconButton from '../../forms-and-inputs/IconButton';
+import LinkIconButton from '../../forms-and-inputs/LinkIconButton';
 
 /** The one-word roles the account row shows. */
 export const ACCOUNT_ROLES = ['Tutor', 'Lead', 'Admin'];

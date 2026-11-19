@@ -12,7 +12,7 @@ Arrange components by filling a template's slots. Use patterns to guide the choi
 
 Templates run from broadest to smallest. Each page covers types, anatomy, key states and usage. See Templates and patterns below for how the layers fit together.
 
-- **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.
+- **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare.
 - **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
 - **Section.** A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.
 - **Card.** A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.
@@ -42,7 +42,7 @@ The step up from a quick look to its own page is under Opening a record, below. 
 
 ### Frame, Screen, Flow
 
-- **Frame:** the template. Sidebar, Page and the AI panel slot, in its default, focused and bare types.
+- **Frame:** the template. Sidebar, Page and the AI panel slot, in its default and bare types; a multi-step task runs in its inner sidebar.
 - **Screen:** a Frame with its slots filled for one page. Screens are documented under Flows in Figma.
 - **Flow:** Screens in order, fulfilling one user story. Flows are documented under Flows in Figma as well.
 
@@ -58,7 +58,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Dialog`, `Button` |
-| A long task with steps | Frame · focused, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
+| A long task with steps | Frame multi-step task, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
 | Settings saved as a group | Form in a page, on the Page under its page-level header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
 | Signing in | Frame · bare | Forms · Errors | `Logo`, `TextField`, `Button` |
@@ -69,7 +69,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 
 One chooser for the four layers that take over from the page or sit above it. A filled dot means the layer is built for it.
 
-| The task… | Frame · focused | Modal | Panel | Popup |
+| The task… | Frame · multi-step | Modal | Panel | Popup |
 | --- | --- | --- | --- | --- |
 | blocks the page until it is done | Yes | Yes | No | No |
 | keeps the page in view and usable | No | No | Yes | Yes |
@@ -82,7 +82,7 @@ One chooser for the four layers that take over from the page or sit above it. A 
 | has its own URL | Yes | No | No | No |
 | closes on Escape and returns focus | No | Yes | Yes | Yes |
 
-A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close, and unsaved work asks first, in a Modal.
+A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a multi-step task goes through Save and exit, and unsaved work asks first, in a Modal.
 
 ## Opening a record
 

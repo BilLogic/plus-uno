@@ -64,3 +64,14 @@ describe('Panel', () => {
         expect(() => render(<Probe />)).toThrow('usePanelManager must be used within a PanelProvider');
     });
 });
+
+describe('Panel barrel', () => {
+    it('is exported once, from the patterns barrel, and not from the components barrel', async () => {
+        const patterns = await import('@/patterns');
+        const components = await import('@/components');
+        expect(patterns.PanelContainer).toBe(patterns.Panel);
+        expect(patterns.PanelHeader).toBeTypeOf('function');
+        expect(components.Panel).toBeUndefined();
+        expect(components.PanelContainer).toBeUndefined();
+    });
+});

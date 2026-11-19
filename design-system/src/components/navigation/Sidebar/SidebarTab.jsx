@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './SidebarTab.scss';
-import { Icon } from '@/components';
+import Icon from '../../images-and-icons/Icon';
 
 /**
  * SidebarTab Component

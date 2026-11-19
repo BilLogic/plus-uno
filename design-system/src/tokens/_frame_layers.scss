@@ -64,20 +64,11 @@
     --tooltip-pad-y: var(--space-025);
     --tooltip-max-width: var(--width-1500);
     --popup-gap-screen: var(--space-050);
-    /* Focused page */
-    --focused-page-pad-x: var(--space-050);
-    --focused-page-pad-y: var(--space-050);
-    --focused-page-stack-sm: var(--space-050);
-    --focused-page-stack-md: var(--space-100);
-    --focused-page-stack-lg: var(--space-150);
-    --focused-page-inline-sm: var(--space-050);
-    --focused-page-inline-md: var(--space-075);
 
     /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
     --popup-offset: var(--space-025); /* gap from a Popup to its trigger */
     --layer-frame-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
     --layer-frame-sidebar: var(--layer-navigation); /* the raised Sidebar */
-    --layer-frame-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
     --layer-frame-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
     --layer-frame-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
     --layer-frame-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */

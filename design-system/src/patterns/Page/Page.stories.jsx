@@ -6,7 +6,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SlideViews } from '@/lib/navigationMotion';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { ScreenStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import {
     CardsSection,

@@ -357,24 +357,10 @@
       "name": "spacing / templates",
       "variables": [
         {
-          "name": "Frame/topbar-height",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--frame-topbar-height)"
-          }
-        },
-        {
           "name": "Frame/sidebar-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--frame-sidebar-width)"
-          }
-        },
-        {
-          "name": "Frame/sidebar-width-nav",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--frame-sidebar-width-nav)"
           }
         },
         {

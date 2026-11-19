@@ -4,7 +4,7 @@
 
 A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
-Import the Panel component from `@/components`. This template documents its layout within the Frame.
+Import the Panel and its parts from `@/patterns`. This template documents the parts and its layout within the Frame.
 
 **Kind:** Template
 
@@ -40,7 +40,7 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
 ## Key states
 
@@ -54,7 +54,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 | --- | --- | --- |
 | `--panel-width-default` | 400 | The width a Panel opens at. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
-| `--ds-surface-overlay`, `--ds-shadow-overlay` | pair | The floating Panel's fill and elevation. A docked Panel uses `--ds-surface` and an edge line. |
+| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
 | `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
 
 The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
@@ -62,8 +62,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/patterns';
 ```
 
 The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
@@ -88,7 +87,36 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - For a decision that must happen before the page continues, use `Modal`.
 - For a queue page, use `Panel` docked beside the list; the record opens on demand.
 - For a short aside off a control, use `Popup`.
-- For complex or multistep work, give the record its own page with `Frame` · focused.
+- For complex or multistep work, give the record its own page with a multi-step task on `Frame`.
+
+## Parts
+
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default`; inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (`PanelCloseAction`, `PanelMoreAction`).
+3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
+4. **Body** (`PanelBody`). The main content, which scrolls.
+5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The page ground with a leading edge. |
+| Hovered | Nothing changes on the panel. |
+| Pressed | Nothing changes on the panel. |
+| Focused | Not focusable. Focus goes to the fixed actions and the content. |
+| Disabled | A panel has no disabled state. Disable the controls in it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ground and edge | `--ds-surface`; `--ds-border` at `--border-width-default` on the leading edge. |
+| Header | Padding `--panel-pad-y` and `--panel-pad`; `--panel-inline-md` between its parts; `--border-width-default` rule below. |
+| Action group | `--panel-inline-sm` between actions. |
+| Subheader | Padding `--panel-subheader-pad-y` and `--panel-pad`; `--border-width-default` rule below. |
+| Body | Padding `--panel-pad`. |
+| Footer | Padding `--panel-pad-y` and `--panel-pad`, `--panel-inline-lg` between its parts; rule above; disclaimer in `--body-sm`, `--ds-text-subtle`. |
 
 ## Content guidelines
 
@@ -97,6 +125,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 | Title Details with the record: "Ana Ruiz · Thu 4:00 PM". | "Details". |
 | Name the filter by what it keeps: "Unread". | "Filter". |
 | Give the empty state a way back: "Back to sessions". | "Nothing here". |
+| Keep the disclaimer to one line. | Put instructions in the footer that belong in the body. |
 | Name the footer's actions: "Discard" and "Save". | "OK" and "Done". |
 
 ## Accessibility
@@ -105,6 +134,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - Escape closes the Panel unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
+- **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.
 
 ## Related
@@ -185,6 +215,42 @@ If the person must not look at anything outside it, it is a Modal.
 **Checked:** Review
 
 Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
+
+### Give the Panel room to read. {#give-the-panel-room-to-read}
+
+**Checked:** Review
+
+Below its default width the title wraps and the body stops being scannable.
+
+Do: Default width.
+Don't: Squeezed to a narrow strip.
+
+### Keep the header to one cue. {#keep-the-header-to-one-cue}
+
+**Checked:** Review
+
+An icon, a back action and a subheader together bury the title; pick the one the task needs.
+
+### Share one width across a page's Panels with `PanelProvider`. {#share-one-width-across-a-page-s-panels-with-panelprovider}
+
+**Checked:** Review
+
+Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own.
+
+```jsx
+<PanelProvider>
+    <PanelContainer>
+        <PanelHeader title="Student detail" actions={<PanelCloseAction onClick={close} />} />
+        <PanelBody>...</PanelBody>
+    </PanelContainer>
+</PanelProvider>
+```
+
+### Reach for the fixed action components before building your own. {#reach-for-the-fixed-action-components-before-building-your-own}
+
+**Checked:** Review
+
+`PanelBackAction`, `PanelCloseAction` and the rest already carry the right icon, label and compact spacing; a custom `IconButton` for the same job risks a different icon or label than the rest of the system uses.
 
 ### Title the Panel with the object. {#title-the-panel-with-the-object}
 

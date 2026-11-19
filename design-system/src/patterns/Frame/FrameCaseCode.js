@@ -16,27 +16,22 @@ const BAR = (cancel) => `<CaseSurface border="top" padding="sm">
 export const CODE = {
     BarInOrder: BAR(false),
     BarScrambled: BAR(true),
-    FocusedNoSidebar: WINDOW('app.plus.org/terms/new', `    <Frame
-        header={<><IconButton icon="xmark" label="Close" /><h1>Plan a tutoring term</h1></>}
-        width="reading"
+    MultiStepInnerSidebar: WINDOW('app.plus.org/terms/new', `    <Frame
+        surfaceDirect
+        sidebarDocked
+        sidebar={<Sidebar user="tutor" account={account} activeId="schedule" inner={{ areaLabel: 'Home', rows, label: 'Steps' }} onBack={leave} />}
     >
+        <h1>Plan a tutoring term</h1>
+        {stepBody}
+        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" />}>
+            <Button text="Back" />
+            <Button text="Next" appearance="primary" />
+        </FooterActions>
+    </Frame>`),
+    MultiStepStepsInPage: WINDOW('app.plus.org/terms/new', `    <Frame surfaceDirect sidebar={${SIDEBAR}}>
         <ProgressTracker label="Steps" orientation="vertical" items={steps} />
-    </Frame>
-    <FooterActions>
-        <Button text="Back" />
-        <Button text="Next" appearance="primary" />
-    </FooterActions>`),
-    FocusedWithSidebar: WINDOW('app.plus.org/terms/new', `    <Frame
-        sidebar={${SIDEBAR}}
-        header={<><IconButton icon="xmark" label="Close" /><h1>Plan a tutoring term</h1></>}
-        width="reading"
-    >
-        <ProgressTracker label="Steps" orientation="vertical" items={steps} />
-    </Frame>
-    <FooterActions>
-        <Button text="Back" />
-        <Button text="Next" appearance="primary" />
-    </FooterActions>`),
+        <Skeleton preset="text" lines={4} />
+    </Frame>`),
     AiPanelDocked: WINDOW('app.plus.org/dashboard', `    <Frame sidebar={${SIDEBAR}} panel={<AskPanel />} panelOpen panelLabel="AI chat">
         <PatternSection title="Upcoming sessions">
             <Skeleton preset="text" lines={6} />

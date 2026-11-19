@@ -26,7 +26,7 @@ const trackListFor = (count, { hasLeading }) => {
 };
 
 /**
- * FooterActions — 4-track footer layout for Modal, Panel and Focused view.
+ * FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer.
  *
  * Divides the footer into 4 equal tracks separated by `--inline-md`. Every
  * filled action button is cloned at `spacing="spacious"` (48) with

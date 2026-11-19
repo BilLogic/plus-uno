@@ -202,6 +202,18 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   overrides['color.icon.warning.inverse'] = [N(1100), null, N(0), null, 'Full ink, as text.warning.inverse.'];
 
   const ADDITIONS = [ // [name, light, dark, light IC, dark IC, use, why]
+    ['elevation.surface.material.media', ref('whiteAlpha', 50), ref('overlayAlpha', 50), N(0), D(250),
+      'A control or tag over an image or video. Transparency only, no blur; solid under reduced transparency and increased contrast.',
+      'PLUS addition: floating material. Increased contrast and reduced transparency fall back to the solid surface.overlay.'],
+    ['elevation.surface.material.control', ref('whiteAlpha', 74), ref('overlayAlpha', 72), N(0), D(250),
+      'A floating button, search or toolbar. Transparency only, no blur; solid under reduced transparency and increased contrast.',
+      'PLUS addition: floating material. Increased contrast and reduced transparency fall back to the solid surface.overlay.'],
+    ['elevation.surface.material.overlay', ref('whiteAlpha', 94), ref('overlayAlpha', 94), N(0), D(250),
+      'The ground of a floating Sidebar, a floating Panel and the Modal. Transparency only, no blur; solid under reduced transparency and increased contrast.',
+      'PLUS addition: floating material, named for the layer it paints (Panel is a template). Increased contrast and reduced transparency fall back to the solid surface.overlay.'],
+    ['color.border.material', N(0), ref('whiteAlpha', 14), NA(49), DA(50),
+      'The 1px edge of a floating surface that wears material. Forced colors keep it.',
+      'PLUS addition: paired with elevation.surface.material.*.'],
     ['color.interaction.dragged', NA(16), DA(16), null, null, 'Overlay on an item while it is dragged.', 'PLUS addition: the 16% step of the state-layer ruling.'],
     ['color.interaction.inverse.hovered', DA(8), NA(8), null, null,
       'Hover overlay on a dark or colored ground (close buttons on toasts, chips on bold fills).', "PLUS addition: today's surface-state on dark grounds has no Atlassian equivalent."],

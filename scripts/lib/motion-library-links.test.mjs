@@ -9,7 +9,7 @@ import { deriveMotionLibraryLinks, deriveMotionLibraryLinksFromPages } from './m
 
 const REGISTRY = [
   { name: 'Panel', tier: 'template', events: { enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow' } } },
-  { name: 'Panel', tier: 'component', events: { enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow' } } },
+  { name: 'Carousel', tier: 'component', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } },
   { name: 'Blanket', tier: 'template', events: { enter: { transition: 'Open and close an overlay', appearance: 'appearance.default' } } },
   { name: 'PatternModal', tier: 'template', events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.default' } } },
   { name: 'Filtering', tier: 'pattern', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } },
@@ -25,10 +25,10 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
       source: ['<Meta title="Templates/Panel" />', '', '## Motion', '', '<MotionSection component="Panel" tier="template" />', ''].join('\n'),
     },
     {
-      file: 'design-system/src/components/layout-and-structure/Panel/Panel.mdx',
-      docsId: 'components-layout-and-structure-panel--docs',
+      file: 'design-system/src/components/layout-and-structure/Carousel/Carousel.mdx',
+      docsId: 'components-layout-and-structure-carousel--docs',
       source: [
-        '<Meta of={PanelStories} />',
+        '<Meta of={CarouselStories} />',
         '',
         '## Motion',
         '',
@@ -36,7 +36,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
         '<MotionSection component="Unpaged" />',
         '```',
         '',
-        '<MotionSection component="Panel" />',
+        '<MotionSection component="Carousel" />',
         '',
       ].join('\n'),
     },
@@ -60,7 +60,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
 
   const links = deriveMotionLibraryLinksFromPages(pages, REGISTRY);
   assert.deepEqual(links, {
-    'component:Panel': '?path=/docs/components-layout-and-structure-panel--docs#motion',
+    'component:Carousel': '?path=/docs/components-layout-and-structure-carousel--docs#motion',
     'pattern:Filtering': '?path=/docs/patterns-filtering--docs#custom-motion',
     'template:Blanket': '?path=/docs/templates-modal--docs#blanket-motion',
     'template:Panel': '?path=/docs/templates-panel--docs#motion',
@@ -95,9 +95,9 @@ test('deriveMotionLibraryLinks resolves <Meta of={...}> and <Meta title="..."> f
   });
 });
 
-test('live repo links match all 79 MotionSection tags across the 78 docs pages', () => {
+test('live repo links match all 78 MotionSection tags across the 77 docs pages', () => {
   const links = deriveMotionLibraryLinks();
-  assert.equal(Object.keys(links).length, 79);
+  assert.equal(Object.keys(links).length, 78);
   assert.equal(links['template:Blanket'], '?path=/docs/templates-modal--docs#blanket-motion');
   assert.equal(links['template:Modal'], '?path=/docs/templates-modal--docs#motion');
 });

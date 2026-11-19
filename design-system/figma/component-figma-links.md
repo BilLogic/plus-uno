@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-57 docs-page links + 65 style/variant entries across 62 components.
+56 docs-page links + 64 style/variant entries across 61 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -43,7 +43,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Object | `20630:28` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-28) |
 | Components | PageHeader | `20455:2827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2827) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
-| Components | Panel | `20630:44` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-44) |
 | Components | Popup | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
 | Components | ProgressBar | `3497:19483` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19483) |
 | Components | Radio | `14876:12005` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005) |
@@ -53,6 +52,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | RichTextEditor | `9662:17308` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308) |
 | Components | ScrollBar | `13717:87300` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13717-87300) |
 | Components | SectionMessage | `3496:1444` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444) |
+| Components | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) |
 | Components | Skeleton | `20455:854` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-854) |
 | Components | Spinner | `20455:56` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-56) |
 | Components | Spotlight | `20630:66` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-66) |
@@ -70,7 +70,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Tooltip | `3497:19486` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486) |
 | Components | TreeTable | `19685:27043` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043) |
 | Other | Logo | `19592:515` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-515) |
-| Other | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) |
 
 ## Styles / variants
 
@@ -111,7 +110,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Object | Object | `20630:40` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40) | verified |
 | Components | PageHeader | Page header | `20622:81` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20622-81) | verified |
 | Components | Pagination | Pagination | `20095:11283` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11283) | verified |
-| Components | Panel | Panel | `20630:52` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-52) | verified |
 | Components | Popup | Popup | `20871:3153` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3153) | verified |
 | Components | ProgressBar | _Progress Bar | `20095:7780` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7780) | verified |
 | Components | ProgressBar | Progress bar | `20117:5127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127) | verified |
@@ -124,6 +122,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | ScrollBar | Scrollbar | `20095:7615` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7615) | verified |
 | Components | SectionMessage | Section message | `20967:3641` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20967-3641) | verified |
 | Components | SettingRow | SettingRow | `22307:158` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22307-158) | verified |
+| Components | Sidebar | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) | verified |
 | Components | Skeleton | Skeleton | `20095:8179` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8179) | verified |
 | Components | Spinner | Spinner | `20117:5249` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249) | verified |
 | Components | Spotlight | Spotlight | `20630:74` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-74) | verified |
@@ -142,4 +141,3 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Tooltip | Tooltip | `20871:3142` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3142) | verified |
 | Components | TreeTable | Tree table | `20095:15470` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-15470) | verified |
 | Other | Logo | Logo | `21004:1217` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21004-1217) | verified |
-| Other | Sidebar | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) | verified |

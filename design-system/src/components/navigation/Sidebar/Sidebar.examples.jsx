@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { PatternSidebar } from '@/patterns';
+import Sidebar from './Sidebar';
 
 /**
  * The do and don't examples on the Sidebar docs page: the real, live Sidebar,
@@ -36,7 +36,7 @@ const InteractiveSidebar = ({ activeId: initialActiveId, tabs: initialTabs, ...p
 
     return (
         <Box>
-            <PatternSidebar
+            <Sidebar
                 storageKey={null}
                 onToggle={() => {}}
                 {...props}

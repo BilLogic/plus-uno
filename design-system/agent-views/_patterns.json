@@ -4,12 +4,7 @@
     {
       "group": "Templates",
       "name": "Frame",
-      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel, with no top bar). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width=\"reading\"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`."
-    },
-    {
-      "group": "Frame",
-      "name": "PatternSidebar",
-      "use": "The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that isn't the app's."
+      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer."
     },
     {
       "group": "Page",
@@ -30,6 +25,11 @@
       "group": "Table",
       "name": "Table",
       "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
+    },
+    {
+      "group": "Panel",
+      "name": "Panel",
+      "use": "A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`."
     },
     {
       "group": "Overlays",

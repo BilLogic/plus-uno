@@ -117,7 +117,7 @@ Recorded because a sweep that reports everything reports nothing:
   neither is named; the description says so, but whether the card needs two
   variants at all is a design question.
 - **Whether the code and the Figma props agree.** `figmaMeta.variantProps`
-  records known divergences (TopBar's Figma `expand?` against code's `mode`).
+  records known divergences (a Figma prop name against the code's).
   Nothing re-reads them, and this sweep did not.
 - **Publishing.** Every description written here is **unpublished** until the
   library is published from Figma. Consumers see nothing until then.

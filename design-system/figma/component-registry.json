@@ -1122,31 +1122,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
       }
     },
-    "Panel": {
-      "code": {
-        "import": "@/components/layout-and-structure",
-        "export": "default",
-        "mdxPath": "design-system/src/components/layout-and-structure/Panel/Panel.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Panel",
-        "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
-        "storybookId": "components-layout-and-structure-panel--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "panel",
-            "name": "Panel",
-            "componentSetNodeId": "20630:52",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-52",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-44"
-      }
-    },
     "Popup": {
       "code": {
         "import": "@/components/overlays-and-layering",
@@ -1425,11 +1400,11 @@
     },
     "Sidebar": {
       "code": {
-        "import": "@/patterns/Sidebar/Sidebar",
+        "import": "@/components/navigation",
         "export": "default",
-        "mdxPath": "design-system/src/patterns/Sidebar/Sidebar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar",
-        "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
+        "mdxPath": "design-system/src/components/navigation/Sidebar/Sidebar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Sidebar",
+        "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
         "storybookId": "components-navigation-navigation-system-navigation-system--docs"
       },
       "figma": {

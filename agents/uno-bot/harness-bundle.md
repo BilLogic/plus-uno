@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,649 chars from 9 files**, against an assembled budget of 175,500 (68,851 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,265 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,977 chars from 9 files**, against an assembled budget of 175,500 (68,523 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,593 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,849 (−6,838 ide-only) | 9,849 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,866 | 27,744 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,227 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 50,873 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,121 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 57,815 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,601 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 90,775 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,243 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 100,820 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 105,793 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,649 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,194 | 28,072 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,555 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,201 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,449 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,143 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,929 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,103 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,571 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,148 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,121 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,977 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,773 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,483 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,467 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,177 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -222,6 +222,10 @@ A page worked item by item (Flags, Highlights, Feedback, Approvals, Escalations)
 
 **Section detail**:
 An inline expand inside a Section.
+
+**Inner sidebar**:
+The Sidebar's content while a record with stages (a session) or a multi-step task is open: a Back button with the area name, an optional context dropdown, then text-only rows. Back returns to the main Sidebar, where what you left sits as one open row under its area.
+_Avoid_: "sub-sidebar", "second sidebar"
 
 **Commit action**:
 The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
@@ -2026,16 +2030,12 @@ An arrangement of components with named **Slot**s, holding its key scenarios and
 _Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
-The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has three types: **Frame default**, **Frame focused** and **Frame bare**. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
+The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has two types: **Frame default** and **Frame bare**. A multi-step task runs in the **Sidebar**'s inner mode on a default Frame. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
 
 **Frame default**:
 The **Frame** type for pages people move among: the **Sidebar**, the **Page** and the slot for the AI **Panel**.
 _Avoid_: "main frame"
-
-**Frame focused**:
-The **Frame** type for one task: no **Sidebar**, a Close button at the start of the title row, steps down a left **Section** side when there are five or more and across the top when there are four or fewer, and a bottom bar with Cancel on the left and Back and Next on the right.
-_Avoid_: "wizard page", "full-screen modal"
 
 **Frame bare**:
 The **Frame** type with no **Sidebar** and one centered column, such as sign-in.

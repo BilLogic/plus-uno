@@ -19,7 +19,7 @@ import { cloneElement, createContext, createElement, useCallback, useContext, us
  *   top of the scale in `design-system/src/tokens/ladder/_layers.scss`, so it layers
  *   above a modal wherever its `FlagGroup` is placed.
  * - **A Modal never opens on another Modal.** A confirm Modal may open over a
- *   Panel, a Popup or a focused task, a Modal brings its own Blanket, a Panel has none; a Modal that
+ *   Panel, a Popup or a multi-step task, a Modal brings its own Blanket, a Panel has none; a Modal that
  *   needs a confirm holds it inside itself (a warning SectionMessage and the
  *   danger button). `useOverlaySlot(active, onRefused)` refuses a Modal while
  *   one is open: it does not open, development builds warn, and the caller's
