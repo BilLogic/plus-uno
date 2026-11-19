@@ -10,7 +10,7 @@ Also asked as: stars, score.
 
 **Source:** `design-system/src/components/forms-and-inputs/Rating/Rating.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender, Unrated, Rated, Hovered, Focused, Required, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender, Unrated, Rated, RatedNumeric, SelectedHovered, SelectedPressed, DisabledRated, Hovered, Focused, Required, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
@@ -26,7 +26,7 @@ Rating reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| change | Update a value or state | `--ds-motion-appearance-fast` | Stars fill as a color change, staggered 20 ms. |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Stars fill with the brand selected color, staggered 20 ms. |
 
 ## Alternatives
 
@@ -112,10 +112,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | State | What changes |
 | --- | --- |
 | Rest | `--ds-background-neutral` circle with the icon outlined in `--ds-icon-subtle`. |
-| Hovered | The item takes `--ds-background-neutral-hovered`. |
-| Pressed | No step of its own. The hovered look holds while the pointer is down. |
+| Hovered | The item takes `--ds-background-neutral-hovered`; a selected item takes `--ds-background-selected-bold-hovered`. |
+| Pressed | The item takes `--ds-background-neutral-pressed`; a selected item takes `--ds-background-selected-bold-pressed`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the item, for keyboard focus only. |
-| Selected | Icon is filled in `--ds-icon-selected`; unselected items are outlined in `--ds-icon-subtle`. |
+| Selected | Every item up to the score takes a `--ds-background-selected-bold` fill with a filled icon in `--ds-icon-inverse`. Unselected items stay on the neutral circle with an outlined `--ds-icon-subtle` icon. |
 | Disabled | `--ds-background-disabled` fill and `--ds-icon-disabled` icon. Out of the tab order, still announced. |
 | Invalid, read-only | Not drawn. Validate the answer in the form and explain the error beside the rating. |
 
@@ -123,7 +123,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Item | `--control-md` (32) circle on `--ds-background-neutral`. |
+| Item | `--control-md` (32) circle on `--ds-background-neutral`; `--ds-background-selected-bold` when selected. |
 | Icon | `--icon-md` (16). |
 | Gaps | `--rating-gap` between items; `--stack-sm` inside an item group; `--stack-md` between label and row, plus `--stack-sm` under the label. |
 | Label, minority marker, number | `--ds-text`, body default. |
@@ -183,7 +183,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--icon-lg` · `--icon-md` · `--plus-rating-stagger` · `--radius-full` · `--rating-gap` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--icon-lg` · `--icon-md` · `--plus-rating-stagger` · `--radius-full` · `--rating-gap` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 
