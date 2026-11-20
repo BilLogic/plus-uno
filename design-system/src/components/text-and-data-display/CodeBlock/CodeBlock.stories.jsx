@@ -67,7 +67,7 @@ Overview.play = async ({ canvasElement }) => {
     await expect(numbers.length, 'five lines are numbered').toBe(5);
     await expect(numbers[4].textContent, 'the last is numbered 5').toBe('5');
     for (const n of numbers) await expect(n.getAttribute('aria-hidden'), 'numbers are not read').toBe('true');
-    await expect(getComputedStyle(block).fontFamily, 'the code family').toMatch(/Noto Sans Mono/);
+    await expect(getComputedStyle(block).fontFamily, 'the code family').toMatch(/Google Sans Code/);
     await expect(block.querySelector('code').className, 'language is kept for tools').toBe('language-javascript');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(block).backgroundColor, `surface, ${mode}`).toBe(token('--ds-background-code-default'));

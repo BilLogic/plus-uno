@@ -122,7 +122,7 @@ test('a table that fits does not need a scrolling wrapper', () => {
 
 const prose = (over = {}) => ({
   label: 'p 0: Buttons are interactive',
-  fontFamily: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+  fontFamily: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
   fontSize: '16px',
   color: 'rgb(44, 44, 43)',
   measure: 74,
@@ -407,7 +407,7 @@ test('isContextDestroyedError matches navigation-destroyed context errors only',
 
 /* -------------------------- every docs element uses the product type families */
 
-test('chromeFailures: fails when any rendered docs element computes to a family other than Noto Sans or Noto Sans Mono', () => {
+test('chromeFailures: fails when any rendered docs element computes to a family other than Google Sans Flex or Google Sans Code', () => {
   const f = chromeFailures([
     page({
       nonProductFonts: [
@@ -417,16 +417,16 @@ test('chromeFailures: fails when any rendered docs element computes to a family 
     }),
   ]);
   assert.equal(f.length, 2);
-  assert.match(f[0], /span\.plus-tag: Planned.*Nunito Sans.*Noto Sans or Noto Sans Mono/);
-  assert.match(f[1], /td: ResponsiveWidth.*Nunito.*Noto Sans or Noto Sans Mono/);
+  assert.match(f[0], /span\.plus-tag: Planned.*Nunito Sans.*Google Sans Flex or Google Sans Code/);
+  assert.match(f[1], /td: ResponsiveWidth.*Nunito.*Google Sans Flex or Google Sans Code/);
 });
 
-test('chromeFailures: passes when every rendered docs element uses Noto Sans or Noto Sans Mono', () => {
+test('chromeFailures: passes when every rendered docs element uses Google Sans Flex or Google Sans Code', () => {
   const f = chromeFailures([
     page({
       nonProductFonts: [
-        { label: 'span.plus-tag: Planned', fontFamily: '"Noto Sans", "Noto Sans Fallback", sans-serif' },
-        { label: 'code: --body-sm', fontFamily: '"Noto Sans Mono", ui-monospace, monospace' },
+        { label: 'span.plus-tag: Planned', fontFamily: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif' },
+        { label: 'code: --body-sm', fontFamily: '"Google Sans Code", ui-monospace, monospace' },
       ],
     }),
   ]);
@@ -454,8 +454,8 @@ test('chromeFailures and managerFailures cap reported font failures at 20 per sa
     MGR_EXPECTED,
   );
   assert.equal(mgrOut.length, 2);
-  assert.match(mgrOut[0], /manager light: element "button\.sidebar-item: Button" renders in Nunito Sans, not Noto Sans or Noto Sans Mono/);
-  assert.match(mgrOut[1], /manager light: element "button\[role="toolbar"\]: Color mode" renders in -apple-system, not Noto Sans or Noto Sans Mono/);
+  assert.match(mgrOut[0], /manager light: element "button\.sidebar-item: Button" renders in Nunito Sans, not Google Sans Flex or Google Sans Code/);
+  assert.match(mgrOut[1], /manager light: element "button\[role="toolbar"\]: Color mode" renders in -apple-system, not Google Sans Flex or Google Sans Code/);
 
   const mgrCapped = managerFailures([mgrRead('light', { nonProductFonts: thirtyBad }), mgrRead('dark')], MGR_EXPECTED);
   assert.equal(mgrCapped.length, 20);

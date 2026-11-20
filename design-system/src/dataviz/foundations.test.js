@@ -340,7 +340,7 @@ describe('data-viz foundations', () => {
         expect(offenders.map((f) => f.path)).toEqual([]);
     });
 
-    it('sets the Noto Sans body family token on chart.style and explicitly on every theme text slot', () => {
+    it('sets the Google Sans Flex body family token on chart.style and explicitly on every theme text slot', () => {
         expect(BODY).toBe('var(--type-family-body)');
         expect(MEDIUM).toBe('var(--type-weight-medium)');
         expect(SEMIBOLD).toBe('var(--type-weight-semibold)');

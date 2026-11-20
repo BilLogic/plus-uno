@@ -73,7 +73,7 @@ export const Overview = {
         for (const label of canvasElement.querySelectorAll('.highcharts-data-labels text, .highcharts-data-labels tspan')) {
             if (!label.textContent?.trim()) continue;
             const style = getComputedStyle(label);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(['500', '600']).toContain(style.fontWeight);
         }
     },

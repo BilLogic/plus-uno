@@ -59,7 +59,7 @@ The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds i
 Two kinds of text node carry no text style, and each binds its type variables directly so a token change still reaches it:
 
 - **A weighted label or run** (a button or Tab group label at `Weight/medium`, a semibold run inside body text): a weight change drops a node's text style, so the node binds `Font size/0875`, `Line height/125`, `Family/body` and the `Weight/*` it needs. Create no medium or semibold style for it.
-- **A code sample in docs**: `Code` has no Figma style, so the sample is Noto Sans Mono (`Family/code`) bound to `Font size/0875` and `Line height/125`.
+- **A code sample in docs**: `Code` has no Figma style, so the sample is Google Sans Code (`Family/code`) bound to `Font size/0875` and `Line height/125`.
 
 ## Spacing Tokens
 

@@ -77,8 +77,8 @@ const buildTheme = (key) =>
     ...THEMES[key]?.theme,
     // The app's families (--type-family-body and --type-family-code), resolved
     // from _type.scss by scripts/lib/manager-theme.mjs.
-    fontBase: THEMES[key]?.fonts?.fontBase ?? '"Noto Sans", "Noto Sans Fallback", sans-serif',
-    fontCode: THEMES[key]?.fonts?.fontCode ?? '"Noto Sans Mono", "Noto Sans Mono Fallback", monospace',
+    fontBase: THEMES[key]?.fonts?.fontBase ?? '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+    fontCode: THEMES[key]?.fonts?.fontCode ?? '"Google Sans Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
     appBorderRadius: 8,
     inputBorderRadius: 8,
   });
@@ -90,7 +90,7 @@ const paintSelected = (key) => {
   const bg = vars['--plus-manager-selected-bg'];
   const fg = vars['--plus-manager-selected-fg'];
   const border = vars['--plus-manager-selected-border'];
-  const fontBase = fonts.fontBase ?? '"Noto Sans", "Noto Sans Fallback", sans-serif';
+  const fontBase = fonts.fontBase ?? '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif';
   let style = document.getElementById('plus-manager-selected');
   if (!style) {
     style = document.createElement('style');

@@ -59,7 +59,7 @@ export const Overview = {
         });
         for (const valueNode of canvasElement.querySelectorAll('.plus-chart-value')) {
             const style = getComputedStyle(valueNode);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(style.fontWeight).toBe('600');
         }
     },

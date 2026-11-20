@@ -194,7 +194,7 @@ export const EveryChartInEveryMode = {
         });
         await expect([...new Set(strays)], 'paints that are not chart, text or border tokens').toEqual([]);
 
-        // Type & numbers: every chart text node renders in Noto Sans
+        // Type & numbers: every chart text node renders in Google Sans Flex
         // (never a system-font fallback), weights are 500 or 600 only,
         // and number slots compute tabular-nums.
         const typeStrays = [];
@@ -210,7 +210,7 @@ export const EveryChartInEveryMode = {
                 if (!node.textContent?.trim()) continue;
                 const style = getComputedStyle(node);
                 if (
-                    !style.fontFamily.includes('Noto Sans') ||
+                    !style.fontFamily.includes('Google Sans Flex') ||
                     style.fontFamily.includes('-apple-system') ||
                     style.fontFamily.includes('BlinkMacSystemFont')
                 ) {

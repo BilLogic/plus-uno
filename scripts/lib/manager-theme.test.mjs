@@ -16,7 +16,7 @@ function fixture() {
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(root, 'design-system/src/tokens/_type.scss'),
-    ':root {\n  --type-family-body: "Noto Sans", "Noto Sans Fallback", sans-serif;\n  --type-family-code: "Noto Sans Mono", "Noto Sans Mono Fallback", monospace;\n}\n',
+    ':root {\n  --type-family-body: "Google Sans Flex", "Google Sans Flex Fallback", sans-serif;\n  --type-family-code: "Google Sans Code", "Google Sans Code Fallback", monospace;\n}\n',
   );
   fs.writeFileSync(
     path.join(dir, '_palette.scss'),
@@ -71,8 +71,8 @@ test('the live theme equals the token values: light from the corpus, every mode 
   assert.notEqual(themes['dark-no-preference'].theme.appContentBg, themes['light-no-preference'].theme.appContentBg);
   assert.notEqual(themes['dark-more'].theme.appBorderColor, themes['dark-no-preference'].theme.appBorderColor);
   for (const [mode, { fonts }] of Object.entries(themes)) {
-    assert.ok(fonts?.fontBase?.includes('Noto Sans'), `${mode} fontBase includes Noto Sans`);
-    assert.ok(fonts?.fontCode?.includes('Noto Sans Mono'), `${mode} fontCode includes Noto Sans Mono`);
+    assert.ok(fonts?.fontBase?.includes('Google Sans Flex'), `${mode} fontBase includes Google Sans Flex`);
+    assert.ok(fonts?.fontCode?.includes('Google Sans Code'), `${mode} fontCode includes Google Sans Code`);
   }
 });
 

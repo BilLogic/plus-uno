@@ -524,7 +524,7 @@ test('scaffold head: prepare writes index.html with fonts and Font Awesome 7.2 f
   const templateHtml = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, '_template/index.html'), 'utf8');
   assert.doesNotMatch(templateHtml, /fonts\.googleapis\.com|fontawesome-free/, '_template/index.html holds no second copy of head links');
   const shared = headLinks(REPO_ROOT);
-  assert.ok(shared.some((l) => /fonts\.googleapis\.com.*Noto\+Sans/.test(l)), 'shared head links include Noto fonts');
+  assert.ok(shared.some((l) => /fonts\.googleapis\.com.*Google\+Sans\+Flex/.test(l)), 'shared head links include Google Sans fonts');
   assert.ok(shared.some((l) => /@fortawesome\/fontawesome-free@7\.2\.0/.test(l)), 'shared head links include Font Awesome Free 7.2');
 
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-head-'));

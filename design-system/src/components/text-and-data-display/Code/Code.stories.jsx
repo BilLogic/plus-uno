@@ -53,7 +53,7 @@ Overview.play = async ({ canvasElement }) => {
     await expect(snippet.tagName, 'it is a code element').toBe('CODE');
     const parent = px(getComputedStyle(snippet.parentElement).fontSize);
     await expect(px(getComputedStyle(snippet).fontSize), 'it is 0.875 of the text around it').toBeCloseTo(parent * 0.875, 1);
-    await expect(getComputedStyle(snippet).fontFamily, 'it uses the code family').toMatch(/Noto Sans Mono/);
+    await expect(getComputedStyle(snippet).fontFamily, 'it uses the code family').toMatch(/Google Sans Code/);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(snippet).backgroundColor, `fill, ${mode}`).toBe(token('--ds-background-neutral'));
         await expect(getComputedStyle(snippet).color, `ink, ${mode}`).toBe(token('--ds-text-code-default'));

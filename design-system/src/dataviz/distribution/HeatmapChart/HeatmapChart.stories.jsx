@@ -140,7 +140,7 @@ export const Overview = {
         for (const label of cellLabels) {
             if (!label.textContent?.trim()) continue;
             const style = getComputedStyle(label);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },

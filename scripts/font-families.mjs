@@ -14,7 +14,7 @@
  * 1. A STACK WITH NO GENERIC. A family token that names one face and nothing
  *    after it: if the face is missing the browser falls back to ITS default
  *    rather than to a family anyone chose. Inline,
- *    `var(--type-family-heading, "Noto Sans")` is the same defect one level
+ *    `var(--type-family-heading, "Google Sans Flex")` is the same defect one level
  *    down.
  *
  * 2. A MONOSPACE TOKEN THAT DOES NOT FALL BACK TO `monospace`. This one shipped
@@ -28,7 +28,7 @@
  *    decision.
  *
  * WHAT IS NOT A FINDING. A shorter stack is fine: `var(--type-family-body,
- * "Noto Sans", sans-serif)` drops the fallback face from the middle and still
+ * "Google Sans Flex", sans-serif)` drops the fallback face from the middle and still
  * starts with the right face and ends in a generic. The rule is about the
  * FIRST named family and the LAST entry, not about the whole list — a fallback
  * is a safety net, not a duplicate.

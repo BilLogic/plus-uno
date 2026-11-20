@@ -1,8 +1,8 @@
 /**
- * Every Google Fonts link that loads Noto Sans loads weight 500.
+ * Every Google Fonts link that loads Google Sans Flex loads weight 500.
  *
  * A button or tab label is `--body-default` at `--type-weight-medium` (500),
- * and the body family is Noto Sans. A weight the stylesheet never
+ * and the body family is Google Sans Flex. A weight the stylesheet never
  * fetched is synthesized from the nearest one the browser has, so a link that
  * stops at 400 · 600 draws every button label at 400 or 600 and
  * nothing reports it. The links are hand-written in each HTML entry point and
@@ -21,12 +21,17 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 /** Where an entry point or a setup snippet writes a Google Fonts link. */
 const ROOTS = ['.storybook', 'prototypes', 'design-system/README.md', 'skills/uno-prototype/scripts/scaffold-prototype.sh'];
 
-/** The weights a family loads, from a `css2` URL: `Noto+Sans:wght@300;400` → [300, 400]. */
+/**
+ * The weights a family loads, from a `css2` URL: `Google+Sans+Flex:wght@300;400` → [300, 400].
+ * Several axes are read too: `Google+Sans+Flex:opsz,wght,ROND@6..144,400..700,100` → 400 to 700.
+ */
 export function weights(url, family) {
-  const match = url.match(new RegExp(`family=${family}:wght@([\\d;.]+)`));
+  const match = url.match(new RegExp(`family=${family}:([\\w,]+)@([\\d;.,]+)`));
   if (!match) return null;
-  return match[1].split(';').flatMap((part) => {
-    const [from, to = from] = part.split('..').map(Number);
+  const at = match[1].split(',').indexOf('wght');
+  if (at < 0) return null;
+  return match[2].split(';').flatMap((tuple) => {
+    const [from, to = from] = tuple.split(',')[at].split('..').map(Number);
     return [from, ...[100, 200, 300, 400, 500, 600, 700, 800, 900].filter((w) => w > from && w <= to)];
   });
 }
@@ -43,15 +48,15 @@ function links(root) {
 }
 
 test('weights reads a family out of a css2 URL', () => {
-  const url = 'https://fonts.googleapis.com/css2?family=Noto+Serif:wght@500;600&family=Noto+Sans:wght@400..600&display=swap';
-  assert.deepEqual(weights(url, 'Noto\\+Sans'), [400, 500, 600]);
+  const url = 'https://fonts.googleapis.com/css2?family=Google+Sans+Code:wght@400..500&family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..600,100&display=swap';
+  assert.deepEqual(weights(url, 'Google\\+Sans\\+Flex'), [400, 500, 600]);
   assert.equal(weights(url, 'Open\\+Sans'), null);
 });
 
-test('every link that loads Noto Sans loads 500, the medium weight', () => {
-  const found = links(REPO_ROOT).filter(({ url }) => weights(url, 'Noto\\+Sans'));
+test('every link that loads Google Sans Flex loads 500, the medium weight', () => {
+  const found = links(REPO_ROOT).filter(({ url }) => weights(url, 'Google\\+Sans\\+Flex'));
   // The Storybook preview, the README snippet, the prototypes and the scaffold.
-  assert.ok(found.length >= 4, `only ${found.length} Noto Sans links found`);
-  const missing = found.filter(({ url }) => !weights(url, 'Noto\\+Sans').includes(500));
+  assert.ok(found.length >= 4, `only ${found.length} Google Sans Flex links found`);
+  const missing = found.filter(({ url }) => !weights(url, 'Google\\+Sans\\+Flex').includes(500));
   assert.deepEqual(missing.map(({ file }) => file), []);
 });
