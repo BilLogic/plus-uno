@@ -2,17 +2,23 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CODE as cardCode } from './Card/CardCases.jsx';
+import { CODE as frameCode } from './Frame/FrameCases.jsx';
+import { CODE as modalCode } from './Modal/ModalCases.jsx';
+import { CODE as pageCode } from './Page/PageCases.jsx';
+import { CODE as panelCode } from './Panel/PanelCases.jsx';
+import { CODE as popupCode } from './Popup/PopupCases.jsx';
 import { CODE as sectionCode, STORY_CODE as sectionStoryCode } from './Section/SectionCases.jsx';
 import { CODE as tableCode } from './Table/TableCases.jsx';
 
 /**
- * Every Do and Don't pair on the Section, Card and Table pages prints the code
+ * Every Do and Don't pair on the Section, Card, Table, Frame, Page, Modal,
+ * Panel and Popup pages prints the code
  * a consumer writes: imports from react, `@/components` and `@/templates`
  * only, and nothing the docs add around an example.
  */
 
 // The Case guard names docs wrappers (SectionCase); a lowercase-led word like toLowerCase is consumer code.
-const DOCS_ONLY = /\b[A-Z]\w*Case\b|storybook-docs|section-header|view-bar|SectionActions|ViewPills|FormatSwitch|HeaderSearch|StudentsTable|ScreenStage|InAppFrame|sb-unstyled|HeadingLevelContext|\b(inline|isOpen|show|titleAs)=/;
+const DOCS_ONLY = /\b[A-Z]\w*Case\b|storybook-docs|section-header|view-bar|SectionActions|ViewPills|FormatSwitch|HeaderSearch|StudentsTable|ScreenStage|InAppFrame|sb-unstyled|HeadingLevelContext|\b(inline|titleAs|triggerType)=|\bisOpen\b(?!=\{(?!true\b))|\bshow=(?!\{(?!true\b)\w+\})|\bdefaultShow\b/; // `show={open}` and `isOpen={open}` are a Modal's and a PanelOverlay's own open state, consumer code
 const ALLOWED = new Set(['react', '@/components', '@/templates']);
 
 const pages = [
@@ -20,6 +26,11 @@ const pages = [
     ['Section stories', sectionStoryCode],
     ['Card', cardCode],
     ['Table', tableCode],
+    ['Frame', frameCode],
+    ['Page', pageCode],
+    ['Modal', modalCode],
+    ['Panel', panelCode],
+    ['Popup', popupCode],
 ];
 
 describe.each(pages)('%s page printed code', (name, code) => {
@@ -49,6 +60,9 @@ describe.each(pages)('%s page printed code', (name, code) => {
         for (const pair of pairs) {
             expect(pair).toMatch(/doCode=\{CODE\.\w+\}/);
             expect(pair).toMatch(/dontCode=\{CODE\.\w+\}/);
+            for (const [, key] of pair.matchAll(/(?:do|dont)Code=\{CODE\.(\w+)\}/g)) {
+                expect(code[key], `${name} pair prints CODE.${key}`).toBeTypeOf('string');
+            }
         }
     });
 });

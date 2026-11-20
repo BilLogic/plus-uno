@@ -296,8 +296,8 @@ The page keeps scrolling and stays clickable. A press on the page outside the Pa
     doCode={CODE.FloatsNoBlanket}
     doCaption="The Panel floats on its shadow and the page beside it stays undimmed."
     dontExample={<PanelOnBlanket />}
-    dontCode={CODE.PanelOnBlanket}
-    dontCaption="The same Panel with a Blanket dimming the whole page."
+    dontCode={CODE.DetailsInModal}
+    dontCaption="The same details in a Modal: a Blanket dims the whole page."
 />
 
 ### Open one floating Panel at a time.
@@ -330,8 +330,10 @@ Discard (Default) and Save (Primary), full bleed; Close in the header dismisses,
 
 <DoDontPair
     doExample={<ReadingNoFooter />}
+    doCode={CODE.ReadingNoFooter}
     doCaption="Reading: a header and a body, nothing to save."
     dontExample={<ReadingWithFooter />}
+    dontCode={CODE.ReadingWithFooter}
     dontCaption="A footer of buttons on a Panel that is only read."
 />
 
@@ -373,8 +375,10 @@ Below its default width the title wraps and the body stops being scannable.
 
 <DoDontPair
     doExample={<ReadingNoFooter />}
+    doCode={CODE.ReadingNoFooter}
     doCaption="Default width."
     dontExample={<ReadingNarrow />}
+    dontCode={CODE.ReadingNarrow}
     dontCaption="Squeezed to a narrow strip."
 />
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Breadcrumb, DynamicTable, Heading, PageHeader, Tabs } from '@/components';
-import { Page, Section } from '@/templates';
+import React, { useState } from 'react';
+import { Breadcrumb, Button, DynamicTable, Heading, PageHeader, PopupSelect, Tabs } from '@/components';
+import { Card, Page, Section } from '@/templates';
 
 /**
  * The Page template page's do and don't examples, as PLUS parts only. Show
@@ -32,6 +32,17 @@ const SessionsTable = ({ status = 'upcoming' }) => (
 const StudentViews = () => (
     <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
         <Tabs.Tab eventKey="all">All students</Tabs.Tab>
+    </Tabs>
+);
+
+const AddStudentAction = () => (
+    <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
+);
+
+const RecordTabs = ({ active, onSelect }) => (
+    <Tabs activeKey={active} onSelect={onSelect} aria-label="Student pages">
+        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
     </Tabs>
 );
 
@@ -115,3 +126,67 @@ export const ParagraphUnderTitle = () => (
         <StudentsSection />
     </Page>
 );
+
+export const AddInTitleRow = () => (
+    <Page header={<PageHeader title="Students" />}>
+        <Section title="Sessions" views={<StudentViews />} actions={<AddStudentAction />}>
+            <SessionsTable />
+        </Section>
+    </Page>
+);
+
+export const AddTwice = () => (
+    <Page header={<PageHeader title="Students" actions={<AddStudentAction />} />}>
+        <Section title="Sessions" views={<StudentViews />} actions={<AddStudentAction />}>
+            <SessionsTable />
+        </Section>
+    </Page>
+);
+
+export const OneTabSystem = () => {
+    const [tab, setTab] = useState('sessions');
+    const [status, setStatus] = useState('upcoming');
+    return (
+        <Page header={<PageHeader title="Maya Rodriguez" bottomBar={<RecordTabs active={tab} onSelect={setTab} />} />}>
+            {tab === 'overview' ? (
+                <Section title="Overview">
+                    <Card title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
+                </Section>
+            ) : (
+                <Section
+                    title="Sessions"
+                    views={(
+                        <PopupSelect
+                            label="Status"
+                            options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]}
+                            value={status}
+                            onChange={setStatus}
+                            isSearchable={false}
+                        />
+                    )}
+                >
+                    <SessionsTable status={status} />
+                </Section>
+            )}
+        </Page>
+    );
+};
+
+export const TwoTabSystems = () => {
+    const [tab, setTab] = useState('sessions');
+    return (
+        <Page header={<PageHeader title="Maya Rodriguez" bottomBar={<RecordTabs active={tab} onSelect={setTab} />} />}>
+            <Section
+                title="Sessions"
+                views={(
+                    <Tabs appearance="pill" defaultActiveKey="upcoming" aria-label="Views">
+                        <Tabs.Tab eventKey="upcoming">Upcoming</Tabs.Tab>
+                        <Tabs.Tab eventKey="past">Past</Tabs.Tab>
+                    </Tabs>
+                )}
+            >
+                <SessionsTable />
+            </Section>
+        </Page>
+    );
+};
