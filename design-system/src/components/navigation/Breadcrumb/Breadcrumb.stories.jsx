@@ -171,7 +171,7 @@ export const Pressed = {
     },
 };
 
-/** Focused: the 2px ring, 2px off an ancestor link. The current page is not focusable. */
+/** Focused: the 2px ring, 2px off an ancestor link. The current page is focusable only while its text is clipped. */
 export const Focused = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
@@ -203,5 +203,9 @@ export const Overflow = {
         await expect(Math.round(list.getBoundingClientRect().height), 'the trail never wraps').toBe(32);
         await expect(canvas.getByRole('link', { name: 'Home' }).scrollWidth).toBeLessThanOrEqual(canvas.getByRole('link', { name: 'Home' }).clientWidth);
         await expectFullTextReachable(canvasElement, link, LONG_SCHOOL);
+        const current = canvasElement.querySelector('[aria-current="page"]');
+        await expect(current.scrollWidth).toBeGreaterThan(current.clientWidth);
+        await expect(current, 'a clipped current page is a tab stop').toHaveAttribute('tabindex', '0');
+        await expectFullTextReachable(canvasElement, current, LONG_TOPIC);
     },
 };

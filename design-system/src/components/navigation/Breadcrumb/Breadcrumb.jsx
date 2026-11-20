@@ -31,9 +31,10 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
                 const isCurrent = !item.href || isLast;
                 return isCurrent ? (
                     <ClippedTooltip key={index} text={item.text}>
-                        {({ measureRef }) => (
+                        {({ measureRef, truncated }) => (
                             <li
                                 ref={measureRef}
+                                tabIndex={truncated ? 0 : undefined}
                                 id={isLast && id ? id : undefined}
                                 aria-current={isLast ? 'page' : undefined}
                                 className="plus-breadcrumb-item plus-breadcrumb-current"

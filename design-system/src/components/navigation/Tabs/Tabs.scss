@@ -119,6 +119,7 @@
 .plus-tabs--appearance-default .plus-tabs-list {
     border-bottom: var(--border-width-default) solid var(--ds-border);
     width: fit-content;
+    max-width: 100%;
 
     &--justified {
         width: 100%;
@@ -140,7 +141,8 @@
     // One line, always: a tab label never wraps into a two-line tab.
     white-space: nowrap;
     // A label past the cap ends in an ellipsis (Patterns, States, Overflow).
-    max-width: min(100%, var(--label-max-width));
+    max-width: var(--label-max-width);
+    min-width: 0;
     cursor: pointer;
     transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 

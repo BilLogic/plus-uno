@@ -15158,7 +15158,8 @@
         "Focused",
         "Selected",
         "SelectedPill",
-        "Disabled"
+        "Disabled",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",

@@ -64,6 +64,8 @@ export const figmaMeta = {
 
 <ComponentExample of={TabsStories.WithPanels} title="With panels" description={<>Each tab wired to a panel; a disabled tab is still reachable with the arrow keys.</>} />
 
+<ComponentExample of={TabsStories.Overflow} title="Overflow" description="Truncate: a label longer than its cap ends in an ellipsis, and its full text opens in a Tooltip on hover and focus, only while it is clipped. Folding extra tabs into More is Planned." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -255,6 +257,10 @@ A label names a view. A count or status in it changes the name and breaks the pa
     dontExample={<Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions (12)</Tabs.Tab><Tabs.Tab eventKey="2">Progress (new)</Tabs.Tab></Tabs>}
     dontCaption="Counts and status in the label."
 />
+
+### Let a tab label longer than its cap end in an ellipsis with a Tooltip.
+
+The Tooltip is on only while the label is clipped. More tabs than fit a row wrap; folding the extras into More is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 

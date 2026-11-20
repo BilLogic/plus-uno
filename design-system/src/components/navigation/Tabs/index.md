@@ -14,7 +14,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled, Overflow
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
@@ -102,6 +102,10 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 Do: The label names the view.
 Don't: Counts and status in the label.
+
+### Let a tab label longer than its cap end in an ellipsis with a Tooltip. {#let-a-tab-label-longer-than-its-cap-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the label is clipped. More tabs than fit a row wrap; folding the extras into More is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
