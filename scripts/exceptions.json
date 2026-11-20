@@ -173,7 +173,7 @@
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
-          "at": "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss",
+          "at": "design-system/src/lib/field/FieldFrame.scss",
           "token": "--radius-md",
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },

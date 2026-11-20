@@ -28,7 +28,7 @@
  * tokens alone. The map holds whole `var()` references so the generated docs
  * list them.
  */
-@use '../label-heights' as label;
+@use '../../../styles/label-heights' as label;
 @use '../../../styles/state' as *;
 @use '../colored-material' as cm;
 

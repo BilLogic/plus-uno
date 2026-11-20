@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import FieldBox from './FieldBox';
-import FieldFrame, { FieldCaption, FieldLabel } from './FieldFrame';
+import { FieldBox, FieldFrame, FieldCaption, FieldLabel } from './index';
 
 /**
  * _FieldFrame — the part that stacks a label, a field and a caption, and

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
 import useFieldId from '../useFieldId';
-import FieldFrame, { FieldLabel } from '../_internal/FieldFrame';
+import { FieldFrame, FieldLabel } from '@/lib/field';
 import './Range.scss';
 
 /**

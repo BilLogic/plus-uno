@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
+    CODE,
     CountOnIconCase,
     FiltersAmongViewsCase,
     FiltersAtEndCase,
@@ -74,5 +75,14 @@ describe('Filtering live cases and links', () => {
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Filtering.mdx', () => {
         expectTypeCardAnchors(join(__dirname, 'Filtering.mdx'), 5);
+    });
+
+    it('prints each pair\'s own source, as a consumer writes it', () => {
+        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(CODE.OneTier).toContain("from '@/components';");
+        expect(CODE.OneTier).toContain("import { Section } from '@/templates';");
+        expect(CODE.TwoTiers).toContain('<FilterMenu');
+        for (const code of Object.values(CODE)) expect(code.split('\n').length).toBeLessThan(60);
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/\b[A-Z]\w*Case\b|storybook-docs|filteringDemo/);
     });
 });

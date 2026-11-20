@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import useFieldId from '../useFieldId';
 import { choiceClasses, activateChoiceTile } from '../choiceItem';
-import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from '../_internal/FieldFrame';
+import { FieldFrame, FieldLabel, FieldCaption, toneProps, fieldDescription } from '@/lib/field';
 import './Checkbox.scss';
 
 /**

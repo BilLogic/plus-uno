@@ -14,6 +14,7 @@
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js` file under
  * `design-system/src/components`, `design-system/src/templates`,
+ * the shared UI roots (`SHARED_UI_ROOTS`, `scripts/lib/ds-facts.mjs`),
  * `design-system/src/storybook-docs` and `design-system/src/styles`, by
  * `git ls-files`; tests are skipped. The token definitions live in
  * `design-system/src/tokens`, outside every root.
@@ -32,6 +33,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
@@ -40,6 +42,7 @@ export { REPO_ROOT };
 export const SEARCH_ROOTS = [
   'design-system/src/components',
   'design-system/src/templates',
+  ...SHARED_UI_ROOTS,
   'design-system/src/storybook-docs',
   'design-system/src/styles',
 ];

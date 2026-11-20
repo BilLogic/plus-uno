@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Button from './Button';
 import { DropdownMenu } from '@/components';
-import { ButtonItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem } from '@/lib/menu';
 import Select from './Select';
 import Toggle from './Toggle';
 

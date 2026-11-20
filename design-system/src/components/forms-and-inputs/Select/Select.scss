@@ -6,7 +6,7 @@
  * box: the tags, the combobox, the clear × and the caret.
  */
 @use '../../../styles/state' as *;
-@use '../../labels/label-heights' as label;
+@use '../../../styles/label-heights' as label;
 
 .plus-select-wrapper {
     width: 100%;

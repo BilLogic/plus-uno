@@ -6,7 +6,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { FLOATING_PLACEMENTS, useFloatingOverlay } from '@/lib/overlay';
 import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
-import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem, CustomItem, MenuGroup } from '@/lib/menu';
 import useOpenState from '../_internal/useOpenState';
 import './DropdownMenu.scss';
 

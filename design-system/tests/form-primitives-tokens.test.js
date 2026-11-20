@@ -29,7 +29,7 @@ const TARGETS = [
     'design-system/src/components/forms-and-inputs/TagInput/TagInput.scss',
     'design-system/src/components/forms-and-inputs/Toggle/Toggle.scss',
     'design-system/src/components/forms-and-inputs/_internal/Calendar.scss',
-    'design-system/src/components/forms-and-inputs/_internal/FieldBox.scss',
+    'design-system/src/lib/field/FieldBox.scss',
     'design-system/src/components/ai/AiMessage/AiMessage.scss',
     'design-system/src/components/labels/CountTag/CountTag.scss',
     'design-system/src/components/labels/Tag/Tag.scss',

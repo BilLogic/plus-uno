@@ -12,7 +12,7 @@
         "design-system/src/components/forms-and-inputs/_internal/Calendar.scss|--radius-md": {
           "count": 1
         },
-        "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss|--radius-md": {
+        "design-system/src/lib/field/FieldFrame.scss|--radius-md": {
           "count": 1
         },
         "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss|--radius-md": {

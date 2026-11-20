@@ -75,6 +75,8 @@ alias.
 One case is not a violation: a component importing its own siblings inside
 `design-system/src/components/`.
 
+Shared pieces live in `@/lib/field` and `@/lib/menu`; import them by module from any group.
+
 ## Slot names
 
 A component names a before or after slot by what the slot accepts, so the right prop is predictable. Every new slot prop takes one of the four names below.

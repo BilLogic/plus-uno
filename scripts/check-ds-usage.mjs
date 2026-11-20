@@ -44,7 +44,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { CONSUMER_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
+import { CONSUMER_ROOTS, SHARED_UI_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
 import { contextFrom, docLink, escapesIn, isDsStyle, pagesOf } from './lib/ds-usage.mjs';
 import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
@@ -58,7 +58,7 @@ import { importsOf, jsxElementsOf } from './lib/jsx-scan.mjs';
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/ds-usage.json';
-export const SCOPE = [...CONSUMER_ROOTS, 'design-system/src/components', 'design-system/src/templates', 'design-system/src/storybook-docs', 'design-system/src/styles'];
+export const SCOPE = [...CONSUMER_ROOTS, 'design-system/src/components', 'design-system/src/templates', ...SHARED_UI_ROOTS, 'design-system/src/storybook-docs', 'design-system/src/styles'];
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html|mdx)$/;
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const DEFINITION_ROOTS = SOURCE_ROOTS;

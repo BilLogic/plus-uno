@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon } from '@/components';
-import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem, LinkItem, Section } from '@/lib/menu';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';

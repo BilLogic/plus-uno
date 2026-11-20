@@ -58,18 +58,17 @@ test('a color or percent literal in a printed example fails; tokens and the full
   }
 });
 
-test('a pattern DoDontPair needs both doCode and dontCode; a deferred page is excused, a template page is not read', () => {
+test('a pattern DoDontPair needs both doCode and dontCode; a template page is not read', () => {
   const page = 'design-system/src/storybook-docs/patterns/X/X.mdx';
   const both = '<DoDontPair\n    doExample={<A />}\n    doCode={CODE.A}\n    dontExample={<B />}\n    dontCode={CODE.B}\n/>';
   assert.deepEqual(messages(page, both), []);
   assert.ok(messages(page, '<DoDontPair\n    doExample={<A />}\n    doCode={CODE.A}\n    dontExample={<B />}\n/>').some((m) => /no dontCode/.test(m)));
   assert.ok(messages(page, '<DoDontPair\n    doExample={<A />}\n    dontExample={<B />}\n/>').some((m) => /no doCode or dontCode/.test(m)));
-  const [deferred] = Object.keys(DEFERRED_PAGES);
-  assert.deepEqual(messages(deferred, '<DoDontPair\n    doExample={<A />}\n    dontExample={<B />}\n/>'), []);
   assert.deepEqual(messages('design-system/src/templates/X/X.mdx', '<DoDontPair\n    doExample={<A />}\n    dontExample={<B />}\n/>'), []);
 });
 
-test('every deferred page carries a reason and is a real pattern page', () => {
+test('no page is deferred, and any deferred page carries a reason and is a real pattern page', () => {
+  assert.deepEqual(DEFERRED_PAGES, {});
   for (const [file, reason] of Object.entries(DEFERRED_PAGES)) {
     assert.ok(reason.length > 20, file);
     assert.ok(fs.existsSync(path.join(REPO_ROOT, file)), `${file} exists`);

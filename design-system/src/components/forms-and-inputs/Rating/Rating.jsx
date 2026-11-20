@@ -5,7 +5,7 @@ import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { STAGGER } from '@/lib/listMotion';
 import { useMotionReduced } from '@/lib/motionPreference';
 import useFieldId from '../useFieldId';
-import { LabelMarker } from '../_internal/FieldFrame';
+import { LabelMarker } from '@/lib/field';
 import Icon from '../../images-and-icons/Icon';
 import './Rating.scss';
 

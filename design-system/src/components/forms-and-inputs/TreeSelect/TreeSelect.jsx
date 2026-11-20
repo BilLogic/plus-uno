@@ -2,8 +2,7 @@ import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
-import FieldBox from '../_internal/FieldBox';
-import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
+import { FieldBox, FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '@/lib/field';
 import OptionRow from '../_internal/OptionRow';
 import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import {

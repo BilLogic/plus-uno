@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 // Docs scaffolding, not product code: the demos draw the fields' own label and caption rows.
-import { FieldCaption, FieldLabel } from '@/components/forms-and-inputs/_internal/FieldFrame';
+import { FieldCaption, FieldLabel } from '@/lib/field';
 
 /**
  * Label and Caption demos for the Form page.

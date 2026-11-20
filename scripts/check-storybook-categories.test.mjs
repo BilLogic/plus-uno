@@ -124,6 +124,16 @@ test('an _internal story may name any category; a titleless story goes red', () 
   assert.ok(found.some((m) => m.includes('Empty.stories.jsx') && m.includes('no `title:`')));
 });
 
+test('a shared lib story is checked: a valid title passes, a title outside every category goes red', () => {
+  const root = fixture({
+    'design-system/src/lib/field/FieldBox.stories.jsx': story('Components/Forms and inputs/_FieldBox'),
+    'design-system/src/lib/menu/Bad.stories.jsx': story('Widgets/Bad'),
+  });
+  const found = messages(root);
+  assert.ok(!found.some((m) => m.includes('FieldBox.stories.jsx')));
+  assert.ok(found.some((m) => m.includes('lib/menu/Bad.stories.jsx') && m.includes('outside every component category')));
+});
+
 test('a group that is not an Atlassian category, and a sort that disagrees, go red', () => {
   const root = fixture({});
   fs.writeFileSync(

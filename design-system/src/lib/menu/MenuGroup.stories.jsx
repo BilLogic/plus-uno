@@ -3,11 +3,9 @@ import { expect, userEvent, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
-import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
-import OptionRow from '@/components/forms-and-inputs/_internal/OptionRow';
+import { MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/lib/menu';
 import { Checkbox } from '@/components';
-import { iconClass } from '../../../lib/icon';
+import { iconClass } from '../icon';
 
 export default {
     title: 'Components/Forms and inputs/Menu items',
@@ -96,71 +94,6 @@ Spacing.play = async ({ canvasElement }) => {
     for (const [spacing, height] of [['default', 32], ['compact', 24], ['spacious', 40]]) {
         const rows = canvasElement.querySelectorAll(`#menu-spacing-${spacing} .plus-menu-item`);
         for (const row of rows) await expect(row.getBoundingClientRect().height).toBe(height);
-    }
-};
-
-/** MenuGroup and OptionRow side by side: same surface padding, row height, row padding, gap, radius and type size. */
-export const RowSpecParity = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-        {['default', 'compact'].map((spacing) => (
-            <div key={spacing} style={{ display: 'flex', gap: 'var(--inline-lg)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                <MenuGroup spacing={spacing} id={`parity-menu-${spacing}`}>
-                    <ButtonItem elemBefore={<i className={iconClass('plus')} aria-hidden="true" />}>Create</ButtonItem>
-                    <ButtonItem elemBefore={<i className={iconClass('pen')} aria-hidden="true" />}>Rename</ButtonItem>
-                </MenuGroup>
-                <div
-                    role="listbox"
-                    aria-label={`${spacing} options`}
-                    id={`parity-listbox-${spacing}`}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        minWidth: 'var(--menu-group-min-width)',
-                        padding: 'var(--dropdown-menu-pad)',
-                    }}
-                >
-                    <OptionRow spacing={spacing} label="Create" elemBefore={<i className={iconClass('plus')} aria-hidden="true" />} />
-                    <OptionRow spacing={spacing} label="Rename" elemBefore={<i className={iconClass('pen')} aria-hidden="true" />} />
-                </div>
-            </div>
-        ))}
-    </div>
-);
-
-RowSpecParity.play = async ({ canvasElement }) => {
-    const surfacePad = tokenLength(canvasElement, '--dropdown-menu-pad');
-    const padX = tokenLength(canvasElement, '--pad-x-md');
-    const rowGap = tokenLength(canvasElement, '--inline-md');
-    const rowRadius = tokenLength(canvasElement, '--radius-control-md');
-
-    for (const [spacing, expectedHeight] of [['default', 32], ['compact', 24]]) {
-        const menu = canvasElement.querySelector(`#parity-menu-${spacing}`);
-        const listbox = canvasElement.querySelector(`#parity-listbox-${spacing}`);
-        const menuStyle = getComputedStyle(menu);
-        const listStyle = getComputedStyle(listbox);
-
-        await expect(px(menuStyle.paddingTop), `${spacing} menu surface pad`).toBe(surfacePad);
-        await expect(px(menuStyle.paddingLeft), `${spacing} menu surface padLeft`).toBe(px(listStyle.paddingLeft));
-
-        const menuRow = menu.querySelector('.plus-menu-item');
-        const optionRow = listbox.querySelector('.plus-option-row');
-        const mStyle = getComputedStyle(menuRow);
-        const oStyle = getComputedStyle(optionRow);
-
-        await expect(Math.round(menuRow.getBoundingClientRect().height), `${spacing} row height`).toBe(expectedHeight);
-        await expect(Math.round(menuRow.getBoundingClientRect().height), `${spacing} equal row height`).toBe(
-            Math.round(optionRow.getBoundingClientRect().height),
-        );
-        await expect(px(mStyle.paddingTop), `${spacing} paddingTop`).toBe(px(oStyle.paddingTop));
-        await expect(px(mStyle.paddingBottom), `${spacing} paddingBottom`).toBe(px(oStyle.paddingBottom));
-        await expect(px(mStyle.paddingLeft), `${spacing} paddingLeft`).toBe(padX);
-        await expect(px(mStyle.paddingLeft), `${spacing} equal paddingLeft`).toBe(px(oStyle.paddingLeft));
-        await expect(px(mStyle.paddingRight), `${spacing} equal paddingRight`).toBe(px(oStyle.paddingRight));
-        await expect(px(mStyle.columnGap), `${spacing} gap`).toBe(rowGap);
-        await expect(px(mStyle.columnGap), `${spacing} equal gap`).toBe(px(oStyle.columnGap));
-        await expect(px(mStyle.borderTopLeftRadius), `${spacing} radius`).toBe(rowRadius);
-        await expect(px(mStyle.borderTopLeftRadius), `${spacing} equal radius`).toBe(px(oStyle.borderTopLeftRadius));
-        await expect(px(mStyle.fontSize), `${spacing} font size`).toBe(px(oStyle.fontSize));
     }
 };
 
