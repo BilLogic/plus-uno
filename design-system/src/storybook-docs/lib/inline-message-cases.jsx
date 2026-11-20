@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Icon, IconButton, InlineMessage, Popup } from '@/components';
-import { messageIcon } from '@/components/messaging/messageAppearance';
+import { InlineMessage } from '@/components';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
 export const fieldRow = {
@@ -14,11 +13,10 @@ export const fieldRow = {
  * Shared live InlineMessage demo for the Best practices DoDontPair blocks on
  * `InlineMessage.mdx` and the `BestPracticesLive` story in `InlineMessage.stories.jsx`.
  *
- * It is an InlineMessage's trigger and card built on Popup directly, because
- * the demo needs Popup's `onToggle(next, details)`: an open-at-rest card
- * (`defaultOpen`) ignores an outside press, so pressing another example does
- * not close it, but only until the person first changes it. After a press on
- * its trigger or Escape it is an ordinary popup that an outside press closes.
+ * It renders the component once, controlled with `isOpen`. An open-at-rest
+ * card (`defaultOpen`) ignores an outside press, so pressing another example
+ * does not close it, but only until the person first changes it. After a press
+ * on its trigger or Escape it is an ordinary popup that an outside press closes.
  * Nothing here reopens a card: the open state is the only thing that does.
  */
 export const LiveInlineMessage = ({
@@ -32,7 +30,7 @@ export const LiveInlineMessage = ({
     const [open, setOpen] = useState(defaultOpen);
     const [atRest, setAtRest] = useState(defaultOpen);
 
-    const handleToggle = (next, details) => {
+    const handleOpenChange = (next, details) => {
         if (!next && atRest && details?.reason === 'outside-press') {
             details.cancel?.();
             return;
@@ -45,28 +43,16 @@ export const LiveInlineMessage = ({
         <DocsOverlayBoundary fit={false} containHeight>
             <div style={fieldRow}>
                 <span>{field}</span>
-                <Popup
-                    trigger={(
-                        <IconButton
-                            icon={<Icon name={messageIcon(appearance)} style={{ color: `var(--ds-icon-${appearance === 'info' ? 'information' : appearance})` }} />}
-                            label={label}
-                            appearance="subtle"
-                            spacing="compact"
-                            className="plus-inline-message-trigger"
-                        />
-                    )}
+                <InlineMessage
+                    appearance={appearance}
+                    label={label}
+                    title={title}
                     placement="bottom"
-                    show={open}
-                    onToggle={handleToggle}
-                    className="plus-inline-message"
+                    isOpen={open}
+                    onOpenChange={handleOpenChange}
                 >
-                    <div className="plus-inline-message-content">
-                        <div className="plus-inline-message-heading">
-                            <strong className="plus-inline-message-title">{title}</strong>
-                        </div>
-                        {children}
-                    </div>
-                </Popup>
+                    {children}
+                </InlineMessage>
             </div>
         </DocsOverlayBoundary>
     );

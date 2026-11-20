@@ -19,15 +19,12 @@ export const CODE = showCode(examplesSource, [
     'BarScrambled',
     'MultiStepInnerSidebar',
     'MultiStepStepsInPage',
-    'AiPanel',
     'BareColumn',
     'BareWithSidebar',
 ]);
 
 /** Wide enough that the Frame inside the window docks its Sidebar (1024 and up). */
 const DOCKED_STAGE = 1100; // docs-literal: keeps the Frame at 1024 or more inside the window's border
-/** Wide enough that the Sidebar and the AI panel both dock (the Page keeps its 720 floor). */
-const PANEL_STAGE = 1440; // docs-literal: the X-Large stage
 
 const holdLinks = (event) => {
     if (event.target.closest('a')) event.preventDefault();
@@ -58,12 +55,6 @@ export const MultiStepInnerSidebar = () => <InWindow address="app.plus.org/terms
 
 /** The steps drawn again in the Page, beside a Sidebar that still lists the main areas: two lists for one task. */
 export const MultiStepStepsInPage = () => <InWindow address="app.plus.org/terms/new"><Example.MultiStepStepsInPage /></InWindow>;
-
-/** The panel docked at the right edge, the Page narrowing beside it. */
-export const AiPanelDocked = () => <InWindow address="app.plus.org/dashboard" stage={PANEL_STAGE}><Example.AiPanel /></InWindow>;
-
-/** The panel floating over the Page, hiding the rows beneath it: a Frame under 1168 cannot dock a 400 panel. */
-export const AiPanelFloating = () => <InWindow address="app.plus.org/dashboard"><Example.AiPanel /></InWindow>;
 
 /** One centered column: the form and its button. */
 export const BareColumn = () => <InWindow address="app.plus.org/sign-in"><Example.BareColumn /></InWindow>;

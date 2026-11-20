@@ -2,10 +2,12 @@
 embodiment: ide
 summary: A floating Panel keeps the page usable; Modal owns the Backdrop and modal focus behavior; Drawer is retired.
 status: active
-verified: 2026-11-13
+verified: 2026-11-20
 ---
 
 # ADR-044: A Panel floats and never takes a Backdrop; Drawer retires (2026-11-13)
+
+> **Naming (2026-11-20).** The layer is the Blanket, as the code and the glossary have it. This ADR wrote it as Backdrop, and the file name keeps that word so links resolve.
 
 **Decision.** A floating Panel sits over the page without a Backdrop. It does not register as a modal overlay. Drawer and its pattern tokens are retired. A confirmation opened from a Panel uses a Modal, which brings the Backdrop and owns modal focus behavior.
 

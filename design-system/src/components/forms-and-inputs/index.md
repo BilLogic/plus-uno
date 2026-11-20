@@ -43,11 +43,11 @@ authored half, counted rather than assumed.
 - **[Comment](Comment/index.md)** — Use `Comment` for one entry in a threaded discussion, such as a note on a session or a reply in a review thread.
   - For a plain multi-line input with no author or thread context, use `TextArea`.
   - For formatted notes with lists or links, use `RichTextEditor`.
-- **[DatePicker](DatePicker/index.md)** — Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.
+- **[DatePicker](DatePicker/index.md)** — Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period. The form value is ISO `YYYY-MM-DD` (`start/end` for a range); the field shows what was typed.
   - For a time of day with no date, use `TimePicker`.
   - For a combined date and time answer, use `DateTimePicker`.
   - For an always-visible month grid on the page, use `Calendar`.
-- **[DateTimePicker](DateTimePicker/index.md)** — Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.
+- **[DateTimePicker](DateTimePicker/index.md)** — Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline. The date's form value is ISO `YYYY-MM-DD`; the field shows what was typed.
   - For a date or date range with no time, use `DatePicker`.
   - For a time of day with no date, use `TimePicker`.
 - **[DropdownMenu](DropdownMenu/index.md)** — Use `DropdownMenu` for a trigger that opens a menu of actions or navigation links (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`).
@@ -196,7 +196,7 @@ authored half, counted rather than assumed.
 | [TextArea](TextArea/index.md) | 28 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 36 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
+| [Toggle](Toggle/index.md) | 18 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)

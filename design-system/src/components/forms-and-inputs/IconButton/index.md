@@ -10,7 +10,7 @@ Also asked as: icon only button, icon action.
 
 **Used in:** Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Filtering (`ds guide filtering`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx`
 

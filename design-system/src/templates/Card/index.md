@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Used in:** Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/templates/Card/Card.jsx`
 

@@ -137,7 +137,7 @@ describe('every drawn paint resolves to a role', () => {
       const vars = [...html.matchAll(/var\((--[\w-]+)\)/g)].map((m) => `var(${m[1]})`);
       expect(vars.length, `${name} paints nothing`).toBeGreaterThan(0);
       for (const v of vars) {
-        const structural = /^var\(--(stroke|border|radius|type|font-size|kit-label)/.test(v) || /^var\(--[\w-]*radius/.test(v);
+        const structural = /^var\(--(stroke|border|radius|type|font-size|heading-xs|body-sm)/.test(v) || /^var\(--[\w-]*radius/.test(v);
         if (structural) {
           // A corner or stroke width: a corner must be a component radius token.
           if (/radius/.test(v)) expect(corners.has(v), `${v} in ${name} is not a CORNER role token`).toBe(true);
@@ -199,5 +199,12 @@ describe('Zone label cap is per figure', () => {
     expect(html).toContain('data-control="tag"');
     const renderedLabels = html.match(/data-zone-label="/g) ?? [];
     expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
+  });
+});
+
+describe('a real label draws inside the label role group', () => {
+  it('ButtonShape text sits in a group that sets the label role', () => {
+    const html = renderToStaticMarkup(<svg><primitives.ButtonShape x={4} y={4} w={100} label="Save" /></svg>);
+    expect(html).toMatch(/<g[^>]*data-fidelity="real"[^>]*style="font:var\(--heading-xs\)"[^>]*><rect.*<text[^>]*font-size:0\.5em/);
   });
 });

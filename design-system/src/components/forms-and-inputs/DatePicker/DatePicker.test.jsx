@@ -436,9 +436,8 @@ describe('DatePicker, focus events', () => {
 });
 
 describe('DatePicker, in a form', () => {
-    // Open design call for Bill: whether a form should post the ISO date that
-    // `onChange` reports or the typed text. This pins what it does today.
-    it('currently submits the typed MM/DD/YYYY text under its name, not the ISO date', async () => {
+    // The field keeps the typed text; the form posts the ISO date `onChange` reports.
+    it('submits the ISO date under its name while the field keeps the typed text', async () => {
         const user = userEvent.setup();
         const { container } = render(
             <form>
@@ -448,7 +447,24 @@ describe('DatePicker, in a form', () => {
         const form = container.querySelector('form');
         expect(submitted(form)).toEqual([['starts', '']]);
         await user.type(field(), '10/21/2026{Enter}');
-        expect(submitted(form)).toEqual([['starts', '10/21/2026']]);
+        expect(submitted(form)).toEqual([['starts', '2026-10-21']]);
+        expect(field()).toHaveValue('10/21/2026');
+    });
+
+    it('submits a range as start/end, with an empty side when one end is unset', async () => {
+        const user = userEvent.setup();
+        const { container } = render(
+            <form>
+                <Dated text="Session dates" name="span" range />
+            </form>,
+        );
+        const form = container.querySelector('form');
+        expect(submitted(form)).toEqual([['span', '']]);
+        await user.type(field('Session dates'), '10/19/2026{Enter}');
+        expect(submitted(form)).toEqual([['span', '2026-10-19/']]);
+        await user.clear(field('Session dates'));
+        await user.type(field('Session dates'), '10/19/2026 – 10/23/2026{Enter}');
+        expect(submitted(form)).toEqual([['span', '2026-10-19/2026-10-23']]);
     });
 
     it('does not submit a disabled field', () => {

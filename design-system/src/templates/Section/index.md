@@ -211,12 +211,13 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 
 | Token | Used for |
 | --- | --- |
-| `--section-stack-sm` | Title row to header rows. |
+| `--section-stack-sm` | Title row to header rows, and between the rows: 8. |
 | `--section-stack-md` | Header to body; body to footer. |
 | `--section-stack-lg` | Between subsections. |
 | `--section-min-width-main`, `--section-min-width-side` | The main and side columns of a split. |
 | `--card-pad`, `--card-radius` | The detail, which is a sunken Card, on `--ds-surface-sunken`. |
-| `--heading-md`, `--heading-sm` | A Section title and a subsection title. |
+| `--heading-md`, `--heading-sm` | A Section title (20) and a subsection title (16). |
+| `--body-default` | The description under the title: 14. |
 
 ## Content guidelines
 
