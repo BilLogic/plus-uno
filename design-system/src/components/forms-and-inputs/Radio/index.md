@@ -6,11 +6,11 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Import:** `import { Radio } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Soft, Tile, TileNarrowLargeIllustrations
+**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Soft, Tile, TileNarrowLargeIllustrations, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio/Radio.mdx`
 
@@ -85,6 +85,10 @@ For six or more options, use `Select`. Do not write numeric options that overlap
 ### Keep extra detail in `description`. {#keep-extra-detail-in-description}
 
 `description` renders under the label and is read after the name.
+
+### Let a `Radio` label longer than its line wrap. {#let-a-radio-label-longer-than-its-line-wrap}
+
+The circle keeps its size at the top of the row, and the label is never clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

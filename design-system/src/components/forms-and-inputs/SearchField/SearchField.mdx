@@ -78,6 +78,14 @@ what is searched.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={SearchFieldStories.Overflow} title="Truncate" description="A query longer than the field stays on one line; the clear action keeps its place at the end." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="SearchField" />
@@ -208,6 +216,10 @@ A view bar holds 32-high controls, so pass `spacing="compact"`.
 
 Use `isCollapsible` when the bar keeps quiet until search is needed. Elsewhere
 leave the field open.
+
+### Let a `SearchField` query longer than the field end in an ellipsis.
+
+The clear action keeps its place at the end, and focusing the field reaches the rest of the query. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

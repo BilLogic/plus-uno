@@ -10,11 +10,11 @@ Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions
 
 **Used in:** Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, OpensWithAFade, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge, BestPracticesLive
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, OpensWithAFade, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge, BestPracticesLive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
@@ -91,6 +91,10 @@ Don't: Long, near-identical labels.
 ### Keep menus one level deep. {#keep-menus-one-level-deep}
 
 The Menu family has no submenu-trigger row. Flatten the choices or use sections.
+
+### Let a `DropdownMenu` item longer than the menu end in an ellipsis with a Tooltip. {#let-a-dropdownmenu-item-longer-than-the-menu-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the label is clipped, and the item keeps its row height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

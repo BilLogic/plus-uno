@@ -97,6 +97,14 @@ A text area lets a person enter plain multi-line text.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={TextAreaStories.Overflow} title="Grow" description="A long note wraps inside the field's width, scrolls inside the box past its rows and never scrolls sideways." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="TextArea" />
@@ -258,6 +266,10 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
     dontExample={<TextArea label="Session summary" defaultValue="Worked through fractions." isDisabled caption="Locked after the session ends." />}
     dontCaption="Disabled fades a value people need to read."
 />
+
+### Let a `TextArea` note longer than its rows wrap and scroll inside the field.
+
+The field keeps its width, scrolls vertically past `rows` and can be resized from its corner. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

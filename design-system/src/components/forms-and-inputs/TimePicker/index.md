@@ -8,11 +8,11 @@ Also asked as: time input, clock, time field, time selector.
 
 **Import:** `import { TimePicker } from '@/components';`
 
-**Governed by:** Read-only (`ds guide read-only`)
+**Governed by:** Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickTime, TwentyFourHourValueIsSplit, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickTime, TwentyFourHourValueIsSplit, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx`
 
@@ -71,6 +71,10 @@ Every option in the list carries `AM` or `PM` (`9:30 AM` and `9:30 PM` are separ
 
 Do: A set time, read-only and easy to read.
 Don't: The same time disabled, faded as if it did not apply.
+
+### Let a `TimePicker` stay on one line in a narrow slot. {#let-a-timepicker-stay-on-one-line-in-a-narrow-slot}
+
+The field is typed in, so it has no Tooltip: focus reaches the whole value. It keeps its height and stays inside its slot; give it room for the whole time. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -66,11 +66,12 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 <ComponentExample of={OverflowStories.PagedInFooter} title="Page a table" description="A table pages instead of growing, keeping the range and pager at the end of the Section footer. Use the pager to switch pages." />
 
-The three cases below are Planned <PlannedTag />: no component carries them yet.
+The two cases below are Planned <PlannedTag />: no component carries them yet.
 
 - **The breadcrumb middle.** Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. The Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
-- **A file name.** The one mid-line truncation: a file name or an id keeps its start and its end, because the end tells them apart.
+
+A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
 
 </div>
 
@@ -110,9 +111,27 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
 <tr><td>Breadcrumb with five or more levels <PlannedTag /></td><td>Planned: fold the middle into "…"</td><td>The "…" opens a menu of the hidden levels</td></tr>
 <tr><td>Open item in the Sidebar <PlannedTag /></td><td>Planned: truncate at the end</td><td>Tooltip with the school</td></tr>
-<tr><td>Auto-width Popup row <PlannedTag /></td><td>Planned: truncate at the end at 320</td><td>Tooltip when clipped</td></tr>
-<tr><td>File name, id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
+<tr><td>Menu item and Popup row</td><td>Truncate at the end</td><td>Tooltip on hover and focus when clipped</td></tr>
+<tr><td>Button label</td><td>Truncate at the end, no Tooltip</td><td>Shorten the label; the full label stays in the accessible name</td></tr>
+<tr><td>File name</td><td>Truncate mid-line, keeping the extension</td><td>Tooltip on hover and focus when clipped</td></tr>
+<tr><td>Id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
 <tr><td>A list of items, tags or notes <PlannedTag /></td><td>Planned: "Show n more", "Show less"</td><td>Expanded in place</td></tr>
+</tbody>
+</DocsTable>
+
+### Fields and inputs
+
+A field answers a value longer than its room with one of four rules, chosen by what the value is. The answer is the same in every component that shares the rule, and each component's Overflow example shows it.
+
+<DocsTable>
+<thead>
+<tr><th>Rule</th><th>Use it when</th><th>What happens</th><th>Components</th></tr>
+</thead>
+<tbody>
+<tr><td>Grow</td><td>The value is written or read whole: notes, labels, descriptions, a set of tags being edited.</td><td>The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself.</td><td>Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Fieldset, Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu.</td></tr>
+<tr><td>Truncate</td><td>The box has one fixed line and the value is a name, a date or a choice.</td><td>One line ending in an ellipsis. The slots keep their places and the box keeps its height.</td><td>Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button (one value), Dropdown menu items, File item (mid-name), and Button family labels without a Tooltip.</td></tr>
+<tr><td>Collapse</td><td>The value is a list the field shows as tags.</td><td>One line with a +n count of what is hidden; focus or a click on +n shows every item.</td><td>Tag input at rest, multiple Select (truncate), Tag group.</td></tr>
+<tr><td>Scroll</td><td>The value is a list that must stay on one line and every item must stay reachable.</td><td>One row that scrolls sideways inside the field.</td><td>Multiple Select (no wrap).</td></tr>
 </tbody>
 </DocsTable>
 
@@ -153,7 +172,7 @@ They must be read whole, so they take more lines. Nothing that tells a person wh
 
 <RuleTag kind="automatic" />
 
-An ellipsis stands for three or more characters. A cell stays one line. Mid-line truncation is only for file names and ids, where the end tells them apart; it is Planned <PlannedTag />. Truncating from the front is not used.
+An ellipsis stands for three or more characters. A cell stays one line. Mid-line truncation is only for file names and ids, where the end tells them apart; a file name does it today in the File item, and an id is Planned <PlannedTag />. Truncating from the front is not used.
 
 ### Open the full text in a Tooltip only when it is clipped.
 
@@ -169,6 +188,20 @@ The Tooltip opens on hover and on focus, and the clipped element becomes a tab s
     dontCode={CODE.ClippedCellNoText}
     dontCaption="A clipped cell with nothing to open: the rest of the text cannot be read."
 />
+
+### Grow a field by whole rows and stop it at a maximum height.
+
+<RuleTag kind="review" />
+
+A field that grows adds a whole line or a whole tag row and never a blank one: the room under the last row is the room above the first. Past its maximum height, three tag rows for a Tag input, the field scrolls inside itself and the page never moves. No field grows sideways, and none makes its well scroll sideways.
+
+### Reach the full value of a clipped field through focus or a Tooltip.
+
+<RuleTag kind="review" />
+
+A text field the person types in, such as a Text field, a Search field, a Select you type in, or a Date, Time or Date time picker, has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is picked from, such as a Select with `isSearchable` off, a Popup select, a Tree select, a Cascader, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+
+The one exception is a Button, Link button, Split button or Button group: its label ends in an ellipsis with no Tooltip, so shorten the label. The full label stays in the accessible name.
 
 ### Make a bare ellipsis open a menu.
 
@@ -205,7 +238,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><td>"Show 4 more" and "Show less" (Planned). <PlannedTag /></td><td>"Load more", "See all", "…".</td></tr>
 <tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). <PlannedTag /></td><td>The whole title in the Sidebar.</td></tr>
 <tr><td>Breadcrumb levels by the page's own title: "Lincoln Middle School".</td><td>"Back", "Up one level".</td></tr>
-<tr><td>File name mid-line: "reflection_…_week12.pdf" (Planned). <PlannedTag /></td><td>"reflection_maya_rodrig…".</td></tr>
+<tr><td>File name mid-line: "reflection_…_week12.pdf".</td><td>"reflection_maya_rodrig…".</td></tr>
 </tbody>
 </DocsTable>
 
@@ -236,6 +269,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><td>Label</td><td><a target="_top" href="./?path=/docs/components-labels-tag-tag--docs">Tag</a>, <a target="_top" href="./?path=/docs/components-labels-status-tag--docs">Status tag</a></td><td>`maxWidth` caps the tag; a clipped label ends in an ellipsis.</td></tr>
 <tr><td>Folded tags</td><td><a target="_top" href="./?path=/docs/components-labels-tag-group--docs">Tag group</a></td><td>`overflow="collapse"` keeps one line and folds the rest into +n.</td></tr>
 <tr><td>Cell</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>A cell's `overflow` is `truncate` by default; `wrap` takes more lines.</td></tr>
+<tr><td>File name</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-file-upload-file-item--docs">File item</a></td><td>Keeps the start and the extension, and opens the full name in a Tooltip while clipped.</td></tr>
 <tr><td>Trail</td><td><a target="_top" href="./?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumb</a></td><td>The fold is Planned <PlannedTag />; the component never folds its middle yet.</td></tr>
 <tr><td>Pager</td><td><a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a></td><td>Fills the Section's footer slot, aligned to the end.</td></tr>
 </tbody>

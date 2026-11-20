@@ -10,7 +10,7 @@ Also asked as: attach file, dropzone, drag and drop file.
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, Default, AllowFolders, WithFiles, UploadingBatch, DragOver, ReadOnly, Required, Invalid, Valid, Disabled, KeyboardFocus, InvalidFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, Default, AllowFolders, WithFiles, UploadingBatch, DragOver, ReadOnly, Required, Invalid, Valid, Disabled, KeyboardFocus, InvalidFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
@@ -81,6 +81,10 @@ The picker offers the listed types first and every platform lets the user overri
 // Correct: put the qualification in the description, which is prose.
 <FileUpload label="Report" description="PDF, up to 10 MB." />
 ```
+
+### Let a `FileUpload` file name longer than its row end in the middle. {#let-a-fileupload-file-name-longer-than-its-row-end-in-the-middle}
+
+Each row keeps its height and the extension stays visible. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

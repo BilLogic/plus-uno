@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
 import { FieldBox, FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '@/lib/field';
@@ -350,26 +351,33 @@ const Cascader = ({
                         <Icon name="caret-down" className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />
                     )}
                 >
-                    <input
-                        ref={inputRef}
-                        id={fieldId}
-                        type="text"
-                        readOnly
-                        value={displayText}
-                        placeholder={placeholder}
-                        disabled={isDisabled}
-                        className="plus-field__control plus-cascader-input"
-                        onKeyDown={handleTriggerKeyDown}
-                        role="combobox"
-                        aria-haspopup="listbox"
-                        aria-expanded={isOpen}
-                        aria-controls={isOpen ? menuId : undefined}
-                        aria-labelledby={props['aria-labelledby'] || labelId}
-                        aria-required={isRequired || undefined}
-                        aria-describedby={describedBy}
-                        {...tones.control}
-                        {...props}
-                    />
+                    <ClippedTooltip text={isOpen ? '' : displayText} placement="top" deps={[displayText, isOpen]}>
+                        {({ measureRef }) => (
+                        <input
+                            ref={(node) => {
+                                inputRef.current = node;
+                                measureRef.current = node;
+                            }}
+                            id={fieldId}
+                            type="text"
+                            readOnly
+                            value={displayText}
+                            placeholder={placeholder}
+                            disabled={isDisabled}
+                            className="plus-field__control plus-cascader-input"
+                            onKeyDown={handleTriggerKeyDown}
+                            role="combobox"
+                            aria-haspopup="listbox"
+                            aria-expanded={isOpen}
+                            aria-controls={isOpen ? menuId : undefined}
+                            aria-labelledby={props['aria-labelledby'] || labelId}
+                            aria-required={isRequired || undefined}
+                            aria-describedby={describedBy}
+                            {...tones.control}
+                            {...props}
+                        />
+                        )}
+                    </ClippedTooltip>
                 </FieldBox>
 
                 {/* The listbox surface; its body holds one column per level. */}

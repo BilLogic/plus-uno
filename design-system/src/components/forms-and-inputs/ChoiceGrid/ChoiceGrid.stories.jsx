@@ -5,6 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Choice grid',
@@ -448,4 +449,30 @@ Overview.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(rowLabel).backgroundColor, `${mode}: row label takes the sunken fill`).toBe(sunken);
         await expect(getComputedStyle(bodyCell).backgroundColor, `${mode}: body cell takes the sunken fill`).toBe(sunken);
     });
+};
+
+/** Wrap: a row label longer than its column takes more lines; columns that cannot fit scroll inside the grid, never the page. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '360px' /* demo frame */ }}>
+            <ChoiceGrid
+                id="cg-overflow"
+                type="radio"
+                rows={[{ id: 'row-1', label: LONG_TOPIC }, { id: 'row-2', label: 'Monday' }]}
+                columns={columns}
+                values={{}}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const wrapper = canvasElement.querySelector('.plus-choice-grid-wrapper');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(wrapper, canvasElement.firstElementChild);
+        const label = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes(LONG_TOPIC));
+        await expect(label).toBeTruthy();
+        const short = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes('Monday'));
+        await expect(label.getBoundingClientRect().height).toBeGreaterThan(short.getBoundingClientRect().height);
+        await expect(canvasElement.querySelectorAll('input[type=radio]')).toHaveLength(8);
+    },
 };

@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextArea from './TextArea';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Text area',
@@ -278,4 +279,24 @@ export const FieldInvalid = {
 export const FieldReadOnly = {
     render: () => <div style={wrap}><TextArea id="textarea-ex-readonly" label="Notes" placeholder="What did you cover?" isReadOnly /></div>,
     play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
+};
+
+/** Grow: a long note wraps onto more lines inside the field's own width; it never scrolls sideways. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <TextArea id="text-area-overflow" label="Session notes" rows={2} defaultValue={`${LONG_SENTENCE} ${LONG_SENTENCE}`} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const area = within(canvasElement).getByRole('textbox', { name: 'Session notes' });
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(area.closest('.plus-field') || area, canvasElement.firstElementChild);
+        await expect(area.scrollWidth).toBeLessThanOrEqual(area.clientWidth + 1);
+        await expect(getComputedStyle(area).resize).toBe('vertical');
+        await expect(area.value).toBe(`${LONG_SENTENCE} ${LONG_SENTENCE}`);
+        // The text is reachable: scrolling inside the field reaches the last line.
+        area.scrollTop = area.scrollHeight;
+        await expect(area.scrollTop + area.clientHeight).toBeGreaterThanOrEqual(area.scrollHeight - 1);
+    },
 };

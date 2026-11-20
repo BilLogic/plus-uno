@@ -5,6 +5,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
 import TagInput from './TagInput';
+import { MANY_TAGS, expectNoSilentClip, expectInsideWell, expectNoBlankLine } from '../_internal/overflowPlays';
 
 /**
  * `TagInput` — a field of Tags with a text entry after them, modeled on
@@ -822,4 +823,59 @@ export const Focused = {
 export const FieldDisabled = {
     render: () => <div style={wrap}><TagInput id="taginput-ex-disabled" label="Topics" options={TOPICS} isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+const MANY_TOPICS = [...MANY_TAGS, ...MANY_TAGS.map((tag) => `${tag} review`)];
+
+const OverflowSet = () => (
+    <div style={{ width: '320px' /* demo frame */ }}>
+        <TagInput label="Topics" options={TOPICS} defaultTags={MANY_TOPICS} />
+    </div>
+);
+
+/** Collapse: at rest the tags keep one line and the rest count as "+n"; clicking "+n" shows every tag. */
+export const OverflowCollapse = {
+    name: 'Overflow: collapse',
+    render: () => <OverflowSet />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvasElement.querySelector('.plus-field');
+        const list = canvas.getByRole('list', { name: 'Selected: Topics' });
+        const count = await within(list).findByRole('button', { name: /^\+\d+ more tags?$/ });
+        await expect(count).toBeVisible();
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        // The count says how many are hidden, and the hidden tags are all reachable by opening it.
+        const shown = within(list).getAllByRole('listitem').filter((el) => el.getBoundingClientRect().width > 0 && !el.matches('.plus-tag-group__item--hidden')).length;
+        await expect(Number(count.textContent.match(/\d+/)[0]) + shown).toBeGreaterThanOrEqual(MANY_TOPICS.length);
+        await userEvent.click(count);
+        await waitFor(() => expect(within(list).queryByRole('button', { name: /more tag/ })).not.toBeInTheDocument());
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(MANY_TOPICS.length);
+    },
+};
+
+/** Grow: with focus the field grows by whole tag rows with no blank line, and past three rows it scrolls inside the field, never the page. */
+export const OverflowGrow = {
+    name: 'Overflow: grow',
+    render: () => <OverflowSet />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvasElement.querySelector('.plus-field');
+        const list = canvas.getByRole('list', { name: 'Selected: Topics' });
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Topics' }));
+        await waitFor(() => expect(within(list).queryByRole('button', { name: /more tag/ })).not.toBeInTheDocument());
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(MANY_TOPICS.length);
+        await expect(box.getBoundingClientRect().height).toBeGreaterThan(40);
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expectNoBlankLine(box, '.plus-tag-group__item:not(.plus-tag-group__item--hidden), .plus-tag-input__entry');
+        const content = box.querySelector('.plus-tag-input__content');
+        await expect(getComputedStyle(content).overflowY).toBe('auto');
+        await expect(content.scrollHeight).toBeGreaterThan(content.clientHeight);
+        await expect(content.clientHeight).toBeLessThanOrEqual(parseFloat(getComputedStyle(content).maxHeight));
+        // The last tag is reachable by scrolling inside the field.
+        content.scrollTop = content.scrollHeight;
+        await expect(content.scrollTop + content.clientHeight).toBeGreaterThanOrEqual(content.scrollHeight - 1);
+    },
 };

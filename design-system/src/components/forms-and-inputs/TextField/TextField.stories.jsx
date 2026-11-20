@@ -7,6 +7,7 @@ import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Text field',
@@ -595,4 +596,26 @@ export const FieldInvalid = {
 export const FieldReadOnly = {
     render: () => <div style={wrap}><TextField id="textfield-ex-readonly" label="Your name" placeholder="Name" isReadOnly /></div>,
     play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
+};
+
+/** Truncate: a value longer than the field stays on one line and ends in an ellipsis; focusing the field reaches the rest. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <TextField id="text-field-overflow" label="Tutor name" defaultValue={LONG_TUTOR} elemAfterInput={<i className="fa-solid fa-circle-check" aria-hidden="true" />} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const input = within(canvasElement).getByRole('textbox', { name: 'Tutor name' });
+        const box = input.closest('.plus-field');
+        await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        // The icon after the control keeps its place at the end of the box.
+        const icon = box.querySelector('i.fa-circle-check');
+        await expect(icon.getBoundingClientRect().right).toBeLessThanOrEqual(box.getBoundingClientRect().right);
+        // Focus is how the rest is reached: the caret walks to the end of the value.
+        await expectReachableByFocus(canvasElement, input, LONG_TUTOR);
+    },
 };

@@ -8,11 +8,11 @@ Also asked as: multi-select, checklist, tick box.
 
 **Import:** `import { Checkbox } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Soft, Tile, TileNarrowLargeIllustrations
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Soft, Tile, TileNarrowLargeIllustrations, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
@@ -101,6 +101,10 @@ Don't: A disabled box cannot be tabbed to.
 ### Treat `isIndeterminate` as display only. {#treat-isindeterminate-as-display-only}
 
 The underlying value is still checked or unchecked. Clicking a mixed box resolves it like any other, so it cannot be used as a third stored value.
+
+### Let a `Checkbox` label longer than its line wrap. {#let-a-checkbox-label-longer-than-its-line-wrap}
+
+The box keeps its size at the top of the row, and the label is never clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

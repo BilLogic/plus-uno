@@ -71,6 +71,14 @@ branches in place rather than drilling down one level at a time.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={TreeSelectStories.Overflow} title="Truncate" description="A chosen value longer than the field keeps one line and ends in an ellipsis." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="TreeSelect" />
@@ -220,6 +228,10 @@ subtree is complete.
     ]}
 />
 ```
+
+### Let a `TreeSelect` value longer than the field end in an ellipsis.
+
+The full value opens in a Tooltip on hover and focus, only while it is clipped. The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

@@ -74,6 +74,14 @@ A setting row places a setting's name and description at the start and its contr
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={SettingRowStories.Overflow} title="Wrap" description="A long label and description take more lines at the start while the control keeps its size at the end." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="SettingRow" />
@@ -230,6 +238,10 @@ When a setting waits on another setting on the same page, explain how to unlock 
     )}
     dontCaption="Disabled control gives no clue why it cannot be changed."
 />
+
+### Let a `SettingRow` label and description longer than their line wrap.
+
+The control keeps its size and place at the end of the row. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

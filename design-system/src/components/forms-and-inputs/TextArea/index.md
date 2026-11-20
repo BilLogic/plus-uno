@@ -8,11 +8,11 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Import:** `import { TextArea } from '@/components';`
 
-**Governed by:** Read-only (`ds guide read-only`)
+**Governed by:** Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, Rows1, Rows3, Rows6, SpacingDefault, SpacingCompact, Filled, Success, Warning, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, Rows1, Rows3, Rows6, SpacingDefault, SpacingCompact, Filled, Success, Warning, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx`
 
@@ -85,6 +85,10 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
+
+### Let a `TextArea` note longer than its rows wrap and scroll inside the field. {#let-a-textarea-note-longer-than-its-rows-wrap-and-scroll-inside-the-field}
+
+The field keeps its width, scrolls vertically past `rows` and can be resized from its corner. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -109,6 +109,14 @@ A link button navigates to another page, site or place on a page, and looks like
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={LinkButtonStories.Overflow} title="Truncate" description="A label longer than its room ends in an ellipsis inside the link button." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="LinkButton" />
@@ -254,6 +262,10 @@ Keep the natural width. Reserve `shouldFitContainer` for narrow containers, such
 ### Align with the button group.
 
 Right-align in multi-step tasks and Modals; left-align on full-page forms and content-heavy screens.
+
+### Let a `LinkButton` label longer than its room end in an ellipsis.
+
+The link keeps its height and never leaves its slot. A clipped label has no Tooltip, so shorten it; the full label stays in the accessible name. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

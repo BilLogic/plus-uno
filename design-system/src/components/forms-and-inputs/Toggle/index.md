@@ -10,11 +10,11 @@ Also asked as: enable disable, on/off setting.
 
 **Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`)
 
-**Governed by:** Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
@@ -74,6 +74,10 @@ A toggle changes the setting as soon as it is flipped. If the change needs confi
 ### Use read-only for fixed settings and disabled for unavailable ones. {#use-read-only-for-fixed-settings-and-disabled-for-unavailable-ones}
 
 `isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. See [Read-only](?path=/docs/patterns-states-read-only--docs).
+
+### Let a `Toggle` label longer than its line wrap. {#let-a-toggle-label-longer-than-its-line-wrap}
+
+The switch keeps its size, and the label is never clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

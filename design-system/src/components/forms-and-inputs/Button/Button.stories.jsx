@@ -8,6 +8,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 import { CountTag, FooterActions, Icon, SectionMessage } from '@/components';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 const icons = {
     'none': null,
     'plus': 'plus',
@@ -796,5 +797,26 @@ export const FooterLayouts = {
         await expect(notNow, 'declining is a default secondary, not subtle').toHaveClass('plus-btn--default');
         await expect(notNow).toHaveClass('plus-btn--fit-container');
         await expect(close(notNow.getBoundingClientRect().left, declineTracks.span(1, 2).left), 'secondary starts at track 1').toBe(true);
+    },
+};
+
+/** Truncate: a label longer than its room ends in an ellipsis inside the button, the icons keep their places and the button never leaves its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <Button text={LONG_SCHOOL} iconBefore="plus" iconAfter={<Icon name="chevron-down" size={12} />} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button');
+        await expectNoSilentClip(button);
+        await expectInsideWell(button, canvasElement.firstElementChild);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
+        await expect(button).toHaveTextContent(LONG_SCHOOL);
+        // The exception: a button label ends in an ellipsis with no Tooltip, so the full label stays in the accessible name. Shorten the label.
+        await expect(button).toHaveAccessibleName(LONG_SCHOOL);
+        const icons = button.querySelectorAll('i');
+        await expect(icons).toHaveLength(2);
+        for (const icon of icons) await expectTrailingKept(button, icon);
     },
 };

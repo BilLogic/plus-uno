@@ -5,6 +5,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { FileItem } from '@/components';
 import FileUpload from './FileUpload';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { LONG_FILE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
@@ -615,4 +616,25 @@ Interactive.args = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-file-upload-container'), 'Drop zone radius is 16').toBe('16px');
+};
+
+/** Truncate and keep the list: a long file name ends mid-name in its row, and the drop zone's button text stays on one line inside the field. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '320px' /* demo frame */ }}>
+            <FileUpload id="file-upload-overflow" label="Upload files" buttonText="Choose a file" acceptedFormats={['PDF', 'DOCX']}>
+                <FileItem name={LONG_FILE} status="done" fileType="pdf" meta="2.4 MB" removal="remove" />
+                <FileItem name="reflection.pdf" status="done" fileType="pdf" meta="120 KB" removal="remove" />
+            </FileUpload>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.firstElementChild.firstElementChild || canvasElement.firstElementChild, canvasElement.firstElementChild);
+        const rows = canvasElement.querySelectorAll('.plus-file-item');
+        await expect(rows).toHaveLength(2);
+        for (const row of rows) await expect(Math.round(row.getBoundingClientRect().height)).toBe(56);
+        await expect(canvasElement).toHaveTextContent('.pdf');
+        await expectFullTextReachable(canvasElement, canvasElement.querySelector('.plus-file-item__name'), LONG_FILE);
+    },
 };

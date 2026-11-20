@@ -101,6 +101,14 @@ A choice grid asks one question of several things at once, as a matrix of radios
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={ChoiceGridStories.Overflow} title="Wrap" description="A row label longer than its column takes more lines, and the grid stays inside its well." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="ChoiceGrid" />
@@ -257,6 +265,10 @@ Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids t
     dontExample={<FigureStack><ChoiceGrid type="radio" size={14} rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning' }} onChange={() => {}} /><ChoiceGrid type="radio" size={12} rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often' }} onChange={() => {}} /></FigureStack>}
     dontCaption="A `size={12}` grid under a `size={14}` grid."
 />
+
+### Let a `ChoiceGrid` row label longer than its column wrap.
+
+The grid keeps to its width instead of scrolling the page sideways. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

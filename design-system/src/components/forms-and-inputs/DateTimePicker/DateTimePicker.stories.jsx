@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import DateTimePicker from './DateTimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date time picker',
@@ -362,5 +363,23 @@ export const KeyboardFocus = {
     play: async ({ canvasElement }) => {
         await expectFieldFocused(canvasElement, fieldBox(canvasElement, 0), dateInput(canvasElement), 'date half');
         await expectFieldFocused(canvasElement, fieldBox(canvasElement, 1), timeInput(canvasElement), 'time half');
+    },
+};
+
+/** Truncate: in a narrow field the date keeps one line, ends in an ellipsis and, being typed in, has no Tooltip: focus reaches the whole value; the time stays whole and the field stays inside its slot. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '120px' /* demo frame */ }}>
+            <DateTimePicker id="datetime-overflow" label="Session start" showSectionLabels={false} dateValue="2026-11-19" timeValue="04:45 PM" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const [date, time] = canvasElement.querySelectorAll('input');
+        await expect(date.value).toMatch(/2026/);
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.querySelector('.plus-field'), canvasElement.firstElementChild);
+        await expect(date.scrollWidth).toBeGreaterThan(date.clientWidth);
+        await expectReachableByFocus(canvasElement, date, date.value);
+        await expect(time.value).toMatch(/4:45/);
     },
 };

@@ -80,6 +80,14 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Overflow
+
+<ComponentExample of={RichTextEditorStories.Overflow} title="Grow" description="Text longer than the writing area wraps and grows the area by whole lines; the toolbar wraps instead of scrolling." />
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -219,6 +227,10 @@ Pressing those buttons opens the platform `prompt()` dialog for a URL. It is uns
     dontExample={<RichTextEditor placeholder="What did you cover?" minHeight={96} />}
     dontCaption="No label, only a placeholder, which disappears as soon as someone types."
 />
+
+### Let a `RichTextEditor` note longer than its area grow the area by whole lines.
+
+The editor keeps its width, and the toolbar wraps instead of scrolling sideways. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

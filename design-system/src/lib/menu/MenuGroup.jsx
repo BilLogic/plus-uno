@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
+import ClippedTooltip from '../ClippedTooltip';
 import './MenuGroup.scss';
 
 /**
@@ -92,11 +93,11 @@ Section.propTypes = {
 };
 
 /** The row shared by ButtonItem, LinkItem and CustomItem. */
-const ItemRow = ({ elemBefore, elemAfter, description, children }) => (
+const ItemRow = ({ elemBefore, elemAfter, description, labelRef, children }) => (
     <>
         {elemBefore && <span className="plus-menu-item-icon plus-menu-item-icon--before">{elemBefore}</span>}
         <span className="plus-menu-item-content">
-            <span className="plus-menu-item-label">{children}</span>
+            <span ref={labelRef} className="plus-menu-item-label">{children}</span>
             {description && <span className="plus-menu-item-description">{description}</span>}
         </span>
         {elemAfter && <span className="plus-menu-item-icon plus-menu-item-icon--after">{elemAfter}</span>}
@@ -107,7 +108,24 @@ ItemRow.propTypes = {
     elemBefore: PropTypes.node,
     elemAfter: PropTypes.node,
     description: PropTypes.node,
+    labelRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
     children: PropTypes.node,
+};
+
+/**
+ * A label that does not fit ends in an ellipsis, and its full text opens in a
+ * Tooltip on hover and focus, only while it is clipped. Only a string label can
+ * be shown that way.
+ */
+const ItemTooltip = ({ label, children }) => (
+    <ClippedTooltip text={typeof label === 'string' ? label : ''} placement="right">
+        {({ measureRef }) => children(measureRef)}
+    </ClippedTooltip>
+);
+
+ItemTooltip.propTypes = {
+    label: PropTypes.node,
+    children: PropTypes.func.isRequired,
 };
 
 function useRovingHandlers(roving) {
@@ -132,21 +150,25 @@ export const ButtonItem = ({
     const onKeyDown = useRovingHandlers(roving);
 
     return (
-        <button
-            type="button"
-            ref={(node) => { ref.current = node; return roving?.register(node); }}
-            role="menuitem"
-            disabled={isDisabled}
-            aria-disabled={isDisabled || undefined}
-            aria-current={isSelected || undefined}
-            onClick={onClick}
-            onKeyDown={onKeyDown}
-            data-testid={testId}
-            className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected }, className)}
-            {...props}
-        >
-            <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
-        </button>
+        <ItemTooltip label={children}>
+            {(labelRef) => (
+                <button
+                    type="button"
+                    ref={(node) => { ref.current = node; return roving?.register(node); }}
+                    role="menuitem"
+                    disabled={isDisabled}
+                    aria-disabled={isDisabled || undefined}
+                    aria-current={isSelected || undefined}
+                    onClick={onClick}
+                    onKeyDown={onKeyDown}
+                    data-testid={testId}
+                    className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected }, className)}
+                    {...props}
+                >
+                    <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description} labelRef={labelRef}>{children}</ItemRow>
+                </button>
+            )}
+        </ItemTooltip>
     );
 };
 
@@ -170,20 +192,24 @@ export const LinkItem = ({
     const onKeyDown = useRovingHandlers(roving);
 
     return (
-        <a
-            href={isDisabled ? undefined : href}
-            ref={(node) => roving?.register(node)}
-            role="menuitem"
-            aria-disabled={isDisabled || undefined}
-            aria-current={isSelected || undefined}
-            tabIndex={isDisabled ? -1 : undefined}
-            onKeyDown={onKeyDown}
-            data-testid={testId}
-            className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className)}
-            {...props}
-        >
-            <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
-        </a>
+        <ItemTooltip label={children}>
+            {(labelRef) => (
+                <a
+                    href={isDisabled ? undefined : href}
+                    ref={(node) => roving?.register(node)}
+                    role="menuitem"
+                    aria-disabled={isDisabled || undefined}
+                    aria-current={isSelected || undefined}
+                    tabIndex={isDisabled ? -1 : undefined}
+                    onKeyDown={onKeyDown}
+                    data-testid={testId}
+                    className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className)}
+                    {...props}
+                >
+                    <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description} labelRef={labelRef}>{children}</ItemRow>
+                </a>
+            )}
+        </ItemTooltip>
     );
 };
 

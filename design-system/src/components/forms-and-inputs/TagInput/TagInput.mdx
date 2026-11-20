@@ -119,6 +119,16 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={TagInputStories.OverflowCollapse} title="Collapse" description="At rest the tags keep one line and the rest count as +n; clicking +n shows every tag." />
+
+<ComponentExample of={TagInputStories.OverflowGrow} title="Grow" description="With focus the field grows by whole tag rows with no blank line, and past three rows it scrolls inside the field." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="TagInput" />
@@ -355,6 +365,10 @@ A field with none of them works as before, with no "…" and no handle.
 ### Use a `Tag` color for each option.
 
 A tag is a category, so it takes a `Tag` color. Any other name draws gray and warns in development.
+
+### Let a `TagInput` collapse the tags past one line into +n at rest and grow by whole rows with focus.
+
+No blank line is drawn under the last row, and past its maximum height the field scrolls inside itself, not the page. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

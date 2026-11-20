@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import RichTextEditor from './RichTextEditor';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Rich text editor',
@@ -277,5 +278,27 @@ export const ToolbarButtonPressed = {
         button.style.transition = 'none';
         const fill = withForcedPseudo(button, ':active', () => getComputedStyle(button).backgroundColor);
         await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
+    },
+};
+
+/** Grow: pasted text longer than the writing area wraps inside the editor's width and grows the area by whole lines; the toolbar wraps instead of scrolling sideways. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '300px' /* demo frame */ }}>
+            <RichTextEditor
+                label="Session notes"
+                minHeight={100}
+                defaultValue={`<p>${LONG_SENTENCE}</p><p>${LONG_SENTENCE}</p>`}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-rich-text-editor-box');
+        const content = canvasElement.querySelector('.plus-rich-text-editor-content');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(content.scrollWidth).toBeLessThanOrEqual(content.clientWidth + 1);
+        await expect(content).toHaveTextContent(LONG_SENTENCE);
+        await expect(content.getBoundingClientRect().height).toBeGreaterThan(100);
     },
 };

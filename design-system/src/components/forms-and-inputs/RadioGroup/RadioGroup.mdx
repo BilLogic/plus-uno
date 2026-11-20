@@ -149,6 +149,14 @@ A radio group asks one question and offers a set of radio answers, one of which 
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={RadioGroupStories.Overflow} title="Wrap" description="A legend and options longer than their line take more lines; the group stays inside its well." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="RadioGroup" />
@@ -404,6 +412,10 @@ Use `appearance="tile"` when a step asks one focal question with two to four opt
 ### Use `reveal` instead of a separate conditional field.
 
 When choosing one option should show an extra field, such as "Other, please specify", pass that field as the option's `reveal` rather than rendering it outside the group. It stays scoped to the option that triggers it and disappears when another option is chosen.
+
+### Let a `RadioGroup` legend and options longer than their line wrap.
+
+The group grows by lines and nothing in it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

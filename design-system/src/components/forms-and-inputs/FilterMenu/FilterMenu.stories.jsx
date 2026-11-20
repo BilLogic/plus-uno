@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from './FilterMenu';
+import { LONG_SCHOOL, expectNoSilentClip } from '../_internal/overflowPlays';
 
 const SIDE_BY_SIDE = [
     { id: 'status', label: 'Status', options: ['Upcoming', 'Completed', 'Canceled'] },
@@ -226,4 +227,35 @@ export const Interactive = {
         </div>
     ),
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.filterMenu } } },
+};
+
+/** Wrap: an option longer than its column takes more lines beside its checkbox, and the menu stays inside the window. */
+export const Overflow = {
+    render: () => (
+        <div style={pad}>
+            <FilterMenu
+                id="filter-menu-overflow"
+                label="Filters"
+                defaultOpen
+                width="3-col"
+                categories={[
+                    { id: 'site', label: 'Site', options: [LONG_SCHOOL, 'Lincoln Middle'] },
+                    { id: 'format', label: 'Format', options: ['Online', 'In person'] },
+                ]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const menu = await openMenu(canvasElement);
+        const doc = canvasElement.ownerDocument;
+        await expectNoSilentClip(menu);
+        await expect(menu.scrollWidth).toBeLessThanOrEqual(menu.clientWidth + 1);
+        await expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(doc.documentElement.clientWidth);
+        await expect(menu).toHaveTextContent(LONG_SCHOOL);
+        const options = within(menu).getAllByRole('checkbox');
+        await expect(options).toHaveLength(4);
+        for (const option of options) await expect(option.getBoundingClientRect().width).toBeGreaterThan(0);
+        await userEvent.keyboard('{Escape}');
+        await menuClosed(canvasElement);
+    },
 };
