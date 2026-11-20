@@ -1,11 +1,11 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { LABEL_FONT, MONO_LABEL_FONT } from './paint.js';
+import { LABEL_FONT, LABEL_ROLE, MONO_LABEL_FONT } from './paint.js';
 
 /**
- * The kit's labels read a semantic role, not a font-size primitive. The role is
- * declared once in docs-rhythm.css, where the kit's other roles live.
+ * The kit's labels read the existing text roles, not a font-size primitive or a
+ * size of the kit's own.
  */
 const KIT = __dirname;
 const rhythm = readFileSync(join(KIT, '..', 'docs-rhythm.css'), 'utf8');
@@ -18,15 +18,13 @@ describe('illustration kit label type', () => {
         expect(offenders).toEqual([]);
     });
 
-    it('draws labels at the drawing-scale role', () => {
-        expect(LABEL_FONT.fontSize).toBe('var(--kit-label-drawing-size)');
-        expect(MONO_LABEL_FONT.fontSize).toBe('var(--kit-label-mono-drawing-size)');
+    it('draws labels from existing text roles', () => {
+        expect(LABEL_ROLE.font).toBe('var(--heading-xs)');
+        expect(LABEL_FONT.fontSize).toBe('0.5em');
+        expect(MONO_LABEL_FONT.font).toBe('var(--body-sm)');
     });
 
-    it('derives the sans drawing size by halving the real label size; mono draws 1:1', () => {
-        expect(rhythm).toMatch(/--kit-label-size:\s*0\.875rem/);
-        expect(rhythm).toMatch(/--kit-label-mono-size:\s*0\.75rem/);
-        expect(rhythm).toMatch(/--kit-label-drawing-size:\s*calc\(var\(--kit-label-size\) \/ 2\)/);
-        expect(rhythm).toMatch(/--kit-label-mono-drawing-size:\s*var\(--kit-label-mono-size\);/);
+    it('declares no label size of its own in docs-rhythm.css', () => {
+        expect(rhythm).not.toMatch(/--kit-label/);
     });
 });

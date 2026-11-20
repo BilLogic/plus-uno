@@ -107,7 +107,7 @@ describe("the baked DS facts", () => {
   it("names the overrun in bytes, counting multi-byte characters as bytes", () => {
     assert.equal(budgetOverrun("x".repeat(DS_FACTS_BYTE_BUDGET)), null);
     assert.match(budgetOverrun("x".repeat(DS_FACTS_BYTE_BUDGET + 1)), /1 byte over/);
-    assert.match(budgetOverrun("—".repeat(DS_FACTS_BYTE_BUDGET / 3 + 1)), /3 bytes over/);
+    assert.match(budgetOverrun("x".repeat(DS_FACTS_BYTE_BUDGET - 3) + "——"), /3 bytes over/);
   });
 
   it("holds the committed DS facts module in sync with the root facts module", () => {

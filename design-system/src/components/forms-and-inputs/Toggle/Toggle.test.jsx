@@ -121,14 +121,18 @@ describe('Toggle, keyboard', () => {
         expect(onBlur).toHaveBeenCalledTimes(1);
     });
 
-    it('currently switches with Enter as well as Space', async () => {
-        // Design question: the switch pattern requires Space and leaves Enter optional;
-        // Base UI's Switch is a button, so Enter flips it. Pinned so a change is seen.
+    it('switches with Enter as well as Space, one change per press', async () => {
         const user = userEvent.setup();
-        render(<Toggle label="Session reminders" />);
+        const onChange = vi.fn();
+        render(<Toggle label="Session reminders" onChange={onChange} />);
         await user.tab();
         await user.keyboard('{Enter}');
         expect(toggle()).toHaveAttribute('aria-checked', 'true');
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange.mock.calls[0][0].target.checked).toBe(true);
+        await user.keyboard('{Enter}');
+        expect(toggle()).toHaveAttribute('aria-checked', 'false');
+        expect(onChange).toHaveBeenCalledTimes(2);
     });
 
     it('is a stop in the tab order for each toggle, in page order', async () => {

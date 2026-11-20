@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { LABEL_FONT, PAINT, CORNER, CORNER_TOKEN, HAIRLINE, TAB_UNDERLINE } from './paint.js';
+import { LABEL_FONT, LABEL_ROLE, PAINT, CORNER, CORNER_TOKEN, HAIRLINE, TAB_UNDERLINE } from './paint.js';
 
 /**
  * The illustration kit: plain components that return SVG fragments. Each takes
@@ -343,7 +343,7 @@ export const ButtonShape = ({ x, y, w, appearance = 'default', label }) => {
     return <Rect x={x} y={y} w={w} h={8} fill={fill} corner="button" />;
   }
   return (
-    <g data-fidelity="real">
+    <g data-fidelity="real" style={LABEL_ROLE}>
       <Rect x={x} y={y} w={w} h={16} fill={fill} corner="button" />
       <text
         x={x + w / 2}

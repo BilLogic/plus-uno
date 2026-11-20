@@ -20,7 +20,7 @@ Also asked as: date and time, schedule.
 
 ## Usage
 
-Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.
+Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline. The date's form value is ISO `YYYY-MM-DD`; the field shows what was typed.
 
 ## Motion
 

@@ -95,6 +95,9 @@ const fromValue = (value, range) => {
  *   joined by a dash). It is checked when you press Enter or leave the field:
  *   a real day inside `minDate`…`maxDate` is picked, anything else is kept as
  *   typed and marked invalid, and `onChange` is not called.
+ * - **Form value:** the field shows the text as typed, but `name` belongs to a
+ *   hidden input holding the picked day as ISO `YYYY-MM-DD` (`start/end` with
+ *   `range`), empty until a day is accepted.
  * - **Range:** the first click sets the first day, the second the last; a click
  *   before the first day starts again. `onChange` receives `[start, end]`.
  * - **Clearing:** when a value or typed text is in a live field, a subtle
@@ -350,6 +353,11 @@ const DatePicker = ({
         onBlur?.(event);
     };
 
+    // The field keeps the typed text; a form submits the accepted day as ISO.
+    const formValue = Array.isArray(picked)
+        ? (rangeStart || rangeEnd ? `${rangeStart ? formatIso(rangeStart) : ''}/${rangeEnd ? formatIso(rangeEnd) : ''}` : '')
+        : (picked ? formatIso(picked) : '');
+
     const invalid = isInvalid || typedInvalid;
     const hasPicked = Array.isArray(picked) ? Boolean(rangeStart || rangeEnd) : Boolean(picked);
     const hasValue = hasPicked || Boolean(text);
@@ -527,7 +535,6 @@ const DatePicker = ({
                     ref={inputRef}
                     type="text"
                     id={fieldId}
-                    name={name}
                     className="plus-field__control plus-date-picker__input"
                     role="combobox"
                     autoComplete="off"
@@ -550,6 +557,7 @@ const DatePicker = ({
                     onFocus={onFocus}
                     onBlur={handleBlur}
                 />
+                {name && <input type="hidden" name={name} value={formValue} disabled={isDisabled} />}
             </FieldBox>
             <AnchoredListboxSurface
                 open={isOpen}
@@ -602,7 +610,7 @@ const DatePicker = ({
 DatePicker.propTypes = {
     /** Id of the input. Falls back to `name`, then to a generated id. */
     id: PropTypes.string,
-    /** Form key of the input. */
+    /** Form key. A hidden input under it submits the picked day as ISO `YYYY-MM-DD` (`start/end` with `range`), whatever text the field shows. */
     name: PropTypes.string,
     /** Defaults to MM/DD/YYYY, or two of them for a range. */
     placeholder: PropTypes.string,

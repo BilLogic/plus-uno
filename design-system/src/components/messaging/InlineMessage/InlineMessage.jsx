@@ -55,7 +55,7 @@ export const InlineMessage = ({
             placement={placement}
             defaultShow={defaultOpen}
             show={isOpen}
-            onToggle={onOpenChange ? (next) => onOpenChange(next) : undefined}
+            onToggle={onOpenChange ? (next, details) => onOpenChange(next, details) : undefined}
             id={id}
             className={`plus-inline-message ${className}`}
         >
@@ -87,7 +87,7 @@ InlineMessage.propTypes = {
     defaultOpen: PropTypes.bool,
     /** Controls whether the popup is open. Pair with `onOpenChange`. */
     isOpen: PropTypes.bool,
-    /** Called with the next open state, `onOpenChange(isOpen)`, when a press, Escape or an outside press changes it. */
+    /** Called with the next open state and Base UI's change details, `onOpenChange(isOpen, details)`, when a press, Escape or an outside press changes it. `details.cancel()` keeps the popup as it is. */
     onOpenChange: PropTypes.func,
     /** The popup's body content. */
     children: PropTypes.node,
