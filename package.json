@@ -91,6 +91,7 @@
     "check:ds-fallbacks": "node scripts/check-ds-fallbacks.mjs",
     "check:size-fallbacks": "node scripts/check-size-fallbacks.mjs",
     "check:undefined-tokens": "node scripts/check-undefined-tokens.mjs",
+    "check:forms-internals": "node scripts/check-forms-internals.mjs",
     "check:font-families": "node scripts/check-font-families.mjs",
     "check:font-size-literals": "node scripts/check-font-size-literals.mjs",
     "check:radius-literals": "node scripts/check-radius-literals.mjs",
