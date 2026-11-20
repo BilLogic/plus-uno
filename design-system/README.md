@@ -17,7 +17,7 @@ Add these to your `index.html` `<head>`:
 <!-- Fonts via Google Fonts CDN -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..700&family=Noto+Serif:wght@500..600&family=Noto+Sans+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..700,100&family=Google+Sans+Code:wght@400..500&display=swap" rel="stylesheet">
 
 <!-- Font Awesome Icons -->
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" rel="stylesheet">

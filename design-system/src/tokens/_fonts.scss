@@ -5,28 +5,26 @@
    entry point that loads this file gets it. */
 @use "type";
 
-/* Fallback faces. Each stack in `_type.scss` ends in one of these before its
-   CSS generic, so the page reflows by a few pixels, not a line, when the Noto
-   files arrive. They are local system faces resized to Noto's metrics
-   (measured in Chrome with Noto loaded: the width of a Latin and Vietnamese
-   pangram against Arial and Times New Roman, and Noto's ascent and descent;
-   the overrides are divided by size-adjust). No file is downloaded. */
+/* Fallback face. Each sans stack in `_type.scss` ends in this one before its
+   CSS generic, so the page reflows by a few pixels, not a line, when the
+   Google Sans Flex files arrive. It is a local system face resized to Google
+   Sans Flex's metrics (measured in Chrome with the font loaded at weight 400,
+   14px, ROND 100 and automatic optical size: the width of a Latin and
+   Vietnamese pangram against Arial, and the font's ascent and descent; the
+   overrides are divided by size-adjust). No file is downloaded. */
 @font-face {
-    font-family: "Noto Sans Fallback";
+    font-family: "Google Sans Flex Fallback";
     src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
     size-adjust: 104.3%;
-    ascent-override: 102.6%;
+    ascent-override: 93%;
     descent-override: 27.8%;
     line-gap-override: 0%;
 }
 
-@font-face {
-    font-family: "Noto Serif Fallback";
-    src: local("Times New Roman"), local("Times");
-    size-adjust: 113.8%;
-    ascent-override: 94%;
-    descent-override: 25.5%;
-    line-gap-override: 0%;
+/* Rounded ends and optical sizing, set once here so no component sets them. */
+:root {
+    font-variation-settings: "ROND" 100;
+    font-optical-sizing: auto;
 }
 
 /* The page's base type, in the `tokens` layer so any component rule wins over

@@ -7,13 +7,13 @@ const docsEmotionCache = createCache({ key: 'css', prepend: true });
 const docsThemes = {
   light: create({
     base: 'light',
-    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    fontBase: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+    fontCode: '"Google Sans Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
   }),
   dark: create({
     base: 'dark',
-    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    fontBase: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+    fontCode: '"Google Sans Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
   }),
 };
 

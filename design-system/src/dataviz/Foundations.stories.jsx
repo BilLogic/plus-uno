@@ -209,7 +209,7 @@ const TYPE_OPTIONS = {
 };
 
 /**
- * Noto Sans (`--type-family-body`) across every text slot, weights 500 and 600
+ * Google Sans Flex (`--type-family-body`) across every text slot, weights 500 and 600
  * only, tabular figures (`tabular-nums`) on every number slot, and tooltip
  * text in `--ds-text` with the series color confined to the leading swatch.
  */
@@ -247,7 +247,7 @@ export const TypeAndNumbers = {
         const tooltipEl = doc.querySelector('.highcharts-tooltip-container .highcharts-tooltip');
         const tooltipValue = doc.querySelector('.highcharts-tooltip-container .plus-chart-value');
 
-        expect(getComputedStyle(title).fontFamily).toContain('Noto Sans');
+        expect(getComputedStyle(title).fontFamily).toContain('Google Sans Flex');
         expect(getComputedStyle(title).fontWeight).toBe('600');
         expect(getComputedStyle(subtitle).fontWeight).toBe('500');
         expect(getComputedStyle(caption).fontWeight).toBe('500');
@@ -256,7 +256,7 @@ export const TypeAndNumbers = {
         for (const numEl of [axisLabel, dataLabelValue, legendItem, tooltipValue]) {
             expect(numEl).not.toBeNull();
             const cs = getComputedStyle(numEl);
-            expect(cs.fontFamily).toContain('Noto Sans');
+            expect(cs.fontFamily).toContain('Google Sans Flex');
             expect(cs.fontVariantNumeric).toBe('tabular-nums');
         }
         expect(getComputedStyle(dataLabelValue).fontWeight).toBe('600');

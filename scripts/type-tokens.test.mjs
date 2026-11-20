@@ -51,10 +51,10 @@ const STYLES = [
   ['Metric/small', 'heading', 16, 20, 600],
 ];
 const STACKS = {
-  heading: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-  brand: '"Noto Serif", "Noto Serif Fallback", serif',
-  body: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-  code: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+  heading: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+  brand: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+  body: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
+  code: '"Google Sans Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^(heading|body|metric)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)$/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`)}`;
 
@@ -67,7 +67,7 @@ test('the font primitives are named by rem × 100 and resolve to their rem value
   }
 });
 
-test('the family and weight variables resolve to Noto Sans, Noto Serif, Noto Sans Mono and 400 · 500 · 600', () => {
+test('the family and weight variables resolve to Google Sans Flex, Google Sans Code and 400 · 500 · 600', () => {
   assert.equal(corpus.get('--type-family-heading')?.value, STACKS.heading);
   assert.equal(corpus.get('--type-family-body')?.value, STACKS.body);
   assert.equal(corpus.get('--type-family-heading-serif'), undefined, 'the serif heading family is retired');
@@ -134,9 +134,8 @@ test('a family is set in one place: the family token, never in a style', () => {
     [...text.matchAll(/^\s*(--[\w-]+)\s*:\s*([^;]+);/gm)].map(([, name, value]) => ({ name, value })),
   );
   for (const [face, tokens] of [
-    ['Noto Sans', ['--type-family-heading', '--type-family-body', '--type-family-brand-body']],
-    ['Noto Serif', ['--type-family-brand-heading']],
-    ['Noto Sans Mono', ['--type-family-code']],
+    ['Google Sans Flex', ['--type-family-heading', '--type-family-body', '--type-family-brand-heading', '--type-family-brand-body']],
+    ['Google Sans Code', ['--type-family-code']],
   ]) {
     const setters = declarations.filter((d) => d.value.startsWith(`"${face}",`)).map((d) => d.name);
     assert.deepEqual(setters, tokens, `"${face}" is written outside ${tokens.join(', ')}`);
@@ -153,4 +152,9 @@ test('metric classes and .num set tabular figures; running text does not', () =>
   }
   assert.match(css, /\.num \{ font-variant-numeric: tabular-nums; \}/);
   assert.doesNotMatch(css, /\.body-\w+ \{[^}]*tabular-nums/);
+});
+
+test('rounded ends and optical sizing are set once at the root', () => {
+  const fonts = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/tokens/_fonts.scss'), 'utf8');
+  assert.match(fonts, /:root\s*\{[^}]*font-variation-settings:\s*"ROND" 100;[^}]*font-optical-sizing:\s*auto;/);
 });

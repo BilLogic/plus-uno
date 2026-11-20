@@ -89,7 +89,7 @@ export const Overview = {
         for (const node of canvasElement.querySelectorAll('.highcharts-axis-labels text, .plus-chart-value')) {
             if (!node.textContent?.trim()) continue;
             const style = getComputedStyle(node);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(style.fontVariantNumeric).toBe('tabular-nums');
             expect(['500', '600']).toContain(style.fontWeight);
         }

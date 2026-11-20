@@ -23,10 +23,10 @@ const EPSILON = 1;
  * asserting the rendered result, and reading the token to compare against the
  * token would assert nothing.
  */
-const PROSE_FAMILY = 'Noto Sans';
+const PROSE_FAMILY = 'Google Sans Flex';
 const PROSE_SIZE = '16px';
 const PROSE_COLOR = 'rgb(44, 44, 43)';
-const ALLOWED_FAMILIES = new Set(['Noto Sans', 'Noto Sans Mono']);
+const ALLOWED_FAMILIES = new Set(['Google Sans Flex', 'Google Sans Code']);
 /**
  * 45–75 characters is the comfortable range; the ticket asks for at most 80.
  * The corpus sample's longest paragraph ran 134 before the cap.
@@ -134,12 +134,12 @@ export function chromeFailures(pages) {
     }
 
     // Every rendered element in docs must compute to the product's families
-    // (Noto Sans or Noto Sans Mono) — never Nunito Sans or a browser fallback.
+    // (Google Sans Flex or Google Sans Code) — never Nunito Sans or a browser fallback.
     for (const f of (p.nonProductFonts ?? []).slice(0, 20)) {
       const family = f.fontFamily.split(',')[0].replace(/["']/g, '').trim();
       if (!ALLOWED_FAMILIES.has(family)) {
         failures.push(
-          `${where}: element "${f.label}" renders in ${family}, not Noto Sans or Noto Sans Mono.`,
+          `${where}: element "${f.label}" renders in ${family}, not Google Sans Flex or Google Sans Code.`,
         );
       }
     }
@@ -203,7 +203,7 @@ export function measureScript(page) {
         wrapperOverflowX: g(w).overflowX,
       };
     });
-    const allowedFamilies = new Set(['Noto Sans', 'Noto Sans Mono']);
+    const allowedFamilies = new Set(['Google Sans Flex', 'Google Sans Code']);
     const isIconGlyph = (el) =>
       el.matches('.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab') ||
       el.closest('svg') !== null;
@@ -323,8 +323,8 @@ export function colorNumbers(value) {
 /**
  * The manager's state, as a string to evaluate inside the manager document:
  * mode, sidebar and selected-item background colors, and any visible element in
- * the sidebar or toolbar whose computed font-family is not Noto Sans or
- * Noto Sans Mono (capped at 20 per sample).
+ * the sidebar or toolbar whose computed font-family is not Google Sans Flex or
+ * Google Sans Code (capped at 20 per sample).
  *
  * @param {string} step the step label ('light' | 'dark')
  * @returns {string}
@@ -333,7 +333,7 @@ export function managerMeasureScript(step) {
   return `(() => {
     const g = (el) => getComputedStyle(el);
     const paint = (el) => g(el).backgroundColor;
-    const allowedFamilies = new Set(['Noto Sans', 'Noto Sans Mono']);
+    const allowedFamilies = new Set(['Google Sans Flex', 'Google Sans Code']);
     const isIconGlyph = (el) =>
       el.matches('.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab') ||
       el.closest('svg') !== null;
@@ -397,7 +397,7 @@ export function managerFailures(reads, expected) {
       const family = f.fontFamily.split(',')[0].replace(/["']/g, '').trim();
       if (!ALLOWED_FAMILIES.has(family)) {
         failures.push(
-          `manager ${r.step}: element "${f.label}" renders in ${family}, not Noto Sans or Noto Sans Mono.`,
+          `manager ${r.step}: element "${f.label}" renders in ${family}, not Google Sans Flex or Google Sans Code.`,
         );
       }
     }

@@ -10,7 +10,7 @@ Heading, Body, Metric and Code are the text styles for all work.
 
 ## Overview
 
-PLUS is all sans. Every heading, metric and body style is Noto Sans, and Noto Sans Mono is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -46,10 +46,10 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--type-family-heading` | Noto Sans | Headings and metrics |
-| `--type-family-body` | Noto Sans | Body text |
-| `--type-family-code` | Noto Sans Mono | Code |
-| `--type-family-brand-heading` · `--type-family-brand-body` | Noto Serif · Noto Sans | Marketing and docs heroes only, never the product |
+| `--type-family-heading` | Google Sans Flex | Headings and metrics |
+| `--type-family-body` | Google Sans Flex | Body text |
+| `--type-family-code` | Google Sans Code | Code |
+| `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |
 | `--type-weight-regular` | 400 | Body text |
 | `--type-weight-medium` | 500 | Labels and icon-paired text |
 | `--type-weight-semibold` | 600 | Headings, metrics, bold body |
@@ -89,7 +89,7 @@ Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 ## Code
 
-`Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
+`Code/default` (12/16, Google Sans Code) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
 ## Truncate and wrap
 
@@ -129,13 +129,13 @@ Don't: An h3 straight after the h1 skips the h2.
 
 ### Headings
 
-Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Every heading level is Google Sans Flex at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
 Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
 
 ### Numbers
 
-Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
+Metric styles are Google Sans Flex 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
 Do: Metric/large for the figure.
 
@@ -143,7 +143,7 @@ Don't: Heading/medium for a number.
 
 ### Mono
 
-Noto Sans Mono is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
+Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
 
 Do: Metric/large for the count, mono for the session ID.
 Don't: Mono for the count.

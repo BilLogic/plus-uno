@@ -367,15 +367,15 @@ function typeToken(v) {
  * The faces after the Figma family in each stack. Figma holds one family name;
  * a stylesheet needs a chain that ends in a CSS generic, UNQUOTED: a quoted
  * `"sans-serif"` is a family nothing is called, so the chain simply ends
- * (`check:font-families`). Each Noto face falls back to a local face resized
+ * (`check:font-families`). Google Sans Flex falls back to a local face resized
  * to its metrics (`_fonts.scss`).
  */
 const FAMILY_FALLBACKS = {
-    'Family/heading': ['"Noto Sans Fallback"', 'sans-serif'],
-    'Family/body': ['"Noto Sans Fallback"', 'sans-serif'],
+    'Family/heading': ['"Google Sans Flex Fallback"', 'sans-serif'],
+    'Family/body': ['"Google Sans Flex Fallback"', 'sans-serif'],
     'Family/code': ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
-    'Family/brand-heading': ['"Noto Serif Fallback"', 'serif'],
-    'Family/brand-body': ['"Noto Sans Fallback"', 'sans-serif'],
+    'Family/brand-heading': ['"Google Sans Flex Fallback"', 'sans-serif'],
+    'Family/brand-body': ['"Google Sans Flex Fallback"', 'sans-serif'],
 };
 
 /**

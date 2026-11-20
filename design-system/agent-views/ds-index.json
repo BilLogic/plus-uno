@@ -54724,31 +54724,31 @@
 			"name": "--type-family-body",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "\"Noto Sans\", \"Noto Sans Fallback\", sans-serif"
+			"value": "\"Google Sans Flex\", \"Google Sans Flex Fallback\", sans-serif"
 		},
 		{
 			"name": "--type-family-brand-body",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "\"Noto Sans\", \"Noto Sans Fallback\", sans-serif"
+			"value": "\"Google Sans Flex\", \"Google Sans Flex Fallback\", sans-serif"
 		},
 		{
 			"name": "--type-family-brand-heading",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "\"Noto Serif\", \"Noto Serif Fallback\", serif"
+			"value": "\"Google Sans Flex\", \"Google Sans Flex Fallback\", sans-serif"
 		},
 		{
 			"name": "--type-family-code",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "\"Noto Sans Mono\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"
+			"value": "\"Google Sans Code\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace"
 		},
 		{
 			"name": "--type-family-heading",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "\"Noto Sans\", \"Noto Sans Fallback\", sans-serif"
+			"value": "\"Google Sans Flex\", \"Google Sans Flex Fallback\", sans-serif"
 		},
 		{
 			"name": "--type-line-height-100",
@@ -58418,7 +58418,7 @@
 				"\n",
 				"## Overview\n",
 				"\n",
-				"PLUS is all sans. Every heading, metric and body style is Noto Sans, and Noto Sans Mono is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
+				"PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
 				"\n",
 				"```css\n",
 				"font: var(--heading-md);\n",
@@ -58454,10 +58454,10 @@
 				"\n",
 				"| Token | Value | Used for |\n",
 				"| --- | --- | --- |\n",
-				"| `--type-family-heading` | Noto Sans | Headings and metrics |\n",
-				"| `--type-family-body` | Noto Sans | Body text |\n",
-				"| `--type-family-code` | Noto Sans Mono | Code |\n",
-				"| `--type-family-brand-heading` · `--type-family-brand-body` | Noto Serif · Noto Sans | Marketing and docs heroes only, never the product |\n",
+				"| `--type-family-heading` | Google Sans Flex | Headings and metrics |\n",
+				"| `--type-family-body` | Google Sans Flex | Body text |\n",
+				"| `--type-family-code` | Google Sans Code | Code |\n",
+				"| `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |\n",
 				"| `--type-weight-regular` | 400 | Body text |\n",
 				"| `--type-weight-medium` | 500 | Labels and icon-paired text |\n",
 				"| `--type-weight-semibold` | 600 | Headings, metrics, bold body |\n",
@@ -58497,7 +58497,7 @@
 				"\n",
 				"## Code\n",
 				"\n",
-				"`Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.\n",
+				"`Code/default` (12/16, Google Sans Code) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.\n",
 				"\n",
 				"## Truncate and wrap\n",
 				"\n",
@@ -58537,13 +58537,13 @@
 				"\n",
 				"### Headings\n",
 				"\n",
-				"Every heading level is Noto Sans at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
+				"Every heading level is Google Sans Flex at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
 				"\n",
 				"Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.\n",
 				"\n",
 				"### Numbers\n",
 				"\n",
-				"Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration (\"3:30 to 4:30\", \"12 min\") takes the body or heading style of its context, never mono.\n",
+				"Metric styles are Google Sans Flex 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration (\"3:30 to 4:30\", \"12 min\") takes the body or heading style of its context, never mono.\n",
 				"\n",
 				"Do: Metric/large for the figure.\n",
 				"\n",
@@ -58551,7 +58551,7 @@
 				"\n",
 				"### Mono\n",
 				"\n",
-				"Noto Sans Mono is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.\n",
+				"Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.\n",
 				"\n",
 				"Do: Metric/large for the count, mono for the session ID.\n",
 				"Don't: Mono for the count.\n",
@@ -61322,7 +61322,7 @@
 				"## Type and numbers\n",
 				"\n",
 				"Every text slot in a chart — title, subtitle, caption, axis labels and titles,\n",
-				"legend items, data labels, tooltips and empty-data notices — takes the Noto Sans\n",
+				"legend items, data labels, tooltips and empty-data notices — takes the Google Sans Flex\n",
 				"body family (`--type-family-body`) and the current text tokens\n",
 				"(`--type-size-075`, `--type-weight-semibold`, `--type-weight-medium`, and so on) — never a\n",
 				"`'12px'` literal, never a token `var()` paired with a literal fallback\n",

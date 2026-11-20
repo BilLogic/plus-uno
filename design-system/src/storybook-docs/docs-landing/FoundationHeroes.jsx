@@ -491,9 +491,9 @@ export const TokensHero = () => (
   </HeroDrawing>
 );
 
-/** Noto's cap height and x-height as a share of the em: the guides are measured from the glyphs. */
-const CAP = 0.714;
-const X_HEIGHT = 0.536;
+/** Google Sans Flex's cap height and x-height as a share of the em: the guides are measured from the glyphs. */
+const CAP = 0.72;
+const X_HEIGHT = 0.527;
 const SIZE = 130;
 const BASELINE = 130;
 

@@ -81,7 +81,7 @@ default Highcharts border or line entirely) needs no token — it draws nothing.
 ## Type and numbers
 
 Every text slot in a chart — title, subtitle, caption, axis labels and titles,
-legend items, data labels, tooltips and empty-data notices — takes the Noto Sans
+legend items, data labels, tooltips and empty-data notices — takes the Google Sans Flex
 body family (`--type-family-body`) and the current text tokens
 (`--type-size-075`, `--type-weight-semibold`, `--type-weight-medium`, and so on) — never a
 `'12px'` literal, never a token `var()` paired with a literal fallback

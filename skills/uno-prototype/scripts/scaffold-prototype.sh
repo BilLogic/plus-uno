@@ -83,7 +83,7 @@ cat > "$dest/index.html" <<EOF
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..700&family=Noto+Serif:wght@500..600&family=Noto+Sans+Mono:wght@400..500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,ROND@6..144,400..700,100&family=Google+Sans+Code:wght@400..500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="root"></div>

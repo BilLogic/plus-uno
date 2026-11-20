@@ -103,7 +103,7 @@ export const Overview = {
         expect(metrics.length).toBe(3);
         for (const metric of metrics) {
             const style = getComputedStyle(metric);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },

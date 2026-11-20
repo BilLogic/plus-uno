@@ -85,7 +85,7 @@ export const Overview = {
         }
         for (const valueNode of canvasElement.querySelectorAll('.metric-md')) {
             const style = getComputedStyle(valueNode);
-            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontFamily).toContain('Google Sans Flex');
             expect(style.fontWeight).toBe('600');
             expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
