@@ -180,6 +180,32 @@ ReadOnly.play = async ({ canvasElement }) => {
     await expectChoiceReadOnly(canvasElement, control, 'toggle');
 };
 
+/** Enter toggles, as Space does, and fires onChange once each time. */
+export const KeyboardToggle = () => {
+    const [changes, setChanges] = useState(0);
+    return (
+        <>
+            <Toggle id="toggle-keys" label="Send reminders" onChange={() => setChanges((n) => n + 1)} />
+            <output data-testid="toggle-changes">{changes}</output>
+        </>
+    );
+};
+KeyboardToggle.parameters = { docs: { disable: true } };
+KeyboardToggle.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('switch', { name: 'Send reminders' });
+    await userEvent.tab();
+    await expect(control).toHaveFocus();
+    await expect(control).toHaveAttribute('aria-checked', 'false');
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(control).toHaveAttribute('aria-checked', 'true'));
+    await userEvent.keyboard(' ');
+    await waitFor(() => expect(control).toHaveAttribute('aria-checked', 'false'));
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(control).toHaveAttribute('aria-checked', 'true'));
+    await expect(canvas.getByTestId('toggle-changes')).toHaveTextContent('3');
+};
+
 /** Keyboard focus: the focus-ring role, 2px wide and 2px off the track, as on Checkbox and Radio. */
 export const KeyboardFocus = () => <Toggle id="toggle-focus" label="Send reminders" defaultChecked />;
 KeyboardFocus.parameters = { docs: { disable: true } };

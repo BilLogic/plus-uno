@@ -14,7 +14,7 @@ Also asked as: enable disable, on/off setting.
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason, Overflow
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardToggle, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
@@ -151,6 +151,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `onFocus` | func | — | Called with the focus event when the switch gains focus. |
 | `onBlur` | func | — | Called with the blur event when the switch loses focus. |
 | `onClick` | func | — | Called with the click event on the switch. |
+| `onKeyDown` | func | — | Called with the key event on the switch, before Enter toggles it. Call `preventDefault()` to stop that. |
 | `className` | string | `''` | Extra class on the wrapper around the track and label. |
 | `style` | object | — | Inline style on the wrapper around the track and label. |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |

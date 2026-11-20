@@ -522,6 +522,32 @@ TypedEntry.play = async ({ args, canvasElement }) => {
     await expect(args.onChange).not.toHaveBeenCalled();
 };
 
+/** A form reads the accepted day as ISO while the field keeps the typed text. */
+export const SubmitsIsoDate = () => (
+    <form id="date-form" style={{ maxWidth: '296px' }}>
+        <DatePicker name="session-date" aria-label="Session date" />
+    </form>
+);
+SubmitsIsoDate.parameters = { docs: { disable: true } };
+SubmitsIsoDate.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+    const form = canvasElement.querySelector('#date-form');
+
+    await expect(new FormData(form).get('session-date')).toBe('');
+    await userEvent.click(input);
+    await userEvent.type(input, '10/21/2026{Enter}');
+    await expect(input).toHaveValue('10/21/2026');
+    await expect(new FormData(form).get('session-date')).toBe('2026-10-21');
+    await expect(input).not.toHaveAttribute('name');
+
+    // Typed text that is not a day is kept in the field and sends nothing new.
+    await userEvent.clear(input);
+    await userEvent.type(input, '13/45/2026');
+    await userEvent.tab();
+    await expect(input).toHaveValue('13/45/2026');
+    await expect(new FormData(form).get('session-date')).toBe('2026-10-21');
+};
+
 /** Regression cover for #331: every day button announces its full date and selected state. */
 export const DaysAnnounceTheirDate = () => {
     const [date, setDate] = useState('2026-08-17');

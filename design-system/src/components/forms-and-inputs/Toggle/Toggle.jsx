@@ -52,6 +52,7 @@ const Toggle = ({
     onFocus,
     onBlur,
     onClick,
+    onKeyDown,
     className = '',
     style,
     testId,
@@ -76,6 +77,14 @@ const Toggle = ({
         onChange?.({ target: { name, value, checked } });
     };
 
+    // Space toggles through Base UI; Enter does the same, by pressing the switch.
+    const handleKeyDown = (event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented || event.key !== 'Enter' || isDisabled) return;
+        event.preventDefault();
+        event.currentTarget.click();
+    };
+
     return (
         <div className={wrapperClasses} style={style}>
             <Switch.Root
@@ -93,6 +102,7 @@ const Toggle = ({
                 onFocus={onFocus}
                 onBlur={onBlur}
                 onClick={onClick}
+                onKeyDown={handleKeyDown}
                 className="plus-toggle"
                 data-testid={testId}
                 {...props}
@@ -134,6 +144,8 @@ Toggle.propTypes = {
     onBlur: PropTypes.func,
     /** Called with the click event on the switch. */
     onClick: PropTypes.func,
+    /** Called with the key event on the switch, before Enter toggles it. Call `preventDefault()` to stop that. */
+    onKeyDown: PropTypes.func,
     /** Extra class on the wrapper around the track and label. */
     className: PropTypes.string,
     /** Inline style on the wrapper around the track and label. */

@@ -111,11 +111,11 @@ export function bakeFacts(facts, { docFor = () => null, inventions }) {
  * stays on Workers Free and its script-size limit, and since the hosted MCP
  * answers first they are the fallback, so growth here buys an outage answer
  * and nothing else. 279,906 bytes on 2026-11-08, grown ~3.7k across the five
- * bakes that day; 300k leaves ~20k (7%), room for a release's worth of
+ * bakes that day; 300k left ~1.2k by 2026-11-20, and 320k leaves ~20k (6%), room for a release's worth of
  * components and tokens, and fails on a new kind of field arriving unnoticed.
  * Raise it in a PR that says what the bytes bought.
  */
-export const DS_FACTS_BYTE_BUDGET = 300_000;
+export const DS_FACTS_BYTE_BUDGET = 320_000;
 
 /**
  * Null when `payload` fits the budget, else what to say: the overrun in UTF-8 bytes.

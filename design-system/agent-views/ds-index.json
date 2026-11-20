@@ -8343,7 +8343,7 @@
 			"import": "import { DatePicker } from '@/components';",
 			"source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
 			"aliasOf": null,
-			"summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on. `label` does not name the plain field: it is the filter trigger's text and turns DatePicker into the filter popup. Name a plain field with `aria-label`, or a visible label tied to it with `htmlFor` and the field's `id`.",
+			"summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Form value:** the field shows the text as typed, but `name` belongs to a hidden input holding the picked day as ISO `YYYY-MM-DD` (`start/end` with `range`), empty until a day is accepted. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on. `label` does not name the plain field: it is the filter trigger's text and turns DatePicker into the filter popup. Name a plain field with `aria-label`, or a visible label tied to it with `htmlFor` and the field's `id`.",
 			"aliases": [
 				"calendar input",
 				"date field",
@@ -8366,7 +8366,7 @@
 					"required": false,
 					"default": null,
 					"values": null,
-					"description": "Form key of the input.",
+					"description": "Form key. A hidden input under it submits the picked day as ISO `YYYY-MM-DD` (`start/end` with `range`), whatever text the field shows.",
 					"deprecated": null
 				},
 				{
@@ -8606,7 +8606,7 @@
 					"\n",
 					"# DatePicker\n",
 					"\n",
-					"DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on. `label` does not name the plain field: it is the filter trigger's text and turns DatePicker into the filter popup. Name a plain field with `aria-label`, or a visible label tied to it with `htmlFor` and the field's `id`.\n",
+					"DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Form value:** the field shows the text as typed, but `name` belongs to a hidden input holding the picked day as ISO `YYYY-MM-DD` (`start/end` with `range`), empty until a day is accepted. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on. `label` does not name the plain field: it is the filter trigger's text and turns DatePicker into the filter popup. Name a plain field with `aria-label`, or a visible label tied to it with `htmlFor` and the field's `id`.\n",
 					"\n",
 					"Also asked as: calendar input, date field, date input, date selector.\n",
 					"\n",
@@ -8616,7 +8616,7 @@
 					"\n",
 					"**Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`\n",
 					"\n",
-					"**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly, Overflow\n",
+					"**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, SubmitsIsoDate, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly, Overflow\n",
 					"\n",
 					"**Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`\n",
 					"\n",
@@ -8759,7 +8759,7 @@
 					"| Prop | Type | Default | Description |\n",
 					"|------|------|---------|-------------|\n",
 					"| `id` | string | — | Id of the input. Falls back to `name`, then to a generated id. |\n",
-					"| `name` | string | — | Form key of the input. |\n",
+					"| `name` | string | — | Form key. A hidden input under it submits the picked day as ISO `YYYY-MM-DD` (`start/end` with `range`), whatever text the field shows. |\n",
 					"| `placeholder` | string | — | Placeholder text |\n",
 					"| `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be `null`. |\n",
 					"| `defaultValue` | string or arrayOf | — | Initial value when uncontrolled. |\n",
@@ -17551,7 +17551,7 @@
 					"required": false,
 					"default": null,
 					"values": null,
-					"description": "Called with the next open state, `onOpenChange(isOpen)`, when a press, Escape or an outside press changes it.",
+					"description": "Called with the next open state and Base UI's change details, `onOpenChange(isOpen, details)`, when a press, Escape or an outside press changes it. `details.cancel()` keeps the popup as it is.",
 					"deprecated": null
 				},
 				{
@@ -17732,7 +17732,7 @@
 					"| `placement` | enum | `'bottom-start'` | Where the popup opens relative to the trigger. |\n",
 					"| `defaultOpen` | bool | `false` | Whether the message popup starts open. |\n",
 					"| `isOpen` | bool | — | Controls whether the popup is open. Pair with `onOpenChange`. |\n",
-					"| `onOpenChange` | func | — | Called with the next open state, `onOpenChange(isOpen)`, when a press, Escape or an outside press changes it. |\n",
+					"| `onOpenChange` | func | — | Called with the next open state and Base UI's change details, `onOpenChange(isOpen, details)`, when a press, Escape or an outside press changes it. `details.cancel()` keeps the popup as it is. |\n",
 					"| `children` | node | — | The popup's body content. |\n",
 					"| `className` | string | `''` | — |\n",
 					"| `id` | string | — | — |\n",
@@ -37835,6 +37835,15 @@
 					"deprecated": null
 				},
 				{
+					"name": "onKeyDown",
+					"type": "func",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "Called with the key event on the switch, before Enter toggles it. Call `preventDefault()` to stop that.",
+					"deprecated": null
+				},
+				{
 					"name": "className",
 					"type": "string",
 					"required": false,
@@ -37884,7 +37893,7 @@
 					"\n",
 					"**Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`\n",
 					"\n",
-					"**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason, Overflow\n",
+					"**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Motion, Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardToggle, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled, DisabledWithReason, Overflow\n",
 					"\n",
 					"**Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`\n",
 					"\n",
@@ -38021,6 +38030,7 @@
 					"| `onFocus` | func | — | Called with the focus event when the switch gains focus. |\n",
 					"| `onBlur` | func | — | Called with the blur event when the switch loses focus. |\n",
 					"| `onClick` | func | — | Called with the click event on the switch. |\n",
+					"| `onKeyDown` | func | — | Called with the key event on the switch, before Enter toggles it. Call `preventDefault()` to stop that. |\n",
 					"| `className` | string | `''` | Extra class on the wrapper around the track and label. |\n",
 					"| `style` | object | — | Inline style on the wrapper around the track and label. |\n",
 					"| `testId` | string | — | Maps to `data-testid`, for test queries. |\n",

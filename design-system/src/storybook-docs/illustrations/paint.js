@@ -235,22 +235,20 @@ export const HERO_HAIRLINE = 'calc(var(--border-width-default) / 2)';
 export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
 
 /**
- * A real-fidelity label. Drawings show at up to twice their viewBox, so the
- * size is the real label size halved (`--kit-label-drawing-size`, docs-rhythm.css):
- * at full width it reads at true size.
+ * A real-fidelity label. The group holding it reads the real label role
+ * (`LABEL_ROLE`, the heading-xs text style); drawings show at up to twice their
+ * viewBox, so the label itself draws at half that role's size (`0.5em`): at full
+ * width it reads at true size.
  */
-export const LABEL_FONT = {
-  fontFamily: 'var(--type-family-body)',
-  fontWeight: 'var(--type-weight-semibold)',
-  fontSize: 'var(--kit-label-drawing-size)',
-};
+export const LABEL_ROLE = { font: 'var(--heading-xs)' };
+export const LABEL_FONT = { fontSize: '0.5em' }; // docs-literal: half the label role's size, which no token holds; a drawing shows at up to twice its viewBox
 
 /**
- * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
- * (`--kit-label-mono-drawing-size`, docs-rhythm.css).
+ * Mono label for construction-kit brackets and zone callouts, at 1:1 scale: the
+ * body-sm text style with the code family and a medium weight.
  */
 export const MONO_LABEL_FONT = {
+  font: 'var(--body-sm)',
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
-  fontSize: 'var(--kit-label-mono-drawing-size)',
 };

@@ -196,7 +196,7 @@ authored half, counted rather than assumed.
 | [TextArea](TextArea/index.md) | 28 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 36 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
+| [Toggle](Toggle/index.md) | 18 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
