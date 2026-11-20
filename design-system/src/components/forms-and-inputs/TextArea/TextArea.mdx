@@ -285,6 +285,7 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 
 - **The label is associated whether you pass `id` or not**, and `isLabelHidden`
   clips it out of sight without removing the name.
+- **`isRequired` sets `required` and `aria-required`.** An empty required field fails the form's own check: submit is blocked and the field draws itself invalid until it is typed in.
 - **An error is announced.** `isInvalid` sets `aria-invalid` and renders the
   message with `role="alert"`; a warning, a success message and standing help are
   described. A count is part of the description.

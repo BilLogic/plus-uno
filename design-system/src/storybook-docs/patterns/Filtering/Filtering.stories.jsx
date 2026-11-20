@@ -28,7 +28,23 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
-const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
+
+/** The room the picture keeps inside its own clip edge, in px: `--inline-xl`. Docs geometry. */
+const INSET = 16;
+
+/**
+ * A picture at `width`, with a little room inside the stage that clips it. A menu held open from the first trigger
+ * hangs 15 px past that trigger's start (a 160 menu on a 145 trigger) and the layer keeps an 8 px screen gap: with
+ * the Section flush to the clip edge only 15 px was there and the end alignment overflowed by 0.3 px, so Base UI
+ * flipped it to the start edge. That is the settled answer, but the first measure, taken as the stage lays out,
+ * sometimes still read "end", so Tier 1 passed or failed by timing. With the room, "end" fits at every measure. An
+ * app's Section sits beside a Sidebar and has this room already.
+ */
+const staged = (story, width = STAGE) => (
+    <FitStage width={width + 2 * INSET} scrollable>
+        <div style={{ paddingInline: 'var(--inline-xl)' }}>{story}</div>
+    </FitStage>
+);
 
 /** The picture's scale: drawn width over laid-out width. */
 const scaleOf = (canvasElement) => {

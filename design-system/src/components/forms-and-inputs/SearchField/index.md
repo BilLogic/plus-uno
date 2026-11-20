@@ -2,7 +2,7 @@
 
 # SearchField
 
-Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope ("Search students"). `mode="active"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with "All" first and selected. `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke. `mode="focused"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last "See all" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.
+Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope ("Search students"). `mode="active"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with "All" first and selected. `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke: it never calls `loadResults`. `name` is the input's form key, so a plain form submits the text under it. `mode="focused"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last "See all" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.
 
 **Import:** `import { SearchField } from '@/components';`
 
@@ -25,8 +25,10 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 Pick the mode by where the answer lands:
 
 - `active` (default): filters rows as you type through `onValueChange`.
-- `basic`: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke.
+- `basic`: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
 - `focused`: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
+
+`name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
 
 `isCollapsible` starts the field as an icon button (`defaultOpen` starts it open). Default strings can be overridden via `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
 
@@ -127,6 +129,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 |------|------|---------|-------------|
 | `placeholder` | string (required) | — | Names the scope ("Search students"). Required: the label is hidden, so this is what a sighted person reads, and it names the collapsed icon and its tooltip. |
 | `label` | string | — | The accessible name, when it should differ from the placeholder. |
+| `name` | string | — | Form key of the input: a plain form submits the search text under it. |
 | `mode` | enum | `'active'` | `active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel. |
 | `value` | string | — | The search text, when the caller holds it. Pair with `onValueChange`. |
 | `defaultValue` | string | `''` | Starting text when the field holds its own. |

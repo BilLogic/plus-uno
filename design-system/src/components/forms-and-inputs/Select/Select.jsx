@@ -108,6 +108,9 @@ const Select = ({
     const [query, setQuery] = useState(defaultSearchTerm || null);
     const filter = query ?? '';
     const [focused, setFocused] = useState(false);
+    // Set when the form blocked a submit because this required field was empty.
+    const [missing, setMissing] = useState(false);
+    const standInRef = useRef(null);
 
     useEffect(() => { setQuery(defaultSearchTerm || null); }, [defaultSearchTerm]);
 
@@ -279,9 +282,10 @@ const Select = ({
     };
 
     /* ---------- the caption ---------- */
-    const tone = isInvalid ? 'invalid' : (isValid ? 'success' : 'help');
+    const isMissing = missing && isEmpty(committedList);
+    const tone = isInvalid || isMissing ? 'invalid' : (isValid ? 'success' : 'help');
     const tones = toneProps(tone);
-    let message = (isInvalid && errorMessage) || (isValid && successMessage) || caption;
+    let message = ((isInvalid || isMissing) && errorMessage) || (isValid && successMessage) || caption;
     if (waiting) message = `Choose ${dependsOn.label || 'the field above'} first`;
     else if (atLimit && !caption) message = `You can pick up to ${maxSelections}`;
     const { messageId, describedBy } = fieldDescription({
@@ -505,6 +509,28 @@ const Select = ({
                     emptyMessage={waitingForSearch ? 'Type to search' : 'No results'}
                 />
             </div>
+            {isRequired && live && (
+                // The combobox is not a form control, so a stand-in carries the check: the form
+                // sees an empty required input until something is picked, and focus moves back here.
+                <input
+                    type="text"
+                    className="visually-hidden"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    required
+                    ref={standInRef}
+                    value={isEmpty(committedList) ? '' : 'picked'}
+                    onChange={() => {}}
+                    onInvalid={() => {
+                        setMissing(true);
+                        // The browser focuses the first invalid control after this event, which
+                        // can be the stand-in: once it has, hand focus on to the combobox.
+                        requestAnimationFrame(() => {
+                            if (document.activeElement === standInRef.current) controlRef.current?.focus();
+                        });
+                    }}
+                />
+            )}
             {name && (multi ? committedList : (isEmpty(committedList) ? [] : [committedList])).map((v) => (
                 <input key={v} type="hidden" name={name} value={v} disabled={disabled} />
             ))}
@@ -576,7 +602,7 @@ Select.propTypes = {
     isReadOnly: PropTypes.bool,
     /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
     labelMarker: PropTypes.oneOf(['required', 'optional']),
-    /** Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
+    /** Sets `aria-required` on the combobox and makes an empty field fail the form's own check: submit is blocked and the field draws itself invalid. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Text for the info tooltip beside the label. */
     info: PropTypes.node,

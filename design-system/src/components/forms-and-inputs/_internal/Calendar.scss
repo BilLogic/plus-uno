@@ -44,15 +44,24 @@
     color: var(--ds-text);
 }
 
+.plus-calendar-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stack-md);
+}
+
 .plus-calendar-weekdays,
-.plus-calendar-days {
+.plus-calendar-week {
     display: grid;
     grid-template-columns: repeat(7, var(--plus-calendar-day));
     column-gap: 0;
-    row-gap: var(--stack-sm);
 }
 
 .plus-calendar-days {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
     position: relative;
     isolation: isolate;
 }
@@ -119,19 +128,19 @@
         background-color: var(--ds-background-selected);
         border-radius: 0;
 
-        &:nth-child(7n + 1) {
+        &[data-column='0'] {
             border-start-start-radius: var(--_calendar-day-radius);
             border-end-start-radius: var(--_calendar-day-radius);
         }
 
-        &:nth-child(7n) {
+        &[data-column='6'] {
             border-start-end-radius: var(--_calendar-day-radius);
             border-end-end-radius: var(--_calendar-day-radius);
         }
     }
 
-    &--range-start:not(:nth-child(7n))::before,
-    &--range-end:not(:nth-child(7n + 1))::before {
+    &--range-start:not([data-column='6'])::before,
+    &--range-end:not([data-column='0'])::before {
         content: '';
         position: absolute;
         top: 0;
@@ -141,12 +150,12 @@
         pointer-events: none;
     }
 
-    &--range-start:not(:nth-child(7n))::before {
+    &--range-start:not([data-column='6'])::before {
         left: 50%;
         right: 0;
     }
 
-    &--range-end:not(:nth-child(7n + 1))::before {
+    &--range-end:not([data-column='0'])::before {
         left: 0;
         right: 50%;
     }

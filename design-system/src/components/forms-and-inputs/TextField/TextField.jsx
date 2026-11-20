@@ -99,13 +99,15 @@ const TextField = ({
         if (isNumber && value !== undefined) setText(toText(value));
     }, [isNumber, value]);
 
+    // A required field left empty on submit: the browser blocks the form and the field draws itself invalid.
+    const [missing, setMissing] = useState(false);
     const failed = edit.enabled && edit.error;
     let tone = 'help';
     let message = caption;
     if (failed) {
         tone = 'invalid';
         message = edit.error;
-    } else if (isInvalid) {
+    } else if (isInvalid || missing) {
         tone = 'invalid';
         message = errorMessage || caption;
     } else if (warningMessage) {
@@ -133,6 +135,7 @@ const TextField = ({
     /** Tells the caller, in the shape of a change event. */
     const emit = (nextText) => {
         setText(nextText);
+        setMissing(false);
         if (onChange) onChange({ target: { name, value: nextText, type: 'number' } });
     };
 
@@ -145,6 +148,7 @@ const TextField = ({
     };
 
     const handleChange = (event) => {
+        setMissing(false);
         if (isNumber) setText(event.target.value);
         else if (edit.enabled) edit.setDraft(event.target.value);
         else if (value === undefined) setTypedLength(event.target.value.length);
@@ -240,12 +244,17 @@ const TextField = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
+                    required={isRequired || undefined}
                     aria-required={isRequired || undefined}
                     data-testid={testId}
                     {...props}
                     /* After the spread: this value already contains the
                      * caller's, so letting the spread win would drop ours. */
                     aria-describedby={describedBy}
+                    onInvalid={(event) => {
+                        if (isRequired) setMissing(true);
+                        props.onInvalid?.(event);
+                    }}
                     {...toneProps(tone).control}
                 />
             </FieldBox>
@@ -270,7 +279,7 @@ TextField.propTypes = {
     label: PropTypes.node,
     /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
     labelMarker: PropTypes.oneOf(['required', 'optional']),
-    /** Sets `aria-required` on the input. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
+    /** Marks the input `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Hides the label visually. It is still rendered and still names the input. */
     isLabelHidden: PropTypes.bool,

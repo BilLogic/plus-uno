@@ -25,8 +25,8 @@
      * like `.highcharts-container`.
      */
     --chart-bar-radius: var(--radius-sm);
-    --chart-line-width: var(--stroke-2);
-    --chart-grid-width: var(--stroke-1);
+    --chart-line-width: var(--border-width-selected);
+    --chart-grid-width: var(--border-width-default);
 }
 
 .highcharts-container {

@@ -258,7 +258,8 @@ export const Basic = {
         await expect(canvas.getByTestId('searched')).toHaveTextContent('');
         await userEvent.keyboard('{Enter}');
         await expect(canvas.getByTestId('searched')).toHaveTextContent('ada');
-        // Basic mode never calls loadResults, typing or Enter.
+        // Basic mode never calls loadResults: not on mount, typing, a typing pause or Enter.
+        await new Promise((resolve) => { setTimeout(resolve, 500); });
         await expect(loadSpy).not.toHaveBeenCalled();
     },
 };

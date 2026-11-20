@@ -189,20 +189,34 @@ describe('TextField, validation', () => {
         expect(field('Link')).toHaveAccessibleDescription('Bad.');
     });
 
-    it('currently only announces isRequired: an empty required field still submits', async () => {
-        // Design question: isRequired sets aria-required and never `required`, so the
-        // browser does not block submit. Pages must validate themselves.
+    it('fails form validity when empty and required, and shows its own invalid state on submit', async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn((event) => event.preventDefault());
-        render(
+        const { container } = render(
             <form onSubmit={onSubmit}>
                 <TextField label="Email" name="email" isRequired />
                 <button type="submit">Send</button>
             </form>,
         );
+        expect(field()).toBeRequired();
+        expect(container.querySelector('form')).toBeInvalid();
+        expect(field()).not.toHaveAttribute('aria-invalid');
+        await user.click(screen.getByRole('button', { name: 'Send' }));
+        expect(onSubmit).not.toHaveBeenCalled();
+        expect(field()).toHaveAttribute('aria-invalid', 'true');
+        await user.type(field(), 'x');
+        expect(field()).not.toHaveAttribute('aria-invalid');
         await user.click(screen.getByRole('button', { name: 'Send' }));
         expect(onSubmit).toHaveBeenCalledTimes(1);
-        expect(field()).not.toHaveAttribute('required');
+    });
+
+    it('does not hold a form back for a disabled or read-only required field', () => {
+        const { container } = render(
+            <form>
+                <TextField label="Email" name="email" isRequired isReadOnly />
+            </form>,
+        );
+        expect(container.querySelector('form')).toBeValid();
     });
 });
 

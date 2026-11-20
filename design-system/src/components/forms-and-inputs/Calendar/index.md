@@ -10,13 +10,15 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size24, Size32, Size40, PickADay, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size24, Size32, Size40, PickADay, ArrowKeys, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
 **Motion:** enter `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
+
+The days are one tab stop (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
 
 Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
 

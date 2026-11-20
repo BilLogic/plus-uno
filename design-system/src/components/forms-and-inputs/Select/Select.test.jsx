@@ -460,17 +460,52 @@ describe('Select, in a form', () => {
         expect(submitted(form)).toEqual([['school', 'riverside']]);
     });
 
-    // Pins today's behavior: isRequired is announced (aria-required) but the
-    // field draws no native `required`, so an empty required Select does not
-    // fail the form's own validity check. A page validates it and sets isInvalid.
-    it('announces isRequired without blocking the form', () => {
+    it('fails form validity when empty and required, and shows its own invalid state on submit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn((event) => event.preventDefault());
         const { container } = render(
-            <form>
+            <form onSubmit={onSubmit}>
                 <Select label="School" name="school" isRequired options={SCHOOLS} />
+                <button type="submit">Send</button>
             </form>,
         );
+        const form = container.querySelector('form');
         expect(field()).toHaveAttribute('aria-required', 'true');
-        expect(container.querySelector('form').checkValidity()).toBe(true);
+        expect(form).toBeInvalid();
+        expect(field()).not.toHaveAttribute('aria-invalid', 'true');
+        await user.click(screen.getByRole('button', { name: 'Send' }));
+        expect(onSubmit).not.toHaveBeenCalled();
+        expect(field()).toHaveAttribute('aria-invalid', 'true');
+        await user.click(field());
+        await user.click(await screen.findByRole('option', { name: 'Riverside Academy' }));
+        expect(field()).not.toHaveAttribute('aria-invalid', 'true');
+        expect(form).toBeValid();
+        await user.click(screen.getByRole('button', { name: 'Send' }));
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it('holds a multi-select to at least one pick when required', () => {
+        const valid = (props) => {
+            const { container, unmount } = render(
+                <form>
+                    <Select label="Schools" isMulti name="schools" isRequired options={SCHOOLS} {...props} />
+                </form>,
+            );
+            const ok = !container.querySelector('form').matches(':invalid');
+            unmount();
+            return ok;
+        };
+        expect(valid()).toBe(false);
+        expect(valid({ defaultValue: ['north'] })).toBe(true);
+    });
+
+    it('does not hold a form back for a read-only required field', () => {
+        const { container } = render(
+            <form>
+                <Select label="School" name="school" isRequired isReadOnly options={SCHOOLS} />
+            </form>,
+        );
+        expect(container.querySelector('form')).toBeValid();
     });
 
     it('submits one entry per value when multiple', () => {

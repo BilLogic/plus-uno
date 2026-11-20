@@ -64,13 +64,15 @@ const TextArea = ({
         ? String(currentValue).length
         : typedLength;
 
+    // A required field left empty on submit: the browser blocks the form and the field draws itself invalid.
+    const [missing, setMissing] = useState(false);
     const failed = edit.enabled && edit.error;
     let tone = 'help';
     let message = caption;
     if (failed) {
         tone = 'invalid';
         message = edit.error;
-    } else if (isInvalid) {
+    } else if (isInvalid || missing) {
         tone = 'invalid';
         message = errorMessage || caption;
     } else if (warningMessage) {
@@ -88,6 +90,7 @@ const TextArea = ({
     });
 
     const handleChange = (event) => {
+        setMissing(false);
         if (edit.enabled) edit.setDraft(event.target.value);
         else if (value === undefined) setTypedLength(event.target.value.length);
         if (onChange) onChange(event);
@@ -140,9 +143,14 @@ const TextArea = ({
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
+                    required={isRequired || undefined}
                     aria-required={isRequired || undefined}
                     {...props}
                     aria-describedby={describedBy}
+                    onInvalid={(event) => {
+                        if (isRequired) setMissing(true);
+                        props.onInvalid?.(event);
+                    }}
                     {...toneProps(tone).control}
                 />
             </FieldBox>
@@ -184,7 +192,7 @@ TextArea.propTypes = {
     label: PropTypes.node,
     /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
     labelMarker: PropTypes.oneOf(['required', 'optional']),
-    /** Sets `aria-required` on the textarea. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
+    /** Marks the textarea `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Hides the label without removing it. */
     isLabelHidden: PropTypes.bool,

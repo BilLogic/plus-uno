@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { TEXT_SIZE } from '@/dataviz/chartTheme';
 import { tooltipPointFormat } from '@/dataviz/chartFormat';
 import { CATEGORICAL, CHROME, mostToLeast } from '@/dataviz/palette';
 
@@ -121,7 +121,7 @@ const DonutChart = ({
                     <div
                         style={{
                             fontFamily: 'var(--type-family-body)',
-                            fontSize: 'var(--type-size-075)',
+                            fontSize: TEXT_SIZE.small,
                             fontWeight: 'var(--type-weight-medium)',
                             color: 'var(--ds-text-subtle)',
                             marginTop: 'var(--pad-x-xs)',
