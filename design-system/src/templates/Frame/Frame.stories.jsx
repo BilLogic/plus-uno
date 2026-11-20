@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, IconButton, Logo, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Frame, Modal, PANEL_STORAGE_KEY, Card, Section, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/templates';
+import { Frame, Modal, Page, PANEL_STORAGE_KEY, Card, Section, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/templates';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -508,6 +508,26 @@ export const XLarge1440 = {
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
+    }),
+};
+
+/** 1440: a Page inside the Frame adds no pad of its own; the content sits one 24 pad from the surface edge. */
+export const PageInset1440 = {
+    parameters: { frameWidth: 1440 },
+    render: () => (
+        <Frame sidebar={<Sidebar user="tutor" activeTabId="home" account={{ name: 'Maya Rodriguez', email: 'maya@plus.org' }} />}>
+            <Page title="Members">
+                <Section title="Roster">Rows go here.</Section>
+            </Page>
+        </Frame>
+    ),
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const { frame, surface } = parts(canvasElement);
+        const page = surface.querySelector('.plus-template-page');
+        const title = page.querySelector('.plus-template-page-title');
+        const pad = tokenLength(frame, '--page-pad');
+        await expect(px(getComputedStyle(page).paddingLeft), 'the Page adds no pad inside a Frame').toBeCloseTo(0, 0);
+        await expect(rect(title).left - rect(surface).left, 'content inset from the surface edge').toBeCloseTo(pad, 0);
     }),
 };
 

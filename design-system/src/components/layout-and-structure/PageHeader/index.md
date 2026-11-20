@@ -8,7 +8,7 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Import:** `import { PageHeader } from '@/components';`
 
-**Used in:** Page (`ds guide page`); Section (`ds guide section`)
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Section (`ds guide section`)
 
 **Governed by:** Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 
