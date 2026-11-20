@@ -14,6 +14,7 @@ import { LOGO_SIZES } from '@/assets/Logo/Logo';
 import LogoConstruction from '@/assets/Logo/LogoConstruction';
 import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
 import { LogoExpressions } from '@/storybook-docs/logos/LogoExpressions.jsx';
+import { LockupSizes, LockupRule, WordmarkStep, TypedWordmarkFigure, TrackedWordmarkFigure } from '@/storybook-docs/logos/LogoWordmark.jsx';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
@@ -43,6 +44,8 @@ export const Ground = ({ token, mode, children, caption }) => (
 <FoundationSection title="Overview">
 
 Use the logo to mark PLUS in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.
+
+The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, letter gaps set for the logo, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.
 
 ```jsx
 import { Logo } from '@/components';
@@ -75,6 +78,16 @@ The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and be
 </div>
 </FoundationExample>
 
+<FoundationSubsection title="Lockup at each size">
+
+The lockup ships at 24, 32, 48, 64 and 96. Each size has its own wordmark, drawn at the weight that keeps it legible there: heavier as the lockup gets smaller.
+
+<FoundationExample>
+<LockupSizes />
+</FoundationExample>
+
+</FoundationSubsection>
+
 </FoundationSection>
 
 <FoundationSection title="Construction">
@@ -85,11 +98,47 @@ The logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing co
 <LogoConstruction />
 </FoundationExample>
 
+<FoundationSubsection title="Lockup">
+
+The wordmark's cap height is half the logomark's height. The gap between them is a quarter of the logomark's height, and the wordmark is centered on the logomark. These proportions hold at every size.
+
+<FoundationExample caption="Cap height is ½ the logomark, the gap is ¼, and the wordmark is centered.">
+<LockupRule />
+</FoundationExample>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Wordmark">
+
+The wordmark is Google Sans Flex as it ships, with four small brand tweaks. Nothing is redrawn from scratch. Measures are a share of the cap height (the height of a capital), so they hold at any size.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
+    <FoundationExample><WordmarkStep step={0} /></FoundationExample>
+    <FoundationExample><WordmarkStep step={1} /></FoundationExample>
+    <FoundationExample><WordmarkStep step={2} /></FoundationExample>
+    <FoundationExample><WordmarkStep step={3} /></FoundationExample>
+</div>
+
+Weight and optical size follow the lockup size: the smaller the lockup, the heavier the weight and the lower the optical size.
+
+<RefTable
+    head={['Lockup size', 'Cap height', 'Weight', 'Optical size']}
+    rows={[
+        ['96', '48', '510', '96'],
+        ['64', '32', '520', '64'],
+        ['48', '24', '530', '48'],
+        ['32', '16', '550', '32'],
+        ['24', '12', '580', '18'],
+    ]}
+/>
+
+</FoundationSubsection>
+
 </FoundationSection>
 
 <FoundationSection title="Color options">
 
-Choose the color option for the ground the logo sits on.
+Choose the color option for the ground the logo sits on. On a dark ground the light wordmark is drawn thinner, with a hairline of 0.7% of the cap, so it does not bloom.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
     <Ground token="--ds-surface" caption="Colored, on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
@@ -178,6 +227,27 @@ Do not add effects to the logo or edit the artwork. Use the outlined option on p
 
 </FoundationSubsection>
 
+<FoundationSubsection title="Use the Logo component's wordmark">
+
+The wordmark is outlined artwork inside the component. Do not set PLUS in a font beside the mark, even Google Sans Flex.
+
+<DoDont>
+<Do caption="The Logo component's wordmark."><Mark color="colored" size={64} wordmark /></Do>
+<Dont caption="PLUS typed in a font beside the mark."><TypedWordmarkFigure /></Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep the letter spacing">
+
+The letter gaps are tuned for the logo. Do not track the wordmark out or in.
+
+<DoDont>
+<Do caption="The wordmark's own letter spacing."><Mark color="colored" size={64} wordmark /></Do>
+<Dont caption="The wordmark tracked out."><TrackedWordmarkFigure /></Dont>
+</DoDont>
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -204,6 +274,7 @@ Write the name in the alt text for the logo in digital experiences.
     items={[
         { title: 'Logo', description: 'The component page, under Images and icons.', href: '?path=/docs/components-images-and-icons-logo--docs' },
         { title: 'Iconography', description: 'Icons stand for actions and objects; the logo stands for PLUS itself.', href: '?path=/docs/foundations-visual-iconography--docs' },
+        { title: 'Typography', description: 'The type family the wordmark comes from.', href: '?path=/docs/foundations-visual-typography--docs' },
         { title: 'Color', description: 'The logo colors are brand artwork, not theme tokens.', href: '?path=/docs/foundations-visual-color--docs' },
     ]}
 />

@@ -12,6 +12,8 @@ The visual mark of PLUS, shown with or without the wordmark.
 
 Use the logo to mark PLUS in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.
 
+The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, letter gaps set for the logo, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.
+
 ```jsx
 import { Logo } from '@/components';
 ```
@@ -26,13 +28,35 @@ The logo has two parts: the logomark and the wordmark. Together they form the lo
 
 The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and below it uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.
 
+### Lockup at each size
+
+The lockup ships at 24, 32, 48, 64 and 96. Each size has its own wordmark, drawn at the weight that keeps it legible there: heavier as the lockup gets smaller.
+
 ## Construction
 
 The logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing coordinates). Two circles of 6 and 4.5 units share its center, two 2-unit corner circles sit at the top right and bottom left, and the 3-unit plus is centered 8.5 units from the left and 3.5 from the top. Use the `Logo` component; the drawing explains the shape and is not a template to redraw from.
 
+### Lockup
+
+The wordmark's cap height is half the logomark's height. The gap between them is a quarter of the logomark's height, and the wordmark is centered on the logomark. These proportions hold at every size.
+
+### Wordmark
+
+The wordmark is Google Sans Flex as it ships, with four small brand tweaks. Nothing is redrawn from scratch. Measures are a share of the cap height (the height of a capital), so they hold at any size.
+
+Weight and optical size follow the lockup size: the smaller the lockup, the heavier the weight and the lower the optical size.
+
+| Lockup size | Cap height | Weight | Optical size |
+| --- | --- | --- | --- |
+| 96 | 48 | 510 | 96 |
+| 64 | 32 | 520 | 64 |
+| 48 | 24 | 530 | 48 |
+| 32 | 16 | 550 | 32 |
+| 24 | 12 | 580 | 18 |
+
 ## Color options
 
-Choose the color option for the ground the logo sits on.
+Choose the color option for the ground the logo sits on. On a dark ground the light wordmark is drawn thinner, with a hairline of 0.7% of the cap, so it does not bloom.
 
 | Color option | Ground | When to use |
 | --- | --- | --- |
@@ -81,6 +105,20 @@ Do not add effects to the logo or edit the artwork. Use the outlined option on p
 
 Do: The logomark as drawn.
 Don't: A drop shadow added to the logomark.
+
+### Use the Logo component's wordmark
+
+The wordmark is outlined artwork inside the component. Do not set PLUS in a font beside the mark, even Google Sans Flex.
+
+Do: The Logo component's wordmark.
+Don't: PLUS typed in a font beside the mark.
+
+### Keep the letter spacing
+
+The letter gaps are tuned for the logo. Do not track the wordmark out or in.
+
+Do: The wordmark's own letter spacing.
+Don't: The wordmark tracked out.
 
 ## Accessibility
 

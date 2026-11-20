@@ -1,0 +1,63 @@
+/* Logos page, wordmark figures (docs only). The step drawings and the lockup rule are illustration-kit
+   compositions; this file styles the captions, the size row and the Don't figures. */
+
+.logo-wm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+    margin: 0;
+}
+
+.logo-wm__caption {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}
+
+.logo-wm__caption strong { font-weight: var(--type-weight-medium); }
+
+/* Lockup size row */
+.logo-lockups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--stack-2xl) var(--inline-2xl);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.logo-lockups__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--stack-sm);
+}
+
+/* Lockup rule: the real lockup laid over its kit drawing, placed by percentages of the drawing's view box. */
+.logo-rule {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    margin-inline: auto;
+}
+
+/* The logo scales with the drawing: its width is a share of the view box and its svg fills it. */
+.logo-rule__logo { position: absolute; }
+.logo-rule__logo > svg { inline-size: 100%; block-size: auto; }
+
+/* Don't figures */
+.logo-dont {
+    display: inline-flex;
+    align-items: center;
+}
+
+.logo-dont__typed {
+    margin-inline-start: var(--stack-md);
+    font: var(--heading-lg);
+    color: var(--ds-text);
+}
+
+.logo-dont__tracked {
+    display: block;
+    margin-inline-start: var(--stack-lg);
+}
