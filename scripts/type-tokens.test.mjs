@@ -34,21 +34,21 @@ const FONT_SIZES = { '075': 12, '0875': 14, 100: 16, 125: 20, 150: 24, 175: 28, 
 const LINE_HEIGHTS = { 100: 16, 125: 20, 150: 24, 175: 28, 200: 32, 225: 36 };
 const rem = (px) => `${px / 16}rem`;
 
-/** Name, family, size px, line height px, weight: the Atlassian scale in the lab. */
+/** Name, family, size px, line height px, weight, letter spacing %: the Atlassian scale in the lab. */
 const STYLES = [
-  ['Heading/xxlarge', 'heading', 32, 36, 600],
-  ['Heading/xlarge', 'heading', 28, 32, 600],
-  ['Heading/large', 'heading', 24, 28, 600],
-  ['Heading/medium', 'heading', 20, 24, 600],
-  ['Heading/small', 'heading', 16, 20, 600],
-  ['Heading/xsmall', 'heading', 14, 20, 600],
-  ['Heading/xxsmall', 'heading', 12, 16, 600],
-  ['Body/large', 'body', 16, 24, 400],
-  ['Body/default', 'body', 14, 20, 400],
-  ['Body/small', 'body', 12, 16, 400],
-  ['Metric/large', 'heading', 28, 32, 600],
-  ['Metric/medium', 'heading', 24, 28, 600],
-  ['Metric/small', 'heading', 16, 20, 600],
+  ['Heading/xxlarge', 'heading', 32, 36, 400, -2],
+  ['Heading/xlarge', 'heading', 28, 32, 400, -2],
+  ['Heading/large', 'heading', 24, 28, 400, -1.5],
+  ['Heading/medium', 'heading', 20, 24, 500, -0.5],
+  ['Heading/small', 'heading', 16, 20, 500, 0],
+  ['Heading/xsmall', 'heading', 14, 20, 500, 0],
+  ['Heading/xxsmall', 'heading', 12, 16, 500, 1],
+  ['Body/large', 'body', 16, 24, 400, 0],
+  ['Body/default', 'body', 14, 20, 400, 0.5],
+  ['Body/small', 'body', 12, 16, 400, 1],
+  ['Metric/large', 'heading', 28, 32, 500, -1],
+  ['Metric/medium', 'heading', 24, 28, 500, -1],
+  ['Metric/small', 'heading', 16, 20, 500, 0],
 ];
 const STACKS = {
   heading: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
@@ -87,6 +87,17 @@ test('every text style resolves to its size, line height, weight and family', ()
       cssName(style),
     );
   }
+});
+
+test('every text style has a tracking companion in em, and the tracking variables hold its percent', () => {
+  for (const [style, , , , , percent] of STYLES) {
+    assert.equal(resolved(`${cssName(style)}-tracking`), `${percent / 100}em`, `${cssName(style)}-tracking`);
+  }
+  assert.equal(corpus.get('--heading-xl-tracking')?.raw, 'var(--type-tracking-tighter)');
+});
+
+test('only weights 400 and 500 are in a text style', () => {
+  for (const [style, , , , weight] of STYLES) assert.ok([400, 500].includes(weight), style);
 });
 
 test('code is 0.875em of the text around it, in the code stack', () => {

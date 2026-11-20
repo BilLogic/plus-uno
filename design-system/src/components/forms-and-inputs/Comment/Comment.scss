@@ -30,6 +30,7 @@
 
 .plus-comment-author {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     font-weight: var(--type-weight-semibold);
 }
 
@@ -37,11 +38,13 @@
 .plus-comment-edited,
 .plus-comment-restricted {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
 }
 
 .plus-comment-content {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     margin-top: var(--stack-sm);
 }
 
@@ -53,6 +56,7 @@
 
 .plus-comment-saving {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
     margin-top: var(--stack-md);
 }

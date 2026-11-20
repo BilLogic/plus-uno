@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--inline-lg` · `--page-header-gap` · `--page-header-stack`
+`--body-sm` · `--body-sm-tracking` · `--inline-lg` · `--page-header-gap` · `--page-header-stack`
 
 From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss`. Override these through the token layer, never with a literal.
 

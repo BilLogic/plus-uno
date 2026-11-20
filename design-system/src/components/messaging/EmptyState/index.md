@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-sm` · `--icon-lg` · `--image-md` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--stack-md` · `--stack-sm` · `--stack-xl`
+`--body-default` · `--body-default-tracking` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--icon-lg` · `--image-md` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--stack-md` · `--stack-sm` · `--stack-xl`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 

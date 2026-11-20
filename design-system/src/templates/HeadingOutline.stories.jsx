@@ -14,7 +14,7 @@ import { Modal, Card, Section, Page } from '@/templates';
  * names it), and a card's, a popup's and a flag's are 14. A card's title sits
  * over a 14 description, and its tag is one level below its section.
  *
- * Group labels are 12 semibold and are not headings: a menu's label names a
+ * Group labels are 12 medium and are not headings: a menu's label names a
  * group, and a table's labels are column headers.
  */
 export default {
@@ -30,11 +30,11 @@ const expectStyle = async (element, name, [size, lineHeight, weight]) => {
     await expect(style.fontWeight, `${name} font weight`).toBe(String(weight));
 };
 
-const HEADING_LG = [24, 28, 600];
-const HEADING_MD = [20, 24, 600];
-const HEADING_SM = [16, 20, 600];
-const HEADING_XS = [14, 20, 600];
-const HEADING_XXS = [12, 16, 600];
+const HEADING_LG = [24, 28, 400];
+const HEADING_MD = [20, 24, 500];
+const HEADING_SM = [16, 20, 500];
+const HEADING_XS = [14, 20, 500];
+const HEADING_XXS = [12, 16, 500];
 const BODY_DEFAULT = [14, 20, 400];
 
 const headingNamed = (canvas, level, name) => canvas.getByRole('heading', { level, name });
@@ -136,7 +136,7 @@ FlagTitle.play = async ({ canvasElement }) => {
     await expectStyle(within(canvasElement).getByText('Session moved'), 'flag title', HEADING_XS);
 };
 
-/** Group labels are 12 semibold: a menu group's label, and a table's column headers. */
+/** Group labels are 12 medium: a menu group's label, and a table's column headers. */
 export const GroupLabels = () => (
     <div style={{ display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'flex-start' }}>
         <DropdownMenu isOpen trigger={<Button>Sort</Button>}>

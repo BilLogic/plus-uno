@@ -175,7 +175,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-lg` · `--body-sm` · `--checkbox-control-size` · `--choice-grid-control-size-10` · `--choice-grid-control-size-12` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--pad-x-md` · `--pad-y-md` · `--table-radius`
+`--body-default` · `--body-default-tracking` · `--body-lg` · `--body-lg-tracking` · `--body-sm` · `--body-sm-tracking` · `--checkbox-control-size` · `--choice-grid-control-size-10` · `--choice-grid-control-size-12` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--pad-x-md` · `--pad-y-md` · `--table-radius`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.scss`. Override these through the token layer, never with a literal.
 

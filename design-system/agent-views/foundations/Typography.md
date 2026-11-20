@@ -10,19 +10,25 @@ Heading, Body, Metric and Code are the text styles for all work.
 
 ## Overview
 
-PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
+letter-spacing: var(--heading-md-tracking);
+
 font: var(--body-default);
+letter-spacing: var(--body-default-tracking);
+
 font: var(--metric-lg);
+letter-spacing: var(--metric-lg-tracking);
+font-variant-numeric: tabular-nums;
 ```
 
 Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (Tokens: Typography).
 
 ## Type scale
 
-Every text style binds to a typography variable and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.
+Every text style binds to a typography variable (family, weight, size, line height and letter spacing) and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.
 
 ### Body, metric and weights
 
@@ -40,7 +46,7 @@ Every text style binds to a typography variable and is sized in `rem` (1 rem = 1
 
 ## In code
 
-Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
+Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
 
 ### Family, weight and tracking tokens
 
@@ -50,14 +56,21 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 | `--type-family-body` | Google Sans Flex | Body text |
 | `--type-family-code` | Google Sans Code | Code |
 | `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |
-| `--type-weight-regular` | 400 | Body text |
-| `--type-weight-medium` | 500 | Labels and icon-paired text |
-| `--type-weight-semibold` | 600 | Headings, metrics, bold body |
-| `--heading-xxl-tracking` · `-xlarge-tracking` · `-large-tracking` | −2% · −1% · −1% | Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0) |
+| `--type-weight-regular` | 400 | Body text and headings xxl, xl and lg |
+| `--type-weight-medium` | 500 | Headings md to xxs, metrics, labels and icon-paired text |
+| `--type-weight-semibold` | 600 | Inline bold emphasis only, not a text style |
+| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |
+| `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |
+| `--heading-lg-tracking` | −1.5% | Heading 24 |
+| `--heading-md-tracking` | −0.5% | Heading 20 |
+| `--heading-sm-tracking` · `--heading-xs-tracking` | 0 | Headings 16 and 14 |
+| `--heading-xxs-tracking` | +1% | Heading 12 |
+| `--body-lg-tracking` · `--body-default-tracking` · `--body-sm-tracking` | 0 · +0.5% · +1% | Body 16, 14 and 12 |
+| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −1% · −1% · 0 | Metrics 28, 24 and 16 |
 
 ### Text-style classes
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, and add `font-variant-numeric: tabular-nums` to a metric.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and `letter-spacing` together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -81,7 +94,7 @@ Every page has one `h1` (visually hidden when a tab strip replaces a visible pag
 
 ## Labels
 
-Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
+Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); letter-spacing: var(--body-default-tracking); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
 Do: Body/default/medium on a button or tab label.
 
@@ -129,13 +142,13 @@ Don't: An h3 straight after the h1 skips the h2.
 
 ### Headings
 
-Every heading level is Google Sans Flex at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
-Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
+Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.
 
 ### Numbers
 
-Metric styles are Google Sans Flex 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
+Metric styles are Google Sans Flex 500 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
 Do: Metric/large for the figure.
 

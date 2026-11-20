@@ -136,7 +136,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--ds-text` · `--ds-text-danger` · `--stack-md`
+`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--ds-text` · `--ds-text-danger` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Fieldset.scss`. Override these through the token layer, never with a literal.
 

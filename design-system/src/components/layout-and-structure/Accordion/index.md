@@ -205,7 +205,7 @@ Implemented as `AccordionItem`.
 
 ## Tokens touched
 
-`--body-lg` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-subtle` · `--heading-sm` · `--icon-sm` · `--image-md` · `--inline-md` · `--stack-sm`
+`--body-lg` · `--body-lg-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-subtle` · `--heading-sm` · `--heading-sm-tracking` · `--icon-sm` · `--image-md` · `--inline-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

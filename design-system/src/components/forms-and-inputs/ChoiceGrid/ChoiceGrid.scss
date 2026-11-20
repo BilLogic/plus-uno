@@ -14,16 +14,19 @@
     // Unset keeps the default rendering (the control's own size, body-default text).
     &[data-size="12"] {
         --_choice-grid-label-font: var(--body-sm);
+        --_choice-grid-label-tracking: var(--body-sm-tracking);
         --_choice-grid-control-size: var(--choice-grid-control-size-10);
     }
 
     &[data-size="14"] {
         --_choice-grid-label-font: var(--body-default);
+        --_choice-grid-label-tracking: var(--body-default-tracking);
         --_choice-grid-control-size: var(--choice-grid-control-size-12);
     }
 
     &[data-size="16"] {
         --_choice-grid-label-font: var(--body-lg);
+        --_choice-grid-label-tracking: var(--body-lg-tracking);
         --_choice-grid-control-size: var(--choice-grid-control-size-12);
     }
 }
@@ -57,6 +60,7 @@
     text-align: center;
     color: var(--ds-text);
     font: var(--_choice-grid-label-font, var(--body-default));
+    letter-spacing: var(--_choice-grid-label-tracking, var(--body-default-tracking));
     background-color: var(--ds-surface-sunken);
 }
 
@@ -72,6 +76,7 @@
     text-align: left;
     color: var(--ds-text);
     font: var(--_choice-grid-label-font, var(--body-default));
+    letter-spacing: var(--_choice-grid-label-tracking, var(--body-default-tracking));
     background-color: var(--ds-surface-sunken);
     // A long label takes more lines; the grid keeps to its well.
     overflow-wrap: anywhere;

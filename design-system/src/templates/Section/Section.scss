@@ -67,20 +67,24 @@
 /* A section on a page: Heading/medium 20/24. */
 .plus-template-section-title--section {
     font: var(--heading-md);
+    letter-spacing: var(--heading-md-tracking);
 }
 
 /* A section inside a section: Heading/small 16/20. */
 .plus-template-section-title--subsection {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
 }
 
 /* Inside a Dialog or Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
 :is(.plus-dialog, .plus-modal) .plus-template-section-title--section {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
 }
 
 :is(.plus-dialog, .plus-modal) .plus-template-section-title--subsection {
     font: var(--heading-xs);
+    letter-spacing: var(--heading-xs-tracking);
 }
 
 :is(.plus-dialog, .plus-modal) .plus-template-section-spacing-default {
@@ -90,6 +94,7 @@
 .plus-template-section-description {
     margin: 0;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -173,6 +178,7 @@
 
 .plus-section-row__count {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
     white-space: nowrap;
 }
@@ -192,6 +198,7 @@
 /* Inside a Dialog or Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
 :is(.plus-dialog, .plus-modal) .plus-template-section-content {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 
     > p:last-child {
         margin-bottom: 0;
@@ -236,6 +243,7 @@
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     text-align: left;
     cursor: pointer;
     transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
@@ -255,11 +263,13 @@
 
 .plus-template-section-detail-title {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
     color: var(--ds-text);
 }
 
 .plus-template-section-detail-description {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
 }
 

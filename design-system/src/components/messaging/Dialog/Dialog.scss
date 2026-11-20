@@ -88,17 +88,20 @@
 .plus-dialog-title {
     margin: 0;
     font: var(--heading-md);
+    letter-spacing: var(--heading-md-tracking);
     color: var(--ds-text);
 }
 
 .plus-dialog-body-text {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text);
 }
 
 .plus-dialog-description {
     margin: 0;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 }
 

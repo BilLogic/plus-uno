@@ -207,7 +207,7 @@ $-dragging: (
         }
         &.plus-template-card--image-half {
             > .plus-template-card-image { flex-basis: 50%; }
-            .plus-template-card-title { font: var(--card-title-font-lg); }
+            .plus-template-card-title { font: var(--card-title-font-lg); letter-spacing: var(--heading-md-tracking); }
         }
     }
     .plus-template-card--image-end > .plus-template-card-image { order: 1; }
@@ -241,6 +241,7 @@ $-dragging: (
 .plus-template-card-description {
     margin: 0;
     font: var(--card-description-font);
+    letter-spacing: var(--body-default-tracking);
     color: var(--card-text-subtle);
 }
 

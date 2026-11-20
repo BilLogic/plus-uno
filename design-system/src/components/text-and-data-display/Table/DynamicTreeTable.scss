@@ -62,6 +62,7 @@
     caption-side: top;
     padding: 0 var(--table-pad-x-cell) var(--stack-sm);
     font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text);
     text-align: left;
 }
@@ -140,6 +141,7 @@
 .plus-table-bulk-actions__count {
     margin-inline-end: var(--inline-md);
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text);
     white-space: nowrap;
 }

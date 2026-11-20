@@ -59,6 +59,7 @@
         text-align: left;
         border-bottom: var(--border-width-default) solid var(--ds-border);
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         color: var(--ds-text);
         // Row states are layered over the fill, never swapped for it, so an
         // opaque sticky cell keeps the highlight.
@@ -69,6 +70,7 @@
     // head rule.
     thead th {
         font: var(--heading-xxs);
+        letter-spacing: var(--heading-xxs-tracking);
         color: var(--ds-text-subtle);
         border-bottom-color: var(--ds-border-bold);
     }

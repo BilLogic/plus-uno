@@ -173,6 +173,7 @@
     background-color: transparent;
     color: var(--ds-text-subtle);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     font-weight: var(--type-weight-medium);
     text-decoration: none;
     // One line, always: a tab label never wraps into a two-line tab.

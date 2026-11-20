@@ -246,7 +246,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--anchor-width` · `--body-default` · `--border-width-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xs` · `--layer-popup` · `--popup-max-width` · `--popup-min-width` · `--popup-offset` · `--popup-pad` · `--popup-radius` · `--stack-md`
+`--anchor-width` · `--body-default` · `--body-default-tracking` · `--border-width-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xs` · `--heading-xs-tracking` · `--layer-popup` · `--popup-max-width` · `--popup-min-width` · `--popup-offset` · `--popup-pad` · `--popup-radius` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

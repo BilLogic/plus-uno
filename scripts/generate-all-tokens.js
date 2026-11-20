@@ -424,7 +424,7 @@ function generateTypeSCSS() {
 
     const percentSpacing = (style) => {
         const ls = style.letterSpacing;
-        if (!ls || ls.unit !== 'PERCENT' || ls.value === 0) return undefined;
+        if (!ls || ls.unit !== 'PERCENT') return undefined;
         const match = json.variables.find((v) => v.name.startsWith('Letter spacing/') && v.valuesByMode?.[mode] === ls.value);
         if (!match) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} has letter spacing ${ls.value}% and no Letter spacing variable holds it.`);
         return match.id;
@@ -469,7 +469,8 @@ function generateTypeSCSS() {
     return `/**
  * Type Tokens
  * Generated from the Figma \`typography\` collection and its bound text styles.
- * A text style is a \`font\` shorthand: weight, size / line height, family.
+ * A text style is a \`font\` shorthand: weight, size / line height, family;
+ * its letter spacing is the \`-tracking\` companion beside it.
  */
 
 :root {
@@ -481,7 +482,7 @@ ${block(bySize(lineHeights))}
 ${block(families)}
     /* Weights */
 ${block(bySize(weights))}
-    /* Letter spacing (a \`font\` shorthand cannot carry it; a text style that has one gets a \`-tracking\` companion) */
+    /* Letter spacing (a \`font\` shorthand cannot carry it; every text style gets a \`-tracking\` companion) */
 ${block(bySize(tracking))}
     /* Text styles */
 ${block([...styles].sort((a, b) => a.group - b.group))}

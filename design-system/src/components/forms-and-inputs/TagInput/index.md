@@ -278,7 +278,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--plus-tag-input-max-height` · `--stack-md`
+`--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--plus-tag-input-max-height` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/TagInput/TagInput.scss`. Override these through the token layer, never with a literal.
 

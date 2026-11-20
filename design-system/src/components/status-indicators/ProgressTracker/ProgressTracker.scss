@@ -115,6 +115,7 @@ button.plus-progress-tracker__item:focus-visible {
     text-overflow: ellipsis;
     white-space: nowrap;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 }
 
 .plus-progress-tracker__item--current {

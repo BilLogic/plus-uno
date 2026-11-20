@@ -145,7 +145,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-danger` · `--ds-background-neutral` · `--ds-background-warning` · `--ds-icon-danger` · `--ds-icon-warning` · `--ds-text` · `--ds-text-danger` · `--ds-text-warning` · `--icon-md` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--type-weight-medium`
+`--body-default` · `--body-default-tracking` · `--ds-background-danger` · `--ds-background-neutral` · `--ds-background-warning` · `--ds-icon-danger` · `--ds-icon-warning` · `--ds-text` · `--ds-text-danger` · `--ds-text-warning` · `--icon-md` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Banner/Banner.scss`. Override these through the token layer, never with a literal.
 

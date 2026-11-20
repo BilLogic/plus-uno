@@ -185,7 +185,7 @@ Implemented as `RatingItem`.
 
 ## Tokens touched
 
-`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--icon-lg` · `--icon-md` · `--plus-rating-stagger` · `--radius-full` · `--rating-gap` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--body-default-tracking` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--icon-lg` · `--icon-md` · `--plus-rating-stagger` · `--radius-full` · `--rating-gap` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 

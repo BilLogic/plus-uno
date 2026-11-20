@@ -39,11 +39,13 @@
     margin: 0;
     color: var(--ds-text);
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
     white-space: pre-wrap;
 }
 
 .plus-section-message-text {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     white-space: pre-wrap;
     margin: 0;
 
@@ -68,6 +70,7 @@
     border: none;
     background: none;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     font-weight: var(--type-weight-medium);
     color: inherit;
     text-decoration: underline;
@@ -106,10 +109,12 @@
 
 .plus-section-message-strut--title {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
 }
 
 .plus-section-message-strut--text {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 }
 
 .plus-section-message-leading-icon,

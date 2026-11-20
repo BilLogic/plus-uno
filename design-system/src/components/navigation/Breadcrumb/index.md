@@ -186,7 +186,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 ## Tokens touched
 
-`--body-default` · `--control-md` · `--ds-link` · `--ds-text-subtlest` · `--plus-breadcrumb-divider` · `--stack-md`
+`--body-default` · `--body-default-tracking` · `--control-md` · `--ds-link` · `--ds-text-subtlest` · `--plus-breadcrumb-divider` · `--stack-md`
 
 From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Override these through the token layer, never with a literal.
 

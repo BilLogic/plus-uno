@@ -59,7 +59,7 @@ export const Overview = () => (
 );
 
 /**
- * The header is a heading in Google Sans Flex semibold at 20, the description sits under it in
+ * The header is a heading in Google Sans Flex medium at 20, the description sits under it in
  * the subtle ink, the two actions follow in order, and the character is hidden
  * from assistive technology. Text and header ink resolve from tokens in every mode.
  */
@@ -67,7 +67,7 @@ Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const heading = canvas.getByRole('heading', { name: 'No students yet' });
     await expect(getComputedStyle(heading).fontFamily, 'sans at 20').toMatch(/Google Sans Flex/);
-    await expect(getComputedStyle(heading).fontWeight, 'semibold').toBe('600');
+    await expect(getComputedStyle(heading).fontWeight, 'medium').toBe('500');
     await expect(px(getComputedStyle(heading).fontSize), 'size 20').toBe(20);
     const buttons = canvas.getAllByRole('button').map((b) => b.textContent.trim());
     await expect(buttons, 'primary first, then secondary').toEqual(['Add student', 'Import a list']);

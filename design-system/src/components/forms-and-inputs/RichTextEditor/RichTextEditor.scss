@@ -41,6 +41,7 @@
 /* The field's label: Body/default 14/20, above the box. */
 .plus-rich-text-editor-label {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text);
 }
 
@@ -101,6 +102,7 @@
     box-sizing: border-box;
     color: var(--ds-text);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     text-align: start;
 
     &:focus {

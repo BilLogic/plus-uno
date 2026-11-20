@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--inline-lg` · `--plus-overlay-origin` · `--popup-radius` · `--radius-lg` · `--spotlight-footer-stack` · `--spotlight-gap` · `--spotlight-media-height` · `--spotlight-pad` · `--spotlight-screen-pad` · `--spotlight-width` · `--transform-origin`
+`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--heading-sm-tracking` · `--inline-lg` · `--plus-overlay-origin` · `--popup-radius` · `--radius-lg` · `--spotlight-footer-stack` · `--spotlight-gap` · `--spotlight-media-height` · `--spotlight-pad` · `--spotlight-screen-pad` · `--spotlight-width` · `--transform-origin`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

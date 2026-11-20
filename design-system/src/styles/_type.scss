@@ -1,15 +1,53 @@
 @use 'sass:string';
 
-// Sets a component's product type style (weight, size / line-height, family)
-// from a `--body-*`, `--heading-*`, `--code-*` or `--metric-*` token, with an
-// optional `$weight` override (`--type-weight-medium` on Button). Accepts a
-// bare token name (`--body-sm`) or a `var(--body-sm)` reference.
-@mixin ds-type($token: --body-default, $weight: null) {
+// A text style's token name from a bare `--body-sm` or a `var(--body-sm)`
+// reference (a `var()` with a fallback is not one style, so it has no name).
+@function ds-type-name($token) {
+    $str: '#{$token}';
+    @if string.slice($str, 1, 2) == '--' {
+        @return $str;
+    }
+    @if string.slice($str, 1, 6) == 'var(--' and string.index($str, ',') == null {
+        @return string.slice($str, 5, -2);
+    }
+    @return null;
+}
+
+// The `-tracking` companion of a text style, as a `var()` reference:
+// `--body-sm` or `var(--body-sm)` gives `var(--body-sm-tracking)`. A `font`
+// shorthand cannot carry letter spacing, so a style's tracking always travels
+// beside it.
+@function ds-type-tracking($token) {
+    $name: ds-type-name($token);
+    @if $name == null {
+        @error 'ds-type-tracking needs a bare style token or a var() of one, got #{$token}.';
+    }
+    @return var(#{$name}-tracking);
+}
+
+// Sets a component's product type style (weight, size / line-height, family
+// and letter spacing) from a `--body-*`, `--heading-*`, `--code-*` or
+// `--metric-*` token, with an optional `$weight` override
+// (`--type-weight-medium` on Button). Accepts a bare token name (`--body-sm`)
+// or a `var(--body-sm)` reference. Metrics also get tabular figures. A style
+// chosen at run time through a custom property (`var(--avatar-font, ...)`)
+// passes its tracking in `$tracking`; code has no tracking companion.
+@mixin ds-type($token: --body-default, $weight: null, $tracking: null) {
     $token-str: '#{$token}';
     @if string.slice($token-str, 1, 2) == '--' {
         font: var(#{$token});
     } @else {
         font: $token;
+    }
+
+    $name: ds-type-name($token);
+    @if $tracking {
+        letter-spacing: $tracking;
+    } @else if $name != null and string.slice($name, 1, 7) != '--code-' {
+        letter-spacing: ds-type-tracking($token);
+    }
+    @if $name != null and string.slice($name, 1, 9) == '--metric-' {
+        font-variant-numeric: tabular-nums;
     }
 
     @if $weight {

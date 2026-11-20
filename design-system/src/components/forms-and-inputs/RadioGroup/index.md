@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--inline-lg` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--radio-group-inline-gap` · `--stack-md`
+`--body-default` · `--body-default-tracking` · `--ds-text` · `--inline-lg` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--radio-group-inline-gap` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss`. Override these through the token layer, never with a literal.
 

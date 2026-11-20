@@ -40,6 +40,7 @@
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     text-align: start;
     cursor: pointer;
     transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);

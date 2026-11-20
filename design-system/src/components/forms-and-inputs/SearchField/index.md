@@ -176,7 +176,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--control-md` · `--dropdown-menu-max-height` · `--dropdown-menu-pad` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-control-md`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--control-md` · `--dropdown-menu-max-height` · `--dropdown-menu-pad` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-control-md`
 
 From `design-system/src/components/forms-and-inputs/SearchField/SearchField.scss`. Override these through the token layer, never with a literal.
 

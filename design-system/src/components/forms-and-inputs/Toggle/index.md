@@ -164,7 +164,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--control-sm` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-text` · `--radius-full` · `--stack-md` · `--toggle-pad` · `--toggle-track-height-16` · `--toggle-track-height-20` · `--toggle-track-width-16` · `--toggle-track-width-20`
+`--body-default` · `--body-default-tracking` · `--control-sm` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-text` · `--radius-full` · `--stack-md` · `--toggle-pad` · `--toggle-track-height-16` · `--toggle-track-height-20` · `--toggle-track-width-16` · `--toggle-track-width-20`
 
 From `design-system/src/components/forms-and-inputs/Toggle/Toggle.scss`. Override these through the token layer, never with a literal.
 

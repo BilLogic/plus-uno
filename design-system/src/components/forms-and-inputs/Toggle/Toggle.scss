@@ -18,6 +18,7 @@
     display: flex;
     // The row's text style, which the label and the line box both take.
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     align-items: center;
     width: 100%;
     gap: var(--stack-md);
@@ -110,6 +111,7 @@
     flex: 1;
     margin: 0;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     display: flex;
     align-items: center;
 }

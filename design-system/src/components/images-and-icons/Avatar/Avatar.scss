@@ -43,8 +43,8 @@ $avatar-colors: (
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
     // Initials are set in the semibold text style nearest the avatar's size;
-    // each size sets --avatar-font to that style.
-    @include ds-type(var(--avatar-font, var(--heading-xs)));
+    // each size sets --avatar-font and --avatar-tracking to that style.
+    @include ds-type(var(--avatar-font, var(--heading-xs)), $tracking: var(--avatar-tracking, var(--heading-xs-tracking)));
     border-radius: var(--radius-full);
     --avatar-glyph: var(--icon-md);
 }
@@ -59,6 +59,7 @@ $avatar-colors: (
     .plus-avatar-group--#{$size} {
         --avatar-size: #{nth($values, 1)};
         --avatar-font: #{nth($values, 2)};
+        --avatar-tracking: #{ds-type-tracking(nth($values, 2))};
         --avatar-glyph: #{nth($values, 3)};
     }
 }

@@ -126,7 +126,9 @@
       ],
       "tokens": [
         "--body-lg",
+        "--body-lg-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--card-pad",
         "--card-radius",
@@ -144,6 +146,7 @@
         "--ds-text",
         "--ds-text-subtle",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--icon-sm",
         "--image-md",
         "--inline-md",
@@ -380,7 +383,9 @@
         "--ai-chat-height",
         "--ai-chat-width",
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--content-max-width-reading",
         "--ds-shadow-overlay",
         "--ds-surface",
@@ -611,7 +616,9 @@
         "--ai-message-caret-width",
         "--ai-message-dot-size",
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--code-default",
         "--ds-background-neutral",
         "--ds-motion-loop",
@@ -619,6 +626,7 @@
         "--ds-text",
         "--ds-text-subtle",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--icon-md",
         "--inline-md",
         "--inline-sm",
@@ -779,6 +787,7 @@
         "--avatar-size",
         "--avatar-size-128",
         "--avatar-size-96",
+        "--avatar-tracking",
         "--border-width-default",
         "--ds-background-accent-blue-subtler",
         "--ds-background-accent-gray-subtle",
@@ -802,6 +811,7 @@
         "--ds-text-accent-yellow",
         "--heading-sm",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--heading-xxl",
         "--heading-xxs",
         "--icon-lg",
@@ -984,6 +994,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--ds-background-danger",
         "--ds-background-neutral",
         "--ds-background-warning",
@@ -1078,6 +1089,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--control-md",
         "--ds-link",
         "--ds-text-subtlest",
@@ -1790,6 +1802,7 @@
         "Overflow"
       ],
       "tokens": [
+        "--body-default-tracking",
         "--card-border-default",
         "--card-border-width",
         "--card-description-font",
@@ -1813,7 +1826,8 @@
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-utility-elevation-surface-current",
-        "--focus-ring-width"
+        "--focus-ring-width",
+        "--heading-md-tracking"
       ]
     },
     {
@@ -1955,6 +1969,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-selected",
         "--card-radius",
         "--carousel-aspect",
@@ -2552,6 +2567,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--border-width-selected",
         "--card-pad",
@@ -2948,8 +2964,11 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-lg",
+        "--body-lg-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
@@ -3171,6 +3190,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--card-radius",
         "--ds-background-code-default",
@@ -3344,7 +3364,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--card-radius",
         "--comment-gap",
@@ -4346,7 +4368,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--date-time-picker-section-gap",
         "--ds-text",
         "--ds-text-subtle",
@@ -4608,6 +4632,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--dialog-body-min-height",
         "--dialog-inline-sm",
@@ -4623,6 +4648,7 @@
         "--ds-text",
         "--ds-text-subtle",
         "--heading-md",
+        "--heading-md-tracking",
         "--plus-overlay-max-height"
       ]
     },
@@ -4828,6 +4854,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--dropdown-menu-max-height",
         "--dropdown-menu-max-width",
@@ -5325,11 +5352,14 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--ds-icon-subtle",
         "--ds-text",
         "--ds-text-subtle",
         "--heading-md",
+        "--heading-md-tracking",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--icon-lg",
         "--image-md",
         "--inline-md",
@@ -5447,7 +5477,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--ds-text",
         "--ds-text-danger",
         "--stack-md"
@@ -5627,6 +5659,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-background-disabled",
         "--ds-border",
@@ -5866,7 +5899,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--card-pad",
         "--card-radius",
@@ -6213,6 +6248,7 @@
       "tokens": [
         "--dropdown-menu-max-height",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--inline-lg",
         "--inline-md",
         "--plus-filter-menu-columns",
@@ -6455,7 +6491,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-background-danger-bold",
         "--ds-background-neutral-bold",
@@ -6492,6 +6530,7 @@
         "--flag-timer-height",
         "--flag-width",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--icon-md",
         "--inline-lg",
         "--inline-md",
@@ -7091,13 +7130,17 @@
         "--heading-lg",
         "--heading-lg-tracking",
         "--heading-md",
+        "--heading-md-tracking",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--heading-xl",
         "--heading-xl-tracking",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--heading-xxl",
         "--heading-xxl-tracking",
-        "--heading-xxs"
+        "--heading-xxs",
+        "--heading-xxs-tracking"
       ]
     },
     {
@@ -7788,6 +7831,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--control-lg",
         "--control-md",
@@ -8151,8 +8195,10 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--ds-text-subtle",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--stack-sm"
       ]
     },
@@ -9427,6 +9473,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--inline-lg",
         "--page-header-gap",
         "--page-header-stack"
@@ -9563,6 +9610,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--control-md",
         "--control-sm",
@@ -9728,6 +9776,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-border",
         "--ds-shadow-overlay",
@@ -9947,11 +9996,13 @@
       "tokens": [
         "--anchor-width",
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--layer-popup",
         "--popup-max-width",
         "--popup-min-width",
@@ -10572,6 +10623,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--control-md",
         "--ds-background-brand-bold",
@@ -11083,6 +11135,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--border-width-selected",
         "--card-pad",
@@ -11371,6 +11424,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--ds-text",
         "--inline-lg",
         "--radio-control-size",
@@ -11537,6 +11591,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--control-md",
         "--ds-background-disabled",
         "--ds-background-neutral",
@@ -11728,6 +11783,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--control-md",
         "--ds-background-disabled",
         "--ds-background-neutral",
@@ -11989,6 +12045,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--ds-background-input",
         "--ds-background-neutral",
@@ -12444,6 +12501,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--control-md",
         "--dropdown-menu-max-height",
@@ -12820,7 +12878,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--card-stack-md",
         "--control-md",
         "--ds-icon-subtle",
@@ -12834,8 +12894,11 @@
         "--heading-lg",
         "--heading-lg-tracking",
         "--heading-md",
+        "--heading-md-tracking",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--inline-md",
         "--section-min-width-main",
         "--section-min-width-side",
@@ -12982,6 +13045,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--card-inline-sm",
         "--card-pad",
@@ -12990,6 +13054,7 @@
         "--ds-border",
         "--ds-text",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--icon-lg",
         "--stack-md",
         "--type-weight-medium"
@@ -13612,7 +13677,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-background-input",
         "--ds-background-neutral-subtle-hovered",
@@ -13761,6 +13828,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-border",
         "--ds-motion-appearance-fast",
@@ -14138,7 +14206,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--control-md",
         "--ds-background-neutral-subtle-hovered",
@@ -14612,7 +14682,9 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--body-sm",
+        "--body-sm-tracking",
         "--ds-background-brand-bold",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
@@ -14621,6 +14693,7 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--inline-lg",
         "--plus-overlay-origin",
         "--popup-radius",
@@ -15410,6 +15483,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--border-width-default",
         "--border-width-selected",
         "--control-md",
@@ -16351,6 +16425,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-border",
         "--ds-icon-subtle",
@@ -17583,6 +17658,7 @@
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--control-sm",
         "--ds-background-disabled",
         "--ds-background-neutral-bold",
@@ -17723,6 +17799,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--body-sm-tracking",
         "--border-width-default",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",

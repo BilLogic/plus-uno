@@ -11,7 +11,7 @@ import { TypeScaleBlocks } from '@/storybook-docs/token-blocks.jsx';
 import * as TypographyStories from './Typography.stories.jsx';
 
 export const Sample = ({ font, weight, children = 'Tutors plan the week from here' }) => (
-    <span style={{ font: `var(${font})`, fontVariantNumeric: font.startsWith('--metric') ? 'tabular-nums' : undefined, fontWeight: weight ? `var(${weight})` : undefined, color: 'var(--ds-text)' }}>{children}</span>
+    <span style={{ font: `var(${font})`, fontVariantNumeric: font.startsWith('--metric') ? 'tabular-nums' : undefined, letterSpacing: `var(${font}-tracking)`, fontWeight: weight ? `var(${weight})` : undefined, color: 'var(--ds-text)' }}>{children}</span>
 );
 
 <Meta of={TypographyStories} />
@@ -32,12 +32,18 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <FoundationSection title="Overview">
 
-PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
+letter-spacing: var(--heading-md-tracking);
+
 font: var(--body-default);
+letter-spacing: var(--body-default-tracking);
+
 font: var(--metric-lg);
+letter-spacing: var(--metric-lg-tracking);
+font-variant-numeric: tabular-nums;
 ```
 
 Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (<DocsLink id="foundations-tokens-typography">Tokens: Typography</DocsLink>).
@@ -46,7 +52,7 @@ Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the t
 
 <FoundationSection title="Type scale">
 
-Every text style binds to a typography variable and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.
+Every text style binds to a typography variable (family, weight, size, line height and letter spacing) and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.
 
 <TypeScaleBlocks />
 
@@ -73,7 +79,7 @@ Every text style binds to a typography variable and is sized in `rem` (1 rem = 1
 
 <FoundationSection title="In code">
 
-Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (<DocsLink id="foundations-visual-iconography">Iconography</DocsLink>). Never hardcode a font size, family or weight.
+Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (<DocsLink id="foundations-visual-iconography">Iconography</DocsLink>). Never hardcode a font size, family or weight.
 
 <FoundationSubsection title="Family, weight and tracking tokens">
 
@@ -84,10 +90,17 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
         [<C>--type-family-body</C>, 'Google Sans Flex', 'Body text'],
         [<C>--type-family-code</C>, 'Google Sans Code', 'Code'],
         [<><C>--type-family-brand-heading</C> · <C>--type-family-brand-body</C></>, 'Google Sans Flex', 'Marketing and docs heroes only, never the product'],
-        [<C>--type-weight-regular</C>, '400', 'Body text'],
-        [<C>--type-weight-medium</C>, '500', 'Labels and icon-paired text'],
-        [<C>--type-weight-semibold</C>, '600', 'Headings, metrics, bold body'],
-        [<><C>--heading-xxl-tracking</C> · <C>-xlarge-tracking</C> · <C>-large-tracking</C></>, '−2% · −1% · −1%', 'Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0)'],
+        [<C>--type-weight-regular</C>, '400', 'Body text and headings xxl, xl and lg'],
+        [<C>--type-weight-medium</C>, '500', 'Headings md to xxs, metrics, labels and icon-paired text'],
+        [<C>--type-weight-semibold</C>, '600', 'Inline bold emphasis only, not a text style'],
+        [<><C>--type-tracking-tighter</C> · <C>-close</C> · <C>-tight</C> · <C>-snug</C> · <C>-none</C> · <C>-open</C> · <C>-loose</C></>, '−2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1%', 'The letter-spacing steps the companions below read'],
+        [<><C>--heading-xxl-tracking</C> · <C>--heading-xl-tracking</C></>, '−2%', 'Headings 32 and 28'],
+        [<C>--heading-lg-tracking</C>, '−1.5%', 'Heading 24'],
+        [<C>--heading-md-tracking</C>, '−0.5%', 'Heading 20'],
+        [<><C>--heading-sm-tracking</C> · <C>--heading-xs-tracking</C></>, '0', 'Headings 16 and 14'],
+        [<C>--heading-xxs-tracking</C>, '+1%', 'Heading 12'],
+        [<><C>--body-lg-tracking</C> · <C>--body-default-tracking</C> · <C>--body-sm-tracking</C></>, '0 · +0.5% · +1%', 'Body 16, 14 and 12'],
+        [<><C>--metric-lg-tracking</C> · <C>--metric-md-tracking</C> · <C>--metric-sm-tracking</C></>, '−1% · −1% · 0', 'Metrics 28, 24 and 16'],
     ]}
 />
 
@@ -95,7 +108,7 @@ Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`
 
 <FoundationSubsection title="Text-style classes">
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, and add `font-variant-numeric: tabular-nums` to a metric.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and `letter-spacing` together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -130,7 +143,7 @@ Every page has one `h1` (visually hidden when a tab strip replaces a visible pag
 
 <FoundationSection title="Labels">
 
-Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
+Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); letter-spacing: var(--body-default-tracking); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
 Do: Body/default/medium on a button or tab label.
 
@@ -202,15 +215,15 @@ Don't: An h3 straight after the h1 skips the h2.
 
 <FoundationSubsection title="Headings">
 
-Every heading level is Google Sans Flex at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
-Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.
+Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.
 
 </FoundationSubsection>
 
 <FoundationSubsection title="Numbers">
 
-Metric styles are Google Sans Flex 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
+Metric styles are Google Sans Flex 500 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
 Do: Metric/large for the figure.
 
@@ -261,6 +274,6 @@ export const MetricLargeForDoFigure = () => (
 
 export const MonoForTheDontFigure = () => (
     <>
-    <span style={{ font: 'var(--metric-lg)', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+    <span style={{ font: 'var(--metric-lg)', letterSpacing: 'var(--metric-lg-tracking)', fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ font: 'var(--body-sm)', letterSpacing: 'var(--body-sm-tracking)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
     </>
 );
