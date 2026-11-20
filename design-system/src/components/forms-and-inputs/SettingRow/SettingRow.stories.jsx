@@ -4,7 +4,7 @@ import { px, probe, tokenColor, tokenLength } from '@/storybook-docs/lib/style-p
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { Button, Flag, FlagGroup, Select, StatusTag, Toggle } from '@/components';
 import SettingRow from './SettingRow';
-import { LONG_SENTENCE, LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 const LEAD_TIME_OPTIONS = [
     { value: '15m', label: '15 minutes before' },

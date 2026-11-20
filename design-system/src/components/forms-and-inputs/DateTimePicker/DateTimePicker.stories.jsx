@@ -4,7 +4,7 @@ import { expect, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import DateTimePicker from './DateTimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date time picker',

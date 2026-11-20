@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 import { Button, InlineEditableTextfield, Select } from '@/components';
 import InlineEdit from './InlineEdit';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 /**
  * `InlineEdit` and `InlineEditableTextfield`: text that becomes a field when pressed.
  *
@@ -399,4 +400,41 @@ Interactive.args = {
     keepEditViewOpenOnBlur: false,
     hideActionButtons: false,
     readViewFitContainerWidth: false,
+};
+
+/** Truncate: the read view keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped, and the read view keeps its height. */
+export const Overflow = () => (
+    <div style={{ width: '280px' /* demo frame */ }}>
+        <InlineEditableTextfield label="School" defaultValue={LONG_SCHOOL} />
+        <InlineEditableTextfield label="Grade" defaultValue="Grade 7" />
+    </div>
+);
+Overflow.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const read = canvas.getByRole('button', { name: `School ${LONG_SCHOOL}` });
+    const short = canvas.getByRole('button', { name: 'Grade Grade 7' });
+    await expect(read.querySelector('.plus-inline-edit__text').scrollWidth).toBeGreaterThan(read.querySelector('.plus-inline-edit__text').clientWidth);
+    await expectNoSilentClip(canvasElement);
+    await expectInsideWell(read, canvasElement.firstElementChild);
+    await expect(height(read), 'the clipped read view keeps its height').toBe(height(short));
+    await expectFullTextReachable(canvasElement, read, LONG_SCHOOL);
+};
+
+/** Truncate: the edit view is the Text field, so a value longer than it keeps one line, has no Tooltip, and focus reaches the whole value. */
+export const OverflowEditing = () => (
+    <div style={{ width: '280px' /* demo frame */ }}>
+        <InlineEditableTextfield label="School" defaultValue={LONG_SCHOOL} startWithEditViewOpen />
+    </div>
+);
+OverflowEditing.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('textbox', { name: 'School' });
+    await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
+    await expectNoSilentClip(canvasElement);
+    await expectInsideWell(input.closest('.plus-field'), canvasElement.firstElementChild);
+    // The field is a native input: its whole value is there and scrolls into view, with no Tooltip.
+    await expect(input).toHaveValue(LONG_SCHOOL);
+    await expect(input).toHaveFocus();
+    input.scrollLeft = input.scrollWidth;
+    await expect(input.scrollLeft).toBeGreaterThan(0);
+    await expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull();
 };

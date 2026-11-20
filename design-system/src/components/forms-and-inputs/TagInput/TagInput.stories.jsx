@@ -5,7 +5,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
 import TagInput from './TagInput';
-import { MANY_TAGS, expectNoSilentClip, expectInsideWell, expectNoBlankLine } from '../_internal/overflowPlays';
+import { MANY_TAGS, expectNoSilentClip, expectInsideWell, expectNoBlankLine } from '../../_internal/overflowPlays';
 
 /**
  * `TagInput` — a field of Tags with a text entry after them, modeled on

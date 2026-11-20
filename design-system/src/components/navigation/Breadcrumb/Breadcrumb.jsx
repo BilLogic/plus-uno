@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import './Breadcrumb.scss';
 
 /**
@@ -29,27 +30,38 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
                 // Active if there's no href, or it's the last item.
                 const isCurrent = !item.href || isLast;
                 return isCurrent ? (
-                    <li
-                        key={index}
-                        id={isLast && id ? id : undefined}
-                        aria-current={isLast ? 'page' : undefined}
-                        className="plus-breadcrumb-item plus-breadcrumb-current"
-                    >
-                        {item.text}
-                    </li>
+                    <ClippedTooltip key={index} text={item.text}>
+                        {({ measureRef, truncated }) => (
+                            <li
+                                ref={measureRef}
+                                tabIndex={truncated ? 0 : undefined}
+                                id={isLast && id ? id : undefined}
+                                aria-current={isLast ? 'page' : undefined}
+                                className="plus-breadcrumb-item plus-breadcrumb-current"
+                            >
+                                {item.text}
+                            </li>
+                        )}
+                    </ClippedTooltip>
                 ) : (
                     <li key={index} className="plus-breadcrumb-item plus-breadcrumb-link">
-                        <a
-                            href={item.href}
-                            onClick={(e) => {
-                                if (item.onClick) {
-                                    e.preventDefault();
-                                    item.onClick(e);
-                                }
-                            }}
-                        >
-                            {item.text}
-                        </a>
+                        <ClippedTooltip text={item.text}>
+                            {({ measureRef }) => (
+                                <a
+                                    ref={measureRef}
+                                    className="plus-breadcrumb-text"
+                                    href={item.href}
+                                    onClick={(e) => {
+                                        if (item.onClick) {
+                                            e.preventDefault();
+                                            item.onClick(e);
+                                        }
+                                    }}
+                                >
+                                    {item.text}
+                                </a>
+                            )}
+                        </ClippedTooltip>
                     </li>
                 );
             })}

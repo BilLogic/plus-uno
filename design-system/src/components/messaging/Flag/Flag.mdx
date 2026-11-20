@@ -74,6 +74,8 @@ reply. It appears over the page and goes away on its own or when dismissed.
 
 <ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton, last in a default flag's row. A bold flag has none." />
 
+<ComponentExample of={FlagStories.Overflow} title="Overflow" description="Wrap: a title and a message longer than the flag take more lines and never end in an ellipsis; the dismiss button keeps its place." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -238,6 +240,10 @@ Success for a finished action; error only when something failed.
     dontExample={<Flag appearance="error" defaultExpanded title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
     dontCaption="Error appearance on good news."
 />
+
+### Let a long title or message wrap.
+
+A flag takes more lines and never ends in an ellipsis. Keep it short anyway, because a flag leaves on its own. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep routine news on the default flag.
 

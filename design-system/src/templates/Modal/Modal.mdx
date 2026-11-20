@@ -140,6 +140,8 @@ Which tier, and its words: <DocsLink id="patterns-common-actions">Common actions
 
 <ComponentExample of={ModalStories.TierTypeName} title="Danger, type the name" description="A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches." />
 
+<ComponentExample of={ModalStories.Overflow} title="Overflow" description="Wrap: a title longer than the Modal takes more lines and never ends in an ellipsis; the close button keeps its place." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -437,6 +439,10 @@ A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps 
     dontCode={CODE.ConfirmWide}
     dontCaption="The same confirm at a wide step: empty width around one line, picked to make it look a certain way."
 />
+
+### Let a title longer than the Modal wrap.
+
+A title takes more lines and never ends in an ellipsis; the close button keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Confirm inside the Modal, and never open a Modal on another Modal.
 

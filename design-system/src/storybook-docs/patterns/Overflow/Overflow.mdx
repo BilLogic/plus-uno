@@ -66,9 +66,9 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 <ComponentExample of={OverflowStories.PagedInFooter} title="Page a table" description="A table pages instead of growing, keeping the range and pager at the end of the Section footer. Use the pager to switch pages." />
 
-The two cases below are Planned <PlannedTag />: no component carries them yet.
+Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle.** Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. The Breadcrumb never wraps.
+- **The breadcrumb middle** is Planned <PlannedTag />. Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. Today each level truncates and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
@@ -102,16 +102,20 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tr><th>Element</th><th>Answer</th><th>Full text</th></tr>
 </thead>
 <tbody>
-<tr><td>Page title, Section title</td><td>Wrap</td><td>Always visible</td></tr>
-<tr><td>Field error, Section message, Flag, Banner</td><td>Wrap</td><td>Always visible</td></tr>
-<tr><td>Column header <PlannedTag /></td><td>Planned: wrap</td><td>Always visible</td></tr>
+<tr><td>Page title, Section title, Card title, Modal title</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Field error, Section message, Flag, Banner, Tooltip</td><td>Wrap</td><td>Always visible</td></tr>
+<tr><td>Column header <PlannedTag /></td><td>Wrap with `shouldTruncate` false; wrap by default is Planned</td><td>Always visible</td></tr>
 <tr><td>Table cell</td><td>Truncate at the end, one line</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Tag (180), Status tag (200)</td><td>Truncate at the end</td><td>Tooltip when clipped; the tag becomes focusable</td></tr>
 <tr><td>Tags in a group</td><td>Fold into +n</td><td>The +n menu lists the hidden tags</td></tr>
 <tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
-<tr><td>Breadcrumb with five or more levels <PlannedTag /></td><td>Planned: fold the middle into "…"</td><td>The "…" opens a menu of the hidden levels</td></tr>
-<tr><td>Open item in the Sidebar <PlannedTag /></td><td>Planned: truncate at the end</td><td>Tooltip with the school</td></tr>
-<tr><td>Menu item and Popup row</td><td>Truncate at the end</td><td>Tooltip on hover and focus when clipped</td></tr>
+<tr><td>Tab label</td><td>Truncate at the end; folding extra tabs into More is Planned <PlannedTag /></td><td>Tooltip when clipped</td></tr>
+<tr><td>Breadcrumb level</td><td>Truncate at the end; with five or more levels, fold the middle into "…" <PlannedTag /></td><td>Tooltip when clipped; the "…" opens a menu of the hidden levels</td></tr>
+<tr><td>Open item in the Sidebar</td><td>Truncate at the end</td><td>Tooltip with the school</td></tr>
+<tr><td>People in an Avatar group</td><td>Fold into +n</td><td>The +n menu lists the hidden people by name</td></tr>
+<tr><td>Inline edit, read view</td><td>Truncate at the end, one line</td><td>Tooltip when clipped; the edit view follows the Text field</td></tr>
+<tr><td>Prompt input</td><td>Grow to five lines, then scroll inside</td><td>Always reachable by scrolling</td></tr>
+<tr><td>Menu item, custom row and Popup row</td><td>Truncate at the end</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Button label</td><td>Truncate at the end, no Tooltip</td><td>Shorten the label; the full label stays in the accessible name</td></tr>
 <tr><td>File name</td><td>Truncate mid-line, keeping the extension</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
@@ -236,7 +240,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 </thead>
 <tbody>
 <tr><td>"Show 4 more" and "Show less" (Planned). <PlannedTag /></td><td>"Load more", "See all", "…".</td></tr>
-<tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). <PlannedTag /></td><td>The whole title in the Sidebar.</td></tr>
+<tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip.</td><td>The whole title in the Sidebar.</td></tr>
 <tr><td>Breadcrumb levels by the page's own title: "Lincoln Middle School".</td><td>"Back", "Up one level".</td></tr>
 <tr><td>File name mid-line: "reflection_…_week12.pdf".</td><td>"reflection_maya_rodrig…".</td></tr>
 </tbody>

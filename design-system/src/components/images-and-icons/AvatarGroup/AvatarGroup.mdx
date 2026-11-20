@@ -77,6 +77,8 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 <ComponentExample of={AvatarGroupStories.GroupFits} title="Group fits" description={<>Within <code>max</code> there is no <code>+n</code>.</>} />
 
+<ComponentExample of={AvatarGroupStories.Overflow} title="Overflow" description="Collapse: past the maximum the rest fold into a +n, and every hidden person stays reachable by name; a long name ends in an ellipsis with its full text in a Tooltip." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -199,6 +201,10 @@ slot — `max` is the most slots the row ever shows, the `+n` included.
     dontExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /></AvatarGroup>}
     dontCaption="A fourth person shows two avatars and +n, because the +n takes a slot."
 />
+
+### Fold the rest into `+n`, never past the row.
+
+The group never outgrows its row: people past `max` go behind `+n`, listed by name, and a name longer than the menu ends in an ellipsis with a Tooltip. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep the group short.
 

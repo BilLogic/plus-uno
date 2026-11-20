@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from './FilterMenu';
-import { LONG_SCHOOL, expectNoSilentClip } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip } from '../../_internal/overflowPlays';
 
 const SIDE_BY_SIDE = [
     { id: 'status', label: 'Status', options: ['Upcoming', 'Completed', 'Canceled'] },

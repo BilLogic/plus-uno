@@ -94,7 +94,7 @@ The Menu family has no submenu-trigger row. Flatten the choices or use sections.
 
 ### Let a `DropdownMenu` item longer than the menu end in an ellipsis with a Tooltip. {#let-a-dropdownmenu-item-longer-than-the-menu-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped, and the item keeps its row height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped, and the item keeps its row height; a `CustomItem` row follows the same rule. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

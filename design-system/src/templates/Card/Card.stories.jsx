@@ -9,6 +9,7 @@ import { CardJobs } from './CardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
+import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
@@ -679,5 +680,32 @@ export const PlacementBoundary = {
                 }
             }
         }
+    },
+};
+
+/** Wrap: a Card title longer than the Card takes more lines and never ends in an ellipsis; the actions keep their place at the end of the row. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: 'var(--card-min-width-sm)' }}>
+            <Card
+                title={`${LONG_TUTOR}: ${LONG_TOPIC}`}
+                description="Lincoln Middle · Thu 4:00 PM"
+                actions={<IconButton appearance="subtle" spacing="compact" icon="ellipsis" label="More actions" />}
+            >
+                {bodyCopy}
+            </Card>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const card = canvasElement.querySelector('.plus-template-card');
+        const heading = within(card).getByRole('heading');
+        const one = parseFloat(getComputedStyle(heading).lineHeight);
+        await expect(getComputedStyle(heading).textOverflow, 'a title never ends in an ellipsis').not.toBe('ellipsis');
+        await expect(heading.scrollWidth, 'the whole title is shown').toBeLessThanOrEqual(heading.clientWidth + 1);
+        await expect(heading.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expectInsideWell(heading, card);
+        await expectInsideWell(within(card).getByRole('button', { name: 'More actions' }), card);
+        await expectInsideWell(card, canvasElement.firstElementChild);
+        await expectNoSilentClip(card);
     },
 };

@@ -75,6 +75,8 @@ dismissed, with an optional title, a leading icon and up to two actions.
 
 <ComponentExample of={SectionMessageStories.DismissPlacement} title="Dismiss placement" description="The × centers on the first line of text and stays there when the text wraps." />
 
+<ComponentExample of={SectionMessageStories.Overflow} title="Overflow" description="Wrap: a title and a message longer than the section message take more lines and never end in an ellipsis; the dismiss button keeps its place." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -243,6 +245,10 @@ A short body speaks for itself.
     dontExample={<SectionMessage appearance="info" title="Tutors confirm times by Friday">Tutors confirm times by Friday.</SectionMessage>}
     dontCaption="A title that repeats the body."
 />
+
+### Let a long title or message wrap.
+
+A section message takes more lines and never ends in an ellipsis. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Dismiss only what is optional.
 

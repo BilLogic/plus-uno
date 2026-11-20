@@ -5,7 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
-import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Choice grid',

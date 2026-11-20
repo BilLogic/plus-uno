@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Avatar, Comment } from '@/components';
 import { expect, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { LONG_TUTOR, LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_TUTOR, LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 export default {
     title: 'Components/Forms and inputs/Comment',
     component: Comment,

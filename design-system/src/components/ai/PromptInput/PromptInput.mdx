@@ -28,6 +28,8 @@ A growing text area for AI prompts, with an optional leading control and a send 
 
 <ComponentExample of={PromptInputStories.WithSlots} title="Slots" description="startSlot holds a quiet control before the text, attachments a row of staged files above it, and actions extra controls beside send." />
 
+<ComponentExample of={PromptInputStories.Overflow} title="Overflow" description="Grow, then scroll: the field grows from one line to five, then scrolls inside itself. The send button stays at the bottom." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -150,6 +152,10 @@ For a plain multiline field without send-on-Enter or loading behavior, use `Text
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Let a long prompt grow to five lines, then scroll.
+
+The field never grows past its maximum height and never scrolls sideways; the send button stays at the bottom. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep the field visible while generating.
 

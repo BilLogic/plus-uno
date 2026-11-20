@@ -14,7 +14,7 @@ Also asked as: dialog panel, dialog layout.
 
 **Source:** `design-system/src/components/messaging/Dialog/Dialog.jsx`
 
-**Stories:** `design-system/src/components/messaging/Dialog/Dialog.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Tabs, Loading, Content, Layout, Interactive, Overview, FooterLayouts, SizeToContent, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Dialog/Dialog.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Tabs, Loading, Content, Layout, Interactive, Overview, FooterLayouts, SizeToContent, Rest, Hovered, Pressed, Focused, Overflow
 
 **Storybook page:** `design-system/src/components/messaging/Dialog/Dialog.mdx`
 
@@ -90,6 +90,10 @@ objects and the component renders the `FooterActions` pair.
 Do: Pass `primaryButton` or `footer` when the dialog asks for a decision.
 
 Don't: Leave a confirm dialog with no footer action.
+
+### Let a title longer than the Dialog wrap. {#let-a-title-longer-than-the-dialog-wrap}
+
+A title takes more lines and never ends in an ellipsis; the close button keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use `Modal` from `@/templates` when a task needs a Blanket and focus trap. {#use-modal-from-templates-when-a-task-needs-a-blanket-and-focus-trap}
 

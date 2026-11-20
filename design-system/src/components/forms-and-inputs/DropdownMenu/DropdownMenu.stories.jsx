@@ -16,7 +16,7 @@ import {
     VerbCaseDo,
     VerbCaseDont,
 } from '@/storybook-docs/lib/dropdown-menu-cases';
-import { LONG_SCHOOL, expectNoSilentClip, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Dropdown menu',

@@ -86,7 +86,7 @@ category.
 
 ## Size and layout
 
-<ComponentExample of={TagStories.Truncation} title="Truncation" description="Every tag caps at 180 wide, or narrower in a narrower container; a clipped label ellipsizes and its full text is a tooltip on hover and focus." />
+<ComponentExample of={TagStories.Overflow} title="Overflow" description="Truncate: every tag caps at 180 wide, or narrower in a narrower container; a clipped label ellipsizes and its full text is a tooltip on hover and focus." />
 
 </div>
 
@@ -342,6 +342,10 @@ and every tag inside follows:
 ```
 
 `useTagContext()` reads the same value from inside a custom tag.
+
+### Let a label longer than 180 end in an ellipsis with a Tooltip.
+
+The Tooltip is on only while the label is clipped, and a clipped tag is the one tab stop that reaches it. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Let the group own the gaps.
 

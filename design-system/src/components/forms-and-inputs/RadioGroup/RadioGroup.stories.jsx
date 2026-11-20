@@ -6,7 +6,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { Illustration } from '@/components';
 import CheckboxGroup from '../CheckboxGroup';
 import RadioGroup from './RadioGroup';
-import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio group',

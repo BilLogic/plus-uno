@@ -6,6 +6,8 @@ The one dismiss control for a surface that closes as a whole — Modal, Section 
 
 **Import:** `import { CloseButton } from '@/components';`
 
+**Used in:** Modal (`ds guide modal`)
+
 **Source:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.stories.jsx` — Overview, Spacing, Tones, Focus, InverseGrounds, Interactive

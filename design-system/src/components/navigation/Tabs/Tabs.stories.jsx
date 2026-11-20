@@ -10,6 +10,7 @@ import { CountTag } from '@/components';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Navigation/Tabs',
@@ -90,8 +91,8 @@ Overview.parameters = {
  */
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const selected = canvas.getByText('Home');
-    const other = canvas.getByText('Profile');
+    const selected = canvas.getByRole('tab', { name: 'Home' });
+    const other = canvas.getByRole('tab', { name: 'Profile' });
     for (const tab of [selected, other]) tab.style.transition = 'none';
 
     await inEveryColorMode(async () => {
@@ -425,5 +426,33 @@ export const Disabled = {
         disabled.focus();
         await userEvent.keyboard('{Enter}');
         await expect(disabled).toHaveAttribute('aria-selected', 'false');
+    },
+};
+
+/** Truncate: a tab label longer than its cap keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped. Folding extra tabs into More is Planned. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '360px' /* demo frame */ }}>
+            <Tabs defaultActiveKey="one">
+                <Tabs.Tab eventKey="one">Overview</Tabs.Tab>
+                <Tabs.Tab eventKey="two">{LONG_TOPIC}</Tabs.Tab>
+            </Tabs>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const long = canvas.getByRole('tab', { name: LONG_TOPIC });
+        const short = canvas.getByRole('tab', { name: 'Overview' });
+        const label = long.querySelector('.plus-tab-label');
+        await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+        await expect(getComputedStyle(label).textOverflow).toBe('ellipsis');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(long, canvasElement.firstElementChild);
+        await expect(Math.round(long.getBoundingClientRect().height)).toBe(Math.round(short.getBoundingClientRect().height));
+        await userEvent.hover(short);
+        await new Promise((resolve) => { setTimeout(resolve, 600); });
+        await expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip'), 'a tab that fits has no Tooltip').toBeNull();
+        await userEvent.unhover(short);
+        await expectFullTextReachable(canvasElement, long, LONG_TOPIC);
     },
 };
