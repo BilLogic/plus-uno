@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 
 import {
-    Avatar,
     Button,
     EmptyState,
     Heading,
-    PopupSelect,
     StaticTable,
     StatusTag,
     TextArea,
     TextField,
-    VisuallyHidden,
 } from '@/components';
 import {
     Section,
@@ -33,10 +30,10 @@ import { FullBleedFooter } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
  * The Panel template's examples: the real Frame with its Panel area, filled the
  * way each type fills it. A Frame under 1408 wide cannot dock a Sidebar and a
  * 400 Panel beside 720 of content, so at the docs stage the Panel floats on the
- * overlay material and shadow with no Blanket, which is what Details and the
- * Inbox always do. The Frame is the only host a Panel has today, so the
- * Inbox's own placement (out of the Sidebar, on the left) is Planned and the
- * Inbox is drawn in the same right-hand slot.
+ * overlay material and shadow with no Blanket, which is what Details does. The
+ * Inbox is the other type: it opens from the Sidebar's bell and docks beside the
+ * Sidebar at the start, 360 wide, so it is drawn by the Notifications pattern's
+ * `InboxInSidebar` rather than in the Frame's right-hand Panel area.
  */
 
 /** The width the docs lay the Frame out at so the Panel floats: under 1168, where a 400 Panel docks alone. Docs geometry, px. */
@@ -116,70 +113,6 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
     </PanelContainer>
 );
 
-const INBOX_VIEWS = [
-    { value: 'unread', label: 'Unread' },
-    { value: 'all', label: 'All' },
-    { value: 'mentions', label: 'Mentions' },
-];
-
-const INBOX = [
-    { id: 1, name: 'Ana Ruiz', what: 'moved Thursday’s session', where: 'Sessions', excerpt: 'New time is 4:30 PM, if that works.', time: '2m', unread: true, kind: 'session' },
-    { id: 2, name: 'Ben Okafor', what: 'mentioned you', where: 'Notes', excerpt: 'Can you check the unit rates plan?', time: '1h', unread: true, kind: 'mention' },
-    { id: 3, name: 'Chloe Tran', what: 'confirmed Friday', where: 'Sessions', excerpt: 'See you at 3:30 PM.', time: 'Yesterday', unread: false, kind: 'session' },
-];
-
-/** Notifications: the Inbox. Items carry an avatar, who did what and where, an excerpt, the time and an unread dot paired with the word. */
-export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => {
-    const [view, setView] = useState('unread');
-    const visibleItems = view === 'unread'
-        ? items.filter((n) => n.unread)
-        : view === 'mentions'
-            ? items.filter((n) => n.kind === 'mention')
-            : items;
-    return (
-        <PanelContainer>
-            <PanelHeader
-                title="Inbox"
-                actions={(
-                    <>
-                        <Button text="Archive all" appearance="subtle" spacing="compact" onClick={() => {}} />
-                        <PanelCloseAction onClick={onClose} />
-                    </>
-                )}
-            />
-            <PanelSubheader>
-                <PopupSelect
-                    label="Show"
-                    value={view}
-                    onChange={setView}
-                    options={INBOX_VIEWS}
-                    isSearchable={false}
-                />
-            </PanelSubheader>
-            <PanelBody data-probe="body">
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                    {visibleItems.map((n) => (
-                        <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
-                            <Avatar name={n.name} size={32} />
-                            <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
-                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
-                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
-                            </div>
-                            {n.unread ? (
-                                <>
-                                    <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
-                                    <VisuallyHidden>unread</VisuallyHidden>
-                                </>
-                            ) : null}
-                        </li>
-                    ))}
-                </ul>
-            </PanelBody>
-        </PanelContainer>
-    );
-};
-
 /** The record behind the Panel was removed: the body shows its empty state with a way back. */
 export const GonePanel = ({ onClose = () => {} }) => (
     <PanelContainer>
@@ -228,8 +161,8 @@ export const DetailsFrame = ({ editing: start = false, ...frame }) => {
     );
 };
 
-/** The Inbox open over the session list. */
-export const InboxFrame = (frame) => <PanelFrame label="Inbox" panel={<InboxPanel />} {...frame} />;
+/** The Inbox, opened from the Sidebar's bell: the Notifications pattern's picture, drawn here for the Panel's start-side placement. */
+export { InboxInSidebar as InboxFrame } from '@/storybook-docs/patterns/Notifications/notificationsDemo.jsx';
 
 /** The record is gone: the same Panel shows its empty state. */
 export const GoneFrame = (frame) => <PanelFrame label="Session" panel={<GonePanel />} behind={<SessionsBehind picked={-1} />} {...frame} />;

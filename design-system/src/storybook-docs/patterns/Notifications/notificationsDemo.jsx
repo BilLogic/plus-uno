@@ -9,7 +9,6 @@ import {
     Flag,
     FlagGroup,
     Heading,
-    IconButton,
     NotificationItem,
     SectionMessage,
     Sidebar,
@@ -41,7 +40,7 @@ import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
  *   FlagWithActions   a Flag with up to two verbs
  *   FlagUndo          the timed Undo Flag, then the plain "restored" Flag
  *   MustStay          a SectionMessage with dismiss off, by the action it informs
- *   InboxInSidebar    the 360px (--inbox-width) Inbox Panel beside the Sidebar
+ *   InboxInSidebar    the Sidebar's bell opens the 360px (--inbox-width) Inbox Panel beside it
  *   TierPicture       one Banner at the Frame, Page or Section tier
  *   SeverityRow       the four statuses on SectionMessage
  */
@@ -121,22 +120,11 @@ const actorFor = (item) => (
         : <Avatar name={item.name} size={32} color={item.color} />
 );
 
-const buildSidebarGroups = (unreadCount) => [
+const SIDEBAR_GROUPS = [
     {
         id: 'home',
         items: [
             { id: 'home', text: 'Home', icon: 'house' },
-            {
-                id: 'inbox',
-                text: 'Inbox',
-                icon: 'bell',
-                ...(unreadCount > 0
-                    ? {
-                        count: unreadCount,
-                        countLabel: `${unreadCount} unread ${unreadCount === 1 ? 'notification' : 'notifications'}`,
-                    }
-                    : {}),
-            },
             { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: '#slack', external: true },
         ],
     },
@@ -201,12 +189,11 @@ const InboxDayList = ({ items, onMarkRead }) => {
     );
 };
 
-/** The Inbox Panel itself: 360px (--inbox-width), Mark all as read, settings, close, Unread/All tabs and day groups. */
+/** The Inbox Panel itself: 360px (--inbox-width), Mark all as read, close, Unread/All tabs and day groups. */
 export const NotificationsInboxPanel = ({
     items,
     onMarkRead,
     onMarkAllRead,
-    onSettings = noop,
     onClose = noop,
 }) => {
     const [tab, setTab] = useState('unread');
@@ -227,14 +214,6 @@ export const NotificationsInboxPanel = ({
                                 onClick={onMarkAllRead}
                             />
                         ) : null}
-                        <IconButton
-                            icon="gear"
-                            label="Notification settings"
-                            tooltip="Notification settings"
-                            appearance="subtle"
-                            spacing="compact"
-                            onClick={onSettings}
-                        />
                         <PanelCloseAction onClick={onClose} />
                     </>
                 )}
@@ -268,7 +247,7 @@ export const NotificationsInboxPanel = ({
     );
 };
 
-/** The Inbox opening from the Sidebar at the start, 360px wide (--inbox-width), over the page with no Blanket. */
+/** The bell beside the account name opens the Inbox at the Sidebar's end edge, 360px wide (--inbox-width), over the page with no Blanket. */
 export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) => {
     const [open, setOpen] = useState(defaultOpen);
     const [items, setItems] = useState(() => (
@@ -287,16 +266,13 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
         setItems((prev) => prev.map((item) => (item.unread ? { ...item, unread: false } : item)));
     };
 
-    const findInboxTrigger = () => {
-        const buttons = rootRef.current?.querySelectorAll('nav[aria-label="Main"] button') ?? [];
-        return Array.from(buttons).find((btn) => btn.textContent?.startsWith('Inbox')) ?? null;
-    };
+    const findBell = () => rootRef.current?.querySelector('.plus-sidebar-account__bell') ?? null;
 
     const closeFromInside = () => {
         const wasInside = inboxWrapRef.current?.contains(document.activeElement);
         setOpen(false);
         if (wasInside) {
-            findInboxTrigger()?.focus();
+            findBell()?.focus();
         }
     };
 
@@ -314,10 +290,7 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
             const target = event.target;
             if (!(target instanceof Element)) return;
             if (inboxWrapRef.current?.contains(target)) return;
-            const clickedSidebarInbox = Boolean(
-                target.closest('nav[aria-label="Main"] button')?.textContent?.startsWith('Inbox')
-            );
-            if (clickedSidebarInbox) return;
+            if (findBell()?.contains(target)) return;
             setOpen(false);
         };
 
@@ -335,11 +308,11 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
                 <Frame
                     sidebar={(
                         <Sidebar
-                            groups={buildSidebarGroups(unreadCount)}
-                            activeId={open ? 'inbox' : 'sessions'}
-                            onSelect={(id) => {
-                                if (id === 'inbox') setOpen((prev) => !prev);
-                            }}
+                            groups={SIDEBAR_GROUPS}
+                            activeId="sessions"
+                            inboxCount={unreadCount}
+                            isInboxOpen={open}
+                            onInbox={() => setOpen((prev) => !prev)}
                             account={{ name: 'Maya Chen', role: 'Tutor' }}
                             storageKey={null}
                         />

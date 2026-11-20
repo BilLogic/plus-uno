@@ -544,7 +544,7 @@ button.plus-template-sidebar__title {
 /* ------------------------------------------------------------- account row */
 
 // Under the one divider, full bleed. The trigger is a nav row (avatar in the
-// icon slot); Help Center sits on the trailing column, center x 208.
+// icon slot); the Inbox bell sits on the trailing column, center x 208.
 .plus-sidebar-account {
     display: flex;
     align-items: center;
@@ -615,39 +615,25 @@ button.plus-template-sidebar__title {
     color: var(--ds-text-subtlest);
 }
 
-.plus-sidebar-account__help {
+.plus-sidebar-account__bell {
     flex-shrink: 0;
     margin-inline-start: auto;
-
-    @include plus-state(
-        (pressed: (background-color: var(--ds-background-selected))),
-        $ring: false
-    );
 }
 
-.plus-sidebar-account__help-glyphs {
+// The bell's glyph with the unread count riding its top corner, so the button
+// stays 32 wide and its center stays on the trailing column.
+.plus-sidebar-account__bell-glyphs {
+    position: relative;
     display: inline-grid;
     place-items: center;
 
     i {
-        grid-area: 1 / 1;
         font-size: var(--icon-md);
     }
 }
 
-// Help Center opens in a new tab: on hover and focus its glyph turns into the external icon.
-.plus-sidebar-account__help-go {
-    visibility: hidden;
+.plus-sidebar-account__bell-count {
+    position: absolute;
+    inset-block-start: calc(-1 * var(--stack-md));
+    inset-inline-start: 50%;
 }
-
-@include plus-state(
-    (hovered: (visibility: visible)),
-    $ring: false,
-    $hovered-selector: '.plus-sidebar-account__help:hover .plus-sidebar-account__help-go, .plus-sidebar-account__help:focus-visible .plus-sidebar-account__help-go'
-);
-
-@include plus-state(
-    (hovered: (visibility: hidden)),
-    $ring: false,
-    $hovered-selector: '.plus-sidebar-account__help:hover .plus-sidebar-account__help-rest, .plus-sidebar-account__help:focus-visible .plus-sidebar-account__help-rest'
-);

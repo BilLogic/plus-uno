@@ -19,7 +19,7 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
 
         // Header controls: Mark all as read, settings, close
         expect(within(inbox).getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
-        expect(within(inbox).getByRole('button', { name: /settings/i })).toBeInTheDocument();
+        expect(within(inbox).queryByRole('button', { name: /settings/i })).toBeNull();
         expect(within(inbox).getByRole('button', { name: 'Close' })).toBeInTheDocument();
 
         // Tabs: Unread (with count) and All
@@ -71,21 +71,21 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         }
     });
 
-    it('closes on Escape and outside click, restores focus to the Sidebar trigger, and reopens', async () => {
+    it('closes on Escape and outside click, restores focus to the bell, and reopens', async () => {
         const user = userEvent.setup();
         render(<InboxInSidebar />);
 
         const inbox = screen.getByRole('region', { name: 'Inbox' });
-        const nav = screen.getByRole('navigation', { name: 'Main' });
-        const inboxTrigger = within(nav).getByRole('button', { name: /Inbox/i });
+        const inboxTrigger = screen.getByRole('button', { name: /^Inbox, 3 unread/ });
+        expect(screen.queryByRole('button', { name: 'Inbox' }), 'no Inbox row in the nav').toBeNull();
 
-        // Focus inside Inbox, then press Escape -> closes and restores focus to Sidebar Inbox button
+        // Focus inside Inbox, then press Escape -> closes and restores focus to the bell
         within(inbox).getByRole('tab', { name: /Unread/i }).focus();
         await user.keyboard('{Escape}');
         expect(screen.queryByRole('region', { name: 'Inbox' })).toBeNull();
         expect(inboxTrigger).toHaveFocus();
 
-        // Reopens from the Sidebar Inbox button
+        // Reopens from the bell
         await user.click(inboxTrigger);
         expect(screen.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
 

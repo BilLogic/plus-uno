@@ -15,6 +15,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { FormInPanel } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
+import { INBOX_STAGE } from '@/storybook-docs/patterns/Notifications/notificationsDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from './Panel';
 
@@ -94,33 +95,39 @@ export const TypeDetails = {
     },
 };
 
-/** Notifications: the Inbox, drawn in the same right-hand slot until its own left placement is built. */
+/** Notifications: the Inbox, opened from the bell beside the account name and docked beside the Sidebar, 360 wide, over the page with no Blanket. */
 export const TypeNotifications = {
     name: 'Type: Notifications',
-    render: () => sized(<InboxFrame />),
+    render: () => sized(<InboxFrame />, INBOX_STAGE),
     play: async ({ canvasElement }) => {
-        await expectFloating(canvasElement);
-        const { panel } = frameParts(canvasElement);
-        await expect(panel(), 'named Inbox').toHaveAccessibleName('Inbox');
-        const unread = within(panel()).getAllByText('unread');
-        await expect(unread.length, 'each unread dot is paired with the word').toBe(canvasElement.querySelectorAll('[data-probe="unread"]').length);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
+        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        const sidebar = canvasElement.querySelector('.plus-frame__sidebar');
+        await expect(rect(inbox).width, '360 wide (--inbox-width)').toBeCloseTo(tokenLength(canvasElement, '--inbox-width'), 0);
+        await expect(rect(inbox).left, 'docked beside the Sidebar, on its end edge').toBeCloseTo(rect(sidebar).right, 0);
+        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'no Blanket').toBeNull();
+        const page = canvasElement.querySelector('.plus-frame__surface');
+        await expect(rect(inbox).left < rect(page).right && rect(inbox).right > rect(page).left, 'over the page, not beside it').toBe(true);
+        const bell = canvas.getByRole('button', { name: /^Inbox/ });
+        await expect(bell, 'the bell is pressed while the Inbox is open').toHaveAttribute('aria-pressed', 'true');
 
-        const body = within(canvasElement.ownerDocument.body);
-        const p = within(panel());
-        await expect(p.queryByText(/Chloe Tran/)).toBeNull();
+        const p = within(inbox);
+        await expect(p.getByRole('tab', { name: /Unread/ })).toBeInTheDocument();
+        await expect(p.getByRole('tab', { name: 'All' })).toBeInTheDocument();
+        await expect(p.getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
+        await expect(p.queryByRole('button', { name: /^Show/ }), 'no Show filter').toBeNull();
+        await expect(p.queryByRole('button', { name: 'Archive all' }), 'no Archive all').toBeNull();
+        await expect(p.queryByRole('option', { name: 'Mentions' })).toBeNull();
 
-        await userEvent.click(p.getByRole('button', { name: 'Show: Unread' }));
-        await userEvent.click(await body.findByRole('option', { name: 'All' }));
-        await expect(p.getByText(/Chloe Tran/)).toBeInTheDocument();
-
-        await userEvent.click(p.getByRole('button', { name: 'Show: All' }));
-        await userEvent.click(await body.findByRole('option', { name: 'Mentions' }));
-        await expect(p.getByText(/Ben Okafor/)).toBeInTheDocument();
-        await expect(p.queryByText(/Ana Ruiz/)).toBeNull();
-
-        await userEvent.click(p.getByRole('button', { name: 'Show: Mentions' }));
-        await userEvent.click(await body.findByRole('option', { name: 'Unread' }));
-        await expect(p.getByText(/Ana Ruiz/)).toBeInTheDocument();
+        // Escape closes it and returns focus to the bell.
+        p.getByRole('tab', { name: /Unread/ }).focus();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull());
+        await expect(bell, 'focus returns to the bell').toHaveFocus();
+        await userEvent.click(bell);
+        await expect(canvas.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
     },
 };
 
@@ -154,13 +161,14 @@ export const AnatomyDetails = {
 
 const ANATOMY_INBOX_PARTS = [
     { selector: '.plus-panel-header', label: 'Header', side: 'end', at: 'middle' },
-    { selector: '[data-probe="body"] ul', label: 'Items', side: 'end', at: 'middle' },
+    { selector: '.plus-tabs-list', label: 'Tabs', side: 'end', at: 'middle' },
+    { selector: '.plus-panel-body', label: 'Items', side: 'end', at: 'middle' },
 ];
 
 export const AnatomyNotifications = {
     name: 'Anatomy: Notifications',
     render: () => (
-        <LiveAnatomy live scrollable width={FLOAT_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
+        <LiveAnatomy live scrollable width={INBOX_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
             <InboxFrame />
         </LiveAnatomy>
     ),
@@ -169,15 +177,14 @@ export const AnatomyNotifications = {
         await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_INBOX_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_INBOX_PARTS);
-        const { panel } = frameParts(canvasElement);
-        const p = within(panel());
-        const body = within(canvasElement.ownerDocument.body);
-        await userEvent.click(p.getByRole('button', { name: 'Show: Unread' }));
-        await userEvent.click(await body.findByRole('option', { name: 'All' }));
-        await expect(p.getByText(/Chloe Tran/)).toBeInTheDocument();
-        await userEvent.click(p.getByRole('button', { name: 'Show: All' }));
-        await userEvent.click(await body.findByRole('option', { name: 'Unread' }));
-        await expect(p.queryByText(/Chloe Tran/)).toBeNull();
+        const inbox = within(canvasElement).getByRole('region', { name: 'Inbox' });
+        const p = within(inbox);
+        await userEvent.click(p.getByRole('tab', { name: 'All' }));
+        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(4);
+        await userEvent.click(p.getByRole('tab', { name: /Unread/ }));
+        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(3);
+        await userEvent.click(p.getByRole('button', { name: 'Mark all as read' }));
+        await expect(p.getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
     },
 };
 

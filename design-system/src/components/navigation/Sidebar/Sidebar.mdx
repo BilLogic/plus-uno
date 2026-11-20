@@ -75,7 +75,7 @@ The Sidebar, the app's navigation: the logo row, the groups with their section t
 
 <ComponentExample of={SidebarStories.InnerStepsDoneAndOff} title="Steps of a task" description="A done step ticks and stays pressable; a step past your answers is dimmed, does nothing, and says why in a tooltip. The layout around it is on Frame." />
 
-<ComponentExample of={SidebarStories.AccountRow} title="Account row" description="The initials avatar, the first name and the role open the account menu, beside Help Center." />
+<ComponentExample of={SidebarStories.AccountRow} title="Account row" description="The initials avatar, the first name and the role open the account menu; the bell, with its unread count, opens the Inbox." />
 
 </div>
 
@@ -155,7 +155,7 @@ the URL: the caller handles `onSelect` and decides which groups a role sees.
 3. **Section title.** A full `--control-md` row in the subtlest text. On hover and focus the collapse angle shows after it.
 4. **Row.** An icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
 5. **Open tabs.** Records a person opened, such as a session or a student, under their row on a thread. Three show, then Show n more.
-6. **Account row.** The avatar, the name and the role, which open the account menu, and Help Center, under a divider.
+6. **Account row.** The avatar, the name and the role, which open the account menu (Profile, Help Center, Sign out), and the bell with its unread count, which opens the Inbox beside the Sidebar, under a divider.
 
 Every part sits on one grid: icon centers on x `32`, labels start on x `48`, trailing slots center on x `208`, and section titles start on x `20`.
 

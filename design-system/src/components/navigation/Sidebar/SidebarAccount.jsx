@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Avatar, { initialsOf } from '../../images-and-icons/Avatar';
-import DropdownMenu, { ButtonItem, Section } from '../../forms-and-inputs/DropdownMenu';
+import DropdownMenu, { ButtonItem, LinkItem, Section } from '../../forms-and-inputs/DropdownMenu';
 import Icon from '../../images-and-icons/Icon';
 import IconButton from '../../forms-and-inputs/IconButton';
-import LinkIconButton from '../../forms-and-inputs/LinkIconButton';
+import CountTag from '../../labels/CountTag';
 
 /** The one-word roles the account row shows. */
 export const ACCOUNT_ROLES = ['Tutor', 'Lead', 'Admin'];
@@ -15,16 +15,16 @@ const ROLE_IN_FULL = { Tutor: 'Tutor', Lead: 'Lead tutor', Admin: 'Admin' };
 /**
  * The Sidebar's account row, at its foot under a divider: a 24 avatar with the
  * first and last initials, the preferred first name (14), a middle dot and the
- * one-word role (12, subtlest), then Help Center on the trailing column.
+ * one-word role (12, subtlest), then the Inbox bell on the trailing column.
  *
  * - The button hugs avatar, name and role, padded 4 left (plus the avatar
  *   slot's 4) and 8 right, so its hover fill ends 8 after the role. It has no
  *   tooltip; the full name and role are its accessible name and the menu header.
  * - The name truncates with an ellipsis; the role never does.
- * - The row opens a menu with Profile and Sign out. States: rest, hover,
- *   focus, and menu open (the selected fill).
- * - Help Center opens in a new tab: `circle-question` at rest, the external
- *   icon on hover and focus, the selected fill while pressed.
+ * - The row opens a menu with Profile, Help Center (a new tab) and Sign out.
+ *   States: rest, hover, focus, and menu open (the selected fill).
+ * - The bell opens the Inbox beside the Sidebar. Its unread count rides its
+ *   top corner, and the bell takes the selected fill while the Inbox is open.
  */
 const SidebarAccount = ({
     name,
@@ -33,6 +33,9 @@ const SidebarAccount = ({
     onProfile,
     onSignOut,
     helpHref,
+    inboxCount = 0,
+    isInboxOpen = false,
+    onInbox,
     defaultMenuOpen = false,
     className = '',
 }) => {
@@ -54,10 +57,13 @@ const SidebarAccount = ({
         </button>
     );
 
-    const help = (
-        <span className="plus-sidebar-account__help-glyphs" aria-hidden="true">
-            <Icon name="circle-question" className="plus-sidebar-account__help-rest" />
-            <Icon name="arrow-up-right-from-square" className="plus-sidebar-account__help-go" />
+    const unread = inboxCount > 0
+        ? `${inboxCount} unread ${inboxCount === 1 ? 'notification' : 'notifications'}`
+        : 'no unread notifications';
+    const bell = (
+        <span className="plus-sidebar-account__bell-glyphs" aria-hidden="true">
+            <Icon name="bell" />
+            {inboxCount > 0 ? <CountTag value={inboxCount} className="plus-sidebar-account__bell-count" /> : null}
         </span>
     );
 
@@ -75,31 +81,34 @@ const SidebarAccount = ({
                         <ButtonItem elemBefore={<Icon name="user" />} onClick={onProfile}>
                             Profile
                         </ButtonItem>
+                        {helpHref ? (
+                            <LinkItem
+                                href={helpHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                elemBefore={<Icon name="circle-question" />}
+                                elemAfter={<Icon name="arrow-up-right-from-square" />}
+                            >
+                                Help Center
+                            </LinkItem>
+                        ) : null}
                         <ButtonItem elemBefore={<Icon name="arrow-right-from-bracket" />} onClick={onSignOut}>
                             Sign out
                         </ButtonItem>
                     </Section>
                 </DropdownMenu>
             </span>
-            {helpHref ? (
-                <LinkIconButton
-                    className="plus-sidebar-account__help"
-                    appearance="subtle"
-                    icon={help}
-                    label="Help Center, opens in a new tab"
-                    tooltip="Help Center · opens in a new tab"
-                    href={helpHref}
-                    target="_blank"
-                />
-            ) : (
+            {onInbox ? (
                 <IconButton
-                    className="plus-sidebar-account__help"
+                    className="plus-sidebar-account__bell"
                     appearance="subtle"
-                    icon={help}
-                    label="Help Center"
-                    tooltip="Help Center"
+                    icon={bell}
+                    label={`Inbox, ${unread}`}
+                    tooltip="Inbox"
+                    isSelected={isInboxOpen}
+                    onClick={onInbox}
                 />
-            )}
+            ) : null}
         </div>
     );
 };
@@ -115,8 +124,14 @@ SidebarAccount.propTypes = {
     onProfile: PropTypes.func,
     /** The menu's Sign out */
     onSignOut: PropTypes.func,
-    /** Help Center's address, opened in a new tab */
+    /** Help Center's address: a row in the account menu, opened in a new tab */
     helpHref: PropTypes.string,
+    /** Unread notifications, drawn on the bell; zero draws no count */
+    inboxCount: PropTypes.number,
+    /** The Inbox is open: the bell takes the selected fill */
+    isInboxOpen: PropTypes.bool,
+    /** The bell's press; the bell is drawn only when this is set */
+    onInbox: PropTypes.func,
     /** Start with the menu open (stories) */
     defaultMenuOpen: PropTypes.bool,
     className: PropTypes.string,

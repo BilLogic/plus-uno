@@ -2,7 +2,7 @@
 
 # Panel
 
-A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
+A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
 Import the Panel and its parts from `@/templates`. This template documents the parts and its layout within the Frame.
 
@@ -12,10 +12,10 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 
 ## Types
 
-Both open on the right with no Blanket: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
+Neither has a Blanket. Details opens on the right, docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths); floating at every width is Planned. Notifications opens at the start, beside the Sidebar.
 
 - **Details.** A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.
-- **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
+- **Notifications.** The Inbox, opened from the bell beside your name. It docks beside the Sidebar, 360 wide, and stays open as you pick one.
 
 ## Anatomy
 
@@ -33,10 +33,11 @@ The picked row stays highlighted on the page while the Panel is open.
 
 Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
 
-1. **Header.** The title, Archive all and Close, with the Show filter (`PopupSelect`: Unread, All, Mentions) in the subheader.
-2. **Items.** Avatar, who did what and where, a one-line excerpt and the time. An unread item ends in a dot, paired with the word "unread" for a screen reader.
+1. **Header.** The title, Mark all as read and Close.
+2. **Tabs.** Unread, with its count, and All.
+3. **Items.** One `NotificationItem` per update, grouped by day. An unread item says "Unread" to a screen reader.
 
-The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
+The bell at the end of the Sidebar's account row, with its unread count, opens the Inbox. The Inbox docks beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
 
 ## Width behavior
 
@@ -65,6 +66,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--panel-width-default` | 400 | The width a Panel opens at. |
+| `--inbox-width` | 360 | The width the Inbox opens at, beside the Sidebar. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
 | `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
 | `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
@@ -82,17 +84,17 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | Slot | Details | Notifications |
 | --- | --- | --- |
 | `title` | The record's name, with its StatusTag under it | "Inbox" |
-| `actions` | Edit, then Up, Down, More and Close | Archive all and Close (the Show `PopupSelect` sits in the subheader) |
+| `actions` | Edit, then Up, Down, More and Close | Mark all as read and Close |
 | `backAction` · `titleIcon` | Optional, in the header before the title: a back action (`PanelBackAction`) and an icon. Pick the one the task needs. | None |
-| `subheader` (`PanelSubheader`) | The record's StatusTag under the title | The Show `PopupSelect` |
-| `body` | Sections of the record; the form while editing | Items grouped by time |
+| `subheader` (`PanelSubheader`) | The record's StatusTag under the title | None: the Unread and All tabs sit under the header |
+| `body` | Sections of the record; the form while editing | Items grouped by day, in Unread and All tabs |
 | `footer` · `disclaimer` (`PanelFooter`, `PanelDisclaimer`) | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. A `PanelDisclaimer` carries small print beside the actions. | None |
-| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Floating, left, out of the Sidebar. Planned. Today it uses the right-hand area. |
+| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. It opens from the Sidebar's bell, not from the Frame's Panel area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that; the Inbox floating out of the Sidebar on the left is  Planned, and today it uses the same right-hand area. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell and docks beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 

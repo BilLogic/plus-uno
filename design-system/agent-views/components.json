@@ -13517,7 +13517,7 @@
       "import": "import { Sidebar } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
-      "summary": "The PLUS sidebar: the app's navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting to `'tutor'`), the signed-in person's account row, and open tabs from `useOpenTabs()`. Pass `user` and `groups` together to add or override a prototype's own area(s) by `id` while keeping the role's navigation; pass `groups` without `user` (and/or `tabs`) to render custom groups directly. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner sidebar: one full-width Back button (`onBack`) with the area name centered, an optional full-width context dropdown (`inner.switcher`), then text-only rows (`inner.rows`: a record's stages, or a task's steps). The container, logo row and account row stay still; only the content swaps. The old content leaves at once and the new enters as one block, sliding 12 on `spatial.fast` from the end going in and from the start going back, and fading on `appearance.fast`, with no overshoot. Reduced motion keeps only the fade. Back shows the main Sidebar, where what was left sits as one open row (`tabs`) under its area. - **Account row**: `SidebarAccount`, under a divider. Content is data. Nothing here changes the URL.",
+      "summary": "The PLUS sidebar: the app's navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting to `'tutor'`), the signed-in person's account row, and open tabs from `useOpenTabs()`. Pass `user` and `groups` together to add or override a prototype's own area(s) by `id` while keeping the role's navigation; pass `groups` without `user` (and/or `tabs`) to render custom groups directly. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner sidebar: one full-width Back button (`onBack`) with the area name centered, an optional full-width context dropdown (`inner.switcher`), then text-only rows (`inner.rows`: a record's stages, or a task's steps). The container, logo row and account row stay still; only the content swaps. The old content leaves at once and the new enters as one block, sliding 12 on `spatial.fast` from the end going in and from the start going back, and fading on `appearance.fast`, with no overshoot. Reduced motion keeps only the fade. Back shows the main Sidebar, where what was left sits as one open row (`tabs`) under its area. - **Account row**: `SidebarAccount`, under a divider: the account menu (Profile, Help Center, Sign out) and, at the end, the Inbox bell with its unread count. Content is data. Nothing here changes the URL.",
       "props": [
         {
           "name": "user",
@@ -13690,7 +13690,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Help Center, opened in a new tab",
+          "description": "Help Center, a row in the account menu, opened in a new tab",
+          "deprecated": null
+        },
+        {
+          "name": "inboxCount",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Unread notifications, drawn on the account row's bell",
+          "deprecated": null
+        },
+        {
+          "name": "isInboxOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The Inbox is open beside the Sidebar: the bell takes the selected fill",
+          "deprecated": null
+        },
+        {
+          "name": "onInbox",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Opens and closes the Inbox from the bell; the bell is drawn only when this is set",
           "deprecated": null
         },
         {
