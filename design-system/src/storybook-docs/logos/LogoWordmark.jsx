@@ -159,8 +159,8 @@ export const LockupRule = () => {
     const vbW = width + RULE_PAD_X * 2;
     const vbH = 96 + RULE_PAD_Y * 2;
     return (
-        <div className="logo-rule" data-testid="lockup-rule" style={{ inlineSize: `${vbW}px` }}>
-            <Illustration viewBox={`${-RULE_PAD_X} ${-RULE_PAD_Y} ${vbW} ${vbH}`} scale={1} title="The lockup rule: the wordmark's cap height is half the logomark, the gap is a quarter, and it is centered">
+        <div className="logo-rule" data-testid="lockup-rule" style={{ maxInlineSize: `${vbW}px` }}>
+            <Illustration viewBox={`${-RULE_PAD_X} ${-RULE_PAD_Y} ${vbW} ${vbH}`} scale={1} capped={false} title="The lockup rule: the wordmark's cap height is half the logomark, the gap is a quarter, and it is centered">
                 <Rule x1="96" y1="24" x2={width} y2="24" stroke={PAINT.measureLine} dash="4 3" />
                 <Rule x1="96" y1="72" x2={width} y2="72" stroke={PAINT.measureLine} dash="4 3" />
                 <Measure x={width + 10} y={24} h={48} side="right" tick={4} label="½" />
@@ -171,7 +171,11 @@ export const LockupRule = () => {
                 className="logo-rule__logo"
                 size={96}
                 wordmark
-                style={{ insetInlineStart: `${(RULE_PAD_X / vbW) * 100}%`, insetBlockStart: `${(RULE_PAD_Y / vbH) * 100}%` }}
+                style={{
+                    insetInlineStart: `${(RULE_PAD_X / vbW) * 100}%`,
+                    insetBlockStart: `${(RULE_PAD_Y / vbH) * 100}%`,
+                    inlineSize: `${(width / vbW) * 100}%`,
+                }}
             />
         </div>
     );
@@ -190,17 +194,19 @@ export const TrackedWordmarkFigure = () => {
     const set = WORDMARKS[64];
     const track = 200;
     const scale = 32 / set.cap;
-    const width = (set.width + track * 3) * scale;
+    const width = +((set.width + track * 3) * scale).toFixed(2);
     return (
         <span className="logo-dont">
             <Logo size={64} />
-            <svg className="logo-dont__tracked" role="img" aria-label="PLUS wordmark tracked out" width={width} height={32} viewBox={`0 0 ${width} 32`}>
-                <g transform={`scale(${scale})`}>
-                    {set.paths.map((d, i) => (
-                        <path key={i} d={d} transform={`translate(${i * track} 0)`} />
-                    ))}
-                </g>
-            </svg>
+            <span className="logo-dont__tracked" style={{ inlineSize: `${width}px` }}>
+                <Illustration viewBox={`0 0 ${width} 32`} scale={1} capped={false} title="PLUS wordmark tracked out">
+                    <g fill="var(--ds-text)" transform={`scale(${scale})`}>
+                        {set.paths.map((d, i) => (
+                            <path key={i} d={d} transform={`translate(${i * track} 0)`} />
+                        ))}
+                    </g>
+                </Illustration>
+            </span>
         </span>
     );
 };

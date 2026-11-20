@@ -112,7 +112,7 @@ The wordmark's cap height is half the logomark's height. The gap between them is
 
 The wordmark is Google Sans Flex as it ships, with four small brand tweaks. Nothing is redrawn from scratch. Measures are a share of the cap height (the height of a capital), so they hold at any size.
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-lg), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-lg)), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
     <FoundationExample><WordmarkStep step={0} /></FoundationExample>
     <FoundationExample><WordmarkStep step={1} /></FoundationExample>
     <FoundationExample><WordmarkStep step={2} /></FoundationExample>

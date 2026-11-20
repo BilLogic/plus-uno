@@ -37,10 +37,13 @@
 .logo-rule {
     position: relative;
     display: block;
-    max-inline-size: 100%;
+    inline-size: 100%;
+    margin-inline: auto;
 }
 
+/* The logo scales with the drawing: its width is a share of the view box and its svg fills it. */
 .logo-rule__logo { position: absolute; }
+.logo-rule__logo > svg { inline-size: 100%; block-size: auto; }
 
 /* Don't figures */
 .logo-dont {
@@ -55,6 +58,6 @@
 }
 
 .logo-dont__tracked {
+    display: block;
     margin-inline-start: var(--stack-lg);
-    fill: var(--ds-text);
 }
