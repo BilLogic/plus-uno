@@ -91,6 +91,9 @@ export const Overview = () => (
         {slotContent('Content · cards, tables, rows or forms')}
     </Section>
 );
+Overview.play = async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('.plus-browser-frame'), 'a Section renders without browser chrome').toBeNull();
+};
 
 /* Header types, one per story. The type is read from the slots you fill. */
 

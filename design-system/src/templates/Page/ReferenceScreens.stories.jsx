@@ -28,7 +28,7 @@ import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 export default {
     title: 'Templates/Page/Reference screens',
     tags: ['!dev', '!autodocs'],
-    parameters: { layout: 'fullscreen' },
+    parameters: { layout: 'fullscreen', fullPage: true },
 };
 
 const STATUS_CYCLE = ['All', 'Needs review', 'Reviewed'];

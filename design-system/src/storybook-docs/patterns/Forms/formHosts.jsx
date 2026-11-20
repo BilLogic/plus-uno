@@ -210,7 +210,8 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
     const dirty = f.values.student !== '' || f.values.notes !== '';
     const close = () => { if (dirty) setConfirming(true); };
     return (
-        <BrowserWindow address="app.plus.org/students" height={stageHeight}>
+        // A Modal with no page behind it is not a website, so it sits bare in a stage, not in a browser window.
+        <div style={{ position: 'relative', overflow: 'hidden', blockSize: stageHeight }}>
             {confirming ? (
                 <Modal
                     inline
@@ -249,7 +250,7 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                     <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                 </Modal>
             )}
-        </BrowserWindow>
+        </div>
     );
 };
 

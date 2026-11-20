@@ -199,6 +199,7 @@ const AreaPage = ({ type = 'default' }) => (
 
 /** Default: the content grid, centered and capped at 1232. */
 export const TypeDefault = {
+    parameters: { fullPage: true },
     name: 'Type: Default',
     render: () => <AreaPage />,
     play: async ({ canvasElement }) => {
@@ -215,6 +216,7 @@ export const TypeDefault = {
 
 /** Full width: the content runs to the pad, with no cap. */
 export const TypeFullWidth = {
+    parameters: { fullPage: true },
     name: 'Type: Full width',
     render: () => <AreaPage type="full" />,
     play: async ({ canvasElement }) => {
@@ -231,6 +233,7 @@ export const TypeFullWidth = {
 
 /** Reading: the content grid capped at 864, the readable measure for a lesson, an article or a policy. */
 export const TypeReading = {
+    parameters: { fullPage: true },
     name: 'Type: Reading',
     render: () => <AreaPage type="reading" />,
     play: async ({ canvasElement }) => {
@@ -285,6 +288,7 @@ const playRecordAnatomy = async (canvasElement) => {
 
 /** Every part once: breadcrumb, title with its StatusTag, description, actions, page tabs, banner, content. Markers sit in the nearest gutter. */
 export const AnatomyRecord = {
+    parameters: { fullPage: true },
     name: 'Anatomy',
     render: () => (
         <LiveAnatomy live scrollable width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
@@ -299,6 +303,7 @@ export const AnatomyRecord = {
 
 /** Area page, one collection: the title alone; the collection's Primary sits in the Section's title row. */
 export const ScenarioArea = {
+    parameters: { fullPage: true },
     name: 'Area page, one collection',
     render: () => (
         <PageStage scrollable>
@@ -329,6 +334,7 @@ const REFLECTION_ROWS = [
 
 /** Area page, several Sections: each takes a title and its own actions. */
 export const ScenarioSeveralSections = {
+    parameters: { fullPage: true },
     name: 'Area page, several Sections',
     render: () => (
         <PageStage scrollable height={420}>
@@ -361,6 +367,7 @@ const ScenarioRecordTabsDemo = () => {
 };
 
 export const ScenarioRecordTabs = {
+    parameters: { fullPage: true },
     name: 'Record page under page tabs',
     render: () => <ScenarioRecordTabsDemo />,
     play: async ({ canvasElement }) => {
@@ -388,6 +395,7 @@ export const ScenarioRecordTabs = {
 
 /** Two levels down: every parent in order, each a link. */
 export const ScenarioTwoLevels = {
+    parameters: { fullPage: true },
     name: 'Two levels down',
     render: () => (
         <PageStage scrollable>
@@ -408,6 +416,7 @@ export const ScenarioTwoLevels = {
 
 /** Page banner: under the header, one at a time, scrolling with the content. */
 export const KeyBanner = {
+    parameters: { fullPage: true },
     name: 'Page banner',
     render: () => (
         <PageStage scrollable>
@@ -430,7 +439,7 @@ export const KeyBanner = {
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: PAGE_STAGE },
-    parameters: { controls: { include: ['width'] } },
+    parameters: { fullPage: true, controls: { include: ['width'] } },
     argTypes: {
         width: { control: { type: 'range', min: 720, max: 1600, step: 8 }, description: "The page's own width, in px.", table: { category: 'Docs' } },
     },

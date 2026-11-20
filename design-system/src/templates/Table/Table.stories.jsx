@@ -113,6 +113,7 @@ export const StaticKind = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expect(canvasElement.querySelector('.plus-browser-frame'), 'a Table renders without browser chrome').toBeNull();
         const template = canvasElement.querySelector('.plus-table-template');
         await expect(template, 'the template wraps the table').not.toBeNull();
         await expect(template).toHaveAttribute('data-kind', 'static');

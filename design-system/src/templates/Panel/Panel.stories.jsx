@@ -258,7 +258,7 @@ const expectOverlay = async (canvasElement) => {
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1440 },
-    parameters: { layout: 'padded', controls: { include: ['width'] } },
+    parameters: { fullPage: true, layout: 'padded', controls: { include: ['width'] } },
     argTypes: {
         width: { control: { type: 'range', min: 600, max: 1600, step: 8 }, description: 'The Frame\'s own width, in px.', table: { category: 'Docs' } },
     },
@@ -281,6 +281,7 @@ export const ResponsiveWidth = {
 
 /** At 1440 the Panel is docked: an edge line and no shadow. */
 export const WidthDocked = {
+    parameters: { fullPage: true },
     name: 'Width: 1440',
     args: { width: 1440 },
     render: WidthStage,
@@ -292,6 +293,7 @@ export const WidthDocked = {
 
 /** At 1000 the Panel floats on the overlay material and shadow, with no Blanket. */
 export const WidthFloating = {
+    parameters: { fullPage: true },
     name: 'Width: 1000',
     args: { width: 1000 },
     render: WidthStage,
