@@ -432,6 +432,15 @@ export const CHECKS = [
     guards: 'design tokens used and defined nowhere, which silently drop the whole declaration; the recorded set may fall and never rise.',
   },
   {
+    name: 'check:forms-internals',
+    script: 'node scripts/check-forms-internals.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-forms-internals.mjs',
+    floors: { MIN_FILES: 1000 },
+    guards: 'nothing outside the forms-and-inputs folder importing its `_internal`; a shared piece goes through lib/field or lib/menu.',
+  },
+  {
     name: 'check:font-families',
     script: 'node scripts/check-font-families.mjs',
     pkg: 'root',
