@@ -10,7 +10,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Source:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.stories.jsx` — Overview, Appearances, Spacing, WithIcons, Selected, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.stories.jsx` — Overview, Appearances, Spacing, WithIcons, Selected, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.mdx`
 
@@ -60,6 +60,10 @@ Don't: Stretched across a wide row.
 ### Align with the button group. {#align-with-the-button-group}
 
 Right-align in multi-step tasks and Modals; left-align on full-page forms and content-heavy screens.
+
+### Let a `LinkButton` label longer than its room end in an ellipsis. {#let-a-linkbutton-label-longer-than-its-room-end-in-an-ellipsis}
+
+The link keeps its height and never leaves its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

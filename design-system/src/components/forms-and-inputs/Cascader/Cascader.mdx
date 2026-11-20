@@ -70,6 +70,14 @@ one level to reveal the next column of choices beneath it.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={CascaderStories.Overflow} title="Truncate" description="A chosen path longer than the field keeps one line and ends in an ellipsis." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="Cascader" />
@@ -198,6 +206,10 @@ With `isInvalid`, the field draws the danger border and `errorMessage` replaces 
     dontExample={<Cascader label="Location" value={[]} options={locationOptions} onChange={() => {}} caption="Pick a location." />}
     dontCaption="A failed pick still draws the normal border, so nothing marks the error."
 />
+
+### Let a `Cascader` path longer than the field end in an ellipsis.
+
+The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

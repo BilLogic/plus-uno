@@ -5,6 +5,7 @@ import { Button, Icon, IconButton } from '@/components';
 import SplitButton from './SplitButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -193,4 +194,26 @@ export const Interactive = {
             <IconButton icon={chevronDown} label="More save options" aria-haspopup="menu" />
         </SplitButton>
     ),
+};
+
+/** Truncate: the action's label ends in an ellipsis; the menu button keeps its place and both stay in the split button's well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <SplitButton>
+                <Button text={LONG_SCHOOL} />
+                <IconButton icon={chevronDown} label="More save options" aria-haspopup="menu" aria-expanded={false} />
+            </SplitButton>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const action = canvas.getByRole('button', { name: LONG_SCHOOL });
+        const menu = canvas.getByRole('button', { name: 'More save options' });
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(menu, canvasElement.firstElementChild);
+        await expect(Math.round(action.getBoundingClientRect().height)).toBe(32);
+        await expect(menu.getBoundingClientRect().width).toBeGreaterThan(0);
+        await expect(menu.getBoundingClientRect().left).toBeGreaterThanOrEqual(action.getBoundingClientRect().right - 1);
+    },
 };

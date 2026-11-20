@@ -76,6 +76,14 @@ A comment is one entry in a threaded discussion: who wrote it, when, and what th
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Overflow
+
+<ComponentExample of={CommentStories.Overflow} title="Wrap" description="A long author name and a long note take more lines inside the comment." />
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -202,6 +210,10 @@ Name the action and the detail. An open "Thoughts?" leaves the reader guessing.
     dontExample={<Comment author="Maya Chen" time="2 h ago" content="Thoughts?" />}
     dontCaption="No action named."
 />
+
+### Let a `Comment` author and note longer than the line wrap.
+
+Nothing in the comment is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

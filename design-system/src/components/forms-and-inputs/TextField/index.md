@@ -8,11 +8,11 @@ Also asked as: search box, single-line, text box.
 
 **Import:** `import { TextField } from '@/components';`
 
-**Governed by:** Errors (`ds guide errors`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Errors (`ds guide errors`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TextField/TextField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, ElementBefore, TextAffix, HelperText, Filled, Success, SpacingDefault, SpacingCompact, Spacing, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, ElementBefore, TextAffix, HelperText, Filled, Success, SpacingDefault, SpacingCompact, Spacing, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextField/TextField.mdx`
 
@@ -102,6 +102,10 @@ Use `type="number"` for stepped quantities such as seats; for an ID, phone numbe
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
+
+### Let a `TextField` value longer than the field end in an ellipsis. {#let-a-textfield-value-longer-than-the-field-end-in-an-ellipsis}
+
+The box keeps its height and the elements in its slots keep their places. Focus is how the rest of the value is reached: the caret walks to the end and the field scrolls with it. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

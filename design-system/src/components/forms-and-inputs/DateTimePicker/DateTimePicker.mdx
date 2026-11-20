@@ -79,6 +79,14 @@ Use a date time picker when a date and a time are one answer.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={DateTimePickerStories.Overflow} title="Truncate" description="In a narrow field the date and the time keep one line each and the field stays inside its slot." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="DateTimePicker" />
@@ -229,6 +237,10 @@ Tutors and students can sit in different zones. Name the zone next to the time s
     dontExample={<DateTimePicker label="Session start" isInvalid errorMessage="Invalid" showTimeZone={false} />}
     dontCaption="A bare 'Invalid' does not say what to change."
 />
+
+### Let a `DateTimePicker` keep one line in a narrow slot.
+
+The date and the time keep one line each, and the field stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

@@ -67,6 +67,7 @@ const PAINT = {
 
 /** The link appearances draw no fill: hovering underlines the label and pressing darkens it. */
 const LINK_PRESSED = { link: '--ds-link-pressed', 'danger-link': '--ds-text-danger-bolder' };
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 
 const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance === 'danger-link' ? 'Danger link' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
@@ -796,5 +797,24 @@ export const FooterLayouts = {
         await expect(notNow, 'declining is a default secondary, not subtle').toHaveClass('plus-btn--default');
         await expect(notNow).toHaveClass('plus-btn--fit-container');
         await expect(close(notNow.getBoundingClientRect().left, declineTracks.span(1, 2).left), 'secondary starts at track 1').toBe(true);
+    },
+};
+
+/** Truncate: a label longer than its room ends in an ellipsis inside the button, the icons keep their places and the button never leaves its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <Button text={LONG_SCHOOL} iconBefore="plus" iconAfter={<Icon name="chevron-down" size={12} />} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button');
+        await expectNoSilentClip(button);
+        await expectInsideWell(button, canvasElement.firstElementChild);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
+        await expect(button).toHaveTextContent(LONG_SCHOOL);
+        const icons = button.querySelectorAll('i');
+        await expect(icons).toHaveLength(2);
+        for (const icon of icons) await expectTrailingKept(button, icon);
     },
 };

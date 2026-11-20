@@ -8,9 +8,11 @@ Also asked as: matrix question.
 
 **Import:** `import { ChoiceGrid } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive, Keyboard, Unselected, Selected, Hovered, Focused, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive, Keyboard, Unselected, Selected, Hovered, Focused, Disabled, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx`
 
@@ -85,6 +87,10 @@ Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids t
 
 Do: One size (`size={14}`) across both grids.
 Don't: A `size={12}` grid under a `size={14}` grid.
+
+### Let a `ChoiceGrid` row label longer than its column wrap. {#let-a-choicegrid-row-label-longer-than-its-column-wrap}
+
+The grid keeps to its width instead of scrolling the page sideways. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

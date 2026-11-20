@@ -6,6 +6,7 @@ import FileItem, {
     FILE_ITEM_REMOVALS,
     FILE_ITEM_STATUSES,
 } from './FileItem';
+import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const wrap = { maxWidth: '640px' /* demo frame */ };
 const narrowWrap = { maxWidth: '320px' /* demo frame */ };
@@ -406,7 +407,8 @@ export const Disabled = {
     },
 };
 
-export const LongName = {
+/** Truncate in the middle: a long file name keeps its start and its extension, and its full name opens in a Tooltip on hover and focus. */
+export const Overflow = {
     render: () => {
         const longFileName = '2026-11-12-algebra-session-recording-with-jayden-final-edited-export.mp4';
         return (
@@ -429,6 +431,8 @@ export const LongName = {
 
         await expect(heightOf(row)).toBe(56);
         await expect(px(getComputedStyle(row).height)).toBe(56);
+        await expectNoSilentClip(row);
+        await expectInsideWell(row, canvasElement.firstElementChild);
         await expect(tail.textContent).toContain('.mp4');
         await expect(head.scrollWidth).toBeGreaterThan(head.clientWidth);
         await expect(tail.getBoundingClientRect().right).toBeLessThanOrEqual(row.getBoundingClientRect().right);

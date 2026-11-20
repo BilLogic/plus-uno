@@ -66,6 +66,14 @@ what is applied, and a chevron when it opens a menu.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={FilterButtonStories.Overflow} title="Truncate" description="A chosen value longer than the button ends in an ellipsis; the name and the count keep their places and the full text opens in a Tooltip." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="FilterButton" />
@@ -211,6 +219,10 @@ Below the desktop breakpoint (`768px`), a row of filter buttons does not fit. Fo
 
 `hasChevronDown` defaults to `true`. Set it `false` only for a filter that
 toggles directly on click, with nothing to open.
+
+### Let a `FilterButton` value longer than the button end in an ellipsis.
+
+The name and the count keep their places, and the Tooltip is on only while the value is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

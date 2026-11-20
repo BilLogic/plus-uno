@@ -1,6 +1,7 @@
+import { LONG_TUTOR, LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React from 'react';
 import { Button, Avatar, Comment } from '@/components';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 export default {
     title: 'Components/Forms and inputs/Comment',
@@ -110,4 +111,20 @@ export const Interactive = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Basic.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-comment'), 'Comment radius is 16').toBe('16px');
+};
+
+/** Wrap: a long author name and a long note take more lines inside the comment; nothing is clipped. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '320px' /* demo frame */ }}>
+            <Comment author={LONG_TUTOR} content={LONG_SENTENCE} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const comment = canvasElement.querySelector('.plus-comment');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(comment, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_TUTOR);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+    },
 };

@@ -6,9 +6,11 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Import:** `import { Cascader } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, EmptyPath, PreselectedPath, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
+**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, EmptyPath, PreselectedPath, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
@@ -59,6 +61,10 @@ With `isInvalid`, the field draws the danger border and `errorMessage` replaces 
 
 Do: A failed pick draws the danger border, so the error is seen at the field.
 Don't: A failed pick still draws the normal border, so nothing marks the error.
+
+### Let a `Cascader` path longer than the field end in an ellipsis. {#let-a-cascader-path-longer-than-the-field-end-in-an-ellipsis}
+
+The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

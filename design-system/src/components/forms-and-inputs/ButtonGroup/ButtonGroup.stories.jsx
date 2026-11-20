@@ -6,6 +6,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'center' };
 
@@ -231,4 +232,22 @@ export const Interactive = {
             <Button text="Month" />
         </ButtonGroup>
     ),
+};
+
+/** Truncate: buttons that do not fit one row shrink, each label ending in an ellipsis; the group stays on one line inside its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '260px' /* demo frame */ }}>
+            <ButtonGroup label="Sites">
+                <Button text={LONG_SCHOOL} />
+                <Button text="Lincoln Middle" />
+            </ButtonGroup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const group = canvasElement.querySelector('.plus-btn-group') || canvasElement.firstElementChild.firstElementChild;
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(group, canvasElement.firstElementChild);
+        for (const button of within(canvasElement).getAllByRole('button')) await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
+    },
 };

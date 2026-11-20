@@ -1,3 +1,4 @@
+import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useEffect, useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -234,4 +235,26 @@ export const FieldDisabled = {
 export const FieldInvalid = {
     render: () => <div style={wrap}><Cascader id="cascader-ex-invalid" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a location." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
+};
+
+/** Truncate: a chosen path longer than the field keeps one line and ends in an ellipsis. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '240px' /* demo frame */ }}>
+            <Cascader
+                id="cascader-overflow"
+                label="Location"
+                value={['a', 'b']}
+                options={[{ value: 'a', label: LONG_SCHOOL, children: [{ value: 'b', label: LONG_TOPIC }] }]}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-field');
+        const clipped = await expectNoSilentClip(box);
+        await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+    },
 };

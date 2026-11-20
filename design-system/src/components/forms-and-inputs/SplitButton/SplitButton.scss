@@ -3,6 +3,16 @@
 .plus-split-btn {
     display: inline-flex;
     vertical-align: middle;
+    max-width: 100%;
+
+    // The action's label shrinks and ends in an ellipsis; the menu button keeps its size.
+    > .plus-btn:first-child {
+        min-width: 0;
+    }
+
+    > .plus-btn:last-child {
+        flex: none;
+    }
 
     > .plus-btn:first-child {
         border-start-end-radius: 0;

@@ -10,7 +10,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Source:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.stories.jsx` — Overview, Appearances, Spacing, MenuState, States, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.stories.jsx` — Overview, Appearances, Spacing, MenuState, States, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.mdx`
 
@@ -76,6 +76,10 @@ Don't: The two halves disagree on appearance, so they read as two controls.
 
 `SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
 a `Popup` or `DropdownMenu` positioned under it.
+
+### Let a `SplitButton` action label longer than its room end in an ellipsis. {#let-a-splitbutton-action-label-longer-than-its-room-end-in-an-ellipsis}
+
+The menu button keeps its size at the seam, and the pair stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -12,7 +12,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -88,6 +88,10 @@ Don't: Two separate fields.
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
+
+### Let a `DatePicker` value wider than its field end in an ellipsis. {#let-a-datepicker-value-wider-than-its-field-end-in-an-ellipsis}
+
+The field keeps its height and stays inside its slot; give it room for the whole date. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

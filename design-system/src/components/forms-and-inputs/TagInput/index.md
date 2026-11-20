@@ -6,9 +6,11 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Import:** `import { TagInput } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 
@@ -127,6 +129,10 @@ A field with none of them works as before, with no "…" and no handle.
 ### Use a `Tag` color for each option. {#use-a-tag-color-for-each-option}
 
 A tag is a category, so it takes a `Tag` color. Any other name draws gray and warns in development.
+
+### Let a `TagInput` collapse the tags past one line into +n at rest and grow by whole rows with focus. {#let-a-taginput-collapse-the-tags-past-one-line-into-n-at-rest-and-grow-by-whole-rows-with-focus}
+
+No blank line is drawn under the last row, and past its maximum height the field scrolls inside itself, not the page. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

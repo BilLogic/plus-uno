@@ -12,7 +12,7 @@ FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's
 
 **Source:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.stories.jsx` — OneButton, TwoButtons, ThreeButtons, DeclineInLeftHalf, SubtleFillsTrack, LinkLeft, DangerLeft, LeadingWithThreeFilled, DestructiveSplit, Steps, NarrowPanel, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.stories.jsx` — OneButton, TwoButtons, ThreeButtons, DeclineInLeftHalf, SubtleFillsTrack, LinkLeft, DangerLeft, LeadingWithThreeFilled, DestructiveSplit, Steps, NarrowPanel, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx`
 
@@ -87,6 +87,10 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
 
 Do: Back in the left half and Next in the right half, splitting the footer equally.
 Don't: Back in the leading slot, so Next stands alone instead of an equal step pair.
+
+### Let `FooterActions` buttons with long labels end in an ellipsis. {#let-footeractions-buttons-with-long-labels-end-in-an-ellipsis}
+
+The buttons keep their height and the footer keeps to its well. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

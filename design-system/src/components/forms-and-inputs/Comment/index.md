@@ -6,9 +6,11 @@ Comment: one entry in a threaded discussion, with slots for the author, time, co
 
 **Import:** `import { Comment } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/Comment/Comment.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Comment/Comment.stories.jsx` — Basic, Saving, Highlighted, Edited, Restricted, WithNestedReplies, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Comment/Comment.stories.jsx` — Basic, Saving, Highlighted, Edited, Restricted, WithNestedReplies, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Comment/Comment.mdx`
 
@@ -63,6 +65,10 @@ Name the action and the detail. An open "Thoughts?" leaves the reader guessing.
 
 Do: One action, one detail.
 Don't: No action named.
+
+### Let a `Comment` author and note longer than the line wrap. {#let-a-comment-author-and-note-longer-than-the-line-wrap}
+
+Nothing in the comment is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

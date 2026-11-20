@@ -8,7 +8,7 @@ Button group: a visually connected row of related actions. A plain container for
 
 **Source:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Seams, Appearances, Spacing, IconOnly, Selected, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Seams, Appearances, Spacing, IconOnly, Selected, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx`
 
@@ -60,6 +60,10 @@ Don't: A noun, a phrase and a verb in one group.
 
 `ButtonGroup` renders children as given — set `isSelected` on the `Button`
 that should read as current, and manage which one that is yourself.
+
+### Let `ButtonGroup` buttons that do not fit shrink and end their labels in an ellipsis. {#let-buttongroup-buttons-that-do-not-fit-shrink-and-end-their-labels-in-an-ellipsis}
+
+The group keeps one row inside its slot. Keep the labels short enough that the ellipsis is the exception. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

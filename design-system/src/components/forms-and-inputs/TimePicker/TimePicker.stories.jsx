@@ -1,3 +1,4 @@
+import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -250,3 +251,18 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = { 'aria-label': 'Reminder time', spacing: 'default', isDisabled: false, isReadOnly: false, isInvalid: false };
+
+/** Truncate: a time is short and never wraps; in a narrow slot the field keeps one line and inside its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '100px' /* demo frame */ }}>
+            <TimePicker aria-label="Start time" defaultValue="11:45 PM" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-field');
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+    },
+};

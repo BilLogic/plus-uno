@@ -1,3 +1,4 @@
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import { withReducedMotion, expectMenuExit } from '@/storybook-docs/lib/overlay-motion-plays';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import React, { useEffect, useState } from 'react';
@@ -298,5 +299,27 @@ export const MotionKeyboardOpen = {
         await expect(surface).toBeVisible();
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(surface.isConnected).toBe(false));
+    },
+};
+
+/** Truncate: a chosen path longer than the field keeps one line and the chevron keeps its place. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '240px' /* demo frame */ }}>
+            <TreeSelect
+                id="tree-select-overflow"
+                label="Topic"
+                value={'long'}
+                options={[{ value: 'long', label: LONG_TOPIC }]}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-field');
+        const clipped = await expectNoSilentClip(box);
+        await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
     },
 };

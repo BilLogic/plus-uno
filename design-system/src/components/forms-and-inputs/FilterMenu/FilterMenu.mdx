@@ -55,6 +55,14 @@ Two or three categories sit side by side; four or more stack.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={FilterMenuStories.Overflow} title="Wrap" description="An option longer than its column takes more lines beside its checkbox, and the menu stays inside the window." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="FilterMenu" />
@@ -168,6 +176,10 @@ The content behind the menu updates once on Apply, not on each checkbox tick, so
 ### Stack categories when lists are long.
 
 Pass `layout="stacked"` when a few categories have long option lists so each category gets the full menu width.
+
+### Let a `FilterMenu` option longer than its column wrap.
+
+The menu keeps its width and scrolls inside itself past its maximum height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

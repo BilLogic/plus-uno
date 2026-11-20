@@ -118,6 +118,14 @@ A text field is an input that allows a user to write or edit text.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={TextFieldStories.Overflow} title="Truncate" description="A value longer than the field stays on one line and ends in an ellipsis; focusing the field reaches the rest." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="TextField" />
@@ -301,6 +309,10 @@ Use `type="number"` for stepped quantities such as seats; for an ID, phone numbe
     dontExample={<TextField label="School email" defaultValue="name@school.edu" isDisabled caption="Your school sets this address." />}
     dontCaption="Disabled fades a value people need to read."
 />
+
+### Let a `TextField` value longer than the field end in an ellipsis.
+
+The box keeps its height and the elements in its slots keep their places. Focus is how the rest of the value is reached: the caret walks to the end and the field scrolls with it. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

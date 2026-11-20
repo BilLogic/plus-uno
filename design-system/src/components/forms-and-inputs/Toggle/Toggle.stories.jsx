@@ -7,6 +7,7 @@ import { px, probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Toggle from './Toggle';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export const Motion = {
     render: () => <Toggle label="Session reminders" />,
@@ -307,5 +308,21 @@ export const DisabledWithReason = {
         const canvas = within(canvasElement);
         await expect(switchOf(canvasElement, 'Share notes')).toHaveAttribute('data-disabled');
         await expect(canvas.getByText('Add a co-tutor to share notes.')).toBeVisible();
+    },
+};
+
+/** Wrap: a label longer than its line takes more lines beside the switch, which keeps its size. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '260px' /* demo frame */ }}>
+            <Toggle id="toggle-overflow" label={LONG_SENTENCE} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const toggle = within(canvasElement).getByRole('switch');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(toggle, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+        await expect(toggle.getBoundingClientRect().width).toBeGreaterThan(0);
     },
 };

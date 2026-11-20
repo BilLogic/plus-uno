@@ -159,6 +159,14 @@ Inside <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterAc
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={ButtonStories.Overflow} title="Truncate" description="A label longer than its room ends in an ellipsis inside the button, which keeps its height and its icons." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="Button" />
@@ -315,6 +323,10 @@ An action that is not ready stays enabled. When pressed, move focus to the first
 ### Align the primary button with its group.
 
 In Modal and Panel footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
+
+### Let a `Button` label longer than its room end in an ellipsis.
+
+The button keeps its height, its icons stay at their ends and it never leaves its slot. Shorten the label rather than rely on the ellipsis. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

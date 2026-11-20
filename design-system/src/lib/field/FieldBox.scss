@@ -159,6 +159,9 @@
     color: inherit;
     font: inherit;
     line-height: inherit;
+    // A value or hint wider than the field ends in an ellipsis while the field
+    // is not being edited; focusing it reaches the rest (Patterns › States › Overflow).
+    text-overflow: ellipsis;
 
     &::placeholder {
         color: var(--ds-text-subtlest);

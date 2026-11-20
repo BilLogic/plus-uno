@@ -26,6 +26,25 @@
     color: var(--ds-text);
 }
 
+// The name and the count keep their width; the value takes what is left and
+// ends in an ellipsis, so a long value never pushes the count out of the button.
+.plus-filter-btn .plus-btn-text {
+    display: flex;
+    align-items: baseline;
+    gap: var(--inline-sm);
+}
+
+.plus-filter-btn .plus-filter-btn__label,
+.plus-filter-btn .plus-filter-btn__metric {
+    flex: none;
+}
+
+.plus-filter-btn :is(.plus-filter-btn__value, .plus-filter-btn__text) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .plus-filter-btn.plus-btn--selected :is(.plus-filter-btn__label, .plus-filter-btn__value) {
     color: inherit;
 }

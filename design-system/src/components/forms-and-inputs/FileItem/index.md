@@ -6,9 +6,11 @@
 
 **Import:** `import { FileItem } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/FileItem/FileItem.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileItem/FileItem.stories.jsx` — Overview, Queued, Uploading0, Uploading40, Uploading80, DoneRemove, DoneDelete, ErrorWithRetry, FolderUploading, FolderDone, ReadOnly, Disabled, LongName, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FileItem/FileItem.stories.jsx` — Overview, Queued, Uploading0, Uploading40, Uploading80, DoneRemove, DoneDelete, ErrorWithRetry, FolderUploading, FolderDone, ReadOnly, Disabled, Overflow, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileItem/FileItem.mdx`
 
@@ -55,6 +57,10 @@ Keep the file list scannable by collapsing a dropped or picked folder into one `
 
 Do: One folder row with its file count in meta.
 Don't: Folder row hides how many files were included.
+
+### Let a `FileItem` name longer than its row end in the middle. {#let-a-fileitem-name-longer-than-its-row-end-in-the-middle}
+
+The name keeps its start and its extension, and the full name opens in a Tooltip on hover and focus while it is clipped. The row keeps its height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

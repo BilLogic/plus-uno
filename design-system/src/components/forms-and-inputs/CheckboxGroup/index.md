@@ -10,7 +10,7 @@ CheckboxGroup — one question and its checkbox answers, any number of which may
 
 **Source:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Soft, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Soft, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.mdx`
 
@@ -63,6 +63,10 @@ Pass `error` on `CheckboxGroup` so one message explains what to fix, rather than
 
 Do: One error explains what to select.
 Don't: Invalid borders with no explanation.
+
+### Let a `CheckboxGroup` legend and options longer than their line wrap. {#let-a-checkboxgroup-legend-and-options-longer-than-their-line-wrap}
+
+The group grows by lines and nothing in it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

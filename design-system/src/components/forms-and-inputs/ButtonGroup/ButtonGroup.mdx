@@ -61,6 +61,14 @@ children, each keeping its own appearance and spacing.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Overflow
+
+<ComponentExample of={ButtonGroupStories.Overflow} title="Truncate" description="Buttons that do not fit one row shrink, each label ending in an ellipsis; the group stays on one line." />
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -175,6 +183,11 @@ Buttons in a group share one spacing so the outline stays continuous.
 
 `ButtonGroup` renders children as given — set `isSelected` on the `Button`
 that should read as current, and manage which one that is yourself.
+
+
+### Let `ButtonGroup` buttons that do not fit shrink and end their labels in an ellipsis.
+
+The group keeps one row inside its slot. Keep the labels short enough that the ellipsis is the exception. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

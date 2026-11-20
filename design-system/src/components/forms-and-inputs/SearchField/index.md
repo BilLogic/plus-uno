@@ -8,11 +8,11 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 **Used in:** Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Search (`ds guide search`)
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, ButtonInside, Disabled, Loading, Async, Collapsible, Scopes, CollapsibleScopes, Basic, Focused, FocusedKeyboard, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, ButtonInside, Disabled, Loading, Async, Collapsible, Scopes, CollapsibleScopes, Basic, Focused, FocusedKeyboard, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.mdx`
 
@@ -62,6 +62,10 @@ A view bar holds 32-high controls, so pass `spacing="compact"`.
 
 Use `isCollapsible` when the bar keeps quiet until search is needed. Elsewhere
 leave the field open.
+
+### Let a `SearchField` query longer than the field end in an ellipsis. {#let-a-searchfield-query-longer-than-the-field-end-in-an-ellipsis}
+
+The clear action keeps its place at the end, and focusing the field reaches the rest of the query. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -1,3 +1,4 @@
+import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -637,4 +638,24 @@ Interactive.args = {
     isRequired: false,
     isDisabled: false,
     isReadOnly: false,
+};
+
+/** Wrap: a legend and options longer than their line take more lines; the group stays inside its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <CheckboxGroup
+                name="cbg-overflow"
+                legend={LONG_SENTENCE}
+                options={[{ value: 'long', label: LONG_TOPIC }, { value: 'short', label: 'Fractions' }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const group = canvasElement.querySelector('fieldset');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(group, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+        await expect(canvasElement).toHaveTextContent(LONG_TOPIC);
+    },
 };

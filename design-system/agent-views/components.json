@@ -1288,7 +1288,8 @@
         "AnchorKeyboard",
         "AnchorHref",
         "Anatomy",
-        "FooterLayouts"
+        "FooterLayouts",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -1378,7 +1379,8 @@
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--border-width-default",
@@ -2134,7 +2136,8 @@
         "Hovered",
         "Focused",
         "FieldDisabled",
-        "FieldInvalid"
+        "FieldInvalid",
+        "Overflow"
       ],
       "tokens": [
         "--border-width-default",
@@ -2503,7 +2506,8 @@
         "Card",
         "Soft",
         "Tile",
-        "TileNarrowLargeIllustrations"
+        "TileNarrowLargeIllustrations",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -2751,7 +2755,8 @@
         "SoftInvalidSelected",
         "SoftReadOnly",
         "SoftDisabled",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--checkbox-control-size",
@@ -2897,7 +2902,8 @@
         "Selected",
         "Hovered",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -3292,7 +3298,8 @@
         "Edited",
         "Restricted",
         "WithNestedReplies",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -3852,7 +3859,8 @@
         "RangePopupPresetKeyboard",
         "RangePopupClearCommits",
         "RangePopupPresetBounds",
-        "RangePopupReadOnly"
+        "RangePopupReadOnly",
+        "Overflow"
       ],
       "tokens": [
         "--border-width-default",
@@ -4291,7 +4299,8 @@
         "ReadOnly",
         "Disabled",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -4771,7 +4780,8 @@
         "HoveredState",
         "KeyboardFocus",
         "OpenMenuEdge",
-        "BestPracticesLive"
+        "BestPracticesLive",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -5567,7 +5577,7 @@
         "FolderDone",
         "ReadOnly",
         "Disabled",
-        "LongName",
+        "Overflow",
         "Interactive"
       ],
       "tokens": [
@@ -5806,7 +5816,8 @@
         "Disabled",
         "KeyboardFocus",
         "InvalidFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -5969,7 +5980,8 @@
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--ds-text",
@@ -6150,7 +6162,8 @@
         "Staging",
         "Stacked",
         "Placement",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--dropdown-menu-max-height",
@@ -6504,7 +6517,8 @@
         "DestructiveSplit",
         "Steps",
         "NarrowPanel",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--footer-height",
@@ -8318,7 +8332,8 @@
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ]
     },
     {
@@ -10059,7 +10074,8 @@
         "Placement",
         "Searchable",
         "Spacing",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--dropdown-menu-max-height",
@@ -10987,7 +11003,8 @@
         "Required",
         "Soft",
         "Tile",
-        "TileNarrowLargeIllustrations"
+        "TileNarrowLargeIllustrations",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -11274,7 +11291,8 @@
         "Required",
         "Invalid",
         "ReadOnly",
-        "Disabled"
+        "Disabled",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -11891,7 +11909,8 @@
         "Compact",
         "FullToolbar",
         "ToolbarButtonHovered",
-        "ToolbarButtonPressed"
+        "ToolbarButtonPressed",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -12345,7 +12364,8 @@
         "Basic",
         "Focused",
         "FocusedKeyboard",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -13352,7 +13372,8 @@
         "MotionOpenClose",
         "MotionReduced",
         "MotionKeyboardOpen",
-        "RequiredBlocksSubmit"
+        "RequiredBlocksSubmit",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -13500,7 +13521,8 @@
         "DisabledWithReason",
         "ReadOnly",
         "Motion",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--body-sm",
@@ -14174,7 +14196,8 @@
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--border-width-default",
@@ -16006,7 +16029,8 @@
         "Rest",
         "Hovered",
         "Focused",
-        "FieldDisabled"
+        "FieldDisabled",
+        "Overflow"
       ],
       "tokens": [
         "--body-sm",
@@ -16313,7 +16337,8 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid",
-        "FieldReadOnly"
+        "FieldReadOnly",
+        "Overflow"
       ]
     },
     {
@@ -16688,7 +16713,8 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid",
-        "FieldReadOnly"
+        "FieldReadOnly",
+        "Overflow"
       ]
     },
     {
@@ -17039,7 +17065,8 @@
         "Disabled",
         "HoveredState",
         "KeyboardFocus",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ]
     },
     {
@@ -17224,7 +17251,8 @@
         "HoveredOn",
         "Focused",
         "Disabled",
-        "DisabledWithReason"
+        "DisabledWithReason",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -17572,7 +17600,8 @@
         "OpensWithAFade",
         "MotionOpenClose",
         "MotionReduced",
-        "MotionKeyboardOpen"
+        "MotionKeyboardOpen",
+        "Overflow"
       ],
       "tokens": [
         "--ds-motion-spatial-fast",

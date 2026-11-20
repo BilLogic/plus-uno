@@ -70,7 +70,8 @@
     color: var(--ds-text);
     font: var(--_choice-grid-label-font, var(--body-default));
     background-color: var(--ds-surface-sunken);
-    white-space: nowrap;
+    // A long label takes more lines; the grid keeps to its well.
+    overflow-wrap: anywhere;
 }
 
 // Grid cells

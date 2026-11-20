@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import Icon from '../../images-and-icons/Icon';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import { Button } from '../Button/Button';
 import './FilterButton.scss';
 
@@ -21,22 +22,25 @@ export const FilterButton = ({
     ...props
 }) => {
     const hasMetric = trailingMetric !== undefined && trailingMetric !== null;
+    // A value longer than the button ends in an ellipsis; the name and the count keep
+    // their places, and the full text opens in a Tooltip on hover and focus.
     return (
-        <Button
-            appearance={appearance}
-            iconAfter={hasChevronDown ? <Icon name="chevron-down" size={12} /> : undefined}
-            className={clsx('plus-filter-btn', className)}
-            {...props}
-        >
-            {label ? (
-                <>
-                    <span className="plus-filter-btn__label">{`${label}:`}</span>
-                    {' '}
-                    <span className="plus-filter-btn__value">{text}</span>
-                </>
-            ) : text}
-            {hasMetric && <span className="plus-filter-btn__metric">{trailingMetric}</span>}
-        </Button>
+        <ClippedTooltip text={label ? `${label}: ${text}` : text} placement="top">
+            {({ measureRef }) => (
+                <Button
+                    appearance={appearance}
+                    iconAfter={hasChevronDown ? <Icon name="chevron-down" size={12} /> : undefined}
+                    className={clsx('plus-filter-btn', className)}
+                    {...props}
+                >
+                    {label ? <span className="plus-filter-btn__label">{`${label}:`}</span> : null}
+                    {/* The space stays for the accessible name; the flex row draws the gap. */}
+                    {label ? ' ' : null}
+                    <span ref={measureRef} className={label ? 'plus-filter-btn__value' : 'plus-filter-btn__text'}>{text}</span>
+                    {hasMetric && <span className="plus-filter-btn__metric">{trailingMetric}</span>}
+                </Button>
+            )}
+        </ClippedTooltip>
     );
 };
 

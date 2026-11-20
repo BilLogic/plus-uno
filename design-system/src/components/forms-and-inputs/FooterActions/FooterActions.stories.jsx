@@ -20,6 +20,7 @@ const stageStyle = {
     borderRadius: 'var(--radius-lg)',
     boxSizing: 'border-box',
 };
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const rect = (el) => el.getBoundingClientRect();
 
@@ -341,4 +342,22 @@ export const Interactive = {
             </FooterActions>
         </div>
     ),
+};
+
+/** Truncate: footer buttons with long labels shrink and end in an ellipsis; the footer stays inside its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '300px' /* demo frame */ }}>
+            <FooterActions>
+                <Button text="Cancel" />
+                <Button appearance="primary" text={LONG_SCHOOL} />
+            </FooterActions>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.firstElementChild.firstElementChild, canvasElement.firstElementChild);
+        const [cancel, save] = within(canvasElement).getAllByRole('button');
+        await expect(Math.round(save.getBoundingClientRect().height)).toBe(Math.round(cancel.getBoundingClientRect().height));
+    },
 };

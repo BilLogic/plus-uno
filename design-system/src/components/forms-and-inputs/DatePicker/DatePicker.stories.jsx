@@ -1,3 +1,4 @@
+import { expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
@@ -1012,4 +1013,21 @@ export const RangePopupReadOnly = {
     },
 };
 
-
+/** Truncate: in a field narrower than its date range, the value keeps one line and the calendar button keeps its place. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '110px' /* demo frame */ }}>
+            <DatePicker id="date-picker-overflow" aria-label="Session date" defaultValue="2026-11-19" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-field');
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        const input = within(canvasElement).getByRole('combobox');
+        await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
+        await expect(input.value).toBe('11/19/2026');
+        await expectTrailingKept(box, within(box).getByRole('button'));
+    },
+};

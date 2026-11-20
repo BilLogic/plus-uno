@@ -31,6 +31,7 @@ const openMenu = async (canvasElement) => {
     await waitFor(() => expect(menu.contains(doc.activeElement)).toBe(true));
     return menu;
 };
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const menuClosed = (canvasElement) => waitFor(
     () => expect(canvasElement.ownerDocument.querySelector('.plus-popup-select')).toBeNull(),
@@ -266,4 +267,20 @@ export const Interactive = {
         return <Demo />;
     },
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.popupSelect } } },
+};
+
+/** Truncate: a chosen value longer than the trigger ends in an ellipsis, and the full text opens in a Tooltip while the trigger is focused. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <PopupSelect label="School" options={[LONG_SCHOOL, 'Lincoln Middle']} defaultValue={LONG_SCHOOL} isSearchable={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const trigger = within(canvasElement).getByRole('button');
+        const clipped = await expectNoSilentClip(canvasElement);
+        await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
+        await expectInsideWell(trigger, canvasElement.firstElementChild);
+        await expect(trigger).toHaveTextContent(LONG_SCHOOL);
+    },
 };

@@ -53,6 +53,14 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={SplitButtonStories.Overflow} title="Truncate" description="The action's label ends in an ellipsis; the menu button keeps its size and place." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="SplitButton" />
@@ -188,6 +196,10 @@ the control reads as one piece.
 
 `SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
 a `Popup` or `DropdownMenu` positioned under it.
+
+### Let a `SplitButton` action label longer than its room end in an ellipsis.
+
+The menu button keeps its size at the seam, and the pair stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

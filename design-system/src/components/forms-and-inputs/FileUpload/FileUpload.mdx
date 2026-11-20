@@ -77,6 +77,14 @@ A file upload lets a person choose or drop files and folders from their device a
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={FileUploadStories.Overflow} title="Truncate" description="A long file name ends mid-name in its row, keeping its extension, and the field stays inside its well." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="FileUpload" />
@@ -236,6 +244,10 @@ The picker offers the listed types first and every platform lets the user overri
 // Correct: put the qualification in the description, which is prose.
 <FileUpload label="Report" description="PDF, up to 10 MB." />
 ```
+
+### Let a `FileUpload` file name longer than its row end in the middle.
+
+Each row keeps its height and the extension stays visible. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

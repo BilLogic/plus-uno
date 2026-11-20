@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import LinkButton from './LinkButton';
 import { BUTTON_APPEARANCES } from '@/components';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -137,4 +138,20 @@ export const KeyboardFocus = {
 export const Interactive = {
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.linkButton } } },
     render: (args) => <LinkButton {...args} />,
+};
+
+/** Truncate: a label longer than its room ends in an ellipsis inside the link button, which never leaves its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <LinkButton href="#school" text={LONG_SCHOOL} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const link = within(canvasElement).getByRole('link');
+        await expectNoSilentClip(link);
+        await expectInsideWell(link, canvasElement.firstElementChild);
+        await expect(Math.round(link.getBoundingClientRect().height)).toBe(32);
+        await expect(link).toHaveTextContent(LONG_SCHOOL);
+    },
 };

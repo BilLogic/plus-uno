@@ -1,3 +1,4 @@
+import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, within } from 'storybook/test';
@@ -362,5 +363,18 @@ export const KeyboardFocus = {
     play: async ({ canvasElement }) => {
         await expectFieldFocused(canvasElement, fieldBox(canvasElement, 0), dateInput(canvasElement), 'date half');
         await expectFieldFocused(canvasElement, fieldBox(canvasElement, 1), timeInput(canvasElement), 'time half');
+    },
+};
+
+/** Truncate: in a narrow field the date and time keep one line each and the field does not grow past its slot. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '240px' /* demo frame */ }}>
+            <DateTimePicker id="datetime-overflow" label="Session start" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.querySelector('.plus-field'), canvasElement.firstElementChild);
     },
 };

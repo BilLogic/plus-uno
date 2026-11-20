@@ -1,3 +1,4 @@
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -448,4 +449,29 @@ Overview.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(rowLabel).backgroundColor, `${mode}: row label takes the sunken fill`).toBe(sunken);
         await expect(getComputedStyle(bodyCell).backgroundColor, `${mode}: body cell takes the sunken fill`).toBe(sunken);
     });
+};
+
+/** Wrap: a row label longer than its column takes more lines, and the grid stays inside its well instead of scrolling the page sideways. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '360px' /* demo frame */ }}>
+            <ChoiceGrid
+                id="cg-overflow"
+                type="radio"
+                rows={[{ id: 'row-1', label: LONG_TOPIC }, { id: 'row-2', label: 'Monday' }]}
+                columns={columns}
+                values={{}}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const table = canvasElement.querySelector('table');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(table, canvasElement.firstElementChild);
+        const label = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes(LONG_TOPIC));
+        await expect(label).toBeTruthy();
+        await expect(label.getBoundingClientRect().height).toBeGreaterThan(48);
+        await expect(canvasElement.querySelectorAll('input[type=radio]')).toHaveLength(8);
+    },
 };

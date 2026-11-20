@@ -19,11 +19,12 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 ## Key cases
 
-The three cases below are Planned : no component carries them yet.
+The two cases below are Planned : no component carries them yet.
 
 - **The breadcrumb middle.** Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. The Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
-- **A file name.** The one mid-line truncation: a file name or an id keeps its start and its end, because the end tells them apart.
+
+A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
 
 ## Usage
 
@@ -41,8 +42,20 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | Breadcrumb with five or more levels | Planned: fold the middle into "…" | The "…" opens a menu of the hidden levels |
 | Open item in the Sidebar | Planned: truncate at the end | Tooltip with the school |
 | Auto-width Popup row | Planned: truncate at the end at 320 | Tooltip when clipped |
-| File name, id | Planned: truncate mid-line | Tooltip when clipped |
+| File name | Truncate mid-line, keeping the extension | Tooltip on hover and focus when clipped |
+| Id | Planned: truncate mid-line | Tooltip when clipped |
 | A list of items, tags or notes | Planned: "Show n more", "Show less" | Expanded in place |
+
+### Fields and inputs
+
+A field answers a value longer than its room with one of four rules, chosen by what the value is. The answer is the same in every component that shares the rule, and each component's Overflow example shows it.
+
+| Rule | Use it when | What happens | Components |
+| --- | --- | --- | --- |
+| Grow | The value is written or read whole: notes, labels, descriptions, a set of tags being edited. | The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself. | Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu. |
+| Truncate | The box has one fixed line and the value is a name, a date or a choice. | One line ending in an ellipsis. The slots keep their places and the box keeps its height. | Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button, Button family labels, Dropdown menu items, File item (mid-name). |
+| Collapse | The value is a list the field shows as tags. | One line with a +n count of what is hidden; focus or a click on +n shows every item. | Tag input at rest, multiple Select (truncate), Tag group. |
+| Scroll | The value is a list that must stay on one line and every item must stay reachable. | One row that scrolls sideways inside the field. | Multiple Select (no wrap). |
 
 ## Alternatives
 
@@ -59,7 +72,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | "Show 4 more" and "Show less" (Planned). | "Load more", "See all", "…". |
 | Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). | The whole title in the Sidebar. |
 | Breadcrumb levels by the page's own title: "Lincoln Middle School". | "Back", "Up one level". |
-| File name mid-line: "reflection_…_week12.pdf" (Planned). | "reflection_maya_rodrig…". |
+| File name mid-line: "reflection_…_week12.pdf". | "reflection_maya_rodrig…". |
 
 ## Accessibility
 
@@ -77,6 +90,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | Label | Tag, Status tag | `maxWidth` caps the tag; a clipped label ends in an ellipsis. |
 | Folded tags | Tag group | `overflow="collapse"` keeps one line and folds the rest into +n. |
 | Cell | Dynamic table | A cell's `overflow` is `truncate` by default; `wrap` takes more lines. |
+| File name | File item | Keeps the start and the extension, and opens the full name in a Tooltip while clipped. |
 | Trail | Breadcrumb | The fold is Planned ; the component never folds its middle yet. |
 | Pager | Pagination | Fills the Section's footer slot, aligned to the end. |
 
@@ -111,7 +125,7 @@ Don't: A clipped Section title: the one thing that names the content is the one 
 
 **Checked:** Automatic
 
-An ellipsis stands for three or more characters. A cell stays one line. Mid-line truncation is only for file names and ids, where the end tells them apart; it is Planned . Truncating from the front is not used.
+An ellipsis stands for three or more characters. A cell stays one line. Mid-line truncation is only for file names and ids, where the end tells them apart; a file name does it today in the File item, and an id is Planned . Truncating from the front is not used.
 
 ### Open the full text in a Tooltip only when it is clipped. {#open-the-full-text-in-a-tooltip-only-when-it-is-clipped}
 
@@ -121,6 +135,18 @@ The Tooltip opens on hover and on focus, and the clipped element becomes a tab s
 
 Do: A clipped cell opens its full text in a Tooltip.
 Don't: A clipped cell with nothing to open: the rest of the text cannot be read.
+
+### Grow a field by whole rows and stop it at a maximum height. {#grow-a-field-by-whole-rows-and-stop-it-at-a-maximum-height}
+
+**Checked:** Review
+
+A field that grows adds a whole line or a whole tag row and never a blank one: the room under the last row is the room above the first. Past its maximum height, three tag rows for a Tag input, the field scrolls inside itself and the page never moves. No field grows sideways, and none makes its well scroll sideways.
+
+### Reach the full value of a clipped field through focus or a Tooltip. {#reach-the-full-value-of-a-clipped-field-through-focus-or-a-tooltip}
+
+**Checked:** Review
+
+A text field the person types in has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is not typed in, such as a Select, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
 
 ### Make a bare ellipsis open a menu. {#make-a-bare-ellipsis-open-a-menu}
 

@@ -79,6 +79,14 @@ Use a time picker when a user needs to enter a time of day.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={TimePickerStories.Overflow} title="Truncate" description="A time is short and never wraps; in a narrow slot the field keeps one line and stays inside its well." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="TimePicker" />
@@ -208,6 +216,10 @@ Every option in the list carries `AM` or `PM` (`9:30 AM` and `9:30 PM` are separ
     dontExample={<TimePicker aria-label="Session start" value="02:30 PM" isDisabled />}
     dontCaption="The same time disabled, faded as if it did not apply."
 />
+
+### Let a `TimePicker` stay on one line in a narrow slot.
+
+The field keeps its height and stays inside its slot; give it room for the whole time. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

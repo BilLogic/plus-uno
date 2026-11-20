@@ -80,6 +80,14 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={ToggleStories.Overflow} title="Wrap" description="A label longer than its line takes more lines beside the switch, which keeps its size." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="Toggle" />
@@ -216,6 +224,10 @@ A toggle changes the setting as soon as it is flipped. If the change needs confi
 ### Use read-only for fixed settings and disabled for unavailable ones.
 
 `isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. See [Read-only](?path=/docs/patterns-states-read-only--docs).
+
+### Let a `Toggle` label longer than its line wrap.
+
+The switch keeps its size, and the label is never clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 
