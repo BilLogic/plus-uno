@@ -47,12 +47,24 @@
           "deprecated": null
         },
         {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'separated'",
+          "values": [
+            "separated",
+            "grouped"
+          ],
+          "description": "Separated gives each item its own container; grouped is one bordered box with dividers",
+          "deprecated": null
+        },
+        {
           "name": "flush",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Remove borders for seamless/flush appearance",
+          "description": "Grouped look without the outer border, for an accordion inside a card or panel",
           "deprecated": null
         },
         {
@@ -104,12 +116,17 @@
         "Pressed",
         "Focused",
         "Expanded",
+        "ExpandedGrouped",
         "Disabled",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "WithSummary",
+        "OpenCloseByClickAndKeyboard",
+        "Overflow"
       ],
       "tokens": [
         "--body-lg",
+        "--body-sm",
         "--border-width-default",
         "--card-pad",
         "--card-radius",
@@ -124,9 +141,13 @@
         "--ds-motion-spatial-fast-duration",
         "--ds-opacity-disabled",
         "--ds-surface",
+        "--ds-text",
         "--ds-text-subtle",
         "--heading-sm",
-        "--icon-sm"
+        "--icon-sm",
+        "--image-md",
+        "--inline-md",
+        "--stack-sm"
       ],
       "subComponents": [
         {
@@ -147,6 +168,20 @@
               "required": true,
               "default": null,
               "description": "Header content (title text or node)"
+            },
+            {
+              "name": "summary",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "One line of subtle text under the title, such as a status or a count. A longer line is cut with an ellipsis."
+            },
+            {
+              "name": "elemBefore",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "An avatar or an icon before the title. In the separated appearance the open body indents to the title's start."
             },
             {
               "name": "children",

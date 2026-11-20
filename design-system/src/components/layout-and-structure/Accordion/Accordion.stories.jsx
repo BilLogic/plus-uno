@@ -1,6 +1,6 @@
 import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
-import { Button } from '@/components';
+import { Avatar, Button } from '@/components';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Accordion from './Accordion';
@@ -30,9 +30,15 @@ export default {
             table: { disable: true },
         },
         // DESIGN
+        appearance: {
+            control: 'inline-radio',
+            options: ['separated', 'grouped'],
+            description: 'Separated gives each item its own container; grouped is one bordered box with dividers',
+            table: { category: 'Design' }
+        },
         flush: {
             control: 'boolean',
-            description: 'Remove borders for seamless/flush appearance',
+            description: 'Grouped look without the outer border, for an accordion inside a card or panel',
             table: { category: 'Design' }
         },
 
@@ -96,6 +102,7 @@ const sampleItems = [
 // another open accordion — a panel's accessible name is its own header, so
 // two open panels both titled "Session notes" collide under the
 // a11y "landmark-unique" rule even though they belong to different accordions.
+const groupedSampleItems = sampleItems.map((item) => ({ ...item, header: `${item.header} (grouped)` }));
 const flushSampleItems = sampleItems.map((item) => ({ ...item, header: `${item.header} (flush)` }));
 
 const accordionPage = {
@@ -110,9 +117,15 @@ function AccordionVariantsDemos() {
         <>
             <section>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
-                    Standard accordion with borders and one item open at a time.
+                    Separated accordion: each item is its own container, with one open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
+            </section>
+            <section>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
+                    Grouped accordion: one bordered box with dividers between items.
+                </p>
+                <Accordion items={groupedSampleItems} defaultActiveKey="0" appearance="grouped" />
             </section>
             <section>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
@@ -270,6 +283,7 @@ export const Interactive = (args) => {
     return (
         <div style={{ maxWidth: '800px' /* token gap: 800px */ }}>
             <Accordion
+                appearance={args.appearance}
                 flush={args.flush}
                 alwaysOpen={args.alwaysOpen}
                 items={items}
@@ -280,6 +294,7 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
+    appearance: 'separated',
     flush: false,
     alwaysOpen: false,
     itemCount: 3
@@ -287,9 +302,9 @@ Interactive.args = {
 
 /* ------------------------------------------------------------------- states */
 
-const Sections = ({ defaultActiveKey, disabled = false }) => (
+const Sections = ({ defaultActiveKey, disabled = false, appearance }) => (
     <div style={{ maxWidth: '520px' }}>
-        <Accordion defaultActiveKey={defaultActiveKey}>
+        <Accordion defaultActiveKey={defaultActiveKey} appearance={appearance}>
             <Accordion.Item eventKey="0" header="Session notes" disabled={disabled}>
                 <p>Notes from the last session.</p>
             </Accordion.Item>
@@ -335,9 +350,21 @@ export const Focused = {
     },
 };
 
-/** Expanded: the selected ground, and a press closes it again. */
+/** Expanded: the header stays plain on the surface, and a press closes it again. */
 export const Expanded = {
     render: () => <Sections defaultActiveKey="0" />,
+    play: async ({ canvasElement }) => {
+        const el = trigger(canvasElement);
+        await expect(el).toHaveAttribute('aria-expanded', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
+        await userEvent.click(el);
+        await expect(el).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+/** Expanded, grouped: the selected ground, and a press closes it again. */
+export const ExpandedGrouped = {
+    render: () => <Sections defaultActiveKey="0" appearance="grouped" />,
     play: async ({ canvasElement }) => {
         const el = trigger(canvasElement);
         await expect(el).toHaveAttribute('aria-expanded', 'true');
@@ -382,4 +409,98 @@ export const MotionReduced = {
     ...MotionOpenClose,
     decorators: [withReducedMotion],
     play: (context) => expansionPlay(context, true),
+};
+
+/* --------------------------------------------------- separated + summary */
+
+const reflectionStudents = [
+    { eventKey: 'maya', name: 'Maya K.', summary: 'Engaged · 2 tags · note added', body: 'Explained each step back before moving on. Two tags: persistence, checking work.' },
+    { eventKey: 'jon', name: 'Jon P.', summary: 'Quiet · 1 tag', body: 'Needed a prompt to start the second set; finished it without help.' },
+    { eventKey: 'ana', name: 'Ana R.', summary: 'Distracted · no tags yet', body: 'Joined late and left early. Nothing to tag yet.' },
+];
+
+const reflectionItems = reflectionStudents.map(({ name, ...item }) => ({
+    ...item,
+    header: name,
+    elemBefore: <Avatar name={name} size={32} />,
+}));
+
+/** A reflection student list: an avatar, the name, and one summary line under it. */
+export const WithSummary = {
+    render: () => (
+        <div style={{ maxWidth: '520px' }}>
+            <Accordion items={reflectionItems} defaultActiveKey="maya" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const maya = canvas.getByRole('button', { name: /Maya K\./ });
+        await expect(maya).toHaveAttribute('aria-expanded', 'true');
+        await expect(within(maya).getByText('Engaged · 2 tags · note added')).toBeVisible();
+        const items = canvasElement.querySelectorAll('.plus-accordion-item');
+        await expect(items).toHaveLength(3);
+        // Each item is its own container with the card radius, and a gap between.
+        await expect(getComputedStyle(items[0]).borderTopLeftRadius).toBe(tokenLength(canvasElement, '--card-radius') + 'px');
+        const gap = items[1].getBoundingClientRect().top - items[0].getBoundingClientRect().bottom;
+        await expect(gap).toBe(tokenLength(canvasElement, '--stack-sm'));
+        // A 32px avatar fits inside the slot column.
+        const avatar = maya.querySelector('.plus-accordion-elem > *');
+        await expect(avatar.getBoundingClientRect().width).toBeLessThanOrEqual(maya.querySelector('.plus-accordion-elem').getBoundingClientRect().width);
+        // The open body starts where the title starts.
+        const title = maya.querySelector('.plus-accordion-title');
+        const body = canvasElement.querySelector('.plus-accordion-body');
+        await expect(Math.round(body.getBoundingClientRect().left + parseFloat(getComputedStyle(body).paddingLeft))).toBe(Math.round(title.getBoundingClientRect().left));
+    },
+};
+
+/** Open and close by click and by keyboard; each header is one button inside a heading. */
+export const OpenCloseByClickAndKeyboard = {
+    render: () => (
+        <div style={{ maxWidth: '520px' }}>
+            <Accordion items={reflectionItems} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const jon = canvas.getByRole('button', { name: /Jon P\./ });
+        await expect(jon.closest('h2, h3, h4, h5, h6')).not.toBeNull();
+        await userEvent.click(jon);
+        await expect(jon).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.click(jon);
+        await expect(jon).toHaveAttribute('aria-expanded', 'false');
+        jon.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(jon).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.keyboard(' ');
+        await expect(jon).toHaveAttribute('aria-expanded', 'false');
+        await userEvent.keyboard('{Tab}');
+        await expect(canvas.getByRole('button', { name: /Ana R\./ })).toHaveFocus();
+        // Base UI's accordion has no arrow-key navigation; Tab and Shift+Tab move between headers.
+        await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+        await expect(jon).toHaveFocus();
+    },
+};
+
+/** A long title wraps; a long summary stays on one line and is cut with an ellipsis. */
+export const Overflow = {
+    render: () => (
+        <div style={{ maxWidth: '360px' }}>
+            <Accordion
+                items={[{
+                    eventKey: 'long',
+                    header: 'Alexandria Montgomery-Featherstonehaugh, Lincoln Middle School Grade 7 math',
+                    summary: 'Engaged throughout the warm-up and the first practice set · 4 tags · note added after the session',
+                    elemBefore: <Avatar name="Alexandria Montgomery" size={32} />,
+                    body: 'Notes from the session.',
+                }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const summary = canvasElement.querySelector('.plus-accordion-summary');
+        await expect(getComputedStyle(summary).textOverflow).toBe('ellipsis');
+        await expect(summary.scrollWidth).toBeGreaterThan(summary.clientWidth);
+        const item = canvasElement.querySelector('.plus-accordion-item');
+        await expect(canvasElement.querySelector('.plus-accordion-trigger').scrollWidth).toBeLessThanOrEqual(item.clientWidth);
+    },
 };

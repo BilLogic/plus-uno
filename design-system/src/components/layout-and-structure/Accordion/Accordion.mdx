@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AccordionStories from './Accordion.stories.jsx';
-import { Accordion } from '@/components';
+import { Accordion, Avatar } from '@/components';
+import { Card } from '@/templates';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -18,6 +19,11 @@ export const sessionItems = [
     { eventKey: '0', header: 'Session notes', body: sessionBody },
     { eventKey: '1', header: 'Goals', body: sessionBody },
     { eventKey: '2', header: 'Materials', body: sessionBody },
+];
+
+export const studentItems = [
+    { eventKey: 'maya', header: 'Maya K.', summary: 'Engaged · 2 tags · note added', elemBefore: <Avatar name="Maya K." size={32} />, body: sessionBody },
+    { eventKey: 'jon', header: 'Jon P.', summary: 'Quiet · 1 tag', elemBefore: <Avatar name="Jon P." size={32} />, body: sessionBody },
 ];
 
 export const figmaMeta = {
@@ -54,9 +60,13 @@ Accordion component for organizing content into collapsible sections.
 
 ## Appearance
 
-<ComponentExample of={AccordionStories.Overview} title="Default" description="A bordered group of items, with the first one open." />
+<ComponentExample of={AccordionStories.Overview} title="Default" description="Separated: each item is its own container, with the first one open." />
 
-<ComponentExample of={AccordionStories.Styles} title="Default and flush" description={<>The default bordered accordion, and <code>flush</code>, which drops the outer border and corners.</>} />
+<ComponentExample of={AccordionStories.Styles} title="Separated, grouped and flush" description={<>The default separated accordion; <code>appearance="grouped"</code>, one bordered box with dividers; and <code>flush</code>, which drops the box for an accordion inside a card or panel.</>} />
+
+<ComponentExample of={AccordionStories.WithSummary} title="With a leading slot and summary" description={<><code>elemBefore</code> puts an avatar or icon before the title, and <code>summary</code> adds one line of subtle text under it. In the separated appearance the open body indents to the title.</>} />
+
+<ComponentExample of={AccordionStories.Overflow} title="Overflow" description="A long title wraps; a long summary stays on one line and is cut with an ellipsis." />
 
 </div>
 
@@ -84,7 +94,9 @@ Accordion component for organizing content into collapsible sections.
 
 <ComponentExample of={AccordionStories.Focused} title="Focused" description="Shows the focus ring while the ground stays put." />
 
-<ComponentExample of={AccordionStories.Expanded} title="Expanded" description="The selected ground, chevron turned up. Press again to close." />
+<ComponentExample of={AccordionStories.Expanded} title="Expanded" description="The header stays plain on the surface, chevron turned up. Press again to close." />
+
+<ComponentExample of={AccordionStories.ExpandedGrouped} title="Expanded, grouped" description="The grouped look keeps the selected ground under an open header." />
 
 <ComponentExample of={AccordionStories.Disabled} title="Disabled" description="Dimmed to the disabled opacity, announced as disabled, and it never opens." />
 
@@ -128,8 +140,11 @@ shape and the headers stay a readable index of what is there.
 
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
-lets more than one item stay open at once, and `flush` removes the outer border
-and rounded corners when the accordion sits inside a card or panel. Use an accordion for several long, independent sections where only one matters at a time.
+lets more than one item stay open at once. Each item is its own container by
+default (`appearance="separated"`); use `appearance="grouped"` for one bordered box with
+dividers, and `flush` to drop that box when the accordion sits inside a card or panel.
+An item takes `elemBefore` (an avatar or icon) and `summary` (one line of subtle text
+under the title) for a list of people or records. Use an accordion for several long, independent sections where only one matters at a time.
 
 </div>
 
@@ -145,10 +160,11 @@ and rounded corners when the accordion sits inside a card or panel. Use an accor
 
 ## Parts
 
-1. **Trigger.** The full-width button: the section title on the left, the chevron on the right.
-2. **Chevron.** Turns up when the section is open, so the state reads without the body.
-3. **Body.** The content, shown under an open trigger.
-4. **Edge.** One border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+1. **Container.** Separated: each item has its own surface, one border and the card corner radius, with a gap between items. Grouped: one border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+2. **Leading slot.** Optional avatar or icon before the title.
+3. **Trigger.** The full-width button: the title, an optional summary line under it, and the chevron on the right.
+4. **Chevron.** Turns up when the section is open, so the state reads without the body.
+5. **Body.** The content under an open trigger, indented to the title's start when there is a leading slot.
 
 ### States
 
@@ -161,7 +177,7 @@ and rounded corners when the accordion sits inside a card or panel. Use an accor
 <tr><td>Hovered</td><td><code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td><code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>Shows the focus ring with no fill change; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
-<tr><td>Expanded</td><td><code>--ds-background-selected</code>, and <code>--ds-background-selected-hovered</code> under the pointer. The chevron turns up.</td></tr>
+<tr><td>Expanded</td><td>Separated: the header stays on the surface. Grouped: <code>--ds-background-selected</code>, and <code>--ds-background-selected-hovered</code> under the pointer. The chevron turns up.</td></tr>
 <tr><td>Disabled</td><td>The item is dimmed to <code>--ds-opacity-disabled</code>. The trigger is announced as disabled, leaves the tab order, and a press never opens it.</td></tr>
 </tbody>
 </DocsTable>
@@ -174,9 +190,10 @@ and rounded corners when the accordion sits inside a card or panel. Use an accor
 </thead>
 <tbody>
 <tr><td>Trigger ground</td><td><code>--ds-surface</code>; <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code> under the pointer; open, <code>--ds-background-selected</code> and <code>--ds-background-selected-hovered</code>.</td></tr>
-<tr><td>Trigger and chevron</td><td><code>--ds-text-subtle</code>; title in <code>--heading-sm</code>; chevron at <code>--icon-sm</code>.</td></tr>
+<tr><td>Trigger and chevron</td><td>Title in <code>--heading-sm</code>, <code>--ds-text</code> when separated and <code>--ds-text-subtle</code> when grouped; chevron at <code>--icon-sm</code> in <code>--ds-text-subtle</code>; <code>--inline-md</code> between the parts.</td></tr>
+<tr><td>Leading slot and summary</td><td>Slot column <code>--image-md</code> wide; summary in <code>--body-sm</code> and <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Body</td><td><code>--body-lg</code> on <code>--ds-surface</code>, <code>--ds-text-subtle</code>, with a <code>--ds-border</code> rule above it.</td></tr>
-<tr><td>Edge</td><td><code>--ds-border</code> at <code>--stroke-1</code>, corners <code>--card-radius</code>.</td></tr>
+<tr><td>Edge</td><td><code>--ds-border</code> at <code>--border-width-default</code>, corners <code>--card-radius</code>; separated items sit <code>--stack-sm</code> apart.</td></tr>
 <tr><td>Padding</td><td><code>--card-pad</code> on every side.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
@@ -211,15 +228,19 @@ The title is the only thing visible when closed, so it has to name the content a
     dontCaption="A title that runs on and wraps."
 />
 
-### Stack the items in one accordion.
+### Use separated on a page, grouped inside a card.
 
-Items share borders so the group reads as one control.
+Separated reads as a list of records on the bare page. Inside a card or panel a container within a container is noisy, so use grouped.
 
 <DoDontPair
-    doExample={<Accordion items={sessionItems} />}
-    doCaption="Items touch, borders shared."
-    dontExample={<FigureStack gap="lg">{sessionItems.map((item) => <Accordion key={item.eventKey} items={[item]} />)}</FigureStack>}
-    dontCaption="Items spaced apart like separate cards."
+    doExample={<Card title="Students"><Accordion items={studentItems} appearance="grouped" /></Card>}
+    doCaption="Grouped inside a card: one box with dividers."
+    dontExample={<Card title="Students"><Accordion items={studentItems} /></Card>}
+    dontCaption="Separated containers nested in a card."
+/>}
+    doCaption="Separated on the page, for a list of people."
+    dontExample={<Accordion items={studentItems} appearance="grouped" />}
+    dontCaption="Grouped on the bare page, where a list of people reads as one block."
 />
 
 ### Author items with either `items` or `children`; `children` wins.
@@ -244,11 +265,11 @@ Items share borders so the group reads as one control.
 <Accordion alwaysOpen defaultActiveKey={['0']} items={sections} />
 ```
 
-### Use `flush` inside another bordered surface.
+### Use `appearance="grouped"` or `flush` inside another bordered surface.
 
-`flush` removes the outer border and corner radius so the item rows sit flat
-against a bordered container such as a card. On the bare page, keep the default
-border.
+`grouped` keeps one box with dividers, and `flush` also removes the outer
+border and corner radius so the rows sit flat against a bordered container such
+as a card. On the bare page, keep the default separated look.
 
 </div>
 
@@ -263,6 +284,7 @@ border.
 <tbody>
 <tr><td>Name the section with a short noun phrase: "Session notes".</td><td>Write a sentence or a question as the header.</td></tr>
 <tr><td>Lead the body with the answer or the content itself.</td><td>Repeat the header as the first line of the body.</td></tr>
+<tr><td>Say the state in the summary: "Engaged · 2 tags".</td><td>Put a paragraph in the summary; it is cut to one line.</td></tr>
 <tr><td>Keep sibling headers parallel: all nouns, all the same case.</td><td>Mix "Goals", "How do I set goals?" and "SETTINGS".</td></tr>
 </tbody>
 </DocsTable>

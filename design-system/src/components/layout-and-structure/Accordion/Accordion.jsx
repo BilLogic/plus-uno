@@ -22,6 +22,7 @@ const Accordion = ({
     activeKey,
 
     // Design
+    appearance = 'separated',
     flush = false,
 
     // Behavior
@@ -35,7 +36,8 @@ const Accordion = ({
 }) => {
     const accordionClasses = [
         'plus-accordion',
-        flush ? 'plus-accordion--flush' : '',
+        // `flush` is the grouped look with the outer box dropped.
+        flush ? 'plus-accordion--flush' : `plus-accordion--${appearance}`,
         className
     ].filter(Boolean).join(' ');
 
@@ -48,6 +50,8 @@ const Accordion = ({
                 key={item.eventKey || index}
                 eventKey={item.eventKey || String(index)}
                 header={item.header}
+                summary={item.summary}
+                elemBefore={item.elemBefore}
                 disabled={item.disabled}
             >
                 {item.body}
@@ -82,6 +86,8 @@ const Accordion = ({
 const AccordionItem = ({
     eventKey,
     header,
+    summary,
+    elemBefore,
     children,
     disabled = false,
     className = '',
@@ -92,6 +98,7 @@ const AccordionItem = ({
     const itemClasses = [
         'plus-accordion-item',
         disabled ? 'plus-accordion-item--disabled' : '',
+        elemBefore ? 'plus-accordion-item--has-elem' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -108,7 +115,11 @@ const AccordionItem = ({
                 <BaseAccordion.Trigger
                     className="plus-accordion-trigger"
                 >
-                    {header}
+                    {elemBefore && <span className="plus-accordion-elem">{elemBefore}</span>}
+                    <span className="plus-accordion-text">
+                        <span className="plus-accordion-title">{header}</span>
+                        {summary && <span className="plus-accordion-summary">{summary}</span>}
+                    </span>
                 </BaseAccordion.Trigger>
             </BaseAccordion.Header>
             <BaseAccordion.Panel keepMounted render={(panelProps, state) => (
@@ -131,6 +142,10 @@ AccordionItem.propTypes = {
     eventKey: PropTypes.string.isRequired,
     /** Header content (title text or node) */
     header: PropTypes.node.isRequired,
+    /** One line of subtle text under the title, such as a status or a count. A longer line is cut with an ellipsis. */
+    summary: PropTypes.node,
+    /** An avatar or an icon before the title. In the separated appearance the open body indents to the title's start. */
+    elemBefore: PropTypes.node,
     /** Body content when expanded */
     children: PropTypes.node,
     /** Disable this item */
@@ -148,6 +163,8 @@ Accordion.propTypes = {
     items: PropTypes.arrayOf(PropTypes.shape({
         eventKey: PropTypes.string,
         header: PropTypes.node.isRequired,
+        summary: PropTypes.node,
+        elemBefore: PropTypes.node,
         body: PropTypes.node.isRequired,
         disabled: PropTypes.bool
     })),
@@ -159,7 +176,9 @@ Accordion.propTypes = {
     activeKey: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
 
     // Design
-    /** Remove borders for flush/seamless appearance */
+    /** `separated` (default) gives each item its own container with a gap between; `grouped` is one bordered box with dividers, for an accordion inside a card or panel. */
+    appearance: PropTypes.oneOf(['separated', 'grouped']),
+    /** The grouped look with the outer border and corners dropped; takes the place of `appearance`. */
     flush: PropTypes.bool,
 
     // Behavior
