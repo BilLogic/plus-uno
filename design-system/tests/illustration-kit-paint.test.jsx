@@ -4,7 +4,9 @@
  * component uses for that part. Two checks hold that:
  * - every fill, stroke, shadow and corner a primitive renders is a role in
  *   `paint.js`, never a borrowed or raw value;
- * - every role's token is still named by its source component's SCSS.
+ * - every role's token is still named by its source component's SCSS, found by
+ *   file name across the library (a moved stylesheet needs no kit edit, and a
+ *   source that matches no file fails here).
  */
 import React from 'react';
 import { readFileSync } from 'node:fs';
@@ -16,8 +18,11 @@ import { Illustration } from '../src/storybook-docs/illustrations/Illustration.j
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
 import * as construction from '../src/storybook-docs/illustrations/construction.jsx';
+import { libraryStyleFiles, resolveStyleSource } from '../../scripts/lib/style-sources.mjs';
 
 const SRC = resolve(__dirname, '../src');
+const STYLES = libraryStyleFiles(resolve(__dirname, '../..'));
+const styleOf = (source) => resolve(SRC, resolveStyleSource(STYLES, source));
 const paints = new Set(Object.values(PAINT));
 const corners = new Set(Object.values(CORNER_TOKEN));
 const roleOf = (value) => Object.keys(PAINT).find((role) => PAINT[role] === value);
@@ -26,7 +31,7 @@ describe('every role names a token its source component uses', () => {
   for (const [role, { token, source }] of Object.entries(ROLE_SOURCES)) {
     if (!source) continue;
     it(role, () => {
-      const scss = readFileSync(resolve(SRC, source), 'utf8');
+      const scss = readFileSync(styleOf(source), 'utf8');
       const named = new RegExp(`${token}(?![\\w-])`).test(scss);
       const name = role.startsWith('corner:') ? `CORNER.${role.slice(7)}` : `PAINT.${role}`;
       expect(named, `${source} no longer uses ${token}: update ${name} in illustrations/paint.js`).toBe(true);
@@ -34,9 +39,23 @@ describe('every role names a token its source component uses', () => {
   }
 });
 
+describe('the kit names style files, never paths', () => {
+  it('every source is a file name or an area-qualified name, so a moved stylesheet is still found', () => {
+    for (const [role, { source }] of Object.entries(ROLE_SOURCES)) {
+      if (source) expect(source, role).toMatch(/^([a-z-]+\/\*\*\/)?[\w-]+\.(scss|css)$/);
+    }
+    for (const [role, [, source]] of Object.entries(HEIGHTS)) expect(source, role).toMatch(/^([a-z-]+\/\*\*\/)?[\w-]+\.(scss|css)$/);
+  });
+
+  it('every source resolves to exactly one style file', () => {
+    const sources = [...Object.values(ROLE_SOURCES).map((r) => r.source), ...Object.values(HEIGHTS).map(([, source]) => source)].filter(Boolean);
+    for (const source of new Set(sources)) expect(() => resolveStyleSource(STYLES, source), source).not.toThrow();
+  });
+});
+
 /** A token's px value, followed through the scale files (`--a: var(--b)` or `Npx`). */
-const scaleSrc = ['tokens/_scales.scss', 'tokens/ladder/_semantics.scss', 'tokens/ladder/_templates.scss', 'tokens/ladder/_components.scss']
-  .map((f) => readFileSync(resolve(SRC, f), 'utf8'))
+const scaleSrc = ['_scales.scss', '_semantics.scss', '_templates.scss', '_components.scss']
+  .map((name) => readFileSync(styleOf(name), 'utf8'))
   .join('\n');
 const px = (token) => {
   const m = scaleSrc.match(new RegExp(`${token}:\\s*([^;]+);`));
@@ -49,7 +68,7 @@ const px = (token) => {
 describe('every drawn height is its token, halved', () => {
   for (const [role, [token, source, drawn]] of Object.entries(HEIGHTS)) {
     it(role, () => {
-      expect(readFileSync(resolve(SRC, source), 'utf8')).toMatch(new RegExp(`${token}(?![\\w-])`));
+      expect(readFileSync(styleOf(source), 'utf8')).toMatch(new RegExp(`${token}(?![\\w-])`));
       expect(drawn, `${role}: ${token} is ${px(token)}px, so the kit draws it ${px(token) / 2} high`).toBe(px(token) / 2);
     });
   }
