@@ -12,7 +12,7 @@ The visual mark of PLUS, shown with or without the wordmark.
 
 Use the logo to mark PLUS in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.
 
-The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, wider letter gaps, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.
+The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, letter gaps set for the logo, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.
 
 ```jsx
 import { Logo } from '@/components';

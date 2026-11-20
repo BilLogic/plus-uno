@@ -3,114 +3,86 @@ import PropTypes from 'prop-types';
 import { Logo } from '@/components';
 import { LOGO_SIZES } from '@/assets/Logo/Logo';
 import { WORDMARKS } from '@/assets/Logo/logoArt';
+import { Illustration } from '../illustrations/Illustration.jsx';
+import { Measure, Zone } from '../illustrations/construction.jsx';
+import { PAINT } from '../illustrations/paint.js';
+import { Rule } from '../illustrations/primitives.jsx';
+import { ROUNDED_ENDS, SQUARE_ENDS, STEP_CAP } from './wordmarkSteps.js';
 import './LogoWordmark.scss';
 
 /**
  * The Logos page's wordmark figures: the lockup at every size, the four steps
  * from the font to the logo's wordmark, the lockup rule, and two Don't
  * figures. Lockups and step 3 are the real Logo component and its exported
- * outlines; steps 0 to 2 set live Google Sans Flex so the font's own shapes
- * show before the brand tweaks.
+ * outlines; steps 0 to 2 draw the font's own outlines (see wordmarkSteps.js).
+ * The step drawings and the rule are illustration-kit compositions.
  */
 
 /** The lockup sizes, largest first, each with the wordmark drawn for it. */
 export const LOCKUP_SIZES = LOGO_SIZES.filter((s) => WORDMARKS[s]).sort((a, b) => b - a);
 
-/** Capitals are 716 font units tall; the logo's letter gaps as a share of that. */
-const CAP = WORDMARKS[96].cap;
+const CAP = STEP_CAP;
+/** The logo's letter gaps in font units: P–L 12%, L–U 6%, U–S 10% of the cap. */
 const LOGO_GAPS = [88, 46, 72];
+/** Drawing scale: one font unit is this many drawing units, so the cap is about 143. */
+const K = 0.2;
+const DRAW_CAP = CAP * K;
+const PAD = 24;
+const percent = (units) => `${Math.round((units / CAP) * 100)}%`;
+const px = (units) => +(units * K).toFixed(2);
 
-/**
- * True ink of the drawn 48 instance (weight 530, optical size 48, rounded
- * ends), in font units, measured from the font file: [ink left, ink right].
- * The U is the raw, uncarved width: the 96% carve about its center is undone.
- */
-const TRUE_INK = {
-    P: [71.0, 567.0],
-    L: [71.0, 501.0],
-    U: [43.74, 592.74],
-    S: [34.62, 536.5],
-};
-const LETTERS = ['P', 'L', 'U', 'S'];
-
-/** Lay the four letters ink to ink with the logo's gaps, on the true ink of the drawn instance. */
-function lay(gaps) {
+/** Where each letter's ink starts, given the gaps between them: a target left edge per letter. */
+function layout(ink, gaps) {
     let x = 0;
-    const letters = LETTERS.map((k, i) => {
-        const [l, r] = TRUE_INK[k];
-        const letter = { k, tx: x - l, l: x, r: x + (r - l) };
+    return ink.map(([l, r], i) => {
+        const at = { from: l, left: x, right: x + (r - l) };
         x += r - l + (i < 3 ? gaps[i] : 0);
-        return letter;
+        return at;
     });
-    return { letters, width: x };
 }
 
-const PAD = 130;
-const percent = (units) => `${Math.round((units / CAP) * 100)}%`;
+/** The font's own gaps, from the ink edges of its drawn letters. */
+const gapsOf = (ink) => [0, 1, 2].map((i) => ink[i + 1][0] - ink[i][1]);
 
-const Frame = ({ width, label, children }) => (
-    <svg
-        className="logo-wm__svg"
-        viewBox={`${-PAD} -150 ${width + PAD * 2} 1180`}
-        role="img"
-        aria-label={label}
-    >
-        {children}
-        <line className="logo-wm__dash" x1={-PAD} y1="0" x2={width + PAD} y2="0" />
-        <line className="logo-wm__dash" x1={-PAD} y1={CAP} x2={width + PAD} y2={CAP} />
-    </svg>
-);
-Frame.propTypes = { width: PropTypes.number.isRequired, label: PropTypes.string.isRequired, children: PropTypes.node };
-
-/** The gap redline under a gap: a bracket and its share of the cap. */
-const Redline = ({ from, to }) => (
-    <g>
-        <rect className="logo-wm__band" x={from} y="0" width={to - from} height={CAP} />
-        <line className="logo-wm__line" x1={from} y1="830" x2={to} y2="830" />
-        <line className="logo-wm__line" x1={from} y1="795" x2={from} y2="865" />
-        <line className="logo-wm__line" x1={to} y1="795" x2={to} y2="865" />
-        <text className="logo-wm__label" x={(from + to) / 2} y="960">{percent(to - from)}</text>
-    </g>
-);
-Redline.propTypes = { from: PropTypes.number.isRequired, to: PropTypes.number.isRequired };
-
-/** Live Google Sans Flex letters, each placed by its true ink so the gaps read exact. */
-const LiveLetters = ({ laid }) => (
-    <g>
-        {laid.letters.map((letter) => (
-            <text key={letter.k} className="logo-wm__letter logo-wm__letter--round" fontWeight={530} x={letter.tx} y={CAP}>
-                {letter.k}
-            </text>
+const Letters = ({ paths, placed }) => (
+    <g fill="var(--ds-text)">
+        {paths.map((d, i) => (
+            <path key={i} d={d} transform={`translate(${px(placed ? placed[i].left - placed[i].from : 0)} 0) scale(${K})`} />
         ))}
     </g>
 );
-LiveLetters.propTypes = { laid: PropTypes.object.isRequired };
+Letters.propTypes = { paths: PropTypes.arrayOf(PropTypes.string).isRequired, placed: PropTypes.array };
 
-/** The word set as the font spaces it, at the square or rounded ends. */
-const FontWord = ({ rounded }) => (
-    <text
-        className={`logo-wm__letter logo-wm__letter--${rounded ? 'round' : 'square'}`}
-        fontWeight={530}
-        x={rounded ? -TRUE_INK.P[0] : -52}
-        y={CAP}
-    >
-        PLUS
-    </text>
+/** The cap-height guides across a step drawing. */
+const CapLines = ({ width }) => (
+    <>
+        <Rule x1={-PAD} y1="0" x2={width + PAD} y2="0" stroke={PAINT.measureLine} dash="4 3" />
+        <Rule x1={-PAD} y1={DRAW_CAP} x2={width + PAD} y2={DRAW_CAP} stroke={PAINT.measureLine} dash="4 3" />
+    </>
 );
-FontWord.propTypes = { rounded: PropTypes.bool };
+CapLines.propTypes = { width: PropTypes.number.isRequired };
+
+/** A gap tint with its measure under it, labeled in % of the cap. */
+const GapRedline = ({ from, to }) => (
+    <>
+        <Zone x={px(from)} y={0} w={px(to - from)} h={DRAW_CAP} opacity={0.6} />
+        <Measure x={px(from)} y={DRAW_CAP + 28} w={px(to - from)} tick={6} label={percent(to - from)} />
+    </>
+);
+GapRedline.propTypes = { from: PropTypes.number.isRequired, to: PropTypes.number.isRequired };
 
 const STEPS = [
     {
         title: 'The font out of the box',
-        body: 'Google Sans Flex capitals at weight 530 with the font’s own spacing (gaps of 9%, 5% and 6% of the cap) and square stroke ends. This is the starting point.',
+        body: 'Google Sans Flex capitals at weight 530 and optical size 48, with the font’s own spacing and square stroke ends. This is the starting point.',
     },
     {
         title: 'Rounded ends',
-        body: 'The font’s rounded-ends axis is turned on, so every stroke end gets the same soft cut as the plus’s arm ends.',
+        body: 'The font’s rounded-ends axis is turned on, so every stroke end gets the same soft cut as the plus’s arm ends. The spacing is unchanged.',
     },
     {
         title: 'Logo letter spacing',
-        body: 'The font is spaced for running text, where capitals sit too close for a logo. The logo’s gaps, as a share of the cap height, are P–L 12%, L–U 6% and U–S 10% (the font gives 9%, 5% and 6%).',
+        body: 'The logo sets its own gaps, as a share of the cap height: P–L 12%, L–U 6% and U–S 10%. They sit on the letters’ true edges, so they read the same at every size.',
     },
     {
         title: 'The U at 96%',
@@ -118,43 +90,45 @@ const STEPS = [
     },
 ];
 
-/** The U in the 48 outlines: it starts where the uncarved U would and is 96% as wide. */
-const U_NARROWED = (TRUE_INK.U[1] - TRUE_INK.U[0]) * 0.96;
-const U_LEFT = lay(LOGO_GAPS).letters[2].l;
+const stepFigure = (step) => {
+    if (step === 3) {
+        const set = WORDMARKS[48];
+        const placed = layout(ROUNDED_ENDS.ink, LOGO_GAPS);
+        const uWidth = (placed[2].right - placed[2].left) * 0.96;
+        const width = px(set.width);
+        return (
+            <Illustration viewBox={`${-PAD} ${-PAD} ${width + PAD * 2} ${DRAW_CAP + PAD * 2 + 40}`} scale={1} title="PLUS wordmark with the U narrowed to 96% of its width">
+                <CapLines width={width} />
+                <Zone x={px(placed[2].left)} y={0} w={px(uWidth)} h={DRAW_CAP} opacity={0.6} />
+                <Letters paths={set.paths} />
+                <Measure x={px(placed[2].left)} y={DRAW_CAP + 28} w={px(uWidth)} tick={6} label="U 96%" />
+            </Illustration>
+        );
+    }
+    const data = step === 0 ? SQUARE_ENDS : ROUNDED_ENDS;
+    const placed = step === 2 ? layout(data.ink, LOGO_GAPS) : null;
+    const ink = placed ? placed.map((p) => [p.left, p.right]) : data.ink;
+    const width = px(ink[3][1]);
+    const gaps = placed ? LOGO_GAPS : gapsOf(data.ink);
+    const names = ['the font out of the box', 'rounded ends', 'logo letter spacing'];
+    return (
+        <Illustration viewBox={`${-PAD} ${-PAD} ${width + PAD * 2} ${DRAW_CAP + PAD * 2 + 40}`} scale={1} title={`PLUS wordmark, ${names[step]}`}>
+            <CapLines width={width} />
+            {[0, 1, 2].map((i) => <GapRedline key={i} from={ink[i][1]} to={ink[i][1] + gaps[i]} />)}
+            <Letters paths={data.paths} placed={placed} />
+        </Illustration>
+    );
+};
 
 /**
- * One step of the wordmark build, 0 to 3. Steps 0 to 2 are live text; step 3
- * is the exported 48 outlines with the U highlighted.
+ * One step of the wordmark build, 0 to 3. Steps 0 to 2 draw the font's own
+ * outlines; step 3 is the exported 48 outlines with the U marked.
  */
 export const WordmarkStep = ({ step }) => {
     const meta = STEPS[step];
-    let figure;
-    if (step === 3) {
-        const outline = WORDMARKS[48];
-        figure = (
-            <Frame width={outline.width} label="PLUS wordmark with the U highlighted at 96% of its width">
-                <rect className="logo-wm__band" x={U_LEFT} y="0" width={U_NARROWED} height={CAP} />
-                <g>
-                    {outline.paths.map((d, i) => (
-                        <path key={i} className="logo-wm__outline" d={d} />
-                    ))}
-                </g>
-                <text className="logo-wm__label" x={U_LEFT + U_NARROWED / 2} y="960">U 96% wide</text>
-            </Frame>
-        );
-    } else {
-        const laid = lay(LOGO_GAPS);
-        const width = step === 2 ? laid.width : WORDMARKS[48].width;
-        figure = (
-            <Frame width={width} label={`PLUS wordmark, ${meta.title.toLowerCase()}`}>
-                {step === 2 ? <LiveLetters laid={laid} /> : <FontWord rounded={step === 1} />}
-                {step === 2 && laid.letters.slice(0, 3).map((a, i) => <Redline key={a.k} from={a.r} to={laid.letters[i + 1].l} />)}
-            </Frame>
-        );
-    }
     return (
         <figure className="logo-wm" data-step={step}>
-            {figure}
+            {stepFigure(step)}
             <figcaption className="logo-wm__caption">
                 <strong>{step} · {meta.title}.</strong> {meta.body}
             </figcaption>
@@ -175,27 +149,30 @@ export const LockupSizes = () => (
     </ul>
 );
 
+const RULE_PAD_X = 36;
+const RULE_PAD_Y = 32;
+
 /** The lockup rule drawn over the real lockup at 96: cap half the mark, gap a quarter, centered. */
 export const LockupRule = () => {
     const set = WORDMARKS[96];
     const width = 96 + 24 + (set.width * 48) / set.cap;
+    const vbW = width + RULE_PAD_X * 2;
+    const vbH = 96 + RULE_PAD_Y * 2;
     return (
-        <div className="logo-rule" data-testid="lockup-rule">
-          <div className="logo-rule__stage">
-            <Logo size={96} wordmark />
-            <svg className="logo-rule__overlay" viewBox={`0 0 ${width.toFixed(1)} 96`} aria-hidden="true">
-                <line className="logo-wm__dash" x1="96" y1="24" x2={width} y2="24" />
-                <line className="logo-wm__dash" x1="96" y1="72" x2={width} y2="72" />
-                <line className="logo-wm__line" x1={width + 8} y1="24" x2={width + 8} y2="72" />
-                <text className="logo-rule__label" x={width + 20} y="52">½</text>
-                <line className="logo-wm__line" x1="96" y1="-8" x2="120" y2="-8" />
-                <line className="logo-wm__line" x1="96" y1="-12" x2="96" y2="-4" />
-                <line className="logo-wm__line" x1="120" y1="-12" x2="120" y2="-4" />
-                <text className="logo-rule__label" x="108" y="-18">¼</text>
-                <line className="logo-wm__line" x1="-8" y1="0" x2="-8" y2="96" />
-                <text className="logo-rule__label" x="-20" y="52">1</text>
-            </svg>
-          </div>
+        <div className="logo-rule" data-testid="lockup-rule" style={{ inlineSize: `${vbW}px` }}>
+            <Illustration viewBox={`${-RULE_PAD_X} ${-RULE_PAD_Y} ${vbW} ${vbH}`} scale={1} title="The lockup rule: the wordmark's cap height is half the logomark, the gap is a quarter, and it is centered">
+                <Rule x1="96" y1="24" x2={width} y2="24" stroke={PAINT.measureLine} dash="4 3" />
+                <Rule x1="96" y1="72" x2={width} y2="72" stroke={PAINT.measureLine} dash="4 3" />
+                <Measure x={width + 10} y={24} h={48} side="right" tick={4} label="½" />
+                <Measure x={96} y={-10} w={24} side="top" tick={4} label="¼" />
+                <Measure x={-10} y={0} h={96} side="left" tick={4} label="1" />
+            </Illustration>
+            <Logo
+                className="logo-rule__logo"
+                size={96}
+                wordmark
+                style={{ insetInlineStart: `${(RULE_PAD_X / vbW) * 100}%`, insetBlockStart: `${(RULE_PAD_Y / vbH) * 100}%` }}
+            />
         </div>
     );
 };
@@ -217,15 +194,7 @@ export const TrackedWordmarkFigure = () => {
     return (
         <span className="logo-dont">
             <Logo size={64} />
-            <svg
-                className="logo-dont__tracked"
-                role="img"
-                aria-label="PLUS wordmark tracked out"
-                width={width}
-                height={32}
-                viewBox={`0 0 ${width} 32`}
-                style={{ marginInlineStart: 'var(--stack-lg)' }}
-            >
+            <svg className="logo-dont__tracked" role="img" aria-label="PLUS wordmark tracked out" width={width} height={32} viewBox={`0 0 ${width} 32`}>
                 <g transform={`scale(${scale})`}>
                     {set.paths.map((d, i) => (
                         <path key={i} d={d} transform={`translate(${i * track} 0)`} />

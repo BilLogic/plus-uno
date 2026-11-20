@@ -56980,7 +56980,7 @@
 				"\n",
 				"Use the logo to mark PLUS in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.\n",
 				"\n",
-				"The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, wider letter gaps, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.\n",
+				"The wordmark is Google Sans Flex, the product's type family, with four brand tweaks: rounded ends, letter gaps set for the logo, a slightly narrower U and a weight tuned to each lockup size. It is drawn as outlines, so it never waits on a web font.\n",
 				"\n",
 				"```jsx\n",
 				"import { Logo } from '@/components';\n",

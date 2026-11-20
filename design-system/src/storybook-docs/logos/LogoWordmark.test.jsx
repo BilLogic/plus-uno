@@ -21,27 +21,26 @@ describe('LogoWordmark figures', () => {
 
     it('redlines the three gaps at 12%, 6% and 10% of the cap in step 2', () => {
         const { container } = render(<WordmarkStep step={2} />);
-        const labels = [...container.querySelectorAll('.logo-wm__label')].map((n) => n.textContent);
+        const labels = [...container.querySelectorAll('[data-part="measure"] text')].map((n) => n.textContent);
         expect(labels).toEqual(['12%', '6%', '10%']);
     });
 
-    it('shows the font as it ships in step 0, square ends and no redlines', () => {
-        const { container } = render(<WordmarkStep step={0} />);
-        expect(container.querySelectorAll('.logo-wm__letter--square')).toHaveLength(1);
-        expect(container.textContent).toContain('9%, 5% and 6%');
-        expect(container.querySelectorAll('.logo-wm__label')).toHaveLength(0);
-    });
-
-    it('rounds the ends from step 1', () => {
-        const { container } = render(<WordmarkStep step={1} />);
-        expect(container.querySelectorAll('.logo-wm__letter--round')).toHaveLength(1);
+    it('draws steps 0 and 1 as outlines with the font\'s own measured gaps', () => {
+        for (const step of [0, 1]) {
+            const { container, unmount } = render(<WordmarkStep step={step} />);
+            expect(container.querySelectorAll('svg path')).toHaveLength(4);
+            expect(container.querySelectorAll('text:not([data-part] text)').length).toBe(0);
+            const labels = [...container.querySelectorAll('[data-part="measure"] text')].map((n) => n.textContent);
+            expect(labels).toHaveLength(3);
+            expect(labels).not.toEqual(['12%', '6%', '10%']);
+            unmount();
+        }
     });
 
     it('draws step 3 from the exported outlines and labels the U', () => {
         const { container } = render(<WordmarkStep step={3} />);
-        expect(container.querySelectorAll('text.logo-wm__letter')).toHaveLength(0);
-        expect(container.querySelectorAll('.logo-wm__outline')).toHaveLength(4);
-        expect(screen.getByText('U 96% wide')).toBeInTheDocument();
+        expect(container.querySelectorAll('svg path')).toHaveLength(4);
+        expect(screen.getByText('U 96%')).toBeInTheDocument();
     });
 
     it('draws the lockup rule over the real lockup', () => {
