@@ -451,6 +451,22 @@ describe('DatePicker, in a form', () => {
         expect(field()).toHaveValue('10/21/2026');
     });
 
+    it('submits a range as start/end, with an empty side when one end is unset', async () => {
+        const user = userEvent.setup();
+        const { container } = render(
+            <form>
+                <Dated text="Session dates" name="span" range />
+            </form>,
+        );
+        const form = container.querySelector('form');
+        expect(submitted(form)).toEqual([['span', '']]);
+        await user.type(field('Session dates'), '10/19/2026{Enter}');
+        expect(submitted(form)).toEqual([['span', '2026-10-19/']]);
+        await user.clear(field('Session dates'));
+        await user.type(field('Session dates'), '10/19/2026 – 10/23/2026{Enter}');
+        expect(submitted(form)).toEqual([['span', '2026-10-19/2026-10-23']]);
+    });
+
     it('does not submit a disabled field', () => {
         const { container } = render(
             <form>

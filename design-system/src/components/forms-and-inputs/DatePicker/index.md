@@ -20,7 +20,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 ## Usage
 
-Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.
+Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period. The form value is ISO `YYYY-MM-DD` (`start/end` for a range); the field shows what was typed.
 
 ## Motion
 

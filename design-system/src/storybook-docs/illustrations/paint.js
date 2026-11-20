@@ -241,7 +241,9 @@ export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
  * width it reads at true size.
  */
 export const LABEL_ROLE = { font: 'var(--heading-xs)' };
-export const LABEL_FONT = { fontSize: '0.5em' }; // docs-literal: half the label role's size, which no token holds; a drawing shows at up to twice its viewBox
+// Half the label role's size, which no token holds; a drawing shows at up to twice its viewBox.
+// `0.5em` reads the size LABEL_ROLE sets, so text drawn with LABEL_FONT must sit inside a LABEL_ROLE group.
+export const LABEL_FONT = { fontSize: '0.5em' }; // docs-literal: no token is half a text role
 
 /**
  * Mono label for construction-kit brackets and zone callouts, at 1:1 scale: the

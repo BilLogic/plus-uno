@@ -8624,7 +8624,7 @@
 					"\n",
 					"## Usage\n",
 					"\n",
-					"Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.\n",
+					"Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period. The form value is ISO `YYYY-MM-DD` (`start/end` for a range); the field shows what was typed.\n",
 					"\n",
 					"## Motion\n",
 					"\n",
@@ -8821,7 +8821,7 @@
 				"docsPage": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
 			},
 			"rankedText": {
-				"usage": "Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period.",
+				"usage": "Use `DatePicker` for a single date or a date range typed or chosen from a popup calendar, such as a session date or a billing period. The form value is ISO `YYYY-MM-DD` (`start/end` for a range); the field shows what was typed.",
 				"best": {
 					"$lines": [
 						"### Typing is checked on Enter or on leaving the field.\n",
@@ -9505,7 +9505,7 @@
 					"\n",
 					"## Usage\n",
 					"\n",
-					"Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.\n",
+					"Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline. The date's form value is ISO `YYYY-MM-DD`; the field shows what was typed.\n",
 					"\n",
 					"## Motion\n",
 					"\n",
@@ -9702,7 +9702,7 @@
 				"docsPage": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
 			},
 			"rankedText": {
-				"usage": "Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline.",
+				"usage": "Use `DateTimePicker` when a date and a time are one combined answer, such as a session's start or a deadline. The date's form value is ISO `YYYY-MM-DD`; the field shows what was typed.",
 				"best": {
 					"$lines": [
 						"### `onChange` reports the date, the time and the combined moment.\n",
