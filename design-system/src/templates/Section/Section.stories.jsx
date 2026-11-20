@@ -688,7 +688,7 @@ export const TypeSubsections = {
 
 /* ---- header rows */
 
-/** Every control in a header row is 32 (Tag 20): measured, not assumed. */
+/** Every control in a header row is 32 (Tag 20): measured, not assumed; a segmented control is measured by its track, not its inset segments. */
 const expectOneHeight = async (canvasElement) => {
     const header = canvasElement.querySelector('.plus-template-section-header');
     const controls = [...header.querySelectorAll('button, input')].filter((el) => {
@@ -696,7 +696,7 @@ const expectOneHeight = async (canvasElement) => {
         return box.height > 0 && !el.closest('.plus-section-row__views') && el.type !== 'hidden';
     });
     controls.forEach((el) => {
-        const box = (el.closest('.plus-search-field') ?? el).getBoundingClientRect();
+        const box = (el.closest('.plus-search-field, .plus-segmented-control') ?? el).getBoundingClientRect();
         expect(Math.round(box.height), `${el.getAttribute('aria-label') ?? el.textContent} draws 32`).toBe(32);
     });
     header.querySelectorAll('.plus-tag').forEach((tag) => {

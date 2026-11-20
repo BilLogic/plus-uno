@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, IconButton, Tabs as TabsComponent } from '@/components';
+import { Button, Checkbox, CountTag, DynamicTable, SegmentedControl, Tabs as TabsComponent } from '@/components';
 
 /**
  * The parts a Section example hands to its header slots and the rows it acts
@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, IconButton, Tabs
  * part is the real PLUS component; only the arrangement lives here.
  *
  *   ViewPills       pill views: a fixed set, one pill even with one view
- *   FormatSwitch    equal-width segments
+ *   FormatSwitch    the Table / Cards segmented control
  *   StudentsTable   a Dynamic table of tutoring rows (STUDENTS)
  *   FilterSide      the filter side: "Reset filters" at its top, a count per category
  *   useLayerMount   an element an open menu mounts in, so a picture keeps it
@@ -92,24 +92,19 @@ export const ViewPills = ({ views, activeView, onViewChange }) => {
     );
 };
 
-/** The format switch: equal-width segments, first on the right. */
-export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFormatChange }) => {
-    const [uncontrolled, setUncontrolled] = useState('table');
-    const format = controlledFormat ?? uncontrolled;
-    const handleSelect = (next) => {
-        if (controlledFormat === undefined) setUncontrolled(next);
-        onFormatChange?.(next);
-    };
-    return (
-        <ButtonGroup label="Format">
-            {[['table', 'table-list', 'Table'], ['cards', 'grip', 'Cards']].map(([key, icon, label]) => (
-                iconsOnly
-                    ? <IconButton key={key} icon={icon} label={label} isSelected={format === key} onClick={() => handleSelect(key)} />
-                    : <Button key={key} text={label} iconBefore={icon} isSelected={format === key} onClick={() => handleSelect(key)} />
-            ))}
-        </ButtonGroup>
-    );
-};
+/** The format switch: a segmented control, Table then Cards. */
+export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFormatChange }) => (
+    <SegmentedControl
+        label="Format"
+        value={controlledFormat}
+        defaultValue="table"
+        onChange={onFormatChange}
+        options={[
+            { value: 'table', label: 'Table', icon: 'table-list', isIconOnly: iconsOnly },
+            { value: 'cards', label: 'Cards', icon: 'grip', isIconOnly: iconsOnly },
+        ]}
+    />
+);
 
 export const FILTERS = [
     ['Grade', ['Grade 6', 'Grade 7', 'Grade 8']],

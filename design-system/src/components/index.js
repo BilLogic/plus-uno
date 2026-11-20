@@ -40,6 +40,7 @@ export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
 export { default as SearchField, SEARCH_DEBOUNCE_MS, SEARCH_FIELD_MODES, SEARCH_FIELD_SPACINGS, SearchFieldAction } from '@/components/forms-and-inputs/SearchField';
+export { default as SegmentedControl, SEGMENTED_CONTROL_SPACINGS } from '@/components/forms-and-inputs/SegmentedControl';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
 export { default as SettingRow } from '@/components/forms-and-inputs/SettingRow';
 export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';

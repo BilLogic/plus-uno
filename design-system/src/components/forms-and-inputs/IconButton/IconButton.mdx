@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { IconButton, Button, ButtonGroup } from '@/components';
+import { IconButton, Button, SegmentedControl } from '@/components';
 import * as IconButtonStories from './IconButton.stories.jsx';
 import {
     ComponentExample,
@@ -286,11 +286,11 @@ If you cannot find a suitable glyph in five seconds, it probably will not commun
 
 ### Group icon buttons that act together.
 
-Put related icon buttons in a `ButtonGroup`, and use `isSelected` for a choice between views.
+Put related icon buttons in a `ButtonGroup`. For a choice between views, use `SegmentedControl` with icon-only segments instead of selected icon buttons.
 
 <DoDontPair
-    doExample={<ButtonGroup label="View"><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></ButtonGroup>}
-    doCaption="Grid and list views joined in one group, with the current view selected."
+    doExample={<SegmentedControl label="View" defaultValue="grid" options={[{ value: 'grid', label: 'Grid view', icon: 'grip', isIconOnly: true }, { value: 'list', label: 'List view', icon: 'list', isIconOnly: true }]} />}
+    doCaption="Grid and list views in one segmented control, with the current view selected."
     dontExample={<FigureRow><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></FigureRow>}
     dontCaption="The same two views as loose buttons read as unrelated actions."
 />
@@ -334,6 +334,7 @@ Put related icon buttons in a `ButtonGroup`, and use `isSelected` for a choice b
 - `LinkIconButton`: use when the icon navigates to another page or URL.
 - `CloseButton`: use when dismissing a modal, message or flag.
 - `ButtonGroup`: use when grouping related icon buttons into one control.
+- `SegmentedControl`: use when the icons switch between views of the same content.
 
 </div>
 

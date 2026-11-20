@@ -51,6 +51,7 @@ import {
     Rating,
     SearchField,
     SectionMessage,
+    SegmentedControl,
     Select,
     SettingRow,
     Skeleton,
@@ -765,6 +766,17 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 }]}
                 expandedIds={step === 'landing' ? ['lincoln'] : []}
                 onExpandedChange={NOOP}
+            />
+        </div>
+    ),
+
+    SegmentedControl: ({ step }) => (
+        <div style={{ width: '100%' }}>
+            <SegmentedControl
+                label="Roster view"
+                options={[{ value: 'table', label: 'Table' }, { value: 'cards', label: 'Cards' }]}
+                value={step === 'landing' ? 'cards' : 'table'}
+                onChange={NOOP}
             />
         </div>
     ),

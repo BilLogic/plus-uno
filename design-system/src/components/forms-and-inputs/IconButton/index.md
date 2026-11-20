@@ -84,9 +84,9 @@ If you cannot find a suitable glyph in five seconds, it probably will not commun
 
 ### Group icon buttons that act together. {#group-icon-buttons-that-act-together}
 
-Put related icon buttons in a `ButtonGroup`, and use `isSelected` for a choice between views.
+Put related icon buttons in a `ButtonGroup`. For a choice between views, use `SegmentedControl` with icon-only segments instead of selected icon buttons.
 
-Do: Grid and list views joined in one group, with the current view selected.
+Do: Grid and list views in one segmented control, with the current view selected.
 Don't: The same two views as loose buttons read as unrelated actions.
 
 ## Accessibility
@@ -103,8 +103,9 @@ Don't: The same two views as loose buttons read as unrelated actions.
 - `LinkIconButton`: use when the icon navigates to another page or URL.
 - `CloseButton`: use when dismissing a modal, message or flag.
 - `ButtonGroup`: use when grouping related icon buttons into one control.
+- `SegmentedControl`: use when the icons switch between views of the same content.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

@@ -175,6 +175,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SearchField | component | exit | Update a value or state | `--ds-motion-appearance-fast` |  |
 | SectionMessage | component | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | SectionMessage | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| SegmentedControl | component | change | Switch views | `--ds-motion-spatial-fast` |  |
 | Select | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Select | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | SettingRow | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

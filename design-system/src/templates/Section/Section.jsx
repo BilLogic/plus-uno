@@ -450,7 +450,7 @@ Section.propTypes = {
      * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
      */
     views: PropTypes.node,
-    /** Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.
+    /** Row 2, at the end: the format switch (Table / Cards), a `SegmentedControl`. With no `views` it moves to the end of row 3.
      * @ds-context Used in: Section.format (ds guide section)
      * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
      */

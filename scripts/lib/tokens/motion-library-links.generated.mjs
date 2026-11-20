@@ -45,6 +45,7 @@ export const MOTION_LIBRARY_LINKS = Object.freeze({
   "component:Rating": "?path=/docs/components-forms-and-inputs-rating--docs#motion",
   "component:SearchField": "?path=/docs/components-forms-and-inputs-search-field--docs#motion",
   "component:SectionMessage": "?path=/docs/components-messaging-section-message--docs#motion",
+  "component:SegmentedControl": "?path=/docs/components-forms-and-inputs-segmented-control--docs#motion",
   "component:Select": "?path=/docs/components-forms-and-inputs-select-select--docs#motion",
   "component:SettingRow": "?path=/docs/components-forms-and-inputs-setting-row--docs#motion",
   "component:Skeleton": "?path=/docs/components-loading-skeleton--docs#motion",

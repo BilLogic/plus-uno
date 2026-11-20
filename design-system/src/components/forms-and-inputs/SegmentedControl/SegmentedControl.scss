@@ -1,0 +1,171 @@
+@use '../../../styles/state' as *;
+
+/*
+ * Segmented control: a track holding 2-5 segments, with one raised indicator
+ * under the selected one. Height comes from the control roles (32 or 24), the
+ * track's inset from `--pad-y-sm`, corners from the control radius (the
+ * indicator's is the track's less the inset, so the two stay concentric).
+ *
+ * Colors: the track is the neutral fill, which reads on the sunken page and
+ * on white alike; the indicator is the raised surface with its shadow. A
+ * raised fill is only 1.1 to 1.2:1 against that track, so the indicator also
+ * carries a 1px neutral edge: `border` (a quiet hairline that rises to 3:1 or
+ * better in both increased-contrast themes) and, in dark, `border.bold`, which
+ * is 3.3:1 or better there (WCAG 1.4.11). The selected label is the strong text
+ * color and the rest are subtle. Hover and press on an unselected segment are
+ * the neutral steps with the strong text color, so the label keeps 4.5:1 on the stacked fill.
+ *
+ * The indicator is one persistent element, measured and placed under the
+ * selected segment at rest (see SegmentedControl.jsx); the segments draw no
+ * fill of their own for the selection.
+ */
+
+.plus-segmented-control {
+    --_sc-height: var(--control-md);
+    --_sc-radius: var(--radius-control-md);
+    --_sc-pad-x: var(--pad-x-md);
+    --_sc-inset: var(--pad-y-sm);
+    --_sc-item-height: calc(var(--_sc-height) - 2 * var(--_sc-inset));
+    --_sc-item-radius: calc(var(--_sc-radius) - var(--_sc-inset));
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    box-sizing: border-box;
+    height: var(--_sc-height);
+    padding: var(--_sc-inset);
+    gap: 0;
+    // A control that does not fit shrinks its segments, each label ending in an ellipsis.
+    max-width: 100%;
+    background-color: var(--ds-background-neutral);
+    border-radius: var(--_sc-radius);
+
+    &--spacing-compact {
+        --_sc-height: var(--control-sm);
+        --_sc-radius: var(--radius-control-sm);
+        --_sc-pad-x: var(--pad-x-sm);
+    }
+
+    &--fit-container {
+        display: flex;
+        width: 100%;
+
+        .plus-segmented-control__item {
+            flex: 1 1 0;
+        }
+    }
+}
+
+.plus-segmented-control__indicator {
+    // Hidden until it has been measured, so it never flashes at the track's corner.
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 0;
+    border: var(--border-width-default) solid light-dark(var(--ds-border), var(--ds-border-bold));
+    border-radius: var(--_sc-item-radius);
+    background-color: var(--ds-surface-raised);
+    box-shadow: var(--ds-shadow-raised);
+
+    &[data-ready='true'] {
+        visibility: visible;
+    }
+}
+
+.plus-segmented-control__item {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--inline-sm);
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    min-width: 0;
+    height: var(--_sc-item-height);
+    margin: 0;
+    padding: 0 var(--_sc-pad-x);
+    border: none;
+    border-radius: var(--_sc-item-radius);
+    background-color: transparent;
+    color: var(--ds-text-subtle);
+    @include ds-type(var(--body-default), var(--type-weight-medium));
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-hovered), color: var(--ds-text)),
+            pressed: (background-color: var(--ds-background-neutral-pressed), color: var(--ds-text)),
+            disabled: (color: var(--ds-text-disabled)),
+        ),
+        $ring-offset: calc(-1 * var(--focus-ring-width))
+    );
+
+    .plus-segmented-control__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: var(--icon-md);
+        line-height: 1;
+        color: var(--ds-icon-subtle);
+
+        i {
+            font-size: inherit;
+            width: auto;
+            line-height: inherit;
+        }
+    }
+
+    .plus-segmented-control__text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &--icon-only {
+        width: var(--_sc-item-height);
+        padding: 0;
+        flex: 0 0 auto;
+    }
+
+    // The selected segment: the default ink. Its chip is the indicator beneath it.
+    &[data-pressed],
+    &[aria-pressed='true'] {
+        color: var(--ds-text);
+
+        .plus-segmented-control__icon {
+            color: var(--ds-icon);
+        }
+
+        // The chip is the indicator beneath, so the selected segment draws no fill of its own, hovered or pressed.
+        @include plus-state(
+            $states: (
+                hovered: (background-color: transparent, color: var(--ds-text)),
+                pressed: (background-color: transparent, color: var(--ds-text)),
+            ),
+            $ring: false
+        );
+    }
+
+    &:disabled,
+    &[data-disabled] {
+        color: var(--ds-text-disabled);
+
+        .plus-segmented-control__icon {
+            color: var(--ds-icon-disabled);
+        }
+    }
+}
+
+@media (forced-colors: active) {
+    .plus-segmented-control__indicator {
+        border-color: Highlight;
+    }
+}
