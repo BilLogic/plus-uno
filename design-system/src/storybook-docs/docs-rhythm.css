@@ -477,7 +477,8 @@
     inline-size: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /* `safe`: a figure wider than the well starts at the well's edge and scrolls, instead of spilling out of both sides. */
+    align-items: safe center;
     justify-content: center;
 }
 

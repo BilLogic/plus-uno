@@ -268,7 +268,9 @@ const AnatomyItem = ({ title, token, children, figure }) => (
     }}
   >
     {figure}
-    <figcaption style={{ display: "grid", gap: "var(--stack-sm)" }}>
+    <figcaption
+      style={{ display: "grid", gap: "var(--stack-sm)", minWidth: 0, overflowWrap: "anywhere" }}
+    >
       <strong
         style={{
           font: "var(--body-default)",
