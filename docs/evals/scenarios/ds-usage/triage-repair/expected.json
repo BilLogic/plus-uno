@@ -31,10 +31,10 @@
       "screen": "Record detail panel",
       "template": "Panel + Form",
       "variant": "Panel · Details / Form · In a Panel",
-      "page": "design-system/agent-views/templates/Panel.md",
+      "page": "design-system/src/templates/Panel/index.md",
       "section": "Details",
       "pages": [
-        "design-system/agent-views/templates/Panel.md",
+        "design-system/src/templates/Panel/index.md",
         "design-system/agent-views/patterns/Forms.md"
       ],
       "guides": ["panel", "form"],

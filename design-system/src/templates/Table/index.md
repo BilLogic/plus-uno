@@ -4,6 +4,12 @@
 
 Section header carries the title and the toolbar. Under the header come the table, then the `footer` slot (range, page size, Pagination), and the empty state box in place of both when there are no rows. The template draws no default footer: the slot is the contract. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. A Dynamic or Tree table already draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` serve a Static table and are not drawn around the other two. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).
 
+How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state.
+
+`StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table kinds; the template takes any of them.
+
+The examples on this page follow the toolbar's Color mode switch.
+
 Also asked as: list of records, data table on a page, sortable list, records with filters, rows and columns, grid, table pattern.
 
 **Import:** `import { Table } from '@/templates';`

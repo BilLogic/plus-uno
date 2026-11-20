@@ -36,10 +36,13 @@ export const OUT_DIR = 'design-system/agent-views';
 const ROOTS = { Templates: 'templates', Patterns: 'patterns', Foundations: 'foundations' };
 const KINDS = { Templates: 'Template', Patterns: 'Pattern', Foundations: 'Foundation' };
 
-/** Standalone template, pattern and foundation pages; attached pages use their component's agent file. */
+/**
+ * Standalone template, pattern and foundation pages; attached pages use their component's agent file.
+ * A template page attached to its stories has its file in the template's folder (`generate:component-docs`), never here.
+ */
 export function docsAgentPages(root) {
   return scanStorybookPages(root)
-    .filter((p) => p.file.endsWith('.mdx') && !p.componentSource && p.categoryRoot in ROOTS)
+    .filter((p) => p.file.endsWith('.mdx') && !p.componentSource && p.categoryRoot in ROOTS && !(p.categoryRoot === 'Templates' && p.storiesFile))
     .map((p) => ({ file: p.file, root: p.categoryRoot, kind: KINDS[p.categoryRoot], title: p.title }));
 }
 

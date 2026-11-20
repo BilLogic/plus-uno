@@ -136,7 +136,7 @@
     "file": "design-system/src/templates/Panel/Panel.mdx",
     "title": "Templates/Panel",
     "categoryRoot": "Templates",
-    "componentSource": null,
+    "componentSource": "design-system/src/templates/Panel/Panel.jsx",
     "componentName": null
   },
   {
