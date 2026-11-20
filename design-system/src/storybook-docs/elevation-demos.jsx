@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Button, DynamicTable, Popup, Toggle } from '@/components';
+import { Button, DynamicTable, Popup, SegmentedControl, Toggle } from '@/components';
 import { Page, Card } from '@/templates';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
@@ -188,13 +188,15 @@ const well = {
     font: 'var(--body-default)',
 };
 
-/** A row of pressed-state Buttons that picks one value. */
+/** A segmented control that picks one value. */
 const Choice = ({ name, options, value, onChange }) => (
-    <div role="group" aria-label={name} style={row}>
-        {options.map((o) => (
-            <Button key={o.id} text={o.label} spacing="compact" isSelected={value === o.id} onClick={() => onChange(o.id)} />
-        ))}
-    </div>
+    <SegmentedControl
+        label={name}
+        spacing="compact"
+        value={value}
+        onChange={onChange}
+        options={options.map((o) => ({ value: o.id, label: o.label }))}
+    />
 );
 
 const MODE_OPTIONS = [{ id: 'light', label: 'Light' }, { id: 'dark', label: 'Dark' }];

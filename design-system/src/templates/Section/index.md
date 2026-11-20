@@ -189,7 +189,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | Slot or prop | Holds |
 | --- | --- |
 | `title` · `description` · `actions` | The title row. |
-| `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
+| `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch (the `format` slot holds a `SegmentedControl`), then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
 | `header` · `type` | With `type="custom"` the `header` slot replaces the title and description; `title` stays as the visually hidden heading. `type` is `default` or `custom`, and is read from the slots when left off. |
 | `isLoading` | Swaps the header for skeleton bars while the Section loads. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
@@ -238,7 +238,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
 | `type` | enum | — | Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. |
 | `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
-| `format` | node | — | Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3. |
+| `format` | node | — | Row 2, at the end: the format switch (Table / Cards), a `SegmentedControl`. With no `views` it moves to the end of row 3. |
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
 | `filters` | arrayOf | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
 | `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |

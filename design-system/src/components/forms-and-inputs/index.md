@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-38 components. Each row links to the generated facts; the three columns after it are the
+39 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -76,7 +76,7 @@ authored half, counted rather than assumed.
   - For one to three quick filter triggers in a bar, use `FilterButton`.
 - **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
   - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-  - For connected view or mode buttons in a toolbar, use `ButtonGroup`.
+  - For switching between views of the same content, use `SegmentedControl`. For connected action buttons in a toolbar, use `ButtonGroup`.
 - **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
   - For an action where space allows a text label, use `Button`.
   - For an icon that navigates to another page or site, use `LinkIconButton`.
@@ -120,6 +120,11 @@ authored half, counted rather than assumed.
   - For picking a value from a known option list, use `Select`.
   - For narrowing a list by a category in a view bar, use `FilterButton`, `PopupSelect` or `FilterMenu`.
   - For general single-line text entry in a form, use `TextField`.
+- **[SegmentedControl](SegmentedControl/index.md)** — Use `SegmentedControl` to change how the same content is shown: Table or Cards, Day, Week or Month, Form or Code. The choice applies at once and there is no apply step. Exactly one segment is selected.
+  - For switching between sections of a page, each with its own content, use `Tabs`.
+  - For a row of related actions that each do something, use `ButtonGroup`.
+  - For one answer in a form that is saved with the form, use `RadioGroup`.
+  - For more than five choices, use `Select`.
 - **[Select](Select/index.md)** — Use `Select` for a form field with six or more options, where typing to filter helps more than scanning, such as a tutor roster or a school name.
   - For up to five mutually exclusive options, use `RadioGroup`.
   - For up to five multi-select options, use `CheckboxGroup`.
@@ -189,6 +194,7 @@ authored half, counted rather than assumed.
 | [Rating](Rating/index.md) | 14 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [SearchField](SearchField/index.md) | 34 | ✅ | ✅ | ✅ |
+| [SegmentedControl](SegmentedControl/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 45 | ✅ | ✅ | ✅ |
 | [SettingRow](SettingRow/index.md) | 11 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
@@ -199,7 +205,7 @@ authored half, counted rather than assumed.
 | [Toggle](Toggle/index.md) | 18 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
+**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

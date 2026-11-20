@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Icon } from '@/components';
+import { Icon, SegmentedControl } from '@/components';
 import { DocsTable, DoDontCard } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
@@ -158,19 +158,14 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <div role="group" aria-label="Color mode for these examples" style={{ display: 'inline-flex', gap: 'var(--inline-sm)' }}>
-                {MODES.map((m) => (
-                    <Button
-                        key={m.id}
-                        appearance="subtle"
-                        spacing="compact"
-                        isSelected={mode === m.id}
-                        aria-pressed={mode === m.id}
-                        onClick={() => setMode(m.id)}
-                        text={m.label}
-                    />
-                ))}
-            </div>
+            <SegmentedControl
+                label="Color mode for these examples"
+                spacing="compact"
+                style={{ alignSelf: 'flex-start' }}
+                value={mode}
+                onChange={setMode}
+                options={MODES.map((m) => ({ value: m.id, label: m.label }))}
+            />
             <div
                 style={{
                     display: 'grid',

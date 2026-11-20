@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, Sidebar, StatusTag, Tabs, TextField } from '@/components';
+import { Button, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
 import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section } from '@/templates';
 
 /**
@@ -39,10 +39,14 @@ const sessionViews = (
 );
 
 const formatSwitch = (
-    <ButtonGroup label="Format">
-        <IconButton icon="table-list" label="Table" isSelected onClick={() => {}} />
-        <IconButton icon="grip" label="Cards" onClick={() => {}} />
-    </ButtonGroup>
+    <SegmentedControl
+        label="Format"
+        defaultValue="table"
+        options={[
+            { value: 'table', label: 'Table', icon: 'table-list', isIconOnly: true },
+            { value: 'cards', label: 'Cards', icon: 'grip', isIconOnly: true },
+        ]}
+    />
 );
 
 const sessionCard = (

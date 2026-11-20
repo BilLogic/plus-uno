@@ -12509,7 +12509,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
+          "description": "Row 2, at the end: the format switch (Table / Cards), a `SegmentedControl`. With no `views` it moves to the end of row 3.",
           "deprecated": null
         },
         {
@@ -12950,6 +12950,153 @@
         "--heading-sm",
         "--icon-lg",
         "--stack-md",
+        "--type-weight-medium"
+      ]
+    },
+    {
+      "name": "SegmentedControl",
+      "kind": "component",
+      "import": "import { SegmentedControl } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.jsx",
+      "summary": "Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment and glides to the new one on a spatial spring; under reduced motion it does not glide.",
+      "props": [
+        {
+          "name": "label",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The group's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "options",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The segments: `{ value, label, icon, isIconOnly, isDisabled }`.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Starting value of an uncontrolled control. Defaults to the first enabled segment.",
+          "deprecated": null
+        },
+        {
+          "name": "onChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the chosen segment's value when the person picks a different segment.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` is 32 high; `compact` is 24.",
+          "deprecated": null
+        },
+        {
+          "name": "shouldFitContainer",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Segments share the container width equally.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Prevents interaction with every segment.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class on the group.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "SelectByClick",
+        "KeyboardArrows",
+        "WithIcons",
+        "IconOnly",
+        "Spacing",
+        "FitContainer",
+        "Disabled",
+        "SelectedLook",
+        "Motion",
+        "Overflow",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-width-default",
+        "--control-md",
+        "--control-sm",
+        "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
+        "--ds-background-neutral-pressed",
+        "--ds-icon",
+        "--ds-icon-disabled",
+        "--ds-icon-subtle",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-shadow-raised",
+        "--ds-surface-raised",
+        "--ds-surface-raised-hovered",
+        "--ds-surface-raised-pressed",
+        "--ds-text",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-md",
+        "--inline-sm",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-y-sm",
+        "--radius-control-md",
+        "--radius-control-sm",
         "--type-weight-medium"
       ]
     },

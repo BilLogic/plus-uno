@@ -1,0 +1,171 @@
+@use '../../../styles/state' as *;
+
+/*
+ * Segmented control: a neutral track holding 2-5 segments, with one raised
+ * indicator under the selected one. Height comes from the control roles (32 or
+ * 24), the track's inset from `--pad-y-sm`, corners from the control radius
+ * (the indicator's is the track's less the inset, so the two stay concentric).
+ *
+ * Colors: track `background.neutral`; an unselected segment is text.subtle on
+ * a clear ground, hover and press are the neutral steps; the selected segment
+ * is the raised surface with the raised shadow and the default ink. The
+ * selected segment draws its own fill, so the control reads with no script;
+ * while the indicator glides (`data-gliding`) the indicator draws the fill and
+ * the segment's goes clear, so the two never double up.
+ */
+
+.plus-segmented-control {
+    --_sc-height: var(--control-md);
+    --_sc-radius: var(--radius-control-md);
+    --_sc-pad-x: var(--pad-x-md);
+    --_sc-inset: var(--pad-y-sm);
+    --_sc-item-height: calc(var(--_sc-height) - 2 * var(--_sc-inset));
+    --_sc-item-radius: calc(var(--_sc-radius) - var(--_sc-inset));
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    box-sizing: border-box;
+    height: var(--_sc-height);
+    padding: var(--_sc-inset);
+    gap: 0;
+    // A control that does not fit shrinks its segments, each label ending in an ellipsis.
+    max-width: 100%;
+    background-color: var(--ds-background-neutral);
+    border-radius: var(--_sc-radius);
+
+    &--spacing-compact {
+        --_sc-height: var(--control-sm);
+        --_sc-radius: var(--radius-control-sm);
+        --_sc-pad-x: var(--pad-x-sm);
+    }
+
+    &--fit-container {
+        display: flex;
+        width: 100%;
+
+        .plus-segmented-control__item {
+            flex: 1 1 0;
+        }
+    }
+}
+
+.plus-segmented-control__indicator {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: var(--_sc-item-radius);
+    background-color: var(--ds-surface-raised);
+    box-shadow: var(--ds-shadow-raised);
+}
+
+.plus-segmented-control[data-gliding='true'] > .plus-segmented-control__indicator {
+    display: block;
+}
+
+.plus-segmented-control__item {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--inline-sm);
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    min-width: 0;
+    height: var(--_sc-item-height);
+    margin: 0;
+    padding: 0 var(--_sc-pad-x);
+    border: none;
+    border-radius: var(--_sc-item-radius);
+    background-color: transparent;
+    color: var(--ds-text-subtle);
+    @include ds-type(var(--body-default), var(--type-weight-medium));
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-pressed)),
+            disabled: (color: var(--ds-text-disabled)),
+        ),
+        $ring-offset: calc(-1 * var(--focus-ring-width))
+    );
+
+    .plus-segmented-control__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: var(--icon-md);
+        line-height: 1;
+        color: var(--ds-icon-subtle);
+
+        i {
+            font-size: inherit;
+            width: auto;
+            line-height: inherit;
+        }
+    }
+
+    .plus-segmented-control__text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &--icon-only {
+        width: var(--_sc-item-height);
+        padding: 0;
+        flex: 0 0 auto;
+    }
+
+    // The selected segment: the raised surface, its shadow, the default ink.
+    &[data-pressed],
+    &[aria-pressed='true'] {
+        color: var(--ds-text);
+        background-color: var(--ds-surface-raised);
+        box-shadow: var(--ds-shadow-raised);
+
+        .plus-segmented-control__icon {
+            color: var(--ds-icon);
+        }
+
+        &:hover,
+        &[data-hovered] {
+            background-color: var(--ds-surface-raised-hovered);
+        }
+
+        &:active {
+            background-color: var(--ds-surface-raised-pressed);
+        }
+    }
+
+    &:disabled,
+    &[data-disabled] {
+        .plus-segmented-control__icon {
+            color: var(--ds-icon-disabled);
+        }
+    }
+}
+
+// While the indicator glides it draws the fill; the selected segment clears its own.
+.plus-segmented-control[data-gliding='true'] .plus-segmented-control__item {
+    &[aria-pressed='true'],
+    &[data-pressed] {
+        background-color: transparent;
+        box-shadow: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .plus-segmented-control__item[aria-pressed='true'] {
+        @include plus-ring(calc(-1 * var(--border-width-default)), Highlight, false, var(--border-width-default));
+    }
+}

@@ -99,7 +99,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 |   | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame. |
 |   | [`Popup`](../../src/templates/Popup/Popup.mdx) | `import { Popup } from '@/components';` | A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu. |
 
-## UI components (93)
+## UI components (94)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiChat](../../src/components/ai/AiChat/index.md)
@@ -171,6 +171,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [ScrollBar](../../src/components/layout-and-structure/ScrollBar/index.md)
 - [SearchField](../../src/components/forms-and-inputs/SearchField/index.md)
 - [SectionMessage](../../src/components/messaging/SectionMessage/index.md)
+- [SegmentedControl](../../src/components/forms-and-inputs/SegmentedControl/index.md)
 - [Select](../../src/components/forms-and-inputs/Select/index.md)
 - [SettingRow](../../src/components/forms-and-inputs/SettingRow/index.md)
 - [Sidebar](../../src/components/navigation/Sidebar/index.md)

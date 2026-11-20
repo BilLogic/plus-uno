@@ -49,7 +49,7 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 ## Alternatives
 
 - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-- For connected view or mode buttons in a toolbar, use `ButtonGroup`.
+- For switching between views of the same content, use `SegmentedControl`. For connected action buttons in a toolbar, use `ButtonGroup`.
 
 ## Best practices
 
@@ -103,7 +103,7 @@ The buttons keep their height and the footer keeps to its well. See [Overflow](?
 - `Modal`: use when a blocking dialog needs `FooterActions` for its bottom action bar.
 - `Panel`: use when pairing `PanelFooter` with `FooterActions` while editing or confirming in a Panel.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

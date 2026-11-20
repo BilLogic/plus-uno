@@ -399,6 +399,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'SegmentedControl',
+    tier: 'component',
+    events: {
+      change: { transition: 'Switch views', spatial: 'spatial.fast', note: 'The raised indicator glides to the chosen segment. Under reduced motion it does not glide and the segment takes its fill at once.' },
+    },
+  },
+  {
     name: 'SearchField',
     tier: 'component',
     events: {
