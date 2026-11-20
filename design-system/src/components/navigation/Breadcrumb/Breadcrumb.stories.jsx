@@ -1,10 +1,11 @@
 import React from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
+import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
@@ -182,7 +183,7 @@ export const Focused = {
     },
 };
 
-/** Truncate: the trail stays on one line and a level longer than its room ends in an ellipsis; its full text opens in a Tooltip on hover and focus. Folding the middle of five or more levels into "..." is Planned. */
+/** Truncate: the trail stays on one line and a level longer than its room ends in an ellipsis; its full text opens in a Tooltip on hover and focus. */
 export const Overflow = {
     render: () => (
         <div style={{ width: '360px' /* demo frame */ }}>
@@ -207,5 +208,49 @@ export const Overflow = {
         await expect(current.scrollWidth).toBeGreaterThan(current.clientWidth);
         await expect(current, 'a clipped current page is a tab stop').toHaveAttribute('tabindex', '0');
         await expectFullTextReachable(canvasElement, current, LONG_TOPIC);
+    },
+};
+
+const DEEP_TRAIL = [
+    { text: 'Cohorts', href: '/cohorts' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
+    { text: 'Lincoln Middle School', href: '/cohorts/a26/lincoln' },
+    { text: 'Grade 7 math', href: '/cohorts/a26/lincoln/g7' },
+    { text: 'Maya Chen', href: '/cohorts/a26/lincoln/g7/maya' },
+    { text: 'Session 12' },
+];
+
+/** Fold: with five or more levels the root and the last two stay, and the middle folds behind a "…" button that opens the hidden levels as links, in order. */
+export const FoldedLevels = {
+    render: () => <Breadcrumb items={DEEP_TRAIL} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        await expect(canvas.getByRole('link', { name: 'Cohorts' })).toBeVisible();
+        await expect(canvas.getByRole('link', { name: 'Maya Chen' })).toBeVisible();
+        await expect(canvasElement.querySelector('[aria-current="page"]')).toHaveTextContent('Session 12');
+        for (const name of ['Autumn 2026', 'Lincoln Middle School', 'Grade 7 math']) {
+            await expect(canvas.queryByRole('link', { name }), `${name} is folded`).toBeNull();
+        }
+        const fold = canvas.getByRole('button', { name: 'Show hidden levels' });
+        await expect(fold).toHaveTextContent('');
+        await userEvent.click(fold);
+        const items = await body.findAllByRole('menuitem');
+        await expect(items.map((i) => i.textContent)).toEqual(['Autumn 2026', 'Lincoln Middle School', 'Grade 7 math']);
+        await expect(items.map((i) => i.getAttribute('href'))).toEqual(['/cohorts/a26', '/cohorts/a26/lincoln', '/cohorts/a26/lincoln/g7']);
+        const menu = items[0].closest('.plus-dropdown-menu');
+        await expectMenuFade(menu, 'enter');
+        await waitFor(() => expect(body.getByRole('menuitem', { name: 'Lincoln Middle School' })).toBeVisible());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(menu.isConnected).toBe(false));
+    },
+};
+
+/** Fewer than five levels do not fold. */
+export const NotFolded = {
+    render: () => <Breadcrumb items={DEEP_TRAIL.slice(2)} />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).queryByRole('button', { name: 'Show hidden levels' })).toBeNull();
+        await expect(within(canvasElement).getAllByRole('listitem')).toHaveLength(4);
     },
 };

@@ -37,6 +37,11 @@
             white-space: nowrap;
         }
 
+        // The "…" button keeps its room; the levels beside it give way first.
+        &.plus-breadcrumb-fold {
+            flex: none;
+        }
+
         // Separator Style
         & + .plus-breadcrumb-item {
             &::before {

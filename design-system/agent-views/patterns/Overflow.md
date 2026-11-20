@@ -21,7 +21,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle** is Planned . Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. Today each level truncates and the Breadcrumb never wraps.
+- **The breadcrumb middle.** Five or more levels keep the root and the last two, and fold the rest into a "…" that opens a menu of the hidden levels as links, in order. Fewer levels truncate, and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
@@ -84,7 +84,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 - The full text is always in the DOM, so a screen reader hears all of it whether or not it is clipped.
 - A clipped element is a tab stop so a keyboard user can reach the Tooltip; an unclipped one is not.
 - The +n button of a Tag group names how many tags it holds, "+3 more tags", and opens a menu the arrow keys move through.
-- The breadcrumb's "…" button is named "Show hidden levels" .
+- The breadcrumb's "…" button is named "Show hidden levels".
 - "Show n more" announces the new count when the list expands .
 
 ## Parts
@@ -96,7 +96,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 | Folded tags | Tag group | `overflow="collapse"` keeps one line and folds the rest into +n. |
 | Cell | Dynamic table | A cell's `overflow` is `truncate` by default; `wrap` takes more lines. |
 | File name | File item | Keeps the start and the extension, and opens the full name in a Tooltip while clipped. |
-| Trail | Breadcrumb | The fold is Planned ; the component never folds its middle yet. |
+| Trail | Breadcrumb | Five or more levels fold the middle into a "…" menu. |
 | Pager | Pagination | Fills the Section's footer slot, aligned to the end. |
 
 ## Related
