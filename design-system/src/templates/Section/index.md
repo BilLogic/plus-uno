@@ -4,6 +4,8 @@
 
 Section: a span of the page grid under one heading, with its title row, views, search and filters.
 
+A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row, the views and the filters.
+
 Also asked as: page section, section header, block, region.
 
 **Import:** `import { Section } from '@/templates';`

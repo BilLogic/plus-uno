@@ -145,6 +145,8 @@ export function renderComponent(facts, docs, edges) {
   const page = docs?.page ?? null;
   let d = `${GENERATED_HEADER}\n\n# ${facts.name}\n\n`;
   if (facts.summary) d += `${facts.summary}\n\n`;
+  // A template page leads with what the template is and its types: the page's own lede, after the source's one-liner.
+  if (page?.intro && docs.path.startsWith('design-system/src/templates/')) d += `${page.intro}\n\n`;
   if (facts.aliases?.length) d += `Also asked as: ${facts.aliases.join(', ')}.\n\n`;
   if (facts.implementedAs) {
     d += `> Implemented as ${code(facts.implementedAs)} in the source and exported as ${code(facts.name)}. `;

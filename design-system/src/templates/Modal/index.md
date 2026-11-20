@@ -4,6 +4,8 @@
 
 `@base-ui/react` Dialog (portal, focus trap, Escape, scroll lock, and the blanket-press rule). One Modal is open at a time (`useOverlaySlot`). `inline` renders the Blanket + Dialog in flow for docs previews and static stages without a portal, focus trap, Escape handling or scroll lock.
 
+A dialog for one task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps.
+
 Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Import:** `import { Modal } from '@/templates';`

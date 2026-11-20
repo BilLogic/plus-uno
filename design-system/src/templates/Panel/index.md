@@ -4,6 +4,10 @@
 
 PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
+A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame.
+
+Import the Panel and its parts from `@/templates`. This template documents the parts and its layout within the Frame.
+
 Also asked as: right panel, detail panel, side pane, slide-over, sheet, side sheet, off-canvas, right sidebar, side panel, inspector.
 
 > Implemented as `PanelContainer` in the source and exported as `Panel`. Import the exported name; read the source under the implementation name.
