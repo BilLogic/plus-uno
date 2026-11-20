@@ -14,7 +14,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 - **Wrap.** Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.
 - **Truncate with a Tooltip.** A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.
-- **Fold a list.** A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned .
+- **Fold a list.** A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are built from a Button; no component carries them.
 - **Page a table.** A table pages instead of growing: the pager sits at the end of the Section footer.
 
 ## Key cases
@@ -49,7 +49,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | Button label | Truncate at the end, no Tooltip | Shorten the label; the full label stays in the accessible name |
 | File name | Truncate mid-line, keeping the extension | Tooltip on hover and focus when clipped |
 | Id | Planned: truncate mid-line | Tooltip when clipped |
-| A list of items, tags or notes | Planned: "Show n more", "Show less" | Expanded in place |
+| A list of items, tags or notes | "Show n more", "Show less" from a Button | Expanded in place |
 
 ### Fields and inputs
 
@@ -74,7 +74,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 
 | Do | Don't |
 | --- | --- |
-| "Show 4 more" and "Show less" (Planned). | "Load more", "See all", "…". |
+| "Show 4 more" and "Show less", built from a Button. | "Load more", "See all", "…". |
 | Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip. | The whole title in the Sidebar. |
 | Breadcrumb levels by the page's own title: "Lincoln Middle School". | "Back", "Up one level". |
 | File name mid-line: "reflection_…_week12.pdf". | "reflection_maya_rodrig…". |
@@ -165,7 +165,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 **Checked:** Review
 
-"Show n more" carries the count and "Show less" closes; both are Planned . A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
+"Show n more" carries the count and "Show less" closes; there is no dedicated component, so build both from a Button. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
 
 Do: A button under the list that names how many more it holds, and the list grows in place.
 Don't: A fade over the list, hiding how much is there.

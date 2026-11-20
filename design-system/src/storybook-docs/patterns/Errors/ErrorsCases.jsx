@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
@@ -18,12 +18,23 @@ export const CODE = showCode(examplesSource, ['MessageOnField', 'BorderAndToolti
 /** The stand-in screen the Modal example is drawn on. Docs geometry, px. */
 const SCREEN = { width: 1024, height: 300 }; // docs-literal
 
-/** Do: the message sits right under the invalid field, in words that say what to fix. */
-export const MessageOnFieldCase = () => (
-    <CaseSurface>
-        <Example.MessageOnField />
-    </CaseSurface>
-);
+/**
+ * Do: the message sits right under the invalid field, in words that say what
+ * to fix. The picture shows the field after a blur, since the message only
+ * appears once the person has left the field.
+ */
+export const MessageOnFieldCase = () => {
+    const ref = useRef(null);
+    useEffect(() => {
+        // A blur event marks the field touched without moving the page's focus or scroll.
+        ref.current?.querySelector('input')?.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    }, []);
+    return (
+        <CaseSurface>
+            <div ref={ref}><Example.MessageOnField /></div>
+        </CaseSurface>
+    );
+};
 
 /** Don't: a red border alone, with the error words hidden inside a tooltip layer. */
 export const BorderAndTooltipCase = () => (

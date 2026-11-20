@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
@@ -59,12 +59,13 @@ describe('Overflow live cases and TypeCard links', () => {
         }
     });
 
-    it('ShowMoreWithCountCase expands from 2 to 6 rows on click while FadedListCase offers no expand control', async () => {
+    it('ShowMoreWithCountCase grows a list from 2 to 6 items on click while FadedListCase offers no expand control', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<ShowMoreWithCountCase />);
-        expect(screen.getAllByRole('row')).toHaveLength(3);
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(within(screen.getByRole('list', { name: 'Students' })).getAllByRole('listitem')).toHaveLength(2);
         await user.click(screen.getByRole('button', { name: 'Show 4 more' }));
-        expect(screen.getAllByRole('row')).toHaveLength(7);
+        expect(within(screen.getByRole('list', { name: 'Students' })).getAllByRole('listitem')).toHaveLength(6);
         expect(screen.getByRole('button', { name: 'Show less' })).toBeVisible();
         unmount();
 
@@ -75,7 +76,8 @@ describe('Overflow live cases and TypeCard links', () => {
     it('prints each example from its own source', () => {
         expect(Object.keys(CODE)).toHaveLength(6);
         expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
-        expect(CODE.ShowMoreWithCount).toContain('const StudentsTable');
+        expect(CODE.ShowMoreWithCount).toContain('const StudentList');
+        expect(CODE.ClippedCellNoText).not.toContain('plus-table-cell-text');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 

@@ -20,10 +20,10 @@ const STUDENTS = [
     ['Noah Williams', 'Grade 6', 'Oct 18'],
 ];
 
-const StudentsTable = ({ count }) => (
+const StudentsTable = ({ rows: shown }) => (
     <DynamicTable
         head={{ cells: ['Name', 'Grade', 'Last session'].map((content) => ({ key: content, content })) }}
-        rows={STUDENTS.slice(0, count).map((cells) => ({ key: cells[0], cells: cells.map((content) => ({ key: content, content })) }))}
+        rows={shown.map((cells) => ({ key: cells[0], cells: cells.map((content) => ({ key: content, content })) }))}
         label="Students"
         isFixedSize
     />
@@ -46,7 +46,7 @@ const NotesTable = ({ note }) => (
 export const WrappedSectionTitle = () => (
     <div style={{ maxInlineSize: 'var(--card-min-width-md)' }}>
         <Section title={LONG_TITLE}>
-            <StudentsTable count={2} />
+            <StudentsTable rows={STUDENTS.slice(0, 2)} />
         </Section>
     </div>
 );
@@ -54,15 +54,23 @@ export const WrappedSectionTitle = () => (
 export const ClippedSectionTitle = () => (
     <div style={{ maxInlineSize: 'var(--card-min-width-md)' }}>
         <Section title={<span style={clipStyle}>{LONG_TITLE}</span>}>
-            <StudentsTable count={2} />
+            <StudentsTable rows={STUDENTS.slice(0, 2)} />
         </Section>
     </div>
 );
 
 export const ClippedCellOpensText = () => <NotesTable note={LONG_NOTE} />;
 
-export const ClippedCellNoText = () => (
-    <NotesTable note={<span className="plus-table-cell-text" style={clipStyle}>{LONG_NOTE}</span>} />
+export const ClippedCellNoText = () => <NotesTable note={<span style={clipStyle}>{LONG_NOTE}</span>} />;
+
+const listStyle = { margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' };
+
+const StudentList = ({ count }) => (
+    <ul style={listStyle} aria-label="Students">
+        {STUDENTS.slice(0, count).map(([name, grade]) => (
+            <li key={name}>{name}, {grade}</li>
+        ))}
+    </ul>
 );
 
 export const ShowMoreWithCount = () => {
@@ -79,7 +87,7 @@ export const ShowMoreWithCount = () => {
                 />
             )}
         >
-            <StudentsTable count={expanded ? 6 : 2} />
+            <StudentList count={expanded ? 6 : 2} />
         </Section>
     );
 };
@@ -87,7 +95,7 @@ export const ShowMoreWithCount = () => {
 export const FadedList = () => (
     <Section title="Students">
         <div style={{ position: 'relative' }}>
-            <StudentsTable count={4} />
+            <StudentList count={4} />
             <div
                 aria-hidden="true"
                 style={{
