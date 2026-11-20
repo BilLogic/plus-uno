@@ -269,11 +269,11 @@ const HeadRow = ({ children }) => (
 );
 
 export const HeadCells = {
-    parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 12 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
+    parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 12 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width wraps onto more lines; with `shouldTruncate` it stays on one line, ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
     render: () => (
         <HeadRow>
             <HeadCell label="Student" icon="user" width="160px" /* demo frame */ />
-            <HeadCell label="A column name far too long for the width it was given" width={'120px' /* token gap: 120px */} />
+            <HeadCell label="A column name far too long for the width it was given" width={'120px' /* token gap: 120px */} shouldTruncate />
             <HeadCell label="Sessions" align="number" icon={iconClass('hashtag')} width={'120px' /* token gap: 120px */} />
             <HeadCell label="Flagged" align="icon" icon={iconClass('flag')} isIconOnlyHeader width={'64px' /* token gap: 64px */} />
         </HeadRow>
@@ -407,12 +407,12 @@ export const Overflow = {
     },
 };
 
-/** Wrap: a header that must be read whole takes more lines instead of ending in an ellipsis (`shouldTruncate={false}`), and the cells under it still truncate. */
+/** Wrap: a header takes more lines instead of ending in an ellipsis, and the cells under it still truncate. A header that must stay on one line sets `shouldTruncate`. */
 export const OverflowWrappedHeader = {
     render: () => (
         <div style={{ width: '280px' /* demo frame */ }}>
             <HeadRow>
-                <HeadCell label="Tutor reflection and supervisor feedback, as submitted after the session" width={'120px' /* demo frame */} shouldTruncate={false} />
+                <HeadCell label="Tutor reflection and supervisor feedback, as submitted after the session" width={'120px' /* demo frame */} />
                 <HeadCell label="Sessions" align="number" width={'120px' /* demo frame */} />
             </HeadRow>
         </div>

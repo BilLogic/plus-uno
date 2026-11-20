@@ -13,7 +13,7 @@ import './Section.scss';
  * Section template for PLUS design system: a span of the page grid that
  * groups content under one heading. It has no fill and no pad: a padded box
  * with a fill is a Card, and the Page around the Section supplies the pad. It mirrors
- * `Pattern/Section` in the Figma design system file.
+ * `Templates/Section` in the Figma design system file.
  *
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an
  * optional footer.
@@ -188,10 +188,10 @@ const TITLE_LINE = {
  * the title's height), one for the description, and one for the views or
  * filters row when there is one.
  */
-const HeaderSkeleton = ({ rank, hasRows }) => (
+const HeaderSkeleton = ({ rank, hasRows, hasDescription }) => (
     <div className="plus-template-section-skeleton">
         <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
-        <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />
+        {hasDescription && <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />}
         {hasRows && (
             <Skeleton className="plus-template-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
         )}
@@ -201,6 +201,7 @@ const HeaderSkeleton = ({ rank, hasRows }) => (
 HeaderSkeleton.propTypes = {
     rank: PropTypes.oneOf(['page', 'section', 'subsection']).isRequired,
     hasRows: PropTypes.bool,
+    hasDescription: PropTypes.bool,
 };
 
 /** Section: a span of the page grid under one heading, with its title row, views, search and filters. */
@@ -272,7 +273,7 @@ const Section = ({
             return (
                 <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                     {titleNode && <div className="visually-hidden">{titleNode}</div>}
-                    <HeaderSkeleton rank={rank} hasRows={hasRows} />
+                    <HeaderSkeleton rank={rank} hasRows={hasRows} hasDescription={Boolean(description)} />
                 </div>
             );
         }

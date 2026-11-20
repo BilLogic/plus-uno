@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, within, waitFor } from 'storybook/test';
+import { expect, within, waitFor, userEvent } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -560,6 +560,24 @@ export const Clickable = {
         const hoveredShadow = withForcedPseudo(card, ':hover', () => getComputedStyle(card).boxShadow);
         await expect(hoveredShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
         await expect(hoveredShadow).not.toBe('none');
+    },
+};
+
+/** Keyboard focus on a clickable card draws the focus ring; a static card never takes focus. */
+export const ClickableFocus = {
+    render: () => (
+        <Card title="Focusable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</Card>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Focusable').closest('.plus-template-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).outlineStyle).toBe('none');
+        await userEvent.tab();
+        await expect(card).toHaveFocus();
+        const ring = getComputedStyle(card);
+        await expect(ring.outlineStyle).toBe('solid');
+        await expect(parseFloat(ring.outlineWidth)).toBeGreaterThan(0);
+        await expect(ring.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
     },
 };
 

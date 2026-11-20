@@ -39,7 +39,7 @@ Don't: Emphasis on every cell, so nothing stands out.
 
 ### Let a cell longer than its column end in an ellipsis with a Tooltip. {#let-a-cell-longer-than-its-column-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the cell is clipped, and the row keeps its height. A header that must be read whole wraps with `shouldTruncate={false}`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the cell is clipped, and the row keeps its height. A header wraps by default; one that must stay on one line sets `shouldTruncate`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep a cell to one line. {#keep-a-cell-to-one-line}
 

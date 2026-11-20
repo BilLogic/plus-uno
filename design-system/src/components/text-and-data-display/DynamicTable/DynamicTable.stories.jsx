@@ -636,18 +636,66 @@ export const DisabledRow = {
     },
 };
 
+/** Wrap: a long header takes more lines by default and never ends in an ellipsis. The sort button stays inside the cell and grows with it, the bulk bar takes the taller head row's height when it swaps in, and a header set to `shouldTruncate` stays on one line. */
+export const WrappedHeaders = {
+    args: {
+        head: {
+            cells: [
+                { key: 'student', content: 'Student', isSortable: true, width: '140px' /* demo frame */ },
+                { key: 'note', content: 'Tutor reflection and supervisor feedback, as submitted after the session', isSortable: true, width: '160px' /* demo frame */ },
+                { key: 'topic', content: 'Topic covered in the most recent session', shouldTruncate: true, width: '120px' /* demo frame */ },
+            ],
+        },
+        rows: ['Marcus Lee', 'Sofia Ramirez', 'Jordan Patel'].map((name) => ({
+            key: name,
+            cells: [{ key: name, content: name }, { key: `${name}-note`, content: 'Fractions' }, { key: `${name}-topic`, content: 'Ratios' }],
+        })),
+        label: 'Students',
+        isSelectable: true,
+        stickyHeader: true,
+    },
+    render: (args) => <div style={{ width: '520px' /* demo frame */ }}><DynamicTable {...args} /></div>,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const headRow = () => canvasElement.querySelector('thead tr');
+        const note = canvas.getByRole('columnheader', { name: /Tutor reflection/ });
+        const noteLabel = note.querySelector('.plus-table-head-cell-label');
+        await expect(getComputedStyle(noteLabel).textOverflow, 'no ellipsis').not.toBe('ellipsis');
+        await expect(noteLabel.scrollWidth, 'the whole header shows').toBeLessThanOrEqual(noteLabel.clientWidth + 1);
+        await expect(noteLabel.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(24);
+        const button = within(note).getByRole('button');
+        const arrow = note.querySelector('.plus-table-head-cell-sort');
+        const cellBox = note.getBoundingClientRect();
+        await expect(button.getBoundingClientRect().height, 'the sort button fills the taller cell').toBeGreaterThanOrEqual(Math.floor(cellBox.height) - 1);
+        await expect(arrow.getBoundingClientRect().right, 'the sort arrow stays inside the cell').toBeLessThanOrEqual(cellBox.right + 1);
+        const rowHeight = canvasElement.querySelector('tbody tr').getBoundingClientRect().height;
+        const restHeight = headRow().getBoundingClientRect().height;
+        await expect(restHeight, 'the head row grew past a body row').toBeGreaterThan(rowHeight);
+        const topic = canvas.getByRole('columnheader', { name: /Topic covered/ });
+        await expect(getComputedStyle(topic.querySelector('.plus-table-head-cell-label')).textOverflow, 'the opt-in header truncates').toBe('ellipsis');
+        await userEvent.click(note.querySelector('button'));
+        await expect(note).toHaveAttribute('aria-sort', 'ascending');
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 1' }));
+        await expect(headRow().querySelector('.plus-dynamic-table-bulk'), 'the head row is the bulk bar').toHaveTextContent('1 selected');
+        await expect(Math.round(headRow().getBoundingClientRect().height), 'the bar keeps the head row height').toBe(Math.round(restHeight));
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 1' }));
+        await expect(Math.round(headRow().getBoundingClientRect().height)).toBe(Math.round(restHeight));
+        await expectNoSilentClip(canvasElement);
+    },
+};
+
 /** The playground: the default story's args, with every control live. */
 export const Interactive = {
     args: { ...Default.args }
 };
 
-/** Page: a table with more rows than a page shows one page and a pager in its footer, never growing past it. A cell longer than its column truncates with a Tooltip; a header that must be read whole wraps. */
+/** Page: a table with more rows than a page shows one page and a pager in its footer, never growing past it. A cell longer than its column truncates with a Tooltip; a header wraps onto more lines by default and a header that must stay on one line sets `shouldTruncate`. */
 export const Overflow = {
     args: {
         head: {
             cells: [
                 { key: 'student', content: 'Student', isSortable: true },
-                { key: 'note', content: 'Tutor reflection and supervisor feedback, as submitted after the session', shouldTruncate: false, width: '200px' /* demo frame */ },
+                { key: 'note', content: 'Tutor reflection and supervisor feedback, as submitted after the session', width: '200px' /* demo frame */ },
             ],
         },
         rows: [

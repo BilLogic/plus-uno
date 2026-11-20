@@ -97,16 +97,18 @@ describe('Section', () => {
             expect(screen.getByText('Body')).toBeInTheDocument();
         });
 
-        it('draws the skeleton before a title has arrived', () => {
-            const { container } = render(<Section isLoading>Body</Section>);
+        it('draws the skeleton before a title has arrived, with no description bar unless a description is set', () => {
+            const { container, rerender } = render(<Section isLoading>Body</Section>);
+            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
+            rerender(<Section description="This week" isLoading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
         });
 
         it('adds a bar for the rows under the title row', () => {
             const { container, rerender } = render(<Section title="S" isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
+            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
             rerender(<Section title="S" views={<div />} isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(3);
+            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
         });
     });
 

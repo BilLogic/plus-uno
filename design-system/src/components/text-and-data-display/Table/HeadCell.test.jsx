@@ -21,11 +21,21 @@ describe('HeadCell', () => {
         expect(th).toHaveStyle({ width: '120px' });
     });
 
-    it('truncates by default and wraps on request', () => {
+    it('wraps by default and truncates on request', () => {
         const { rerender } = inHead(<HeadCell label="Long label" />);
+        const th = screen.getByRole('columnheader');
+        expect(th).not.toHaveClass('plus-table-head-cell--truncate');
+        expect(th).toHaveClass('plus-table-head-cell--wrap');
+        expect(document.querySelector('.plus-table-head-cell-label')).not.toHaveClass('plus-table-head-cell-label--truncate');
+        rerender(<table><thead><tr><HeadCell label="Long label" shouldTruncate /></tr></thead></table>);
         expect(screen.getByRole('columnheader')).toHaveClass('plus-table-head-cell--truncate');
-        rerender(<table><thead><tr><HeadCell label="Long label" shouldTruncate={false} /></tr></thead></table>);
+        expect(screen.getByRole('columnheader')).not.toHaveClass('plus-table-head-cell--wrap');
+    });
+
+    it('keeps the sort button in a wrapping header', () => {
+        inHead(<HeadCell label="A long header that wraps" isSortable />);
         expect(screen.getByRole('columnheader')).not.toHaveClass('plus-table-head-cell--truncate');
+        expect(screen.getByRole('button')).toBeInTheDocument();
     });
 
     it('draws the type icon, hidden from assistive technology', () => {

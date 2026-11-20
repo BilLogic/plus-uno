@@ -14,7 +14,7 @@ Also asked as: data table, interactive table.
 
 **Source:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, Interactive, Overflow
+**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, WrappedHeaders, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx`
 
