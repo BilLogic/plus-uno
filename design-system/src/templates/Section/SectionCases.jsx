@@ -44,6 +44,8 @@ export const STORY_CODE = showCode(examplesSource, [
     'SubsectionHeader',
     'SideAtEnd',
     'FilterSideStudents',
+    'FilterSideStudentsCompact',
+    'FilterSideStudentsNarrow',
     'EmptyInTable',
     'ReflectionsAnatomy',
 ]);

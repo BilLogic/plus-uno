@@ -637,7 +637,16 @@ export const TypeQueue = {
                 onPanelOpenChange={setOpen}
                 panelStorageKey={null}
             >
-                <Example.ReflectionQueue activeIndex={index} isPanelOpen={open} onReview={selectRow} />
+                {/* The example owns its row highlight; the staging reads the Review press to drive the Panel. */}
+                <div
+                    onClick={(event) => {
+                        const button = event.target.closest('button');
+                        const row = button?.closest('tbody tr');
+                        if (button?.textContent === 'Review' && row) selectRow([...row.parentElement.children].indexOf(row));
+                    }}
+                >
+                    <Example.ReflectionQueue />
+                </div>
             </InAppFrame>
         );
     },
@@ -957,9 +966,12 @@ export const SideAtEnd = {
 const FilterSideSection = () => {
     const ref = React.useRef(null);
     const width = useOwnWidth(ref, SECTION_DETAIL_FLOOR);
+    let Variant = Example.FilterSideStudents;
+    if (width < FRAME_LAYOUT.fullWidthBelow) Variant = Example.FilterSideStudentsNarrow;
+    else if (width < SECTION_DETAIL_FLOOR) Variant = Example.FilterSideStudentsCompact;
     return (
         <div ref={ref}>
-            <Example.FilterSideStudents sideFits={width >= SECTION_DETAIL_FLOOR} narrow={width < FRAME_LAYOUT.fullWidthBelow} />
+            <Variant />
         </div>
     );
 };
@@ -1007,7 +1019,7 @@ export const ResponsiveWidth = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const stage = canvasElement.querySelector('[data-probe="stage"]');
-        const side = () => canvasElement.querySelector('.plus-section-filter-side');
+        const side = () => within(canvasElement).queryByRole('group', { name: 'Student filters' });
         const filters = () => canvas.queryByRole('button', { name: /^Filters/ });
         const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
 

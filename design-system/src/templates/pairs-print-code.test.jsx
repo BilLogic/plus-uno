@@ -11,6 +11,7 @@ import { CODE as tableCode } from './Table/TableCases.jsx';
  * only, and nothing the docs add around an example.
  */
 
+// The Case guard names docs wrappers (SectionCase); a lowercase-led word like toLowerCase is consumer code.
 const DOCS_ONLY = /\b[A-Z]\w*Case\b|storybook-docs|section-header|view-bar|SectionActions|ViewPills|FormatSwitch|HeaderSearch|StudentsTable|ScreenStage|InAppFrame|sb-unstyled|HeadingLevelContext|\b(inline|isOpen|show|titleAs)=/;
 const ALLOWED = new Set(['react', '@/components', '@/templates']);
 

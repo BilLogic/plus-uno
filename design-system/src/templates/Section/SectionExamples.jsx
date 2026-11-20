@@ -466,8 +466,8 @@ export const SectionAnatomy = () => (
         description="Optional supporting description for this section."
         actions={(
             <>
-                <Button text="Secondary" onClick={() => {}} />
-                <Button text="Primary" appearance="primary" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
         views={(
@@ -547,49 +547,52 @@ export const ListType = () => {
 
 export const queueStudents = roster.slice(0, 4);
 
-export const ReflectionQueue = ({ activeIndex = 0, isPanelOpen = true, onReview = () => {} }) => (
-    <Section
-        title="Reflections to review"
-        views={(
-            <Tabs appearance="pill" defaultActiveKey="To review" aria-label="Views">
-                <Tabs.Tab eventKey="To review">To review</Tabs.Tab>
-            </Tabs>
-        )}
-    >
-        <DynamicTable
-            label="Reflections to review"
-            isFixedSize
-            highlightedRowIndex={isPanelOpen ? activeIndex : undefined}
-            head={{
-                cells: [
-                    { key: 'name', content: 'Name' },
-                    { key: 'grade', content: 'Grade' },
-                    { key: 'last', content: 'Last session' },
-                    { key: 'action', content: 'Action' },
-                ],
-            }}
-            rows={queueStudents.map(([name, grade, last], i) => ({
-                key: name,
-                cells: [
-                    { key: 'name', content: name },
-                    { key: 'grade', content: grade },
-                    { key: 'last', content: last },
-                    {
-                        key: 'action',
-                        content: (
-                            <Button
-                                text="Review"
-                                spacing="compact"
-                                isSelected={isPanelOpen && i === activeIndex}
-                                onClick={() => onReview(i)}
-                            />
-                        ),
-                    },
-                ],
-            }))}
-        />
-    </Section>
-);
+export const ReflectionQueue = () => {
+    const [activeIndex, setActiveIndex] = useState(0);
+    return (
+        <Section
+            title="Reflections to review"
+            views={(
+                <Tabs appearance="pill" defaultActiveKey="To review" aria-label="Views">
+                    <Tabs.Tab eventKey="To review">To review</Tabs.Tab>
+                </Tabs>
+            )}
+        >
+            <DynamicTable
+                label="Reflections to review"
+                isFixedSize
+                highlightedRowIndex={activeIndex}
+                head={{
+                    cells: [
+                        { key: 'name', content: 'Name' },
+                        { key: 'grade', content: 'Grade' },
+                        { key: 'last', content: 'Last session' },
+                        { key: 'action', content: 'Action' },
+                    ],
+                }}
+                rows={queueStudents.map(([name, grade, last], i) => ({
+                    key: name,
+                    cells: [
+                        { key: 'name', content: name },
+                        { key: 'grade', content: grade },
+                        { key: 'last', content: last },
+                        {
+                            key: 'action',
+                            content: (
+                                <Button
+                                    text="Review"
+                                    spacing="compact"
+                                    isSelected={i === activeIndex}
+                                    onClick={() => setActiveIndex(i)}
+                                />
+                            ),
+                        },
+                    ],
+                }))}
+            />
+        </Section>
+    );
+};
 
 export const MainAndSide = () => (
     <Section
@@ -671,59 +674,92 @@ export const EmptyInTable = () => (
     </Section>
 );
 
-/** The filter side at the start: `sideFits` is whether the Section is wide enough for it, `narrow` whether it is below the full-width break. */
-export const FilterSideStudents = ({ sideFits = true, narrow = false }) => {
-    const filterGroups = [['Grade', ['Grade 6', 'Grade 7', 'Grade 8']], ['Status', ['Active', 'Paused']]];
+const filterGroups = [['Grade', ['Grade 6', 'Grade 7', 'Grade 8']], ['Status', ['Active', 'Paused']]];
+
+const matchingRoster = (checked) => {
+    const grades = checked.filter((value) => value.startsWith('Grade '));
+    const statuses = checked.filter((value) => value === 'Active' || value === 'Paused');
+    return roster.filter(([, grade, , status]) => (
+        (grades.length === 0 || grades.includes(grade)) && (statuses.length === 0 || statuses.includes(status))
+    ));
+};
+
+const FilterSide = ({ checked, onToggle, onReset }) => (
+    <div role="group" aria-label="Student filters" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+        <div>
+            <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={onReset} />
+        </div>
+        {filterGroups.map(([category, values]) => {
+            const on = values.filter((value) => checked.includes(value)).length;
+            return (
+                <fieldset key={category} style={{ margin: 0, padding: 0, border: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                    <legend style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>
+                        {category}
+                        <CountTag value={on} label={`${on} applied`} />
+                    </legend>
+                    {values.map((value) => <Checkbox key={value} label={value} isChecked={checked.includes(value)} onChange={() => onToggle(value)} />)}
+                </fieldset>
+            );
+        })}
+    </div>
+);
+
+const NoStudentsMatch = ({ onReset }) => (
+    <EmptyState
+        spacing="compact"
+        icon="user-group"
+        header="No students match"
+        description="Try other filters, or reset them to see every student."
+        primaryAction={<Button text="Reset filters" appearance="primary" onClick={onReset} />}
+    />
+);
+
+const filterSideViews = (
+    <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
+        <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
+    </Tabs>
+);
+
+const studentsTitle = (count) => `Lincoln Middle · ${count} ${count === 1 ? 'student' : 'students'}`;
+
+const addStudentsPrimary = <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />;
+
+/** The filter side at the start, when the Section is wide enough for it. */
+export const FilterSideStudents = () => {
+    const [checked, setChecked] = useState(['Grade 7', 'Active']);
+    const toggle = (value) => setChecked(checked.includes(value) ? checked.filter((c) => c !== value) : [...checked, value]);
+    const matching = matchingRoster(checked);
+    return (
+        <Section
+            title="Students"
+            description={studentsTitle(matching.length)}
+            actions={(
+                <>
+                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    {addStudentsPrimary}
+                </>
+            )}
+            views={filterSideViews}
+        >
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--section-min-width-side), 3fr) minmax(0, 9fr)', gap: 'var(--grid-gutter)' }}>
+                <FilterSide checked={checked} onToggle={toggle} onReset={() => setChecked([])} />
+                {matching.length > 0 ? <RosterTable list={matching} /> : <NoStudentsMatch onReset={() => setChecked([])} />}
+            </div>
+        </Section>
+    );
+};
+
+/** Below the width the side needs: the filters move behind a Filters button and take the whole Section. */
+export const FilterSideStudentsCompact = () => {
     const [checked, setChecked] = useState(['Grade 7', 'Active']);
     const [isFiltering, setIsFiltering] = useState(false);
     const toggle = (value) => setChecked(checked.includes(value) ? checked.filter((c) => c !== value) : [...checked, value]);
-    const grades = checked.filter((value) => value.startsWith('Grade '));
-    const statuses = checked.filter((value) => value === 'Active' || value === 'Paused');
-    const matching = roster.filter(([, grade, , status]) => (
-        (grades.length === 0 || grades.includes(grade)) && (statuses.length === 0 || statuses.includes(status))
-    ));
-    const side = (
-        <div className="plus-section-filter-side" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-            <div>
-                <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={() => setChecked([])} />
-            </div>
-            {filterGroups.map(([category, values]) => {
-                const on = values.filter((value) => checked.includes(value)).length;
-                return (
-                    <fieldset key={category} style={{ margin: 0, padding: 0, border: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                        <legend style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>
-                            {category}
-                            <CountTag value={on} label={`${on} applied`} />
-                        </legend>
-                        {values.map((value) => <Checkbox key={value} label={value} isChecked={checked.includes(value)} onChange={() => toggle(value)} />)}
-                    </fieldset>
-                );
-            })}
-        </div>
-    );
-    const table = matching.length > 0 ? (
-        <RosterTable list={matching} />
-    ) : (
-        <EmptyState
-            spacing="compact"
-            icon="user-group"
-            header="No students match"
-            description="Try other filters, or reset them to see every student."
-            primaryAction={<Button text="Reset filters" appearance="primary" onClick={() => setChecked([])} />}
-        />
-    );
-    let body = table;
-    if (sideFits) {
-        body = (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--section-min-width-side), 3fr) minmax(0, 9fr)', gap: 'var(--grid-gutter)' }}>
-                {side}
-                {table}
-            </div>
-        );
-    } else if (isFiltering) {
+    const matching = matchingRoster(checked);
+    let body = matching.length > 0 ? <RosterTable list={matching} /> : <NoStudentsMatch onReset={() => setChecked([])} />;
+    if (isFiltering) {
         body = (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-                {side}
+                <FilterSide checked={checked} onToggle={toggle} onReset={() => setChecked([])} />
                 <div><Button text="Show results" appearance="primary" onClick={() => setIsFiltering(false)} /></div>
             </div>
         );
@@ -731,21 +767,56 @@ export const FilterSideStudents = ({ sideFits = true, narrow = false }) => {
     return (
         <Section
             title="Students"
-            description={`Lincoln Middle · ${matching.length} ${matching.length === 1 ? 'student' : 'students'}`}
+            description={studentsTitle(matching.length)}
             actions={(
                 <>
                     <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
-                    {narrow
-                        ? <IconButton icon="user-plus" label="Add students" appearance="primary" onClick={() => {}} />
-                        : <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />}
+                    {addStudentsPrimary}
                 </>
             )}
-            views={(
-                <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
-                    <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
-                </Tabs>
+            views={filterSideViews}
+            filters={[{
+                key: 'filters',
+                text: 'Filters',
+                iconBefore: 'filter',
+                hasChevronDown: false,
+                trailingMetric: checked.length || undefined,
+                isSelected: checked.length > 0,
+                onClick: () => setIsFiltering(true),
+            }]}
+        >
+            {body}
+        </Section>
+    );
+};
+
+/** Under 768 the Primary keeps only its icon. */
+export const FilterSideStudentsNarrow = () => {
+    const [checked, setChecked] = useState(['Grade 7', 'Active']);
+    const [isFiltering, setIsFiltering] = useState(false);
+    const toggle = (value) => setChecked(checked.includes(value) ? checked.filter((c) => c !== value) : [...checked, value]);
+    const matching = matchingRoster(checked);
+    let body = matching.length > 0 ? <RosterTable list={matching} /> : <NoStudentsMatch onReset={() => setChecked([])} />;
+    if (isFiltering) {
+        body = (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                <FilterSide checked={checked} onToggle={toggle} onReset={() => setChecked([])} />
+                <div><Button text="Show results" appearance="primary" onClick={() => setIsFiltering(false)} /></div>
+            </div>
+        );
+    }
+    return (
+        <Section
+            title="Students"
+            description={studentsTitle(matching.length)}
+            actions={(
+                <>
+                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    <IconButton icon="user-plus" label="Add students" appearance="primary" onClick={() => {}} />
+                </>
             )}
-            filters={sideFits ? undefined : [{
+            views={filterSideViews}
+            filters={[{
                 key: 'filters',
                 text: 'Filters',
                 iconBefore: 'filter',
