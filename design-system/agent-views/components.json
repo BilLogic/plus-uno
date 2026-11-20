@@ -145,7 +145,7 @@
         "--ds-text-subtle",
         "--heading-sm",
         "--icon-sm",
-        "--image-sm",
+        "--image-md",
         "--inline-md",
         "--stack-sm"
       ],
@@ -181,7 +181,7 @@
               "type": "node",
               "required": false,
               "default": null,
-              "description": "An avatar or an icon before the title. The open body indents to the title's start."
+              "description": "An avatar or an icon before the title. In the separated appearance the open body indents to the title's start."
             },
             {
               "name": "children",

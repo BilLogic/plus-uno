@@ -443,6 +443,9 @@ export const WithSummary = {
         await expect(getComputedStyle(items[0]).borderTopLeftRadius).toBe(tokenLength(canvasElement, '--card-radius') + 'px');
         const gap = items[1].getBoundingClientRect().top - items[0].getBoundingClientRect().bottom;
         await expect(gap).toBe(tokenLength(canvasElement, '--stack-sm'));
+        // A 32px avatar fits inside the slot column.
+        const avatar = maya.querySelector('.plus-accordion-elem > *');
+        await expect(avatar.getBoundingClientRect().width).toBeLessThanOrEqual(maya.querySelector('.plus-accordion-elem').getBoundingClientRect().width);
         // The open body starts where the title starts.
         const title = maya.querySelector('.plus-accordion-title');
         const body = canvasElement.querySelector('.plus-accordion-body');
@@ -472,6 +475,9 @@ export const OpenCloseByClickAndKeyboard = {
         await expect(jon).toHaveAttribute('aria-expanded', 'false');
         await userEvent.keyboard('{Tab}');
         await expect(canvas.getByRole('button', { name: /Ana R\./ })).toHaveFocus();
+        // Base UI's accordion has no arrow-key navigation; Tab and Shift+Tab move between headers.
+        await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+        await expect(jon).toHaveFocus();
     },
 };
 

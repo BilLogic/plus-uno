@@ -130,7 +130,7 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        inline-size: var(--image-sm);
+        inline-size: var(--image-md);
     }
 
     .plus-accordion-text {
@@ -175,6 +175,7 @@
 
                 @include plus-state((
                     hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+                    pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
                 ), $ring: false);
             }
         }
@@ -186,7 +187,7 @@
 
         // The body starts where the title starts.
         .plus-accordion-item--has-elem .plus-accordion-body {
-            padding-inline-start: calc(var(--card-pad) + var(--image-sm) + var(--inline-md));
+            padding-inline-start: calc(var(--card-pad) + var(--image-md) + var(--inline-md));
         }
     }
 

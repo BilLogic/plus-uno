@@ -144,7 +144,7 @@ AccordionItem.propTypes = {
     header: PropTypes.node.isRequired,
     /** One line of subtle text under the title, such as a status or a count. A longer line is cut with an ellipsis. */
     summary: PropTypes.node,
-    /** An avatar or an icon before the title. The open body indents to the title's start. */
+    /** An avatar or an icon before the title. In the separated appearance the open body indents to the title's start. */
     elemBefore: PropTypes.node,
     /** Body content when expanded */
     children: PropTypes.node,

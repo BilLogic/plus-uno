@@ -59,19 +59,18 @@ The title is the only thing visible when closed, so it has to name the content a
 Do: A short noun title.
 Don't: A title that runs on and wraps.
 
-### Keep the items in one accordion. {#keep-the-items-in-one-accordion}
-
-One accordion spaces its items evenly and keeps one open at a time; separate accordions each open on their own.
-
-Do: One accordion, items spaced by the gap.
-Don't: One accordion per item, spaced by hand.
-
 ### Use separated on a page, grouped inside a card. {#use-separated-on-a-page-grouped-inside-a-card}
 
 Separated reads as a list of records on the bare page. Inside a card or panel a container within a container is noisy, so use grouped.
 
-Do: Separated on the page, for a list of people.
-Don't: Grouped on the bare page, where a list of people reads as one block.
+Do: Grouped inside a card: one box with dividers.
+Don't: Separated containers nested in a card.
+
+}
+    doCaption="Separated on the page, for a list of people."
+    dontExample=
+    dontCaption="Grouped on the bare page, where a list of people reads as one block."
+/>
 
 ### Author items with either `items` or `children`; `children` wins. {#author-items-with-either-items-or-children-children-wins}
 
@@ -151,7 +150,7 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 | --- | --- |
 | Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open, `--ds-background-selected` and `--ds-background-selected-hovered`. |
 | Trigger and chevron | Title in `--heading-sm`, `--ds-text` when separated and `--ds-text-subtle` when grouped; chevron at `--icon-sm` in `--ds-text-subtle`; `--inline-md` between the parts. |
-| Leading slot and summary | Slot column `--image-sm` wide; summary in `--body-sm` and `--ds-text-subtle`. |
+| Leading slot and summary | Slot column `--image-md` wide; summary in `--body-sm` and `--ds-text-subtle`. |
 | Body | `--body-lg` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it. |
 | Edge | `--ds-border` at `--border-width-default`, corners `--card-radius`; separated items sit `--stack-sm` apart. |
 | Padding | `--card-pad` on every side. |
@@ -199,14 +198,14 @@ Implemented as `AccordionItem`.
 | `eventKey` | string (required) | — | Unique key for this accordion item |
 | `header` | node (required) | — | Header content (title text or node) |
 | `summary` | node | — | One line of subtle text under the title, such as a status or a count. A longer line is cut with an ellipsis. |
-| `elemBefore` | node | — | An avatar or an icon before the title. The open body indents to the title's start. |
+| `elemBefore` | node | — | An avatar or an icon before the title. In the separated appearance the open body indents to the title's start. |
 | `children` | node | — | Body content when expanded |
 | `disabled` | bool | — | Disable this item |
 | `className` | string | — | Additional CSS classes |
 
 ## Tokens touched
 
-`--body-lg` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-subtle` · `--heading-sm` · `--icon-sm` · `--image-sm` · `--inline-md` · `--stack-sm`
+`--body-lg` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-subtle` · `--heading-sm` · `--icon-sm` · `--image-md` · `--inline-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 
