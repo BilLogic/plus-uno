@@ -6,6 +6,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import Select from './Select';
+import { Button } from '@/components';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
@@ -774,9 +775,9 @@ export const MotionKeyboardOpen = {
 /** A required Select left empty: the browser blocks the form and focus ends on the combobox, not the hidden stand-in. */
 export const RequiredBlocksSubmit = {
     render: () => (
-        <form onSubmit={(event) => event.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 320 }}>
+        <form onSubmit={(event) => event.preventDefault()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)', maxInlineSize: 'var(--field-width-md)' }}>
             <Select label="School" name="school" isRequired options={[{ value: 'north', label: 'North High' }, { value: 'south', label: 'South High' }]} />
-            <button type="submit">Send</button>
+            <Button type="submit" appearance="primary">Send</Button>
         </form>
     ),
     play: async ({ canvasElement }) => {
