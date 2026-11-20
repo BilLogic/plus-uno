@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
-    DynamicTable,
     EmptyState,
     SearchField,
-    StatusTag,
     TextField,
     Toggle,
 } from '@/components';
@@ -15,14 +13,6 @@ import {
     Card,
     Section,
     SECTION_DETAIL_FLOOR,
-    PanelBody,
-    PanelCloseAction,
-    PanelContainer,
-    PanelDownAction,
-    PanelFooter,
-    PanelHeader,
-    PanelSubheader,
-    PanelUpAction,
 } from '@/templates';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
@@ -30,7 +20,7 @@ import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS 
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { InAppFrame, slotContent } from '@/storybook-docs/lib/template-demo.jsx';
+import { slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -587,69 +577,7 @@ export const TypeQueue = {
     name: 'Type: Queue',
     parameters: { layout: 'fullscreen', ...codeOf('ReflectionQueue') },
     beforeEach: resetPanel,
-    render: () => {
-        const queueRows = Example.queueStudents;
-        const [index, setIndex] = useState(0);
-        const [open, setOpen] = useState(true);
-        const [name, grade, lastSession, , , tutor] = queueRows[index];
-        const selectRow = (i) => {
-            setIndex(i);
-            setOpen(true);
-        };
-        const panel = (
-            <PanelContainer>
-                <div>
-                    <PanelHeader
-                        title={name}
-                        actions={(
-                            <>
-                                <PanelUpAction
-                                    disabled={index === 0}
-                                    onClick={() => setIndex((i) => Math.max(0, i - 1))}
-                                />
-                                <PanelDownAction
-                                    disabled={index === queueRows.length - 1}
-                                    onClick={() => setIndex((i) => Math.min(queueRows.length - 1, i + 1))}
-                                />
-                                <PanelCloseAction onClick={() => setOpen(false)} />
-                            </>
-                        )}
-                    />
-                    <PanelSubheader>
-                        <StatusTag appearance="warning">To review</StatusTag>
-                    </PanelSubheader>
-                </div>
-                <PanelBody>
-                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                        {grade} · Tutor: {tutor} · {lastSession}. The reflection names two goals for next week.
-                    </p>
-                </PanelBody>
-                <PanelFooter>
-                    <Button text="Open full review" appearance="subtle" onClick={() => {}} />
-                </PanelFooter>
-            </PanelContainer>
-        );
-        return (
-            <InAppFrame
-                panel={panel}
-                panelLabel="Reflection"
-                panelOpen={open}
-                onPanelOpenChange={setOpen}
-                panelStorageKey={null}
-            >
-                {/* The example owns its row highlight; the staging reads the Review press to drive the Panel. */}
-                <div
-                    onClick={(event) => {
-                        const button = event.target.closest('button');
-                        const row = button?.closest('tbody tr');
-                        if (button?.textContent === 'Review' && row) selectRow([...row.parentElement.children].indexOf(row));
-                    }}
-                >
-                    <Example.ReflectionQueue />
-                </div>
-            </InAppFrame>
-        );
-    },
+    render: () => <div style={{ height: '100vh' }}><Example.ReflectionQueue /></div>,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const canvas = within(canvasElement);
         await waitFor(() => expect(
@@ -661,11 +589,16 @@ export const TypeQueue = {
         const panel = within(canvas.getByRole('complementary', { name: 'Reflection' }));
         await expect(panel.getByRole('heading', { name: 'Ava Thompson' })).toBeInTheDocument();
 
+        const selectedReviews = () => canvas.getAllByRole('button', { name: 'Review' }).map((b) => b.getAttribute('aria-pressed') === 'true');
+        await expect(selectedReviews(), 'the first row is highlighted').toEqual([true, false, false, false]);
+
         await userEvent.click(panel.getByRole('button', { name: 'Next' }));
         await waitFor(() => expect(panel.getByRole('heading', { name: 'Marcus Lee' })).toBeInTheDocument());
+        await expect(selectedReviews(), 'Next moves the highlighted row').toEqual([false, true, false, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Reflection' })).toBeNull());
+        await expect(selectedReviews(), 'Close clears the highlight').toEqual([false, false, false, false]);
 
         await userEvent.click(canvas.getAllByRole('button', { name: 'Review' })[0]);
         await waitFor(() => expect(canvas.getByRole('complementary', { name: 'Reflection' })).toBeInTheDocument());

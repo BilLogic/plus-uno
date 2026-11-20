@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, StatusTag, Tabs, TextField } from '@/components';
-import { Card, Section } from '@/templates';
+import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section } from '@/templates';
 
 /**
  * The Section page's do and don't examples, as PLUS parts only. Show code
@@ -549,48 +549,88 @@ export const queueStudents = roster.slice(0, 4);
 
 export const ReflectionQueue = () => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [isPanelOpen, setIsPanelOpen] = useState(true);
+    const [name, grade, last, , , tutor] = queueStudents[activeIndex];
+    const panel = (
+        <PanelContainer>
+            <div>
+                <PanelHeader
+                    title={name}
+                    actions={(
+                        <>
+                            <PanelUpAction
+                                disabled={activeIndex === 0}
+                                onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
+                            />
+                            <PanelDownAction
+                                disabled={activeIndex === queueStudents.length - 1}
+                                onClick={() => setActiveIndex((i) => Math.min(queueStudents.length - 1, i + 1))}
+                            />
+                            <PanelCloseAction onClick={() => setIsPanelOpen(false)} />
+                        </>
+                    )}
+                />
+                <PanelSubheader>
+                    <StatusTag appearance="warning">To review</StatusTag>
+                </PanelSubheader>
+            </div>
+            <PanelBody>
+                <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                    {grade} · Tutor: {tutor} · {last}. The reflection names two goals for next week.
+                </p>
+            </PanelBody>
+            <PanelFooter>
+                <Button text="Open full review" appearance="subtle" onClick={() => {}} />
+            </PanelFooter>
+        </PanelContainer>
+    );
     return (
-        <Section
-            title="Reflections to review"
-            views={(
-                <Tabs appearance="pill" defaultActiveKey="To review" aria-label="Views">
-                    <Tabs.Tab eventKey="To review">To review</Tabs.Tab>
-                </Tabs>
-            )}
-        >
-            <DynamicTable
-                label="Reflections to review"
-                isFixedSize
-                highlightedRowIndex={activeIndex}
-                head={{
-                    cells: [
-                        { key: 'name', content: 'Name' },
-                        { key: 'grade', content: 'Grade' },
-                        { key: 'last', content: 'Last session' },
-                        { key: 'action', content: 'Action' },
-                    ],
-                }}
-                rows={queueStudents.map(([name, grade, last], i) => ({
-                    key: name,
-                    cells: [
-                        { key: 'name', content: name },
-                        { key: 'grade', content: grade },
-                        { key: 'last', content: last },
-                        {
-                            key: 'action',
-                            content: (
-                                <Button
-                                    text="Review"
-                                    spacing="compact"
-                                    isSelected={i === activeIndex}
-                                    onClick={() => setActiveIndex(i)}
-                                />
-                            ),
-                        },
-                    ],
-                }))}
-            />
-        </Section>
+        <Frame panel={panel} panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
+            <Section
+                title="Reflections to review"
+                views={(
+                    <Tabs appearance="pill" defaultActiveKey="To review" aria-label="Views">
+                        <Tabs.Tab eventKey="To review">To review</Tabs.Tab>
+                    </Tabs>
+                )}
+            >
+                <DynamicTable
+                    label="Reflections to review"
+                    isFixedSize
+                    highlightedRowIndex={isPanelOpen ? activeIndex : undefined}
+                    head={{
+                        cells: [
+                            { key: 'name', content: 'Name' },
+                            { key: 'grade', content: 'Grade' },
+                            { key: 'last', content: 'Last session' },
+                            { key: 'action', content: 'Action' },
+                        ],
+                    }}
+                    rows={queueStudents.map(([studentName, studentGrade, studentLast], i) => ({
+                        key: studentName,
+                        cells: [
+                            { key: 'name', content: studentName },
+                            { key: 'grade', content: studentGrade },
+                            { key: 'last', content: studentLast },
+                            {
+                                key: 'action',
+                                content: (
+                                    <Button
+                                        text="Review"
+                                        spacing="compact"
+                                        isSelected={isPanelOpen && i === activeIndex}
+                                        onClick={() => {
+                                            setActiveIndex(i);
+                                            setIsPanelOpen(true);
+                                        }}
+                                    />
+                                ),
+                            },
+                        ],
+                    }))}
+                />
+            </Section>
+        </Frame>
     );
 };
 
