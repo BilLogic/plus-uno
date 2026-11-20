@@ -222,7 +222,7 @@ describe('Tabs — overflow collapse', () => {
     afterEach(() => restore());
 
     const renderFolded = (props = {}) => render(
-        <Tabs overflow="collapse" defaultActiveKey="a" {...props}>
+        <Tabs defaultActiveKey="a" {...props}>
             {['a', 'b', 'c', 'd', 'e'].map((k) => <Tabs.Tab key={k} eventKey={k}>{`Tab ${k}`}</Tabs.Tab>)}
             <Tabs.Panel eventKey="e">Panel e</Tabs.Panel>
         </Tabs>,
@@ -244,7 +244,8 @@ describe('Tabs — overflow collapse', () => {
         expect(rows.map((r) => r.textContent)).toEqual(['Tab d', 'Tab e']);
         await user.click(rows[1]);
         expect(onSelect).toHaveBeenCalledWith('e', undefined);
-        await waitFor(() => expect(screen.getByRole('tab', { name: /^More/ })).toHaveAttribute('aria-selected', 'true'));
+        await waitFor(() => expect(screen.queryAllByRole('menu')).toHaveLength(0));
+        expect(screen.getByRole('tab', { name: /^More/ })).toHaveAttribute('aria-selected', 'true');
         expect(screen.getByText('Panel e')).toBeInTheDocument();
     });
 
@@ -259,9 +260,28 @@ describe('Tabs — overflow collapse', () => {
         expect(screen.getByRole('tab', { name: 'Tab c' })).toHaveFocus();
     });
 
+    it('loops through More: the first tab steps back onto it, End and Home bracket the strip', async () => {
+        const user = userEvent.setup();
+        renderFolded();
+        const more = screen.getByRole('tab', { name: /^More/ });
+        screen.getByRole('tab', { name: 'Tab a' }).focus();
+        await user.keyboard('{ArrowLeft}');
+        expect(more).toHaveFocus();
+        await user.keyboard('{Home}');
+        expect(screen.getByRole('tab', { name: 'Tab a' })).toHaveFocus();
+        await user.keyboard('{End}');
+        expect(more).toHaveFocus();
+    });
+
+    it('wraps instead of folding when overflow is wrap or the strip is justified', () => {
+        renderFolded({ overflow: 'wrap' });
+        expect(screen.queryByRole('tab', { name: /^More/ })).toBeNull();
+        expect(screen.getAllByRole('tab')).toHaveLength(5);
+    });
+
     it('has no More when every tab fits', () => {
         render(
-            <Tabs overflow="collapse" defaultActiveKey="a">
+            <Tabs defaultActiveKey="a">
                 <Tabs.Tab eventKey="a">A</Tabs.Tab>
                 <Tabs.Tab eventKey="b">B</Tabs.Tab>
             </Tabs>,

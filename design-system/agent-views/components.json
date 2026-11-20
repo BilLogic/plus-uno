@@ -15100,12 +15100,12 @@
           "name": "overflow",
           "type": "enum",
           "required": false,
-          "default": "'wrap'",
+          "default": "'collapse'",
           "values": [
             "wrap",
             "collapse"
           ],
-          "description": "`wrap` (default) lets tabs that do not fit flow onto more rows; `collapse` keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name.",
+          "description": "`collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds.",
           "deprecated": null
         },
         {

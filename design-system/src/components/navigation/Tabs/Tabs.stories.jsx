@@ -462,7 +462,7 @@ const TOPICS = ['Overview', 'Sessions', 'Progress', 'Reflections', 'Feedback', '
 export const OverflowMore = {
     render: () => (
         <div style={{ width: '440px' /* demo frame */ }}>
-            <Tabs overflow="collapse" defaultActiveKey="Overview">
+            <Tabs defaultActiveKey="Overview">
                 {TOPICS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
                 {TOPICS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} view</Tabs.Panel>)}
             </Tabs>
@@ -488,7 +488,8 @@ export const OverflowMore = {
         await expect(rows.map((row) => row.textContent)).toEqual(TOPICS.slice(visible.length));
         // Choosing one selects it and More holds the selection.
         await userEvent.click(rows[rows.length - 1]);
-        await waitFor(() => expect(more.getAttribute('aria-selected')).toBe('true'));
+        await waitFor(() => expect(body.queryAllByRole('menu')).toHaveLength(0));
+        await expect(more.getAttribute('aria-selected'), 'More holds the selection once the menu closes').toBe('true');
         await expect(canvas.getByText(`${TOPICS[TOPICS.length - 1]} view`)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('tab', { name: TOPICS[0] }));
         await waitFor(() => expect(more.getAttribute('aria-selected')).toBe('false'));
@@ -497,7 +498,7 @@ export const OverflowMore = {
 OverflowMore.parameters = {
     docs: {
         description: {
-            story: 'With `overflow="collapse"` the strip keeps one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
+            story: 'The strip keeps one row (`overflow="collapse"`, the default): the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
         }
     }
 };

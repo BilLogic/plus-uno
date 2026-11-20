@@ -138,16 +138,17 @@ Panel.propTypes = {
  * holds, marks itself selected while one of them is, and opens their menu.
  * It is a tab to the keyboard and a menu trigger to Base UI's Menu.
  */
-const MoreTab = React.forwardRef(({ count, isSelected, className = '', ...props }, ref) => (
+// DropdownMenu hands its trigger `isSelected: open`; More's selection is its own `holdsSelection`, which that cannot overwrite.
+const MoreTab = React.forwardRef(({ count, holdsSelection, isSelected: _open, className = '', ...props }, ref) => (
     <button
         ref={ref}
         type="button"
         role="tab"
         data-more=""
-        data-active={isSelected ? '' : undefined}
-        aria-selected={isSelected}
+        data-active={holdsSelection ? '' : undefined}
+        aria-selected={Boolean(holdsSelection)}
         aria-label={`More, ${count} more ${count === 1 ? 'tab' : 'tabs'}`}
-        tabIndex={isSelected ? 0 : -1}
+        tabIndex={holdsSelection ? 0 : -1}
         className={`plus-tab plus-tab--more ${className}`}
         {...props}
     >
@@ -158,6 +159,7 @@ const MoreTab = React.forwardRef(({ count, isSelected, className = '', ...props 
 MoreTab.displayName = 'MoreTab';
 MoreTab.propTypes = {
     count: PropTypes.number.isRequired,
+    holdsSelection: PropTypes.bool,
     isSelected: PropTypes.bool,
     className: PropTypes.string
 };
@@ -168,7 +170,7 @@ const Tabs = ({
     alignment = 'left',
     appearance = 'default',
     spacing = 'default',
-    overflow = 'wrap',
+    overflow = 'collapse',
     className = '',
     defaultActiveKey,
     activeKey,
@@ -267,7 +269,8 @@ const Tabs = ({
 
     useLayoutEffect(() => () => { animRef.current?.stop?.(); }, []);
 
-    const collapses = overflow === 'collapse';
+    // A justified strip shares the row equally and truncates, so it never folds.
+    const collapses = overflow === 'collapse' && alignment !== 'justified';
 
     /*
      * Collapse keeps one row. The selection is held here so a hidden tab can be
@@ -282,6 +285,7 @@ const Tabs = ({
         onSelect?.(key, details);
     };
 
+    const [menuOpen, setMenuOpen] = useState(false);
     const [shown, setShown] = useState(tabs.length);
     const tabKeys = tabs.map((tab) => tab.props.eventKey).join('|');
     const visibleCount = collapses ? Math.min(shown, tabs.length) : tabs.length;
@@ -329,7 +333,7 @@ const Tabs = ({
     /*
      * More is a tab in the strip and a menu trigger. Arrow keys reach it from
      * the last visible tab (and Home/End wrap through it); Base UI's roving
-     * only knows its own tabs, so the step onto and off More is made here.
+     * only knows its own tabs, so the step onto and off More is made here. Home goes to the first tab, End to More.
      */
     const moreRef = useRef(null);
     const handleListKeyDown = (event) => {
@@ -340,10 +344,14 @@ const Tabs = ({
         if (event.target === more) {
             if (event.key === 'ArrowLeft') focusTab(tabEls[tabEls.length - 1]);
             else if (event.key === 'ArrowRight' || event.key === 'Home') focusTab(tabEls[0]);
+            else if (event.key === 'End') focusTab(more);
             return;
         }
         const last = tabEls[tabEls.length - 1];
-        if ((event.key === 'ArrowRight' && event.target === last) || event.key === 'End') {
+        // The strip loops through More: the last tab steps onto it, the first steps back onto it.
+        if ((event.key === 'ArrowRight' && event.target === last)
+            || (event.key === 'ArrowLeft' && event.target === tabEls[0])
+            || event.key === 'End') {
             event.preventDefault();
             event.stopPropagation();
             more.focus();
@@ -384,11 +392,13 @@ const Tabs = ({
                 {collapses ? tabs.slice(0, visibleCount) : tabs}
                 {collapses && hiddenTabs.length > 0 && (
                     <DropdownMenu
+                        isOpen={menuOpen}
+                        onOpenChange={setMenuOpen}
                         trigger={(
                             <MoreTab
                                 ref={moreRef}
                                 count={hiddenTabs.length}
-                                isSelected={holdsSelection}
+                                holdsSelection={holdsSelection}
                             />
                         )}
                     >
@@ -399,7 +409,11 @@ const Tabs = ({
                                 aria-checked={tab.props.eventKey === selectedKey}
                                 isSelected={tab.props.eventKey === selectedKey}
                                 isDisabled={tab.props.isDisabled}
-                                onClick={() => select(tab.props.eventKey)}
+                                onClick={() => {
+                                    select(tab.props.eventKey);
+                                    // A radio row is not one DropdownMenu closes on its own.
+                                    setMenuOpen(false);
+                                }}
                             >
                                 {labelText(tab.props.children) || String(tab.props.eventKey)}
                             </ButtonItem>
@@ -438,7 +452,7 @@ Tabs.propTypes = {
     appearance: PropTypes.oneOf(['default', 'pill']),
     /** `default` is 32px tabs; `compact` is 24px. */
     spacing: PropTypes.oneOf(['default', 'compact']),
-    /** `wrap` (default) lets tabs that do not fit flow onto more rows; `collapse` keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name. */
+    /** `collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds. */
     overflow: PropTypes.oneOf(TAB_OVERFLOWS),
     /** Extra class on the tabs root, beside `plus-tabs`. */
     className: PropTypes.string,

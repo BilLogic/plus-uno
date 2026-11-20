@@ -105,7 +105,7 @@ Don't: Counts and status in the label.
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip. {#let-a-tab-label-longer-than-its-cap-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped. With `overflow="collapse"` the tabs that do not fit fold into a More tab that opens a menu of them; by default they wrap onto more rows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. A `justified` strip shares the row and never folds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
@@ -188,7 +188,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | `alignment` | enum | `'left'` | Horizontal alignment of the tab strip |
 | `appearance` | enum | `'default'` | Underline indicator (default), or a pill-shaped selected fill. |
 | `spacing` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
-| `overflow` | enum | `'wrap'` | `wrap` (default) lets tabs that do not fit flow onto more rows; `collapse` keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name. |
+| `overflow` | enum | `'collapse'` | `collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds. |
 | `className` | string | `''` | Extra class on the tabs root, beside `plus-tabs`. |
 | `id` | string | — | Id set on the tabs root. |
 | `defaultActiveKey` | string or number | — | The `eventKey` of the tab selected at first, for uncontrolled use. |

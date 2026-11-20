@@ -66,7 +66,7 @@ export const figmaMeta = {
 
 <ComponentExample of={TabsStories.Overflow} title="Overflow" description="Truncate: a label longer than its cap ends in an ellipsis, and its full text opens in a Tooltip on hover and focus, only while it is clipped." />
 
-<ComponentExample of={TabsStories.OverflowMore} title="Overflow: More" description={<><code>overflow="collapse"</code> keeps one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds. Its menu lists them by name; picking one selects it and More holds the selection.</>} />
+<ComponentExample of={TabsStories.OverflowMore} title="Overflow: More" description={<>Tabs keep one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds. Its menu lists them by name; picking one selects it and More holds the selection. <code>overflow="wrap"</code> lets extra tabs flow onto more rows instead.</>} />
 
 </div>
 
@@ -262,7 +262,7 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip.
 
-The Tooltip is on only while the label is clipped. With `overflow="collapse"` the tabs that do not fit fold into a More tab that opens a menu of them; by default they wrap onto more rows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. A `justified` strip shares the row and never folds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 
