@@ -20,29 +20,26 @@ export const LOCKUP_SIZES = LOGO_SIZES.filter((s) => WORDMARKS[s]).sort((a, b) =
 const CAP = WORDMARKS[96].cap;
 const LOGO_GAPS = [88, 46, 72];
 
-/** Ink metrics of P L U S at weight 530 (the 48 lockup), in font units: [advance, ink left, ink right]. */
-const FONT_INK = {
-    P: [563.2, 51.9, 549.0],
-    L: [475.6, 51.9, 471.2],
-    U: [644.7, 45.2, 599.6],
-    S: [552.0, 11.3, 529.8],
+/**
+ * True ink of the drawn 48 instance (weight 530, optical size 48, rounded
+ * ends), in font units, measured from the font file: [ink left, ink right].
+ * The U is the raw, uncarved width: the 96% carve about its center is undone.
+ */
+const TRUE_INK = {
+    P: [71.0, 567.0],
+    L: [71.0, 501.0],
+    U: [43.74, 592.74],
+    S: [34.62, 536.5],
 };
-/** The font's own kerning in the L–U and U–S pairs, in font units. */
-const FONT_KERN = [0, -11.7, -12.2];
 const LETTERS = ['P', 'L', 'U', 'S'];
 
-const fontGaps = LETTERS.slice(0, 3).map((k, i) => {
-    const next = LETTERS[i + 1];
-    return FONT_INK[k][0] - FONT_INK[k][2] + FONT_INK[next][1] + FONT_KERN[i];
-});
-
-/** Lay the four letters ink to ink with the given gaps. */
+/** Lay the four letters ink to ink with the logo's gaps, on the true ink of the drawn instance. */
 function lay(gaps) {
     let x = 0;
     const letters = LETTERS.map((k, i) => {
-        const ink = FONT_INK[k][2] - FONT_INK[k][1];
-        const letter = { k, tx: x - FONT_INK[k][1], l: x, r: x + ink };
-        x += ink + (i < 3 ? gaps[i] : 0);
+        const [l, r] = TRUE_INK[k];
+        const letter = { k, tx: x - l, l: x, r: x + (r - l) };
+        x += r - l + (i < 3 ? gaps[i] : 0);
         return letter;
     });
     return { letters, width: x };
@@ -77,28 +74,35 @@ const Redline = ({ from, to }) => (
 );
 Redline.propTypes = { from: PropTypes.number.isRequired, to: PropTypes.number.isRequired };
 
-/** Live Google Sans Flex letters, each placed by its ink so the gaps read true. */
-const LiveLetters = ({ laid, rounded }) => (
+/** Live Google Sans Flex letters, each placed by its true ink so the gaps read exact. */
+const LiveLetters = ({ laid }) => (
     <g>
         {laid.letters.map((letter) => (
-            <text
-                key={letter.k}
-                className={`logo-wm__letter logo-wm__letter--${rounded ? 'round' : 'square'}`}
-                fontWeight={530}
-                x={letter.tx}
-                y={CAP}
-            >
+            <text key={letter.k} className="logo-wm__letter logo-wm__letter--round" fontWeight={530} x={letter.tx} y={CAP}>
                 {letter.k}
             </text>
         ))}
     </g>
 );
-LiveLetters.propTypes = { laid: PropTypes.object.isRequired, rounded: PropTypes.bool };
+LiveLetters.propTypes = { laid: PropTypes.object.isRequired };
+
+/** The word set as the font spaces it, at the square or rounded ends. */
+const FontWord = ({ rounded }) => (
+    <text
+        className={`logo-wm__letter logo-wm__letter--${rounded ? 'round' : 'square'}`}
+        fontWeight={530}
+        x={rounded ? -TRUE_INK.P[0] : -52}
+        y={CAP}
+    >
+        PLUS
+    </text>
+);
+FontWord.propTypes = { rounded: PropTypes.bool };
 
 const STEPS = [
     {
         title: 'The font out of the box',
-        body: 'Google Sans Flex capitals at weight 530 with the font’s own spacing and square stroke ends. This is the starting point.',
+        body: 'Google Sans Flex capitals at weight 530 with the font’s own spacing (gaps of 9%, 5% and 6% of the cap) and square stroke ends. This is the starting point.',
     },
     {
         title: 'Rounded ends',
@@ -114,12 +118,9 @@ const STEPS = [
     },
 ];
 
-/** Ink edges of the U in the 48 lockup's outlines (rounded ends, optical size 48, narrowed to 96%). */
-const U_ROUND_INK = { left: 43.74, right: 592.74 };
-const U_NARROWED = (U_ROUND_INK.right - U_ROUND_INK.left) * 0.96;
-const P_RIGHT = 567.0 - 71.0;
-const L_RIGHT = P_RIGHT + LOGO_GAPS[0] + (501.0 - 71.0);
-const U_LEFT = L_RIGHT + LOGO_GAPS[1];
+/** The U in the 48 outlines: it starts where the uncarved U would and is 96% as wide. */
+const U_NARROWED = (TRUE_INK.U[1] - TRUE_INK.U[0]) * 0.96;
+const U_LEFT = lay(LOGO_GAPS).letters[2].l;
 
 /**
  * One step of the wordmark build, 0 to 3. Steps 0 to 2 are live text; step 3
@@ -142,10 +143,11 @@ export const WordmarkStep = ({ step }) => {
             </Frame>
         );
     } else {
-        const laid = lay(step === 2 ? LOGO_GAPS : fontGaps);
+        const laid = lay(LOGO_GAPS);
+        const width = step === 2 ? laid.width : WORDMARKS[48].width;
         figure = (
-            <Frame width={laid.width} label={`PLUS wordmark, ${meta.title.toLowerCase()}`}>
-                <LiveLetters laid={laid} rounded={step > 0} />
+            <Frame width={width} label={`PLUS wordmark, ${meta.title.toLowerCase()}`}>
+                {step === 2 ? <LiveLetters laid={laid} /> : <FontWord rounded={step === 1} />}
                 {step === 2 && laid.letters.slice(0, 3).map((a, i) => <Redline key={a.k} from={a.r} to={laid.letters[i + 1].l} />)}
             </Frame>
         );

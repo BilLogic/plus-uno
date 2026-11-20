@@ -2,6 +2,8 @@
  * The Logos page's wordmark figures: the lockup at each size with its weight,
  * the four build steps, the lockup rule and the two Don't figures.
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { WORDMARKS } from '@/assets/Logo/logoArt';
@@ -25,13 +27,14 @@ describe('LogoWordmark figures', () => {
 
     it('shows the font as it ships in step 0, square ends and no redlines', () => {
         const { container } = render(<WordmarkStep step={0} />);
-        expect(container.querySelectorAll('.logo-wm__letter--square')).toHaveLength(4);
+        expect(container.querySelectorAll('.logo-wm__letter--square')).toHaveLength(1);
+        expect(container.textContent).toContain('9%, 5% and 6%');
         expect(container.querySelectorAll('.logo-wm__label')).toHaveLength(0);
     });
 
     it('rounds the ends from step 1', () => {
         const { container } = render(<WordmarkStep step={1} />);
-        expect(container.querySelectorAll('.logo-wm__letter--round')).toHaveLength(4);
+        expect(container.querySelectorAll('.logo-wm__letter--round')).toHaveLength(1);
     });
 
     it('draws step 3 from the exported outlines and labels the U', () => {
@@ -54,5 +57,17 @@ describe('LogoWordmark figures', () => {
         expect(typed.container.textContent).toContain('PLUS');
         const tracked = render(<TrackedWordmarkFigure />);
         expect(tracked.container.querySelectorAll('.logo-dont__tracked path')).toHaveLength(4);
+    });
+
+    it('keeps the Logos page weight table (cap is half the lockup size) equal to the exported wordmarks', () => {
+        const mdx = readFileSync(join(__dirname, '../../styles/Logos.mdx'), 'utf8');
+        const start = mdx.indexOf("head={['Lockup size'");
+        const block = mdx.slice(mdx.indexOf('rows={', start), mdx.indexOf('/>', start));
+        const rows = [...block.matchAll(/\[('[^\]]+')\]/g)].map((m) => m[1].split(',').map((c) => c.trim().replace(/'/g, '')));
+        const expected = Object.keys(WORDMARKS)
+            .map(Number)
+            .sort((a, b) => b - a)
+            .map((size) => [String(size), String(size / 2), String(WORDMARKS[size].weight), String(WORDMARKS[size].opticalSize)]);
+        expect(rows).toEqual(expected);
     });
 });
