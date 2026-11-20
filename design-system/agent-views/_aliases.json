@@ -41,7 +41,7 @@
     "PromptInput": ["ask the assistant", "prompt box", "chat input"],
     "PageHeader": ["heading with buttons", "header actions", "page heading"],
     "Frame": ["page template", "page shell", "page layout", "full page", "new page"],
-    "VisuallyHidden": ["screen reader only", "sr-only", "assistive text", "screen reader text"],
+    "VisuallyHidden": ["screen reader only", "sr-only", "assistive text", "screen reader text", "text for screen readers"],
     "Spotlight": ["onboarding", "feature tour", "coach mark", "new feature highlight", "walkthrough"],
     "Table": ["list of records", "data table on a page", "sortable list", "records with filters", "rows and columns", "grid"],
     "FilterButton": ["filter chip", "filter control"],

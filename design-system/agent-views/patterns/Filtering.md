@@ -13,20 +13,20 @@ How a person narrows a collection, with filters in the Section's header in one o
 Choose a tier by the number of categories and the length of their lists. See Best practices for when to move filters into a menu.
 
 - **1 · Quick filters.** One to three categories, each a short list: a "Field: value" trigger per category opening its own list, applied as you pick.
-- **2a · Menu, one category.** The Filter button opens one list, applied as you pick. No footer.
+- **2a · Menu, one category.** The Filter icon button opens one list, applied as you pick. No footer.
 - **2b · Menu, side by side.** Two or three categories with short lists in columns, with Clear and Apply at the end.
 - **2c · Menu, stacked.** Four or more categories, or long lists, stacked, with Clear and Apply at the end.
-- **3 · Filter side.** Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.
+- **3 · Filter side.** Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category. The Section does not place the side at its start itself yet; the example composes it.
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter button's own count on the selected fill. No row of tags under the header.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon button's own count on the selected fill. No row of tags under the header.
 
 ## Key cases
 
 ### Below 960, the filter side
 
-The side hides and the Filter button returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section owns this behavior: Section › Width behavior.
+The side hides and the Filter button returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section does not build this takeover yet; the example composes it. The Section owns this behavior: Section › Width behavior.
 
 ### Widths
 
@@ -39,9 +39,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Tier | Use when | Controls | Applies | Shows it is on |
 | --- | --- | --- | --- | --- |
 | 1 · Quick filters | One to three categories, each a short list | A FilterButton per category | As you pick | The button's selected fill and count |
-| 2a · Menu, one category | One category, and the bar has no room for a button | The Filter button, one list | As you pick | The Filter button's count |
-| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter button, columns, Clear and Apply | On Apply | The Filter button's count |
-| 2c · Menu, stacked | Four or more categories, or long lists | The Filter button, stacked categories, Clear and Apply | On Apply | The Filter button's count |
+| 2a · Menu, one category | One category, and the bar has no room for a button | The Filter icon button, one list | As you pick | The Filter icon button's count |
+| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter icon button, columns, Clear and Apply | On Apply | The Filter icon button's count |
+| 2c · Menu, stacked | Four or more categories, or long lists | The Filter icon button, stacked categories, Clear and Apply | On Apply | The Filter icon button's count |
 | 3 · Filter side | Filtering is the main job, such as browsing a long catalog | A side at the Section's start | As you pick, or on "Apply filters" for a batch | A count beside each category |
 
 ## Alternatives
@@ -57,13 +57,13 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Name categories as nouns: "Grade", "School", "Subject". | "Filter by grade", "Choose a school". |
 | Label the menu footer "Clear" and "Apply". | "Reset", "OK", "Done". |
 | Put "Reset filters" at the top of a side; "Apply filters" only for a batch. | "Clear all", "Submit". |
-| Name the Filter button with filters on: "Filters, 2 applied". | "Filters (2)". |
+| Name the Filter icon button with filters on: "Filters, 2 applied". | "Filters (2)". |
 | Count the results in words: "1 of 8 students". | "1 result". |
 | Go back from the filters on a narrow Section with "Show results". | "Done", "Close". |
 
 ## Accessibility
 
-- The Filter button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
+- The Filter icon button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
 - Clear and Apply are the last tab stops in a menu.
@@ -74,7 +74,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Part | Component | Notes |
 | --- | --- | --- |
 | Quick filter | Filter button | A count only when a value is on; it hugs its label and opens its list at bottom-end. |
-| Filter button | Filter button | Text "Filters" with the `filter` icon; its `trailingMetric` draws the count on the selected fill. The Section's `filters` entry hands it to the menu. |
+| Filter icon button | Filter menu trigger (Icon button) | The `filter` icon alone, named "Filters"; its `trailingMetric` draws the count on the selected fill. The Filter menu draws it unless you pass a `trigger`. |
 | One list (tier 1 lists, 2a) | Popup select | Applies as you pick, radios for one. Checkboxes for several are Planned. |
 | Filter menu (2b, 2c) | Filter menu | Holds values until Apply; columns side by side or stacked; Clear and Apply at the end. |
 | Placement and width | Popup | bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger. |
@@ -130,9 +130,9 @@ Don't: The filters squeezed in beside the views.
 
 **Checked:** Automatic
 
-A FilterButton's count, the Filter button's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
+A FilterButton's count, the Filter icon button's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
-Do: The count on the Filter button, on the selected fill.
+Do: The count on the Filter icon button, on the selected fill.
 Don't: A row of tags under the bar, repeating what is on.
 
 ### Apply one list as you pick and several categories on Apply. {#apply-one-list-as-you-pick-and-several-categories-on-apply}

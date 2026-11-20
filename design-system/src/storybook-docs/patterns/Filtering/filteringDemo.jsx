@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, EmptyState, FilterMenu, PopupSelect, Skeleton } from '@/components';
+import { Button, EmptyState, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
 import { Page, Card, Section, SECTION_DETAIL_FLOOR } from '@/templates';
@@ -65,15 +65,12 @@ const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 /** A filter side's values, one flat list; the side counts each category. */
 const flat = (value) => Object.values(value).flat();
 
-/** The Filter trigger of a tier 2 menu: one button in the third row, its count the values applied. */
+/** The Filter trigger of a tier 2 menu: the Filter icon button in the third row, its count the values applied. */
 export const filterTrigger = (count, menu) => [{
     key: 'filters',
     text: 'Filters',
-    iconBefore: 'filter',
-    hasChevronDown: false,
-    trailingMetric: count > 0 ? count : undefined,
     isSelected: count > 0,
-    menu,
+    menu: () => menu(<IconButton icon="filter" label="Filters" trailingMetric={count} />),
 }];
 
 /** Tier 2a: the Filter trigger opens one list, applied as you pick, with no footer. */

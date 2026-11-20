@@ -187,7 +187,7 @@ RatingItems.play = async ({ canvasElement }) => {
 
 /** Breadcrumb is 32, its text 14/20. */
 export const Breadcrumbs = () => (
-    <Breadcrumb items={[{ text: 'Home', href: '#home' }, { text: 'Sessions', href: '#sessions' }, { text: 'Today' }]} />
+    <Breadcrumb items={[{ text: 'Home', href: '#home' }, { text: 'Sessions', href: '#sessions' }]} />
 );
 
 Breadcrumbs.play = async ({ canvasElement }) => {

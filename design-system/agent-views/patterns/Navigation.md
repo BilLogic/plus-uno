@@ -64,7 +64,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 
 - The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
 - Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
-- The breadcrumb is a `nav` around an `ol`; the last item is plain text with `aria-current="page"`.
+- The breadcrumb is a `nav` around an `ol` of parent links. The current record is the page's heading, so no crumb carries `aria-current`.
 - Leaving a multi-step task returns focus to the control that opened it .
 
 ## Related
@@ -156,6 +156,6 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Navigat
 import { Breadcrumb } from '@/components';
 
 function NavigationExample() {
-    return <Breadcrumb items={[{ text: 'Sessions', href: '#sessions' }, { text: 'Session review' }]} />;
+    return <Breadcrumb items={[{ text: 'Sessions', href: '#sessions' }]} />;
 }
 ```

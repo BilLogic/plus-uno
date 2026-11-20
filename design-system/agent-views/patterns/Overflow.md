@@ -21,7 +21,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle.** Five or more levels keep the root and the last two, and fold the rest into a "…" that opens a menu of the hidden levels as links, in order. Fewer levels truncate, and the Breadcrumb never wraps.
+- **The breadcrumb middle.** Five or more parents keep the root and the last two, and fold the rest into a "…" that opens a menu of the hidden levels as links, in order. Fewer levels truncate, and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.

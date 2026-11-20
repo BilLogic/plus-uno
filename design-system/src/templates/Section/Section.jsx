@@ -30,7 +30,7 @@ import './Section.scss';
  * filters take the selected state and the row ends with the `count` and Clear
  * all. Three triggers show and the rest go in "More filters" with a count;
  * under 768 Search takes the row and the triggers fold into one Filter button
- * with the applied count, and the count and Clear all stay at the end of the
+ * with the applied count, and the count and Reset filters stay at the end of the
  * Search row. A trigger can open a menu of its own (`menu`). When the triggers
  * no longer fit beside Search they wrap to their own row, end-aligned. A
  * Section with no views drops row 2 and the format switch moves to the end of
@@ -154,7 +154,7 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
                     {hasFilters && applied > 0 && (
                         <div className="plus-section-row__applied">
                             {count && <span className="plus-section-row__count" role="status">{count}</span>}
-                            {onClearAll && <Button text="Clear all" appearance="subtle" onClick={onClearAll} />}
+                            {onClearAll && <Button text="Reset filters" appearance="subtle" onClick={onClearAll} />}
                         </div>
                     )}
                     {formatInRow3 && <div className="plus-section-row__end">{format}</div>}
@@ -471,7 +471,7 @@ Section.propTypes = {
      * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
      */
     count: PropTypes.node,
-    /** Runs when "Clear all" is pressed. The button shows once a filter is applied. */
+    /** Runs when "Reset filters" is pressed. The button shows once a filter is applied. */
     onClearAll: PropTypes.func,
     /** Runs when "More filters" is pressed. */
     onMoreFilters: PropTypes.func,

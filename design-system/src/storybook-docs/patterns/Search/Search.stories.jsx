@@ -66,7 +66,7 @@ export const TypeActive = {
     },
 };
 
-/** Focused: the field in a page header with its panel open under it, grouped matches and "See all results". */
+/** Planned. Focused: the field in a page header with its panel open under it, grouped matches and "See all results". */
 export const TypeFocused = {
     name: 'Type: focused',
     render: () => staged(<FocusedPage />),
@@ -85,7 +85,7 @@ export const TypeFocused = {
     },
 };
 
-/** Basic: the field with its text in the page header, and the results page Enter leads to. */
+/** Planned. Basic: the field with its text in the page header, and the results page Enter leads to. */
 export const TypeBasic = {
     name: 'Type: basic',
     render: () => staged(<BasicPage />),
@@ -110,7 +110,7 @@ export const TypeBasic = {
     },
 };
 
-/** Basic, the field alone: no panel and no per-keystroke work. */
+/** Planned. Basic, the field alone: no panel and no per-keystroke work. */
 export const BasicField = {
     name: 'Type: basic, the field',
     render: () => staged(<BasicStudents />),
@@ -257,7 +257,7 @@ export const WithScope = {
 
 /* ---------- focused panel ---------- */
 
-/** The panel under a focused field: empty text lists recent searches, text lists grouped results. */
+/** Planned. The panel under a focused field: empty text lists recent searches, text lists grouped results. */
 export const FocusedPanel = {
     name: 'Focused panel',
     args: { text: '' },

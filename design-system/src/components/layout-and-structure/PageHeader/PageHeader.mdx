@@ -11,7 +11,7 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
-export const trail = [{ text: 'Students', href: '#' }, { text: 'Ari Patel' }];
+export const trail = [{ text: 'Students', href: '#' }];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -223,7 +223,7 @@ Every extra row pushes content down; add a part only when the page uses it.
     dontExample={
         <HeadingContextProvider value={2}>
             <PageHeader
-                breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Session plans' }]} label="Breadcrumbs, every part" />}
+                breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }]} label="Breadcrumbs, every part" />}
                 title="Session plans"
                 actions={<Button appearance="primary" text="New plan" />}
                 bottomBar={<Tabs defaultActiveKey="all" spacing="compact"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}

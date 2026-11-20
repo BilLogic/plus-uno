@@ -82,7 +82,7 @@ export const Forms = {
 export const Navigation = {
     tags: ['pattern:Navigation'],
     render: function NavigationExample() {
-        return <Breadcrumb items={[{ text: 'Sessions', href: '#sessions' }, { text: 'Session review' }]} />;
+        return <Breadcrumb items={[{ text: 'Sessions', href: '#sessions' }]} />;
     },
 };
 

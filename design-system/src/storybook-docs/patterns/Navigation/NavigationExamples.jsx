@@ -39,7 +39,6 @@ export const BreadcrumbOnRecordPage = () => (
                         label="Record page breadcrumb"
                         items={[
                             { text: 'Students', href: '#students' },
-                            { text: 'Maya Rodriguez' },
                         ]}
                     />
                 )}
@@ -62,7 +61,6 @@ export const BreadcrumbOnAreaPage = () => (
                         label="Area page breadcrumb"
                         items={[
                             { text: 'Home', href: '#home' },
-                            { text: 'Students' },
                         ]}
                     />
                 )}

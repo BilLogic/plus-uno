@@ -246,7 +246,7 @@ The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. Ho
 
 - The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
 - Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
-- The breadcrumb is a `nav` around an `ol`; the last item is plain text with `aria-current="page"`.
+- The breadcrumb is a `nav` around an `ol` of parent links. The current record is the page's heading, so no crumb carries `aria-current`.
 - Leaving a multi-step task returns focus to the control that opened it <PlannedTag />.
 
 </div>

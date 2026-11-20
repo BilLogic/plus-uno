@@ -51,15 +51,15 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 <TypeGrid>
 <TypeCard of={FilteringStories.TierQuickFilters} to="#1-quick-filters" title="1 · Quick filters" stage={STAGE}>One to three categories, each a short list: a "Field: value" trigger per category opening its own list, applied as you pick.</TypeCard>
-<TypeCard of={FilteringStories.TierOneList} to="#2a-menu-one-category" title="2a · Menu, one category" stage={STAGE}>The Filter button opens one list, applied as you pick. No footer.</TypeCard>
+<TypeCard of={FilteringStories.TierOneList} to="#2a-menu-one-category" title="2a · Menu, one category" stage={STAGE}>The Filter icon button opens one list, applied as you pick. No footer.</TypeCard>
 <TypeCard of={FilteringStories.TierSideBySide} to="#2b-menu-side-by-side" title="2b · Menu, side by side" stage={STAGE}>Two or three categories with short lists in columns, with Clear and Apply at the end.</TypeCard>
 <TypeCard of={FilteringStories.TierStacked} to="#2c-menu-stacked" title="2c · Menu, stacked" stage={STAGE}>Four or more categories, or long lists, stacked, with Clear and Apply at the end.</TypeCard>
-<TypeCard of={FilteringStories.TierFilterSide} to="#3-filter-side" title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
+<TypeCard of={FilteringStories.TierFilterSide} to="#3-filter-side" title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category. <PlannedTag /> The Section does not place the side at its start itself yet; the example composes it.</TypeCard>
 </TypeGrid>
 
 <ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description={'Each category is a "Field: value" trigger in the header\'s third row. It opens its own list from the trigger\'s end edge; picking a value narrows the rows at once, with no Apply or Reset, and marks the trigger.'} />
 
-<ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="Clicking the Filter button opens a single radio list that updates the table as soon as a choice is picked." />
+<ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="Clicking the Filter icon button opens a single radio list that updates the table as soon as a choice is picked." />
 
 <ComponentExample of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" description="Tick boxes across two or three columns; nothing changes until Apply is pressed, and Clear clears draft ticks." />
 
@@ -73,9 +73,9 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter button's own count on the selected fill. No row of tags under the header.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon button's own count on the selected fill. No row of tags under the header.
 
-<ComponentExample of={FilteringStories.FilterCount} title="The Filter button's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Clear in the menu clears the ticks; Apply then clears the count." />
+<ComponentExample of={FilteringStories.FilterCount} title="The Filter icon button's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Clear in the menu clears the ticks; Apply then clears the count." />
 
 </div>
 
@@ -89,9 +89,9 @@ The control that holds a filter shows it: the FilterButton's count, or the Filte
 
 <ComponentExample of={FilteringStories.NoMatches} title="No matches" description="The empty state replaces the table, names the filters that are on and offers &quot;Reset filters&quot;. The count stays on the icon until they are reset." />
 
-### Below 960, the filter side
+### Below 960, the filter side <PlannedTag />
 
-The side hides and the Filter button returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section owns this behavior: <a target="_top" href="./?path=/docs/templates-section--docs#width-behavior">Section › Width behavior</a>.
+The side hides and the Filter button returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section does not build this takeover yet; the example composes it. The Section owns this behavior: <a target="_top" href="./?path=/docs/templates-section--docs#width-behavior">Section › Width behavior</a>.
 
 ### Widths
 
@@ -127,9 +127,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 </thead>
 <tbody>
 <tr><td>1 · Quick filters</td><td>One to three categories, each a short list</td><td>A FilterButton per category</td><td>As you pick</td><td>The button's selected fill and count</td></tr>
-<tr><td>2a · Menu, one category</td><td>One category, and the bar has no room for a button</td><td>The Filter button, one list</td><td>As you pick</td><td>The Filter button's count</td></tr>
-<tr><td>2b · Menu, side by side</td><td>Two or three categories with short lists, applied together</td><td>The Filter button, columns, Clear and Apply</td><td>On Apply</td><td>The Filter button's count</td></tr>
-<tr><td>2c · Menu, stacked</td><td>Four or more categories, or long lists</td><td>The Filter button, stacked categories, Clear and Apply</td><td>On Apply</td><td>The Filter button's count</td></tr>
+<tr><td>2a · Menu, one category</td><td>One category, and the bar has no room for a button</td><td>The Filter icon button, one list</td><td>As you pick</td><td>The Filter icon button's count</td></tr>
+<tr><td>2b · Menu, side by side</td><td>Two or three categories with short lists, applied together</td><td>The Filter icon button, columns, Clear and Apply</td><td>On Apply</td><td>The Filter icon button's count</td></tr>
+<tr><td>2c · Menu, stacked</td><td>Four or more categories, or long lists</td><td>The Filter icon button, stacked categories, Clear and Apply</td><td>On Apply</td><td>The Filter icon button's count</td></tr>
 <tr><td>3 · Filter side</td><td>Filtering is the main job, such as browsing a long catalog</td><td>A side at the Section's start</td><td>As you pick, or on "Apply filters" for a batch</td><td>A count beside each category</td></tr>
 </tbody>
 </DocsTable>
@@ -184,12 +184,12 @@ The first two rows are for the title with its actions and for the views. The fil
 
 <RuleTag kind="automatic" />
 
-A FilterButton's count, the Filter button's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
+A FilterButton's count, the Filter icon button's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
 <DoDontPair
     doExample={<CountOnIconCase />}
     doCode={CODE.CountOnIcon}
-    doCaption="The count on the Filter button, on the selected fill."
+    doCaption="The count on the Filter icon button, on the selected fill."
     dontExample={<TagRowCase />}
     dontCode={CODE.TagRow}
     dontCaption="A row of tags under the bar, repeating what is on."
@@ -211,7 +211,7 @@ A menu's footer says "Clear" and "Apply", compact at the end. "Reset filters" at
 
 <RuleTag kind="automatic" />
 
-Below 960 the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: <a target="_top" href="./?path=/docs/templates-section--docs#drop-the-filter-icon-while-a-filter-side-shows">Section › Drop the Filter button while a filter side shows</a>. Below 768 quick filters become a stacked menu.
+<PlannedTag /> Below 960 the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: <a target="_top" href="./?path=/docs/templates-section--docs#drop-the-filter-icon-while-a-filter-side-shows">Section › Drop the Filter button while a filter side shows</a>. Below 768 quick filters become a stacked menu.
 
 </div>
 
@@ -227,7 +227,7 @@ Below 960 the side hides and the Filter button returns with its count; pressing 
 <tr><td>Name categories as nouns: "Grade", "School", "Subject".</td><td>"Filter by grade", "Choose a school".</td></tr>
 <tr><td>Label the menu footer "Clear" and "Apply".</td><td>"Reset", "OK", "Done".</td></tr>
 <tr><td>Put "Reset filters" at the top of a side; "Apply filters" only for a batch.</td><td>"Clear all", "Submit".</td></tr>
-<tr><td>Name the Filter button with filters on: "Filters, 2 applied".</td><td>"Filters (2)".</td></tr>
+<tr><td>Name the Filter icon button with filters on: "Filters, 2 applied".</td><td>"Filters (2)".</td></tr>
 <tr><td>Count the results in words: "1 of 8 students".</td><td>"1 result".</td></tr>
 <tr><td>Go back from the filters on a narrow Section with "Show results".</td><td>"Done", "Close".</td></tr>
 </tbody>
@@ -239,7 +239,7 @@ Below 960 the side hides and the Filter button returns with its count; pressing 
 
 ## Accessibility
 
-- The Filter button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
+- The Filter icon button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
 - Clear and Apply are the last tab stops in a menu.
@@ -257,7 +257,7 @@ Below 960 the side hides and the Filter button returns with its count; pressing 
 </thead>
 <tbody>
 <tr><td>Quick filter</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a></td><td>A count only when a value is on; it hugs its label and opens its list at bottom-end.</td></tr>
-<tr><td>Filter button</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-filter-button--docs">Filter button</a></td><td>Text "Filters" with the `filter` icon; its `trailingMetric` draws the count on the selected fill. The Section's `filters` entry hands it to the menu.</td></tr>
+<tr><td>Filter icon button</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a> trigger (<a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a>)</td><td>The `filter` icon alone, named "Filters"; its `trailingMetric` draws the count on the selected fill. The Filter menu draws it unless you pass a `trigger`.</td></tr>
 <tr><td>One list (tier 1 lists, 2a)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-popup-select--docs">Popup select</a></td><td>Applies as you pick, radios for one. <PlannedTag /> Checkboxes for several are Planned.</td></tr>
 <tr><td>Filter menu (2b, 2c)</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a></td><td>Holds values until Apply; columns side by side or stacked; Clear and Apply at the end.</td></tr>
 <tr><td>Placement and width</td><td><a target="_top" href="./?path=/docs/templates-popup--docs">Popup</a></td><td>bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger.</td></tr>

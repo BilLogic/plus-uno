@@ -13,7 +13,6 @@ const sampleItems = [
     { text: 'Home', href: '/' },
     { text: 'Training', href: '/training' },
     { text: 'Lessons', href: '/lessons' },
-    { text: 'Two-step equations' },
 ];
 
 export default {
@@ -80,7 +79,7 @@ function BreadcrumbShortDemo() {
             <DemoLabel>SHORT BREADCRUMB (2 LEVELS)</DemoLabel>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
-                { text: 'Session plans' }
+                { text: 'Session plans', href: '/session-plans' }
             ]} />
         </div>
     );
@@ -115,15 +114,14 @@ export const Interactive = (args) => (
         items={{
             short: [
                 { text: 'Home', href: '/' },
-                { text: 'Session plans' }
+                { text: 'Session plans', href: '/session-plans' }
             ],
             standard: sampleItems,
             deep: [
                 { text: 'Home', href: '/' },
                 { text: 'Training', href: '/training' },
                 { text: 'Lessons', href: '/lessons' },
-                { text: 'Grade 7 math', href: '/lessons/grade-7-math' },
-                { text: 'Two-step equations' }
+                { text: 'Grade 7 math', href: '/lessons/grade-7-math' }
             ]
         }[args.pathPreset] || sampleItems}
     />
@@ -136,19 +134,17 @@ Interactive.args = {
 
 const trailOf = (canvasElement) => ({
     ancestor: canvasElement.querySelector('.plus-breadcrumb-link a'),
-    current: canvasElement.querySelector('.plus-breadcrumb-current'),
 });
 
-/** Rest: linked ancestors in the link color, the current page plain and subtlest. */
+/** Rest: every level a parent link, in the link color; no level is the current record. */
 export const Rest = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
-        const { ancestor, current } = trailOf(canvasElement);
+        const { ancestor } = trailOf(canvasElement);
         await expectInk(canvasElement, ancestor, undefined, '--ds-link', 'ancestor');
         await expect(decorationUnder(ancestor), 'ancestor is not underlined at rest').toBe('none');
-        await expect(current).toHaveAttribute('aria-current', 'page');
-        await expect(current.querySelector('a'), 'the current page is not a link').toBeNull();
-        await expectInk(canvasElement, current, undefined, '--ds-text-subtlest', 'current page');
+        await expect(canvasElement.querySelectorAll('.plus-breadcrumb-link a'), 'every level is a link').toHaveLength(sampleItems.length);
+        await expect(canvasElement.querySelector('[aria-current]'), 'no level is the current record').toBeNull();
     },
 };
 
@@ -166,20 +162,17 @@ export const Hovered = {
 export const Pressed = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
-        const { ancestor, current } = trailOf(canvasElement);
+        const { ancestor } = trailOf(canvasElement);
         await expectNoStateChange(ancestor, ':active', 'ancestor');
-        await expectNoStateChange(current, ':active', 'current page');
     },
 };
 
-/** Focused: the 2px ring, 2px off an ancestor link. The current page is focusable only while its text is clipped. */
+/** Focused: the 2px ring, 2px off an ancestor link. */
 export const Focused = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
-        const { ancestor, current } = trailOf(canvasElement);
+        const { ancestor } = trailOf(canvasElement);
         await expectFocusRing(canvasElement, ancestor, 'ancestor link');
-        await userEvent.tab();
-        await expect(current.contains(document.activeElement), 'the current page takes no focus').toBe(false);
     },
 };
 
@@ -190,7 +183,7 @@ export const Overflow = {
             <Breadcrumb items={[
                 { text: 'Home', href: '#' },
                 { text: LONG_SCHOOL, href: '#' },
-                { text: LONG_TOPIC },
+                { text: LONG_TOPIC, href: '#' },
             ]} />
         </div>
     ),
@@ -204,10 +197,9 @@ export const Overflow = {
         await expect(Math.round(list.getBoundingClientRect().height), 'the trail never wraps').toBe(32);
         await expect(canvas.getByRole('link', { name: 'Home' }).scrollWidth).toBeLessThanOrEqual(canvas.getByRole('link', { name: 'Home' }).clientWidth);
         await expectFullTextReachable(canvasElement, link, LONG_SCHOOL);
-        const current = canvasElement.querySelector('[aria-current="page"]');
-        await expect(current.scrollWidth).toBeGreaterThan(current.clientWidth);
-        await expect(current, 'a clipped current page is a tab stop').toHaveAttribute('tabindex', '0');
-        await expectFullTextReachable(canvasElement, current, LONG_TOPIC);
+        const last = canvas.getByRole('link', { name: LONG_TOPIC });
+        await expect(last.scrollWidth).toBeGreaterThan(last.clientWidth);
+        await expectFullTextReachable(canvasElement, last, LONG_TOPIC);
     },
 };
 
@@ -217,7 +209,7 @@ const DEEP_TRAIL = [
     { text: 'Lincoln Middle School', href: '/cohorts/a26/lincoln' },
     { text: 'Grade 7 math', href: '/cohorts/a26/lincoln/g7' },
     { text: 'Maya Chen', href: '/cohorts/a26/lincoln/g7/maya' },
-    { text: 'Session 12' },
+    { text: 'Sessions', href: '/cohorts/a26/lincoln/g7/maya/sessions' },
 ];
 
 /** Fold: with five or more levels the root and the last two stay, and the middle folds behind a "…" button that opens the hidden levels as links, in order. */
@@ -228,7 +220,7 @@ export const FoldedLevels = {
         const body = within(canvasElement.ownerDocument.body);
         await expect(canvas.getByRole('link', { name: 'Cohorts' })).toBeVisible();
         await expect(canvas.getByRole('link', { name: 'Maya Chen' })).toBeVisible();
-        await expect(canvasElement.querySelector('[aria-current="page"]')).toHaveTextContent('Session 12');
+        await expect(canvas.getByRole('link', { name: 'Sessions' })).toBeVisible();
         for (const name of ['Autumn 2026', 'Lincoln Middle School', 'Grade 7 math']) {
             await expect(canvas.queryByRole('link', { name }), `${name} is folded`).toBeNull();
         }

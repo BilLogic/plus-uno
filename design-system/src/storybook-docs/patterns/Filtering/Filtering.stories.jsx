@@ -90,9 +90,9 @@ const expectInRow3 = async (canvasElement, controls) => {
     }
 };
 
-/** The Filter button's count: its text reads "Filters" and, once values are on, the number. */
+/** The Filter icon button's count: its name reads "Filters" and, once values are on, "Filters, 2 applied". */
 const expectFilterCount = async (button, count) => {
-    await expect(button.textContent.replace(/\s+/g, ''), 'the label, then the count once values are on').toBe(count > 0 ? `Filters${count}` : 'Filters');
+    await expect(button.getAttribute('aria-label'), 'the name, then the count once values are on').toBe(count > 0 ? `Filters, ${count} applied` : 'Filters');
 };
 
 /* ------------------------------------------------------------------ tiers */
@@ -116,7 +116,7 @@ export const TierQuickFilters = {
         await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 8' }));
         await expect(p.status()).toHaveTextContent('3 of 8 students');
         await waitFor(() => expect(p.canvas.getByRole('button', { name: 'Grade: Grade 8' })).toBeInTheDocument());
-        await userEvent.click(p.canvas.getByRole('button', { name: 'Clear all' }));
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Reset filters' }));
         await expect(p.status()).toHaveTextContent('8 students');
         await fitsCanvas(canvasElement);
     },
@@ -239,7 +239,7 @@ export const FilterCount = {
         await step('Apply puts the count on the icon and reads "Filters, 2 applied"', async () => {
             await userEvent.click(menu().getByRole('button', { name: 'Apply' }));
             await waitFor(() => expectFilterCount(p.filterIcon(), 2));
-            await expect(p.filterIcon(), 'what is on takes the selected state').toHaveAttribute('aria-pressed', 'true');
+            await expect(p.filterIcon(), 'what is on takes the selected fill').toHaveClass('plus-btn--selected');
             await waitFor(() => expect(p.filterIcon(), 'focus returns to the trigger').toHaveFocus());
         });
 
@@ -312,7 +312,8 @@ export const NoMatches = {
         await expect(p.canvas.queryByRole('table'), 'the empty state replaces the whole table').toBeNull();
         await expect(p.canvas.getByText(/Grade 6 and Math/), 'it names the filters that are on').toBeInTheDocument();
         await expectFilterCount(p.filterIcon(), 2);
-        await userEvent.click(p.canvas.getByRole('button', { name: 'Reset filters' }));
+        // The Section's header row and the empty state both offer it; either one resets.
+        await userEvent.click(p.canvas.getAllByRole('button', { name: 'Reset filters' })[0]);
         await waitFor(() => expect(p.canvas.getByRole('table')).toBeInTheDocument());
         await expectFilterCount(p.filterIcon(), 0);
         await expect(p.status()).toHaveTextContent('8 students');

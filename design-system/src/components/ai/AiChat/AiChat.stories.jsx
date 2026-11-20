@@ -27,7 +27,7 @@ const STARTERS = [
     { id: 'next', label: 'Review SMART goals', text: 'Which students need a SMART goal check-in next?' },
 ];
 
-const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
+const BREADCRUMBS = [{ text: 'Home', href: '#' }];
 const ACCOUNT = { id: 'maya-k', name: 'Maya K.', role: 'Lead' };
 
 const respond = async (text) => `You asked: "${text}". Maya K. has 3 Grade 7 math sessions at Lincoln Middle today.`;

@@ -59,7 +59,7 @@ describe('Filtering live cases and links', () => {
     it('CountOnIconCase and TagRowCase render live count vs removable tag row with live FilterMenu', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<CountOnIconCase />);
-        expect(screen.getByRole('button', { name: /^Filters\s*2/ })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Filters, 2 applied' })).toBeInTheDocument();
         expect(screen.queryByRole('list', { name: 'Applied filters' })).toBeNull();
         unmount();
 

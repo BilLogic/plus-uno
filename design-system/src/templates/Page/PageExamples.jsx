@@ -88,7 +88,7 @@ export const BreadcrumbOnAreaPage = () => (
     <Page
         header={(
             <PageHeader
-                breadcrumbs={<Breadcrumb label="Breadcrumb" items={[{ text: 'Students', href: '#students' }, { text: 'Students' }]} />}
+                breadcrumbs={<Breadcrumb label="Breadcrumb" items={[{ text: 'Home', href: '#home' }]} />}
                 title="Students"
             />
         )}

@@ -101,7 +101,7 @@ The part-ticked select-all, the count of selected rows, then the actions, all at
 
 **Checked:** Review
 
-Each control has one home. The Filter button returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
+Each control has one home. The Filter button returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.  The Section does not build this takeover yet.
 
 ### Use a Section detail as an inline expand, never on a queue page. {#use-a-section-detail-as-an-inline-expand-never-on-a-queue-page}
 
@@ -176,7 +176,7 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 
 ## Width behavior
 
-Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
+Drag the width through 960 and 768.  From 960 the filter side sits at the start; the Section does not build that placement or the takeover below yet, so the example composes them. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
 
 ## Key states
 
@@ -194,7 +194,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `isLoading` | Swaps the header for skeleton bars while the Section loads. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
-| `onClearAll` · `onMoreFilters` · `onOpenFilters` | Clear all, More filters, and the Filter button of a narrow Section. |
+| `onClearAll` · `onMoreFilters` · `onOpenFilters` | Reset filters, More filters, and the Filter button of a narrow Section. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
@@ -241,7 +241,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
 | `filters` | arrayOf | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
 | `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |
-| `onClearAll` | func | — | Runs when "Clear all" is pressed. The button shows once a filter is applied. |
+| `onClearAll` | func | — | Runs when "Reset filters" is pressed. The button shows once a filter is applied. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
 | `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
 | `isLoading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |

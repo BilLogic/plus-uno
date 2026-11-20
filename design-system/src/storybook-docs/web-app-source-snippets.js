@@ -34,7 +34,6 @@ export const webAppSourceSnippets = {
         '    { text: "Home", href: "/" },',
         '    { text: "Training", href: "/training" },',
         '    { text: "Lessons", href: "/lessons" },',
-        '    { text: "Current Page" },',
         '  ]}',
         '/>'
     ]),

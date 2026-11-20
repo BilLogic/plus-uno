@@ -322,18 +322,18 @@ describe('Section header rows', () => {
         expect(rows(container)).toHaveLength(1);
     });
 
-    it('ends row 3 with the count and Clear all once a filter is applied', () => {
+    it('ends row 3 with the count and Reset filters once a filter is applied', () => {
         const onClearAll = vi.fn();
         const applied = filters.map((f, i) => ({ ...f, isSelected: i < 2 }));
         render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={onClearAll}>Body</Section>);
         expect(screen.getByText('3 of 12')).toBeInTheDocument();
-        screen.getByRole('button', { name: 'Clear all' }).click();
+        screen.getByRole('button', { name: 'Reset filters' }).click();
         expect(onClearAll).toHaveBeenCalled();
     });
 
-    it('shows no count or Clear all while nothing is applied', () => {
+    it('shows no count or Reset filters while nothing is applied', () => {
         render(<Section title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</Section>);
-        expect(screen.queryByRole('button', { name: 'Clear all' })).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
     });
 
     it('shows three filters and folds the rest into More filters with a count', () => {
@@ -353,14 +353,14 @@ describe('Section header rows', () => {
         expect(trigger).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('keeps the count and Clear all under 768', () => {
+    it('keeps the count and Reset filters under 768', () => {
         const before = window.innerWidth;
         window.innerWidth = 600;
         try {
             const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
             render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>);
             expect(screen.getByText('3 of 12')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Clear all' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
         } finally {
             window.innerWidth = before;
         }
