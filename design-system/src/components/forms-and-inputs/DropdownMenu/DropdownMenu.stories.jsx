@@ -1,4 +1,3 @@
-import { LONG_SCHOOL, expectNoSilentClip } from '../_internal/overflowPlays';
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon } from '@/components';
@@ -17,6 +16,7 @@ import {
     VerbCaseDo,
     VerbCaseDont,
 } from '@/storybook-docs/lib/dropdown-menu-cases';
+import { LONG_SCHOOL, expectNoSilentClip, expectFullTextReachable } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Dropdown menu',
@@ -507,8 +507,7 @@ export const Overflow = {
         await expect(menu.scrollWidth).toBeLessThanOrEqual(menu.clientWidth + 1);
         await expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(doc.documentElement.clientWidth);
         await expect(Math.round(long.getBoundingClientRect().height)).toBe(Math.round(within(menu).getByRole('menuitem', { name: 'Lincoln Middle' }).getBoundingClientRect().height));
-        long.focus();
-        await waitFor(() => expect(within(doc.body).getByRole('tooltip')).toHaveTextContent(LONG_SCHOOL));
+        await expectFullTextReachable(canvasElement, long, LONG_SCHOOL);
         await userEvent.keyboard('{Escape}');
     },
 };

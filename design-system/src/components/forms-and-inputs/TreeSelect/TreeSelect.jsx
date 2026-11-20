@@ -1,4 +1,5 @@
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
@@ -477,26 +478,33 @@ const TreeSelect = ({
                         <Icon name="caret-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />
                     )}
                 >
-                    <input
-                        ref={inputRef}
-                        id={fieldId}
-                        type="text"
-                        readOnly
-                        value={displayText}
-                        placeholder={placeholder}
-                        disabled={isDisabled}
-                        className="plus-field__control plus-tree-select-input"
-                        onKeyDown={handleTriggerKeyDown}
-                        role="combobox"
-                        aria-haspopup="tree"
-                        aria-expanded={isOpen}
-                        aria-controls={isOpen ? treeId : undefined}
-                        aria-labelledby={props['aria-labelledby'] || labelId}
-                        aria-required={isRequired || undefined}
-                        aria-describedby={describedBy}
-                        {...tones.control}
-                        {...props}
-                    />
+                    <ClippedTooltip text={isOpen ? '' : displayText} placement="top" deps={[displayText, isOpen]}>
+                        {({ measureRef }) => (
+                        <input
+                            ref={(node) => {
+                                inputRef.current = node;
+                                measureRef.current = node;
+                            }}
+                            id={fieldId}
+                            type="text"
+                            readOnly
+                            value={displayText}
+                            placeholder={placeholder}
+                            disabled={isDisabled}
+                            className="plus-field__control plus-tree-select-input"
+                            onKeyDown={handleTriggerKeyDown}
+                            role="combobox"
+                            aria-haspopup="tree"
+                            aria-expanded={isOpen}
+                            aria-controls={isOpen ? treeId : undefined}
+                            aria-labelledby={props['aria-labelledby'] || labelId}
+                            aria-required={isRequired || undefined}
+                            aria-describedby={describedBy}
+                            {...tones.control}
+                            {...props}
+                        />
+                        )}
+                    </ClippedTooltip>
                 </FieldBox>
 
                 <AnchoredListboxSurface

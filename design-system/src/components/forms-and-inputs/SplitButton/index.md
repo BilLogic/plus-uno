@@ -6,7 +6,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Import:** `import { SplitButton } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`)
+**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx`
 
@@ -79,7 +79,7 @@ a `Popup` or `DropdownMenu` positioned under it.
 
 ### Let a `SplitButton` action label longer than its room end in an ellipsis. {#let-a-splitbutton-action-label-longer-than-its-room-end-in-an-ellipsis}
 
-The menu button keeps its size at the seam, and the pair stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The menu button keeps its size at the seam, and the pair stays inside its slot. A clipped label has no Tooltip, so shorten it; the full label stays in the accessible name. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

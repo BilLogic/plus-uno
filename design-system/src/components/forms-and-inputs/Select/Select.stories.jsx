@@ -7,7 +7,7 @@ import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid
 import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import Select from './Select';
 import { Button } from '@/components';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable, expectReachableByFocus } from '../_internal/overflowPlays';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
@@ -794,8 +794,31 @@ export const RequiredBlocksSubmit = {
     },
 };
 
-/** Truncate: a single value longer than the field keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus. The chevron keeps its place. */
+/** Truncate: a single value longer than the field keeps one line and ends in an ellipsis. A Select you type in has no Tooltip: focus reaches the whole value, and the chevron keeps its place. */
 export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <Select
+                label="School"
+                value="long"
+                options={[{ value: 'long', label: LONG_SCHOOL }, { value: 'short', label: 'Lincoln Middle' }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const input = within(canvasElement).getByRole('combobox', { name: 'School' });
+        const box = input.closest('.plus-field');
+        await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        await expectTrailingKept(box, box.querySelector('.plus-select-caret'));
+        await expectReachableByFocus(canvasElement, input, LONG_SCHOOL);
+    },
+};
+
+/** Truncate: a Select you only pick from (`isSearchable={false}`) ends a long value in an ellipsis and opens its full text in a Tooltip on hover and focus, only while it is clipped. */
+export const OverflowNotSearchable = {
     render: () => (
         <div style={{ width: '280px' /* demo frame */ }}>
             <Select
@@ -815,9 +838,7 @@ export const Overflow = {
         await expectInsideWell(box, canvasElement.firstElementChild);
         await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
         await expect(text).toHaveTextContent(LONG_SCHOOL);
-        await expectTrailingKept(box, box.querySelector('.plus-field__trailing, .plus-select-chevron, [class*="chevron"]') || box.lastElementChild);
-        // Focus opens the full text in a Tooltip, only while it is clipped.
-        control.focus();
-        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(LONG_SCHOOL));
+        await expectTrailingKept(box, box.querySelector('.plus-select-caret'));
+        await expectFullTextReachable(canvasElement, control, LONG_SCHOOL);
     },
 };

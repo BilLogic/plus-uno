@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WIDTHS } from './FilterMenu';
+import { LONG_SCHOOL, expectNoSilentClip } from '../_internal/overflowPlays';
 
 const SIDE_BY_SIDE = [
     { id: 'status', label: 'Status', options: ['Upcoming', 'Completed', 'Canceled'] },
@@ -41,7 +42,6 @@ const openMenu = async (canvasElement) => {
     await waitFor(() => expect(menu.contains(doc.activeElement)).toBe(true));
     return menu;
 };
-import { LONG_SCHOOL, expectNoSilentClip } from '../_internal/overflowPlays';
 
 const menuClosed = (canvasElement) => waitFor(
     () => expect(canvasElement.ownerDocument.querySelector('.plus-filter-menu')).toBeNull(),

@@ -18,7 +18,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused
 
-**Motion:** docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default` · floating-enter `spatial.default` · floating-exit `spatial.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default` · floating-enter `spatial.default` · floating-exit `spatial.fast` · start-enter `appearance.fast` · start-exit `appearance.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Motion
 
@@ -28,8 +28,10 @@ Panel reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket. |
 | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
-| floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself. |
+| floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details slides in from its edge over the page. A quick look promoted to its record grows from the Panel itself. |
 | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
+| start-enter | Open and close an overlay | `--ds-motion-appearance-fast` | The Inbox, opened from the Sidebar bell, fades in beside the Sidebar with no travel, like a menu. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
+| start-exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place, the same as the enter. |
 | narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket. |
 | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
 
@@ -47,7 +49,7 @@ Same group: `Card` · `Frame` · `Modal` · `Page` · `Section` · `Table`
 
 ## Tokens touched
 
-`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-surface` · `--ds-text-subtle` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y`
+`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-text-subtle` · `--frame-sidebar-width` · `--inbox-width` · `--layer-dialog` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y` · `--panel-width-default`
 
 From `design-system/src/templates/Panel/Panel.scss`. Override these through the token layer, never with a literal.
 

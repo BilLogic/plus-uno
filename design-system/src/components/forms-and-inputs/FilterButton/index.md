@@ -88,7 +88,7 @@ toggles directly on click, with nothing to open.
 
 ### Let a `FilterButton` value longer than the button end in an ellipsis. {#let-a-filterbutton-value-longer-than-the-button-end-in-an-ellipsis}
 
-The name and the count keep their places, and the Tooltip is on only while the value is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The name and the count keep their places, and the Tooltip is on only while the value is clipped. A filter button shows one value; a menu that picks several shows its choice as a count in `trailingMetric`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

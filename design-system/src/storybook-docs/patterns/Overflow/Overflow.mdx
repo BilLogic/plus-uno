@@ -111,7 +111,8 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
 <tr><td>Breadcrumb with five or more levels <PlannedTag /></td><td>Planned: fold the middle into "…"</td><td>The "…" opens a menu of the hidden levels</td></tr>
 <tr><td>Open item in the Sidebar <PlannedTag /></td><td>Planned: truncate at the end</td><td>Tooltip with the school</td></tr>
-<tr><td>Auto-width Popup row <PlannedTag /></td><td>Planned: truncate at the end at 320</td><td>Tooltip when clipped</td></tr>
+<tr><td>Menu item and Popup row</td><td>Truncate at the end</td><td>Tooltip on hover and focus when clipped</td></tr>
+<tr><td>Button label</td><td>Truncate at the end, no Tooltip</td><td>Shorten the label; the full label stays in the accessible name</td></tr>
 <tr><td>File name</td><td>Truncate mid-line, keeping the extension</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
 <tr><td>A list of items, tags or notes <PlannedTag /></td><td>Planned: "Show n more", "Show less"</td><td>Expanded in place</td></tr>
@@ -127,8 +128,8 @@ A field answers a value longer than its room with one of four rules, chosen by w
 <tr><th>Rule</th><th>Use it when</th><th>What happens</th><th>Components</th></tr>
 </thead>
 <tbody>
-<tr><td>Grow</td><td>The value is written or read whole: notes, labels, descriptions, a set of tags being edited.</td><td>The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself.</td><td>Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu.</td></tr>
-<tr><td>Truncate</td><td>The box has one fixed line and the value is a name, a date or a choice.</td><td>One line ending in an ellipsis. The slots keep their places and the box keeps its height.</td><td>Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button, Button family labels, Dropdown menu items, File item (mid-name).</td></tr>
+<tr><td>Grow</td><td>The value is written or read whole: notes, labels, descriptions, a set of tags being edited.</td><td>The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself.</td><td>Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Fieldset, Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu.</td></tr>
+<tr><td>Truncate</td><td>The box has one fixed line and the value is a name, a date or a choice.</td><td>One line ending in an ellipsis. The slots keep their places and the box keeps its height.</td><td>Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button (one value), Dropdown menu items, File item (mid-name), and Button family labels without a Tooltip.</td></tr>
 <tr><td>Collapse</td><td>The value is a list the field shows as tags.</td><td>One line with a +n count of what is hidden; focus or a click on +n shows every item.</td><td>Tag input at rest, multiple Select (truncate), Tag group.</td></tr>
 <tr><td>Scroll</td><td>The value is a list that must stay on one line and every item must stay reachable.</td><td>One row that scrolls sideways inside the field.</td><td>Multiple Select (no wrap).</td></tr>
 </tbody>
@@ -198,7 +199,9 @@ A field that grows adds a whole line or a whole tag row and never a blank one: t
 
 <RuleTag kind="review" />
 
-A text field the person types in has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is not typed in, such as a Select, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+A text field the person types in, such as a Text field, a Search field, a Select you type in or a Time picker, has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is picked from, such as a Select with `isSearchable` off, a Popup select, a Tree select, a Cascader, a Date picker, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+
+The one exception is a Button, Link button, Split button or Button group: its label ends in an ellipsis with no Tooltip, so shorten the label. The full label stays in the accessible name.
 
 ### Make a bare ellipsis open a menu.
 

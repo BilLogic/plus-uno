@@ -60,7 +60,7 @@ Don't: Folder row hides how many files were included.
 
 ### Let a `FileItem` name longer than its row end in the middle. {#let-a-fileitem-name-longer-than-its-row-end-in-the-middle}
 
-The name keeps its start and its extension, and the full name opens in a Tooltip on hover and focus while it is clipped. The row keeps its height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The name keeps its start and its extension, and the full name opens in a Tooltip on hover and focus only while it is clipped; a clipped name becomes a tab stop so the keyboard reaches it. The row keeps its height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

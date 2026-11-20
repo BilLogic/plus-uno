@@ -6,7 +6,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Import:** `import { LinkButton } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`)
+**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.jsx`
 
@@ -63,7 +63,7 @@ Right-align in multi-step tasks and Modals; left-align on full-page forms and co
 
 ### Let a `LinkButton` label longer than its room end in an ellipsis. {#let-a-linkbutton-label-longer-than-its-room-end-in-an-ellipsis}
 
-The link keeps its height and never leaves its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The link keeps its height and never leaves its slot. A clipped label has no Tooltip, so shorten it; the full label stays in the accessible name. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

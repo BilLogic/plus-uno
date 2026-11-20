@@ -1,10 +1,10 @@
-import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useEffect, useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Cascader from './Cascader';
+import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Select/Cascader',
@@ -256,5 +256,8 @@ export const Overflow = {
         await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
         await expectInsideWell(box, canvasElement.firstElementChild);
         await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        const input = box.querySelector('input');
+        await expect(input.value).toContain(LONG_SCHOOL);
+        await expectFullTextReachable(canvasElement, input, input.value);
     },
 };

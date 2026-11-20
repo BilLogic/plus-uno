@@ -64,7 +64,7 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 
 ### Let a `Cascader` path longer than the field end in an ellipsis. {#let-a-cascader-path-longer-than-the-field-end-in-an-ellipsis}
 
-The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The full path opens in a Tooltip on hover and focus, only while it is clipped. The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

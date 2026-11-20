@@ -5,7 +5,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { FileItem } from '@/components';
 import FileUpload from './FileUpload';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { LONG_FILE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_FILE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
@@ -635,5 +635,6 @@ export const Overflow = {
         await expect(rows).toHaveLength(2);
         for (const row of rows) await expect(Math.round(row.getBoundingClientRect().height)).toBe(56);
         await expect(canvasElement).toHaveTextContent('.pdf');
+        await expectFullTextReachable(canvasElement, canvasElement.querySelector('.plus-file-item__name'), LONG_FILE);
     },
 };

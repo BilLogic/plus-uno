@@ -248,6 +248,8 @@ export const Overflow = {
         const group = canvasElement.querySelector('.plus-btn-group') || canvasElement.firstElementChild.firstElementChild;
         await expectNoSilentClip(canvasElement);
         await expectInsideWell(group, canvasElement.firstElementChild);
+        // The exception: a button label ends in an ellipsis with no Tooltip; the full label stays in the accessible name.
+        await expect(within(canvasElement).getByRole('button', { name: LONG_SCHOOL })).toBeInTheDocument();
         for (const button of within(canvasElement).getAllByRole('button')) await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
     },
 };

@@ -1,4 +1,3 @@
-import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -7,6 +6,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { Illustration } from '@/components';
 import CheckboxGroup from '../CheckboxGroup';
 import RadioGroup from './RadioGroup';
+import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio group',

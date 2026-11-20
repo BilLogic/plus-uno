@@ -41,7 +41,8 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | A table | Page | The range and the pager in the footer |
 | Breadcrumb with five or more levels | Planned: fold the middle into "…" | The "…" opens a menu of the hidden levels |
 | Open item in the Sidebar | Planned: truncate at the end | Tooltip with the school |
-| Auto-width Popup row | Planned: truncate at the end at 320 | Tooltip when clipped |
+| Menu item and Popup row | Truncate at the end | Tooltip on hover and focus when clipped |
+| Button label | Truncate at the end, no Tooltip | Shorten the label; the full label stays in the accessible name |
 | File name | Truncate mid-line, keeping the extension | Tooltip on hover and focus when clipped |
 | Id | Planned: truncate mid-line | Tooltip when clipped |
 | A list of items, tags or notes | Planned: "Show n more", "Show less" | Expanded in place |
@@ -52,8 +53,8 @@ A field answers a value longer than its room with one of four rules, chosen by w
 
 | Rule | Use it when | What happens | Components |
 | --- | --- | --- | --- |
-| Grow | The value is written or read whole: notes, labels, descriptions, a set of tags being edited. | The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself. | Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu. |
-| Truncate | The box has one fixed line and the value is a name, a date or a choice. | One line ending in an ellipsis. The slots keep their places and the box keeps its height. | Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button, Button family labels, Dropdown menu items, File item (mid-name). |
+| Grow | The value is written or read whole: notes, labels, descriptions, a set of tags being edited. | The box grows by whole lines or rows, with no blank line under the last. Past its maximum height it scrolls inside itself. | Text area, Rich text editor, Tag input with focus, multiple Select (wrap), and the labels of Fieldset, Checkbox, Radio, Toggle, Choice grid, Setting row, Comment and Filter menu. |
+| Truncate | The box has one fixed line and the value is a name, a date or a choice. | One line ending in an ellipsis. The slots keep their places and the box keeps its height. | Text field, Search field, Select, Popup select, Tree select, Cascader, Date, Time and Date time pickers, Filter button (one value), Dropdown menu items, File item (mid-name), and Button family labels without a Tooltip. |
 | Collapse | The value is a list the field shows as tags. | One line with a +n count of what is hidden; focus or a click on +n shows every item. | Tag input at rest, multiple Select (truncate), Tag group. |
 | Scroll | The value is a list that must stay on one line and every item must stay reachable. | One row that scrolls sideways inside the field. | Multiple Select (no wrap). |
 
@@ -146,7 +147,9 @@ A field that grows adds a whole line or a whole tag row and never a blank one: t
 
 **Checked:** Review
 
-A text field the person types in has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is not typed in, such as a Select, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+A text field the person types in, such as a Text field, a Search field, a Select you type in or a Time picker, has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is picked from, such as a Select with `isSearchable` off, a Popup select, a Tree select, a Cascader, a Date picker, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+
+The one exception is a Button, Link button, Split button or Button group: its label ends in an ellipsis with no Tooltip, so shorten the label. The full label stays in the accessible name.
 
 ### Make a bare ellipsis open a menu. {#make-a-bare-ellipsis-open-a-menu}
 

@@ -107,7 +107,8 @@ const writeCollapsed = (key, value) => {
  *   fading on `appearance.fast`, with no overshoot. Reduced motion keeps only
  *   the fade. Back shows the main Sidebar, where what was left sits as one open
  *   row (`tabs`) under its area.
- * - **Account row**: `SidebarAccount`, under a divider.
+ * - **Account row**: `SidebarAccount`, under a divider: the account menu (Profile,
+ *   Help Center, Sign out) and, at the end, the Inbox bell with its unread count.
  *
  * Content is data. Nothing here changes the URL.
  */
@@ -131,6 +132,9 @@ const Sidebar = ({
     onProfile,
     onSignOut,
     helpHref,
+    inboxCount,
+    isInboxOpen,
+    onInbox,
     homeHref = '/',
     slackUrl,
     onHome,
@@ -840,6 +844,9 @@ const Sidebar = ({
                     onProfile={onProfile}
                     onSignOut={handleSignOut}
                     helpHref={helpHref}
+                    inboxCount={inboxCount}
+                    isInboxOpen={isInboxOpen}
+                    onInbox={onInbox}
                 />
             ) : null}
         </div>
@@ -939,8 +946,14 @@ Sidebar.propTypes = {
     onProfile: PropTypes.func,
     /** The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()` */
     onSignOut: PropTypes.func,
-    /** Help Center, opened in a new tab */
+    /** Help Center, a row in the account menu, opened in a new tab */
     helpHref: PropTypes.string,
+    /** Unread notifications, drawn on the account row's bell */
+    inboxCount: PropTypes.number,
+    /** The Inbox is open beside the Sidebar: the bell takes the selected fill */
+    isInboxOpen: PropTypes.bool,
+    /** Opens and closes the Inbox from the bell; the bell is drawn only when this is set */
+    onInbox: PropTypes.func,
     /** Where the logo goes */
     homeHref: PropTypes.string,
     /** Where Slack links in the role config; defaults to `SLACK_URL` */

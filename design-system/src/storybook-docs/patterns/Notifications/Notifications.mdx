@@ -4,7 +4,8 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NotificationsStories from './Notifications.stories.jsx';
-import { INBOX_STAGE, PLACE_STAGE, STAGE } from './notificationsDemo.jsx';
+import { PLACE_STAGE, STAGE } from './notificationsDemo.jsx';
+import { INBOX_STAGE } from '@/storybook-docs/lib/inbox-demo.jsx';
 import { BannerDo, BannerDont, CODE, FlagDo, FlagDont } from './NotificationsCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -47,7 +48,7 @@ Four components carry every message. Each component page holds its appearances; 
 <TypeCard of={NotificationsStories.CarrierFlag} to="#a-flag-on-the-page" title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierBanner} to="#page-tier-banner" title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
 <TypeCard of={NotificationsStories.CarrierSectionMessage} to="#a-message-that-must-stay" title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierInbox} to="#the-inbox" title="The Inbox" stage={INBOX_STAGE}>Updates that arrived over time, in a 360-wide (`--inbox-width`) <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} to="#the-inbox" title="The Inbox" stage={INBOX_STAGE}>Updates that arrived over time, in a 360-wide (`--inbox-width`) <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> beside the Sidebar, opened from the bell beside your name, with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.</TypeCard>
 </TypeGrid>
 
 <ComponentExample of={NotificationsStories.CarrierInbox} title="The Inbox" description={<>Hover a <code>NotificationItem</code> to mark it read, switch between <code>Unread</code> and <code>All</code>, or close and reopen the <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> from the Sidebar bell (360 wide, <code>--inbox-width</code>).</>} />
@@ -137,7 +138,7 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 <tr><td>A condition that holds for everything in a Frame, page or Section</td><td>`Banner` at that tier</td><td>Top of the tier</td><td>When the condition ends</td></tr>
 <tr><td>A note beside one thing that most people never need</td><td>`InlineMessage`</td><td>Beside the field or value</td><td>On close</td></tr>
 <tr><td>Something that must be answered before going on</td><td>`Modal`, Acknowledge or Active</td><td>Centered over a Blanket</td><td>On the button</td></tr>
-<tr><td>What arrived over time</td><td>The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar</td><td>Start of the page, over content, no Blanket</td><td>Escape, outside click, or Close</td></tr>
+<tr><td>What arrived over time</td><td>The Inbox, a 360-wide (`--inbox-width`) Panel, opened from the bell beside your name</td><td>Beside the Sidebar, over the page, no Blanket</td><td>Escape, outside click, or Close</td></tr>
 </tbody>
 </DocsTable>
 
@@ -227,7 +228,7 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 
 <RuleTag kind="review" />
 
-A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Blanket, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
+A Flag is for now; the Inbox is for later. The Inbox opens from the bell beside the account name, docked beside the Sidebar at `--inbox-width` over the page with no Blanket, carrying `Mark all as read` and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
 
 </div>
 

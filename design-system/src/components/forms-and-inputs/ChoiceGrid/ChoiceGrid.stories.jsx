@@ -1,4 +1,3 @@
-import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -6,6 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Choice grid',
@@ -471,7 +471,8 @@ export const Overflow = {
         await expectInsideWell(table, canvasElement.firstElementChild);
         const label = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes(LONG_TOPIC));
         await expect(label).toBeTruthy();
-        await expect(label.getBoundingClientRect().height).toBeGreaterThan(48);
+        const short = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes('Monday'));
+        await expect(label.getBoundingClientRect().height).toBeGreaterThan(short.getBoundingClientRect().height);
         await expect(canvasElement.querySelectorAll('input[type=radio]')).toHaveLength(8);
     },
 };

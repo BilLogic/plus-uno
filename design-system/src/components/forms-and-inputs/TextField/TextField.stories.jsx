@@ -1,4 +1,3 @@
-import { LONG_TUTOR, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -8,6 +7,7 @@ import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Text field',
@@ -612,13 +612,10 @@ export const Overflow = {
         await expectNoSilentClip(box);
         await expectInsideWell(box, canvasElement.firstElementChild);
         await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
-        await expect(input.value).toBe(LONG_TUTOR);
         // The icon after the control keeps its place at the end of the box.
         const icon = box.querySelector('i.fa-circle-check');
         await expect(icon.getBoundingClientRect().right).toBeLessThanOrEqual(box.getBoundingClientRect().right);
         // Focus is how the rest is reached: the caret walks to the end of the value.
-        input.focus();
-        await userEvent.keyboard('{End}');
-        await expect(input.scrollLeft).toBeGreaterThan(0);
+        await expectReachableByFocus(canvasElement, input, LONG_TUTOR);
     },
 };

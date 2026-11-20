@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import PropTypes from 'prop-types';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
@@ -522,34 +523,41 @@ const DatePicker = ({
                     </>
                 )}
             >
-                <input
-                    {...props}
-                    ref={inputRef}
-                    type="text"
-                    id={fieldId}
-                    name={name}
-                    className="plus-field__control plus-date-picker__input"
-                    role="combobox"
-                    autoComplete="off"
-                    aria-haspopup="dialog"
-                    aria-expanded={isOpen}
-                    aria-controls={isOpen ? popupId : undefined}
-                    aria-invalid={invalid || undefined}
-                    placeholder={placeholder ?? (effectiveRange ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
-                    value={text}
-                    disabled={isDisabled}
-                    readOnly={isReadOnly}
-                    aria-readonly={isReadOnly || undefined}
-                    onClick={openCalendar}
-                    onChange={(event) => {
-                        if (!interactive) return;
-                        setText(event.target.value);
-                        setTypedInvalid(false);
-                    }}
-                    onKeyDown={handleKeyDown}
-                    onFocus={onFocus}
-                    onBlur={handleBlur}
-                />
+                <ClippedTooltip text={isOpen ? '' : text} placement="top" deps={[text, isOpen]}>
+                    {({ measureRef }) => (
+                    <input
+                        {...props}
+                        ref={(node) => {
+                            inputRef.current = node;
+                            measureRef.current = node;
+                        }}
+                        type="text"
+                        id={fieldId}
+                        name={name}
+                        className="plus-field__control plus-date-picker__input"
+                        role="combobox"
+                        autoComplete="off"
+                        aria-haspopup="dialog"
+                        aria-expanded={isOpen}
+                        aria-controls={isOpen ? popupId : undefined}
+                        aria-invalid={invalid || undefined}
+                        placeholder={placeholder ?? (effectiveRange ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
+                        value={text}
+                        disabled={isDisabled}
+                        readOnly={isReadOnly}
+                        aria-readonly={isReadOnly || undefined}
+                        onClick={openCalendar}
+                        onChange={(event) => {
+                            if (!interactive) return;
+                            setText(event.target.value);
+                            setTypedInvalid(false);
+                        }}
+                        onKeyDown={handleKeyDown}
+                        onFocus={onFocus}
+                        onBlur={handleBlur}
+                    />
+                    )}
+                </ClippedTooltip>
             </FieldBox>
             <AnchoredListboxSurface
                 open={isOpen}

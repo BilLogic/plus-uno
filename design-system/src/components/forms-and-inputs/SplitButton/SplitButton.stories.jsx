@@ -212,6 +212,8 @@ export const Overflow = {
         const menu = canvas.getByRole('button', { name: 'More save options' });
         await expectNoSilentClip(canvasElement);
         await expectInsideWell(menu, canvasElement.firstElementChild);
+        // The exception: a button label ends in an ellipsis with no Tooltip; the full label stays in the accessible name.
+        await expect(action).toHaveAccessibleName(LONG_SCHOOL);
         await expect(Math.round(action.getBoundingClientRect().height)).toBe(32);
         await expect(menu.getBoundingClientRect().width).toBeGreaterThan(0);
         await expect(menu.getBoundingClientRect().left).toBeGreaterThanOrEqual(action.getBoundingClientRect().right - 1);

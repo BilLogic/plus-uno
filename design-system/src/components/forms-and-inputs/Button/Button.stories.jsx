@@ -8,6 +8,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 import { CountTag, FooterActions, Icon, SectionMessage } from '@/components';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 const icons = {
     'none': null,
     'plus': 'plus',
@@ -67,7 +68,6 @@ const PAINT = {
 
 /** The link appearances draw no fill: hovering underlines the label and pressing darkens it. */
 const LINK_PRESSED = { link: '--ds-link-pressed', 'danger-link': '--ds-text-danger-bolder' };
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 
 const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance === 'danger-link' ? 'Danger link' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
@@ -813,6 +813,8 @@ export const Overflow = {
         await expectInsideWell(button, canvasElement.firstElementChild);
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
         await expect(button).toHaveTextContent(LONG_SCHOOL);
+        // The exception: a button label ends in an ellipsis with no Tooltip, so the full label stays in the accessible name. Shorten the label.
+        await expect(button).toHaveAccessibleName(LONG_SCHOOL);
         const icons = button.querySelectorAll('i');
         await expect(icons).toHaveLength(2);
         for (const icon of icons) await expectTrailingKept(button, icon);

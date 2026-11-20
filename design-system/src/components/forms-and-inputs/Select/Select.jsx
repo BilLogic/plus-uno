@@ -317,9 +317,11 @@ const Select = ({
         onKeyDown: handleKeyDown,
     };
 
-    // A single value wider than the field ends in an ellipsis and opens its full
-    // text in a Tooltip on hover and focus, only while it is clipped and only
-    // while the list is closed (the open list shows the same value in its row).
+    // A single value wider than the field ends in an ellipsis. A field that is
+    // typed in has no Tooltip: focus reaches the value. One that is only picked
+    // from (`isSearchable={false}`) opens the full text in a Tooltip on hover and
+    // focus, only while it is clipped and only while the list is closed (the open
+    // list shows the same value in its row).
     const buildControl = (measureRef) => {
         if (typeable) {
             const typed = query !== null;
@@ -365,8 +367,8 @@ const Select = ({
         );
     };
 
-    // The wrapper stays for every single Select, so picking a value never remounts the control.
-    const control = !multi ? (
+    // The wrapper stays for every single Select that is not typed in, so picking a value never remounts the control.
+    const control = !multi && !typeable ? (
         <ClippedTooltip text={shown || isReadOnly || disabled ? '' : singleText} placement="top" deps={[singleText, shown]}>
             {({ measureRef }) => buildControl(measureRef)}
         </ClippedTooltip>

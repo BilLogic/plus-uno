@@ -14,7 +14,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen, RequiredBlocksSubmit, Overflow
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen, RequiredBlocksSubmit, Overflow, OverflowNotSearchable
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -135,7 +135,7 @@ Don't: Disabled fades a value people need to read.
 
 ### Let a single `Select` value longer than the field end in an ellipsis with a Tooltip. {#let-a-single-select-value-longer-than-the-field-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the value is clipped and only while the list is closed. A multiple Select picks wrap, no wrap or truncate, shown above. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+A Select you type in has no Tooltip, because focus reaches the value; one with `isSearchable={false}` opens the full text in a Tooltip while it is clipped and the list is closed. A multiple Select picks wrap, no wrap or truncate, shown above. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

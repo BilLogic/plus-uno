@@ -5,7 +5,7 @@
  * growing field has no blank line, nothing escapes its well, and the full value
  * stays reachable.
  */
-import { expect } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 /** Long content in the PLUS voice: a tutor with a double-barrelled name, a school, a lesson topic. */
 export const LONG_TUTOR = 'Dr. Alexandria Montgomery-Featherstonehaugh Rodriguez-Villanueva';
@@ -73,4 +73,36 @@ export const expectTrailingKept = async (box, trailing) => {
     await expect(r.width).toBeGreaterThan(0);
     await expect(r.right).toBeLessThanOrEqual(edge.right + 1);
     await expect(r.left).toBeGreaterThanOrEqual(edge.left - 1);
+};
+
+/**
+ * The full text of a clipped control opens in a Tooltip on hover and again on
+ * focus, and closes when the pointer or focus leaves.
+ */
+export const expectFullTextReachable = async (canvasElement, control, text) => {
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.hover(control);
+    await waitFor(() => expect(body.getByRole('tooltip')).toHaveTextContent(text));
+    await userEvent.unhover(control);
+    await waitFor(() => expect(body.queryByRole('tooltip')).toBeNull());
+    // A menu moves focus to the hovered row; start from none so focus is what opens the Tooltip.
+    control.blur();
+    control.focus();
+    await waitFor(() => expect(body.getByRole('tooltip')).toHaveTextContent(text));
+    control.blur();
+    await waitFor(() => expect(body.queryByRole('tooltip')).toBeNull());
+};
+
+/**
+ * A field the person types in has no Tooltip: its value is whole, and focus
+ * reaches the end of it, because the caret walks there and the field scrolls.
+ */
+export const expectReachableByFocus = async (canvasElement, input, text) => {
+    await expect(input.value).toBe(text);
+    input.scrollLeft = 0;
+    input.focus();
+    await userEvent.keyboard('{End}');
+    await expect(input.scrollLeft).toBeGreaterThan(0);
+    await expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull();
+    input.blur();
 };

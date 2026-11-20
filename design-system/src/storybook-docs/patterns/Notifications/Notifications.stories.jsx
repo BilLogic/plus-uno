@@ -19,13 +19,12 @@ import {
     TierSectionCase,
 } from './NotificationsCases.jsx';
 import {
-    INBOX_STAGE,
-    InboxInSidebar,
     MustStay,
     PLACE_STAGE,
     SeverityRow,
     STAGE,
 } from './notificationsDemo.jsx';
+import { INBOX_STAGE, InboxInSidebar } from '@/storybook-docs/lib/inbox-demo.jsx';
 
 /**
  * Notifications: the pattern page's examples, run in the Storybook tests. Each
@@ -97,9 +96,15 @@ export const CarrierInbox = {
     play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        const inbox = canvas.getByRole('complementary', { name: 'Inbox' });
         await expect(inbox).toBeInTheDocument();
         await expect(px(getComputedStyle(inbox).width)).toBe(tokenLength(canvasElement, '--inbox-width'));
+        const sidebar = canvasElement.querySelector('.plus-frame__sidebar');
+        await expect(inbox.getBoundingClientRect().left, 'docked on the Sidebar\'s end edge').toBeCloseTo(sidebar.getBoundingClientRect().right, 0);
+        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'no Blanket').toBeNull();
+        const bell = canvas.getByRole('button', { name: /^Inbox, 3 unread/ });
+        await expect(bell, 'the bell beside the account name opens it').toHaveAttribute('aria-pressed', 'true');
+        await expect(sidebar.querySelector('.plus-sidebar-account').contains(bell), 'the bell is in the account row').toBe(true);
         await expect(within(inbox).getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
         await expect(within(inbox).getByRole('button', { name: /settings/i })).toBeInTheDocument();
         await expect(within(inbox).getByRole('button', { name: 'Close' })).toBeInTheDocument();
@@ -292,7 +297,7 @@ export const KeyInboxCaughtUp = {
     play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        const inbox = canvas.getByRole('complementary', { name: 'Inbox' });
         await expect(within(inbox).getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
         await userEvent.click(within(inbox).getByRole('tab', { name: 'All' }));
         await expect(inbox.querySelectorAll('.plus-notification-item').length).toBeGreaterThan(0);
@@ -327,12 +332,12 @@ export const TestFlagsLeave = {
     },
 };
 
-/** Test: the Inbox marks one or all as read, shows EmptyState, closes on Escape and outside click, and reopens from the Sidebar. */
+/** Test: the Inbox marks one or all as read, shows EmptyState, closes on Escape and outside click, and reopens from the bell. */
 export const TestInboxInteractions = {
     name: 'Test: Inbox marks read and closes on Escape or outside click',
     render: () => <div style={{ width: INBOX_STAGE }}><InboxInSidebar /></div>,
     play: async ({ canvas }) => {
-        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        const inbox = canvas.getByRole('complementary', { name: 'Inbox' });
 
         // Hover and mark one item read
         const firstRow = inbox.querySelector('.plus-notification-item');
@@ -348,19 +353,19 @@ export const TestInboxInteractions = {
         await userEvent.click(within(inbox).getByRole('tab', { name: 'All' }));
         await expect(within(inbox).getAllByRole('link').length).toBeGreaterThan(0);
 
-        // Escape closes and returns focus to the Sidebar Inbox trigger
-        const nav = canvas.getByRole('navigation', { name: 'Main' });
-        const inboxTrigger = within(nav).getByRole('button', { name: /Inbox/i });
+        // Escape closes and returns focus to the bell
+        const inboxTrigger = canvas.getByRole('button', { name: /^Inbox/ });
+        await expect(canvas.queryByRole('link', { name: /^Inbox/ }), 'the Inbox has no row in the nav').toBeNull();
         await userEvent.keyboard('{Escape}');
-        await expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull();
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Inbox' })).toBeNull());
         await expect(inboxTrigger).toHaveFocus();
 
-        // Sidebar button reopens
+        // The bell reopens
         await userEvent.click(inboxTrigger);
-        await expect(canvas.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
+        await expect(canvas.getByRole('complementary', { name: 'Inbox' })).toBeInTheDocument();
 
         // Outside click closes
         await userEvent.click(canvas.getByRole('heading', { name: 'Sessions' }));
-        await expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull();
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Inbox' })).toBeNull());
     },
 };

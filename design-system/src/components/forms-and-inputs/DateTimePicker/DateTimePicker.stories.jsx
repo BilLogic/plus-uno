@@ -1,10 +1,10 @@
-import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import DateTimePicker from './DateTimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date time picker',
@@ -366,15 +366,20 @@ export const KeyboardFocus = {
     },
 };
 
-/** Truncate: in a narrow field the date and time keep one line each and the field does not grow past its slot. */
+/** Truncate: in a narrow field the date keeps one line, ends in an ellipsis and opens its full value in a Tooltip; the time stays whole and the field stays inside its slot. */
 export const Overflow = {
     render: () => (
-        <div style={{ width: '240px' /* demo frame */ }}>
-            <DateTimePicker id="datetime-overflow" label="Session start" showSectionLabels={false} />
+        <div style={{ width: '120px' /* demo frame */ }}>
+            <DateTimePicker id="datetime-overflow" label="Session start" showSectionLabels={false} dateValue="2026-11-19" timeValue="04:45 PM" />
         </div>
     ),
     play: async ({ canvasElement }) => {
+        const [date, time] = canvasElement.querySelectorAll('input');
+        await expect(date.value).toMatch(/2026/);
         await expectNoSilentClip(canvasElement);
         await expectInsideWell(canvasElement.querySelector('.plus-field'), canvasElement.firstElementChild);
+        await expect(date.scrollWidth).toBeGreaterThan(date.clientWidth);
+        await expectFullTextReachable(canvasElement, date, date.value);
+        await expect(time.value).toMatch(/4:45/);
     },
 };

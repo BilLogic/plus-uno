@@ -1,8 +1,8 @@
-import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import SearchField, { SearchFieldAction } from './SearchField';
 import { Button } from '@/components';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../_internal/overflowPlays';
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' };
 const SCOPES = [
     { value: 'students', label: 'Students', count: 42 },
@@ -400,11 +400,8 @@ export const Overflow = {
         await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
         await expectNoSilentClip(box);
         await expectInsideWell(box, canvasElement.firstElementChild);
-        await expect(input.value).toBe(LONG_TUTOR);
         const clear = within(box).getByRole('button');
         await expectTrailingKept(box, clear);
-        input.focus();
-        await userEvent.keyboard('{End}');
-        await expect(input.scrollLeft).toBeGreaterThan(0);
+        await expectReachableByFocus(canvasElement, input, LONG_TUTOR);
     },
 };

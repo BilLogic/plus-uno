@@ -5,6 +5,7 @@ import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FilterButton } from '../FilterButton/FilterButton';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import PopupSelect, { POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from './PopupSelect';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const STATUSES = ['Upcoming', 'Completed', 'Canceled'];
 
@@ -31,7 +32,6 @@ const openMenu = async (canvasElement) => {
     await waitFor(() => expect(menu.contains(doc.activeElement)).toBe(true));
     return menu;
 };
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const menuClosed = (canvasElement) => waitFor(
     () => expect(canvasElement.ownerDocument.querySelector('.plus-popup-select')).toBeNull(),
@@ -282,5 +282,6 @@ export const Overflow = {
         await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
         await expectInsideWell(trigger, canvasElement.firstElementChild);
         await expect(trigger).toHaveTextContent(LONG_SCHOOL);
+        await expectFullTextReachable(canvasElement, trigger, LONG_SCHOOL);
     },
 };

@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import FilterButton, { FILTER_BUTTON_APPEARANCES } from './FilterButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 
@@ -197,7 +197,7 @@ export const Interactive = {
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.filterButton } } },
 };
 
-/** Truncate: a chosen value longer than the button ends in an ellipsis inside the button; the chevron stays at the end and the full value opens in a Tooltip on hover and focus. */
+/** Truncate: a chosen value longer than the button ends in an ellipsis inside the button; the name and the count keep their places and the full value opens in a Tooltip on hover and focus. A filter takes one value here: a menu that picks several shows its choice as a count in `trailingMetric`. */
 export const Overflow = {
     render: () => (
         <div style={{ width: '220px' /* demo frame */ }}>
@@ -211,7 +211,6 @@ export const Overflow = {
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(32);
         await expect(button).toHaveTextContent(LONG_SCHOOL);
         await expectTrailingKept(button, button.querySelector('.plus-filter-btn__metric'));
-        button.focus();
-        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(LONG_SCHOOL));
+        await expectFullTextReachable(canvasElement, button, `School: ${LONG_SCHOOL}`);
     },
 };

@@ -6,7 +6,7 @@ import FileItem, {
     FILE_ITEM_REMOVALS,
     FILE_ITEM_STATUSES,
 } from './FileItem';
-import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const wrap = { maxWidth: '640px' /* demo frame */ };
 const narrowWrap = { maxWidth: '320px' /* demo frame */ };
@@ -437,10 +437,7 @@ export const Overflow = {
         await expect(head.scrollWidth).toBeGreaterThan(head.clientWidth);
         await expect(tail.getBoundingClientRect().right).toBeLessThanOrEqual(row.getBoundingClientRect().right);
 
-        await userEvent.hover(canvasElement.querySelector('.plus-file-item__name'));
-        const docBody = within(canvasElement.ownerDocument.body);
-        const tooltip = await docBody.findByRole('tooltip');
-        await expect(tooltip).toHaveTextContent(fullName);
+        await expectFullTextReachable(canvasElement, canvasElement.querySelector('.plus-file-item__name'), fullName);
     },
 };
 

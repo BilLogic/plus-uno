@@ -153,5 +153,7 @@ export const Overflow = {
         await expectInsideWell(link, canvasElement.firstElementChild);
         await expect(Math.round(link.getBoundingClientRect().height)).toBe(32);
         await expect(link).toHaveTextContent(LONG_SCHOOL);
+        // The exception: a button label ends in an ellipsis with no Tooltip, so the full label stays in the accessible name. Shorten the label.
+        await expect(link).toHaveAccessibleName(LONG_SCHOOL);
     },
 };

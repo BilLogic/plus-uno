@@ -7,7 +7,7 @@ import Icon from '@/components/images-and-icons/Icon';
 import ProgressRing from '@/components/loading/ProgressRing';
 import Link from '@/components/navigation/Link';
 import Popup from '@/components/overlays-and-layering/Popup';
-import Tooltip from '@/components/overlays-and-layering/Tooltip';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import FileUploadContext from '../_internal/FileUploadContext';
 import './FileItem.scss';
@@ -207,27 +207,29 @@ const FileItem = ({
     const { head, tail } = splitMiddleName(name, resolvedKind);
     const canOpen = Boolean(href) && resolvedStatus === 'done' && !disabled;
 
-    const nameInner = (
-        <>
-            <VisuallyHidden>{name}</VisuallyHidden>
-            <span className="plus-file-item__name-visual" aria-hidden="true">
-                <span className="plus-file-item__name-head" data-file-item-part="name-head">{head}</span>
-                {tail && (
-                    <span className="plus-file-item__name-tail" data-file-item-part="name-tail">{tail}</span>
-                )}
+    // The name element, with the head ellipsizing: its measureRef says when it is clipped.
+    const renderName = (measureRef, truncated) => {
+        const inner = (
+            <>
+                <VisuallyHidden>{name}</VisuallyHidden>
+                <span className="plus-file-item__name-visual" aria-hidden="true">
+                    <span ref={measureRef} className="plus-file-item__name-head" data-file-item-part="name-head">{head}</span>
+                    {tail && (
+                        <span className="plus-file-item__name-tail" data-file-item-part="name-tail">{tail}</span>
+                    )}
+                </span>
+            </>
+        );
+        return canOpen ? (
+            <Link href={href} appearance="subtle" className="plus-file-item__name plus-file-item__link">
+                {inner}
+            </Link>
+        ) : (
+            <span className="plus-file-item__name" tabIndex={truncated ? 0 : undefined}>
+                {inner}
             </span>
-        </>
-    );
-
-    const nameElement = canOpen ? (
-        <Link href={href} appearance="subtle" className="plus-file-item__name plus-file-item__link">
-            {nameInner}
-        </Link>
-    ) : (
-        <span className="plus-file-item__name">
-            {nameInner}
-        </span>
-    );
+        );
+    };
 
     // End actions
     const showActions = !readOnly && !disabled;
@@ -315,9 +317,9 @@ const FileItem = ({
 
             <div className="plus-file-item__body">
                 <div className="plus-file-item__label">
-                    <Tooltip text={name} placement="top">
-                        {nameElement}
-                    </Tooltip>
+                    <ClippedTooltip text={name} placement="top">
+                        {({ measureRef, truncated }) => renderName(measureRef, truncated)}
+                    </ClippedTooltip>
                 </div>
                 <div
                     className={clsx('plus-file-item__description', {

@@ -8,7 +8,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Import:** `import { DatePicker } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
@@ -91,7 +91,7 @@ Don't: Disabled fades a value people need to read.
 
 ### Let a `DatePicker` value wider than its field end in an ellipsis. {#let-a-datepicker-value-wider-than-its-field-end-in-an-ellipsis}
 
-The field keeps its height and stays inside its slot; give it room for the whole date. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The full value opens in a Tooltip on hover and focus, only while it is clipped. The field keeps its height and stays inside its slot; give it room for the whole date. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

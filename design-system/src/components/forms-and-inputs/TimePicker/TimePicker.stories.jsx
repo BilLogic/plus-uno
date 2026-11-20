@@ -1,10 +1,10 @@
-import { expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Time picker',
@@ -252,17 +252,20 @@ export const Interactive = (args) => {
 };
 Interactive.args = { 'aria-label': 'Reminder time', spacing: 'default', isDisabled: false, isReadOnly: false, isInvalid: false };
 
-/** Truncate: a time is short and never wraps; in a narrow slot the field keeps one line and inside its well. */
+/** Truncate: in a field narrower than its time, the value keeps one line and ends in an ellipsis. A time picker is typed in, so it has no Tooltip: focus reaches the whole value. */
 export const Overflow = {
     render: () => (
-        <div style={{ width: '100px' /* demo frame */ }}>
-            <TimePicker aria-label="Start time" defaultValue="11:45 PM" />
+        <div style={{ width: '84px' /* demo frame */ }}>
+            <TimePicker aria-label="Start time" value="11:45 PM" />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const box = canvasElement.querySelector('.plus-field');
+        const input = box.querySelector('input');
+        await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
         await expectNoSilentClip(box);
         await expectInsideWell(box, canvasElement.firstElementChild);
         await expect(Math.round(box.getBoundingClientRect().height)).toBe(40);
+        await expectReachableByFocus(canvasElement, input, input.value);
     },
 };
