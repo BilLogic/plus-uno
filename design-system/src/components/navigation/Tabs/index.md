@@ -232,7 +232,7 @@ Implemented as `Panel`.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--border-width-selected` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--label-max-width` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--border-width-selected` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--label-max-width` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 

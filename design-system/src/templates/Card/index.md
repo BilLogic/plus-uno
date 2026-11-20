@@ -202,7 +202,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current` · `--focus-ring-width`
+`--body-default-tracking` · `--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-md-tracking`
 
 From `design-system/src/templates/Card/Card.scss`. Override these through the token layer, never with a literal.
 

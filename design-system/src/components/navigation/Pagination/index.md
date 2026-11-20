@@ -225,7 +225,7 @@ Implemented as `PaginationNavigator`.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
 

@@ -11,6 +11,7 @@
     box-sizing: border-box;
     min-width: 0;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text);
     --plus-ai-message-caret: var(--ai-message-caret-width);
     --plus-ai-message-dot: var(--ai-message-dot-size);
@@ -95,6 +96,7 @@
     &__heading {
         margin: 0;
         font: var(--heading-xs);
+        letter-spacing: var(--heading-xs-tracking);
     }
 
     &__list {
@@ -175,12 +177,14 @@
         align-items: baseline;
         gap: var(--inline-md);
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         min-width: 0;
     }
 
     &__type {
         flex: none;
         font: var(--body-sm);
+        letter-spacing: var(--body-sm-tracking);
         color: var(--ds-text-subtle);
     }
 }
@@ -202,6 +206,7 @@
 
     &__thanks {
         font: var(--body-sm);
+        letter-spacing: var(--body-sm-tracking);
         color: var(--ds-text-subtle);
     }
 

@@ -10,4 +10,5 @@
 @mixin card-title-type {
     margin: 0;
     font: var(--heading-xs);
+    letter-spacing: var(--heading-xs-tracking);
 }

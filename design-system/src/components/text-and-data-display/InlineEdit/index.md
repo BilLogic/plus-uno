@@ -172,7 +172,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--control-lg` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--control-lg` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--pad-x-md` · `--radius-control-lg` · `--radius-md` · `--stack-sm`
 
 From `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 

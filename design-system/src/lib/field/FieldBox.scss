@@ -46,6 +46,7 @@
     height: var(--control-lg);
     padding: 0 calc(var(--pad-x-md) - var(--border-width-default));
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 
     // Several lines (Text area): 80 at least, growing with its rows, and the
     // first line sits where a single-line field's text does.

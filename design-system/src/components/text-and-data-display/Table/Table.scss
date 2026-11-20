@@ -57,6 +57,7 @@
     thead th {
         height: var(--plus-table-row-height);
         font: var(--heading-xxs);
+        letter-spacing: var(--heading-xxs-tracking);
         color: var(--ds-text-subtle);
         text-align: left;
         border-bottom-color: var(--ds-border-bold);
@@ -65,6 +66,7 @@
     tbody td {
         height: var(--plus-table-row-height);
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         color: var(--ds-text);
     }
 }
@@ -109,6 +111,7 @@
 
 .plus-table-cell-secondary {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -289,6 +292,7 @@
     height: var(--plus-table-row-height);
     border-bottom: none;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -303,6 +307,7 @@
     min-height: var(--table-footer-height);
     padding-inline: var(--table-pad-x-cell);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 
     &.plus-table-footer--compact {
@@ -312,6 +317,7 @@
 
 .plus-table-footer-range {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text-subtle);
 }
 

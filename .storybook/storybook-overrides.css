@@ -176,6 +176,7 @@ body,
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font: var(--body-lg);
+    letter-spacing: var(--body-lg-tracking);
     color: var(--ds-text);
     max-width: 55ch;
 }
@@ -186,18 +187,21 @@ body,
 
 .sbdocs .sbdocs-content table:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text);
     border-collapse: collapse;
 }
 
 .sbdocs .sbdocs-content table:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) th {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
 }
 
 .sbdocs .sbdocs-content table:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) td {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text);
 }
 
@@ -256,6 +260,7 @@ body,
 .sbdocs .docblock-source button,
 .sbdocs pre:not(:where(.docs-story *, .sb-ds-dodont-card *)) button {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-weight: var(--type-weight-medium);
 }
 
@@ -483,6 +488,7 @@ a.sbdocs-a {
   margin: 0 !important;
   border-collapse: collapse;
   font: var(--body-sm);
+  letter-spacing: var(--body-sm-tracking);
   color: var(--ds-text);
 }
 
@@ -540,6 +546,7 @@ a.sbdocs-a {
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
   font: var(--heading-xs) !important;
+  letter-spacing: var(--heading-xs-tracking) !important;
   margin-top: 0 !important;
   margin-bottom: var(--section-stack-lg) !important;
   color: var(--ds-text-subtle) !important;
@@ -555,6 +562,7 @@ a.sbdocs-a {
 .toc-wrapper .toc-list-item > a {
   display: block;
   font: var(--body-sm);
+  letter-spacing: var(--body-sm-tracking);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -721,6 +729,7 @@ a.sbdocs-a {
     margin: 0 !important;
     border-radius: var(--radius-md) !important;
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-weight: var(--type-weight-medium);
 }
 
@@ -948,6 +957,7 @@ a.sbdocs-a {
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
     font: var(--body-lg);
+    letter-spacing: var(--body-lg-tracking);
     font-family: var(--type-family-heading);
     font-weight: var(--type-weight-medium);
     line-height: 1.5;
@@ -1014,6 +1024,7 @@ a.sbdocs-a {
     margin-top: var(--stack-md);
     color: var(--ds-text-subtlest);
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-family: var(--type-family-code);
 }
 
@@ -1070,12 +1081,14 @@ html[data-color-mode="dark"] .docs-story {
  */
 .sbdocs .docblock-argstable {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text);
 }
 
 .sbdocs .docblock-argstable th,
 .sbdocs .docblock-argstable-head th {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
     background: transparent;
@@ -1084,27 +1097,32 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .docblock-argstable tbody td,
 .sbdocs .docblock-argstable td {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     color: var(--ds-text);
 }
 
 .sbdocs .docblock-argstable tbody td[colspan],
 .sbdocs .docblock-argstable td[colspan] {
     font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text-subtle);
 }
 
 .sbdocs .docblock-argstable tbody td:first-of-type > span:first-of-type,
 .sbdocs .docblock-argstable td:first-of-type > span:first-of-type {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
     font-weight: var(--type-weight-semibold);
 }
 
 .sbdocs .docblock-argstable td :is(p, div, span, label) {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
 }
 
 .sbdocs .docblock-argstable :is(input, select, textarea, button) {
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
 }
 
 .sbdocs .docblock-argstable :is(code, summary) {
@@ -1136,6 +1154,7 @@ html[data-color-mode="dark"] .docs-story {
 
 .sbdocs .sb-ds-docs-all-props > summary {
     font: var(--body-lg);
+    letter-spacing: var(--body-lg-tracking);
     font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
     cursor: pointer;
@@ -1168,6 +1187,7 @@ html[data-color-mode="dark"] .docs-story {
 
 .sbdocs p.sb-ds-canvas-description {
   font: var(--body-lg);
+  letter-spacing: var(--body-lg-tracking);
   color: var(--ds-text-subtle);
   max-width: 55ch;
   margin: 0;
@@ -1238,6 +1258,7 @@ html[data-color-mode="dark"] .docs-story {
 
 .sb-ds-resource-card__title {
   font: var(--heading-xs);
+  letter-spacing: var(--heading-xs-tracking);
   color: var(--ds-text);
 }
 

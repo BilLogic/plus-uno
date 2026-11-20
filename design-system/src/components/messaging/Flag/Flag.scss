@@ -119,17 +119,20 @@
         flex: 0 1 auto;
         min-width: 0;
         font: var(--heading-xs);
+        letter-spacing: var(--heading-xs-tracking);
         color: var(--ds-text);
     }
 
     .plus-flag-timestamp {
         flex-shrink: 0;
         font: var(--body-sm);
+        letter-spacing: var(--body-sm-tracking);
         color: var(--ds-text-subtle);
     }
 
     .plus-flag-body {
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         color: var(--ds-text-subtle);
     }
 
@@ -171,6 +174,7 @@
         border: 0;
         background: none;
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         font-weight: var(--type-weight-medium);
         color: var(--ds-text);
         text-decoration: underline;

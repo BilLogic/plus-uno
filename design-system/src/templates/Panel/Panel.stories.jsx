@@ -196,9 +196,9 @@ export const AnatomyNotifications = {
         const inbox = within(canvasElement).getByRole('complementary', { name: 'Inbox' });
         const p = within(inbox);
         await userEvent.click(p.getByRole('tab', { name: 'All' }));
-        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(4);
+        await waitFor(() => expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(4));
         await userEvent.click(p.getByRole('tab', { name: /Unread/ }));
-        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(3);
+        await waitFor(() => expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(3));
         await userEvent.click(p.getByRole('button', { name: 'Mark all as read' }));
         await expect(p.getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
     },

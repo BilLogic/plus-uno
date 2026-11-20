@@ -3,6 +3,7 @@
 .plus-breadcrumb {
     // Body/default, 14/20, in a 32 row (`--control-md`), like every other control.
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 
     .plus-breadcrumb-list {
         list-style: none;

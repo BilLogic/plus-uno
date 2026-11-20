@@ -58,16 +58,19 @@
     &__header {
         margin: 0;
         font: var(--heading-md);
+        letter-spacing: var(--heading-md-tracking);
         color: var(--ds-text);
     }
 
     &--compact &__header {
         font: var(--heading-sm);
+        letter-spacing: var(--heading-sm-tracking);
     }
 
     &__description {
         margin: 0;
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
         color: var(--ds-text-subtle);
         overflow-wrap: anywhere;
     }

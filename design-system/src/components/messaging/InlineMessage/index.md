@@ -157,7 +157,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-text-subtle` · `--heading-sm` · `--stack-sm`
+`--body-default` · `--body-default-tracking` · `--ds-text-subtle` · `--heading-sm` · `--heading-sm-tracking` · `--stack-sm`
 
 From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. Override these through the token layer, never with a literal.
 

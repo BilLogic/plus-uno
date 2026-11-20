@@ -122,6 +122,7 @@
     background: none;
     color: var(--ds-text);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     text-align: left;
     cursor: pointer;
 
@@ -162,6 +163,7 @@
     padding: var(--pad-x-xs) var(--pad-x-md);
     color: var(--ds-text-subtle);
     font: var(--body-sm);
+    letter-spacing: var(--body-sm-tracking);
 }
 
 .plus-select-nowrap {

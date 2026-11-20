@@ -180,6 +180,7 @@
 
 .sbdocs .sb-docs-landing__eyebrow {
     font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -191,6 +192,7 @@
 
 .sbdocs .sb-docs-landing__purpose {
     font: var(--body-lg);
+    letter-spacing: var(--body-lg-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -201,10 +203,12 @@
     align-items: baseline;
     gap: var(--stack-sm) var(--inline-lg);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
 }
 
 .sbdocs .sb-docs-landing__links-label {
     font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -342,12 +346,14 @@
 
 .sbdocs .sb-docs-thumb__title {
     font: var(--heading-xs);
+    letter-spacing: var(--heading-xs-tracking);
     color: var(--ds-link);
     text-decoration: underline;
 }
 
 .sbdocs .sb-docs-thumb__text {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 }
 
@@ -499,6 +505,7 @@
 .sb-ds-plain-reply {
     margin: 0;
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text);
 }
 

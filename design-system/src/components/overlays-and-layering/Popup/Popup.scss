@@ -83,12 +83,14 @@
     .plus-popup-title {
         color: var(--ds-text);
         font: var(--heading-xs);
+        letter-spacing: var(--heading-xs-tracking);
     }
 
     // ===== BODY: body 14/20 =====
     .plus-popup-body {
         color: var(--ds-text);
         font: var(--body-default);
+        letter-spacing: var(--body-default-tracking);
     }
 }
 

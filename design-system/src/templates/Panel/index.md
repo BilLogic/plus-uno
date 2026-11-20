@@ -311,7 +311,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 
 ## Tokens touched
 
-`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-text-subtle` · `--frame-sidebar-width` · `--inbox-width` · `--layer-dialog` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y` · `--panel-width-default`
+`--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-text-subtle` · `--frame-sidebar-width` · `--inbox-width` · `--layer-dialog` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y` · `--panel-width-default`
 
 From `design-system/src/templates/Panel/Panel.scss`. Override these through the token layer, never with a literal.
 

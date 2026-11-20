@@ -114,7 +114,7 @@ Same group: `Code` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTabl
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--card-radius` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--type-family-code` · `--type-line-height-125`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--card-radius` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--type-family-code` · `--type-line-height-125`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
 

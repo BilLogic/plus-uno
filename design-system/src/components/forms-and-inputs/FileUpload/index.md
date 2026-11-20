@@ -177,7 +177,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

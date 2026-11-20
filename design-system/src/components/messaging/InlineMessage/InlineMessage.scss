@@ -18,9 +18,11 @@
 
 .plus-inline-message-title {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
 }
 
 .plus-inline-message-secondary {
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text-subtle);
 }
