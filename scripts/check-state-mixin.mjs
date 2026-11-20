@@ -46,6 +46,7 @@
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
@@ -54,7 +55,7 @@ export { REPO_ROOT };
 /** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/state-mixin.json';
 
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/lib/field', 'design-system/src/lib/menu'];
+export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates', ...SHARED_UI_ROOTS];
 export const SEARCHED = /\.scss$/;
 /** The mixin's own file: the one place these three patterns are meant to live. */
 const MIXIN_FILE = 'design-system/src/styles/_state.scss';

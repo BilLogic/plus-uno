@@ -9,9 +9,6 @@
         "design-system/src/components/forms-and-inputs/Select/Select.scss": {
           "count": 2
         },
-        "design-system/src/lib/field/FieldBox.scss": {
-          "count": 3
-        },
         "design-system/src/components/images-and-icons/Avatar/Avatar.scss": {
           "count": 6
         },

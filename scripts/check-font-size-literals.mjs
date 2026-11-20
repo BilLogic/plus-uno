@@ -42,10 +42,11 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { documents } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles', 'design-system/src/lib/field', 'design-system/src/lib/menu'];
+const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles', ...SHARED_UI_ROOTS];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 

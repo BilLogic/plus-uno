@@ -13,7 +13,7 @@
  * shadow, so it takes no layout), neutral for a date that is not close and
  * the appearance's subtle border for warning and danger.
  */
-@use '../label-heights' as label;
+@use '../../../styles/label-heights' as label;
 @use '../../../styles/type' as *;
 
 .plus-date-tag {

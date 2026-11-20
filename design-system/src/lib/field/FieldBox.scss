@@ -1,4 +1,4 @@
-@use '../../components/labels/label-heights' as label;
+@use '../../styles/label-heights' as label;
 @use '../../styles/state' as *;
 
 /**
@@ -13,7 +13,7 @@
  * `background.neutral`. Figma draws its stroke inside the box, so the border
  * is taken out of the padding here.
  *
- * A single-line field is 40 (`--height-250`) at the default spacing and 32
+ * A single-line field is 40 (`--control-lg`) at the default spacing and 32
  * (`--control-md`) when compact, with its content centered and side
  * padding 12. Its radius is a quarter of its height: 10 and 8. A button in a
  * slot is 32 in the 40 field and 24 in the 32 field, centered, 4 from the
@@ -43,7 +43,7 @@
 
     // One height per spacing: the content centers in it, so nothing pads the
     // top and bottom.
-    height: var(--height-250);
+    height: var(--control-lg);
     padding: 0 calc(var(--pad-x-md) - var(--border-width-default));
     font: var(--body-default);
 
@@ -65,8 +65,8 @@
     // each wrapped row adds to it.
     &--grow {
         height: auto;
-        min-height: var(--height-250);
-        padding-block: calc((var(--height-250) - #{label.$tag-height}) / 2 - var(--border-width-default));
+        min-height: var(--control-lg);
+        padding-block: calc((var(--control-lg) - #{label.$tag-height}) / 2 - var(--border-width-default));
 
         &.plus-field--compact {
             min-height: var(--control-md);

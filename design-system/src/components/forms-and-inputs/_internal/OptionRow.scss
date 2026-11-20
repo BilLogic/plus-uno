@@ -4,6 +4,7 @@
  * line, inset in its list, with every state's fill on the row's own radius.
  */
 @use '../../../styles/state' as *;
+// A SCSS partial the menu module shares with this row, so both draw one row height and padding.
 @use '../../../lib/menu/row-spacing';
 
 .plus-option-row {

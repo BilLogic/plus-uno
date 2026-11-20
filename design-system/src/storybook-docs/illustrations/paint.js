@@ -165,10 +165,10 @@ const ROLES = {
  * height to it. Only roles whose real component sets a height token are here.
  */
 export const HEIGHTS = {
-  field: ['--height-250', 'lib/field/FieldBox.scss', 20],
+  field: ['--control-lg', 'lib/field/FieldBox.scss', 20],
   button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
   tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
-  count: ['--label-height-sm', 'components/labels/_label-heights.scss', 8],
+  count: ['--label-height-sm', 'styles/_label-heights.scss', 8],
   tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
   sidebarRow: ['--control-md', 'components/navigation/Sidebar/Sidebar.scss', 16],
 };

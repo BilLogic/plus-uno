@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
+// Folder paths, not the `@/components` barrel: the barrel loads TextField, PromptInput and the rest,
+// which import this file, so a barrel import here is a cycle that reads a component before it exists.
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import Icon from '@/components/images-and-icons/Icon';
 import './FieldFrame.scss';

@@ -43,6 +43,7 @@
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
@@ -51,7 +52,7 @@ export { REPO_ROOT };
 /** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/inline-jsx-tokens.json';
 
-export const SEARCH_ROOTS = ['design-system/src/components'];
+export const SEARCH_ROOTS = ['design-system/src/components', ...SHARED_UI_ROOTS];
 export const SEARCHED = /\.jsx$/;
 const EXCLUDED = /\.(stories|test)\.jsx$/;
 

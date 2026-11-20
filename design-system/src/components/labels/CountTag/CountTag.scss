@@ -9,7 +9,7 @@
  * Skeleton reads too. The minimum width and the dot take the spacing
  * primitives Figma binds them to. Padding is the Element token, which is 4.
  */
-@use '../label-heights' as label;
+@use '../../../styles/label-heights' as label;
 @use '../../../styles/type' as *;
 
 .plus-count {

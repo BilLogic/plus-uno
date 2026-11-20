@@ -14,6 +14,7 @@
 
 import slotMetadata from '../../design-system/agent-views/_slots.json' with { type: 'json' };
 import { placementsFromSlots } from './ds-placements.mjs';
+import { SHARED_UI_ROOTS } from './ds-facts.mjs';
 import { TOKEN_NAME, varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { EXTERNAL, isInterpolated } from '../undefined-tokens.mjs';
 import { blankComments, closeOf, importsOf, jsxElementsOf, literalOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
@@ -44,7 +45,8 @@ export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
 
 const SCRIPT = /\.(jsx|js|mjs|cjs|tsx|ts)$/;
 const STYLE = /\.(scss|css)$/;
-export const isDsStyle = (path) => /^design-system\/src\/(?:components|templates)\/.+\.(?:scss|css)$/.test(path);
+const DS_STYLE_ROOTS = ['design-system/src/components', 'design-system/src/templates', ...SHARED_UI_ROOTS];
+export const isDsStyle = (path) => STYLE.test(path) && DS_STYLE_ROOTS.some((root) => path.startsWith(`${root}/`));
 const MARKUP = /\.html$/;
 
 /**

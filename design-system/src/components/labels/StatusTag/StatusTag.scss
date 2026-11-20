@@ -16,7 +16,7 @@
  * THE BORDER IS AN INSET SHADOW. A 1px inside border that takes no layout, as
  * a Figma inside stroke does, so the height and the padding stay exact.
  */
-@use '../label-heights' as label;
+@use '../../../styles/label-heights' as label;
 @use '../../../styles/state' as *;
 @use '../colored-material' as cm;
 
