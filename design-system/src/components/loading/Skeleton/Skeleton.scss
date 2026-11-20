@@ -26,7 +26,7 @@
  * NOT A TARGET. No pointer events and no selection: a placeholder cannot be
  * clicked, and the component renders it `aria-hidden` with no focus.
  */
-@use '../../labels/label-heights' as label;
+@use '../../../styles/label-heights' as label;
 
 .plus-skeleton {
     --plus-skeleton-width: 100%;

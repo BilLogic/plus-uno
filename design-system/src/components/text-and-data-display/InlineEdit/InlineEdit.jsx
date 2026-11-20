@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
-import { FieldLabel } from '@/components/forms-and-inputs/_internal/FieldFrame';
-import { SAVE_FAILED } from '@/components/forms-and-inputs/_internal/useInlineEdit';
+import { FieldLabel, SAVE_FAILED } from '@/lib/field';
 import './InlineEdit.scss';
 
 /** What the edit view's control is, to put the caret in it when the view opens. */

@@ -214,7 +214,7 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
 // DropdownMenu has no toggle theme of its own (its trigger is a caller's own
 // Button or IconButton, which carries Button's steps); its rows are
 // MenuGroup's `plus-menu-item`, shared with every other menu in the system.
-const MENU_GROUP = 'components/forms-and-inputs/_internal/MenuGroup.scss';
+const MENU_GROUP = 'lib/menu/MenuGroup.scss';
 
 test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring inside only', () => {
   expectRule(MENU_GROUP, '.plus-menu-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
@@ -312,7 +312,7 @@ for (const [name, file, selector, ring] of [
 /* ─── Field ──────────────────────────────────────────────────────────────── */
 
 test('FieldBox: hover turns the border border.focused, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
-  const file = 'components/forms-and-inputs/_internal/FieldBox.scss';
+  const file = 'lib/field/FieldBox.scss';
   expectRule(file, '.plus-field--hover', { 'border-color': layer('--ds-border-focused') });
   expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(file, '.plus-field--focus', DS_RING_OUTSIDE);

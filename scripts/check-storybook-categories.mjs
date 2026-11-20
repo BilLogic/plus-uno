@@ -19,7 +19,8 @@
  *      name, or `_internal`.
  *   3. Every story file under `components/` is titled `Components/<category>/…`,
  *      and a story in a category folder names THAT folder's category. Stories
- *      under `_internal/`, or directly under `components/`, may name any
+ *      under `_internal/`, directly under `components/`, or under the shared
+ *      `lib/field` and `lib/menu` modules, may name any
  *      category.
  *   4. Every segment after `Components/` is in sentence case: "Text field",
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
@@ -57,6 +58,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadExceptions } from './lib/exceptions.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { rowsOfRule } from './lib/retirement.mjs';
 import { trackedFiles } from './lib/tracked-sources.mjs';
@@ -151,7 +153,7 @@ const inputs = byRoot((repoRoot) => {
   // A component folder is a folder that holds a tracked file: git tracks no empty directory.
   const folders = [...new Set(tracked.filter((rel) => rel.startsWith(COMPONENTS_DIR)).map((rel) => rel.slice(COMPONENTS_DIR.length).split('/')).filter((parts) => parts.length > 1).map(([folder]) => folder))].sort();
   const stories = tracked
-    .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
+    .filter((rel) => [COMPONENTS_DIR, ...SHARED_UI_ROOTS.map((root) => `${root}/`)].some((root) => rel.startsWith(root)) && /\.stories\.[jt]sx?$/.test(rel))
     .map((rel) => ({ rel, title: readStorybookPage(repoRoot, rel).title }));
   const pages = tracked
     .filter((rel) => rel.startsWith('design-system/src/'))
@@ -215,7 +217,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
     const [root, category, ...rest] = title.split('/');
     const parts = rel.split('/');
-    const folder = parts.length > 4 ? parts[3] : '_internal';
+    const folder = rel.startsWith(COMPONENTS_DIR) && parts.length > 4 ? parts[3] : '_internal';
     if (root === AI_ROOT && category === AI_COMPONENTS && (taxonomy.aiComponents ?? []).includes(rest[0])) {
       if (folder !== 'ai' && folder !== '_internal') {
         found.push(`${rel}  is titled "${title}", so its folder belongs under components/ai/.`);

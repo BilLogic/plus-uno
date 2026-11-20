@@ -77,12 +77,12 @@ const ROLES = {
   overflowShadow: ['--ds-shadow-overflow', 'components/text-and-data-display/Table/TableShell.scss'],
   rowSelected: ['--ds-background-selected', 'components/text-and-data-display/Table/Table.scss'],
   // Field
-  fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
-  fieldBorder: ['--ds-border-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
-  fieldBorderInvalid: ['--ds-border-danger', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  fieldSurface: ['--ds-background-input', 'lib/field/FieldBox.scss'],
+  fieldBorder: ['--ds-border-input', 'lib/field/FieldBox.scss'],
+  fieldBorderInvalid: ['--ds-border-danger', 'lib/field/FieldBox.scss'],
   // A danger message block: the Banner's danger surface, edged by the invalid field's border.
   dangerSurface: ['--ds-background-danger', 'components/messaging/Banner/Banner.scss'],
-  fieldMessageDanger: ['--ds-text-danger', 'components/forms-and-inputs/_internal/FieldFrame.scss'],
+  fieldMessageDanger: ['--ds-text-danger', 'lib/field/FieldFrame.scss'],
   // Button
   buttonPrimary: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
   buttonPrimaryText: ['--ds-text-inverse', 'components/forms-and-inputs/Button/Button.scss'],
@@ -165,10 +165,10 @@ const ROLES = {
  * height to it. Only roles whose real component sets a height token are here.
  */
 export const HEIGHTS = {
-  field: ['--height-250', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
+  field: ['--control-lg', 'lib/field/FieldBox.scss', 20],
   button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
   tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
-  count: ['--label-height-sm', 'components/labels/_label-heights.scss', 8],
+  count: ['--label-height-sm', 'styles/_label-heights.scss', 8],
   tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
   sidebarRow: ['--control-md', 'components/navigation/Sidebar/Sidebar.scss', 16],
 };
@@ -185,7 +185,7 @@ const CORNERS = {
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   modal: ['--modal-radius', 'templates/Modal/Modal.scss'],
-  field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  field: ['--radius-control-lg', 'lib/field/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'components/navigation/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],

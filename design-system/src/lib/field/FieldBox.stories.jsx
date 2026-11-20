@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import FieldBox from './FieldBox';
-import { iconClass } from '../../../lib/icon';
+import { FieldBox } from './index';
+import { iconClass } from '../icon';
 
 /**
  * _FieldBox — the part behind Text field and Text area.

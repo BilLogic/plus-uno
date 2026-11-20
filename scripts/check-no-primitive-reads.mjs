@@ -34,6 +34,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
@@ -44,6 +45,7 @@ export const BASELINE = 'scripts/baselines/no-primitive-reads.json';
 export const SEARCH_ROOTS = [
   'design-system/src/components',
   'design-system/src/templates',
+  ...SHARED_UI_ROOTS,
   'design-system/src/storybook-docs',
   'design-system/src/styles',
 ];

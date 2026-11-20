@@ -4,7 +4,7 @@ import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import useFieldId from '../useFieldId';
 import { choiceClasses, activateChoiceTile } from '../choiceItem';
-import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from '../_internal/FieldFrame';
+import { FieldFrame, FieldLabel, FieldCaption, toneProps, fieldDescription } from '@/lib/field';
 import './Radio.scss';
 
 /**

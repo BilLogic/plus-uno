@@ -137,11 +137,12 @@ test('real repo: scope is the consumer-code roots, and the barrel reaches across
 
 test('every check that scopes consumer code composes its roots from the facts module', async () => {
   const facts = await import('./ds-facts.mjs');
-  const { CONSUMER_ROOTS: consumer, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } = facts;
+  const { CONSUMER_ROOTS: consumer, SHARED_UI_ROOTS, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } = facts;
   assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
   const roots = async (file, name) => (await import(`../${file}`))[name];
+  assert.deepEqual(SHARED_UI_ROOTS, ['design-system/src/lib/field', 'design-system/src/lib/menu']);
   assert.deepEqual(await roots('check-ds-usage.mjs', 'SCOPE'), [
-    ...consumer, 'design-system/src/components', 'design-system/src/templates',
+    ...consumer, 'design-system/src/components', 'design-system/src/templates', ...SHARED_UI_ROOTS,
     'design-system/src/storybook-docs', 'design-system/src/styles',
   ]);
   assert.equal(await roots('check-ads-language.mjs', 'SEARCH_ROOTS'), SOURCE_ROOTS);

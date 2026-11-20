@@ -14,7 +14,7 @@
  * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
 @use '../../../styles/state' as *;
-@use '../../labels/label-heights' as label;
+@use '../../../styles/label-heights' as label;
 
 .plus-suggestion {
     --plus-suggestion-height: #{label.$tag-height};

@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 import PropTypes from 'prop-types';
 import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
-import { ButtonItem, CustomItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem, CustomItem } from '@/lib/menu';
 import Icon from '../../images-and-icons/Icon';
 import './TagGroup.scss';
 

@@ -55,13 +55,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { SHARED_UI_ROOTS } from './lib/ds-facts.mjs';
 import { byRoot, main, report } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCAN_ROOT = 'design-system/src/components';
+const SCAN_ROOTS = ['design-system/src/components', ...SHARED_UI_ROOTS];
 
-// A corpus that vanished is not a clean corpus. If SCAN_ROOT is renamed or moved,
+// A corpus that vanished is not a clean corpus. If SCAN_ROOTS is renamed or moved,
 // every walk below returns nothing, every assertion holds vacuously, and this exits
 // 0 having examined no files at all. check-storybook.mjs took the same floor for the
 // same reason. The number is a floor, not a target — raise it only when it bites.
@@ -251,7 +252,7 @@ export function unspread(src) {
  * pass because the script was the process.
  */
 const inputs = byRoot((repoRoot) =>
-  documents(SCAN_ROOT, { root: repoRoot, ext: ['.js', '.jsx'] }).sort(),
+  SCAN_ROOTS.flatMap((dir) => documents(dir, { root: repoRoot, ext: ['.js', '.jsx'] })).sort(),
 );
 
 /** The floor, as a finding, so `--list` and the check itself refuse alike. */
@@ -260,7 +261,7 @@ const shortCorpus = (files) =>
     ? [
         {
           message:
-            `found ${files.length} file(s) under ${SCAN_ROOT} — expected at least ${MIN_FILES}.\n` +
+            `found ${files.length} file(s) under ${SCAN_ROOTS.join(', ')} — expected at least ${MIN_FILES}.\n` +
             '  -> The corpus moved or the walk broke. A check over nothing passes over everything.',
         },
       ]
@@ -295,7 +296,7 @@ function list() {
   const files = inputs(REPO_ROOT);
   const short = shortCorpus(files);
   if (short.length) report('check:unspread-rest', short);
-  console.log(`[check:unspread-rest] ${files.length} file(s) under ${SCAN_ROOT}`);
+  console.log(`[check:unspread-rest] ${files.length} file(s) under ${SCAN_ROOTS.join(', ')}`);
 }
 
 // The entry comparison is `isEntry`'s, inside `main()`: written out by hand

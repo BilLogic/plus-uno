@@ -44,6 +44,12 @@ import { retiredRenames } from './tokens/plan.mjs';
 import { placementsFromSlots } from './ds-placements.mjs';
 
 /** Where consumer code lives: what the usage checks read and hold to the system. */
+/**
+ * The design system's internal shared-UI modules (`@/lib/field`, `@/lib/menu`): source the
+ * component checks scan beside `components` and `templates`, kept out of `@/components`.
+ */
+export const SHARED_UI_ROOTS = ['design-system/src/lib/field', 'design-system/src/lib/menu'];
+
 export const CONSUMER_ROOTS = ['prototypes'];
 
 /*

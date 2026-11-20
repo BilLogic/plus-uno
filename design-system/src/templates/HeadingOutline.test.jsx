@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Module paths rather than the barrels, so the rest stays light.
 import Card from './Card';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
-import { ButtonItem, Section as MenuSection } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem, Section as MenuSection } from '@/lib/menu';
 import PageHeader from '@/components/layout-and-structure/PageHeader';
 import Sidebar from '@/components/navigation/Sidebar';
 import { Dialog, StaticTable } from '@/components';

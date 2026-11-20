@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from '../useFieldId';
-import { LabelMarker } from '../_internal/FieldFrame';
+import { LabelMarker } from '@/lib/field';
 import Icon from '../../images-and-icons/Icon';
 import FileUploadContext from '../_internal/FileUploadContext';
 import './FileUpload.scss';

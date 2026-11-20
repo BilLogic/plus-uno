@@ -5,7 +5,7 @@
  * a competency area's icon reads at the same size as the label it sits beside:
  * `--icon-sm` (12) at default, `--icon-md` (16) when spacious.
  */
-@use '../label-heights' as label;
+@use '../../../styles/label-heights' as label;
 @use '../../../styles/type' as *;
 
 .plus-competency-tag__icon {
