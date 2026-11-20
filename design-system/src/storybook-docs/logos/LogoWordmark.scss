@@ -1,0 +1,107 @@
+/* Logos page, wordmark figures (docs only). Letters take the text token, guides the danger border,
+   labels the subtle text token. Sizes inside the SVGs are the drawing's own units (1000 per em,
+   cap 716), not page pixels. The live letters are Google Sans Flex, loaded app-wide. */
+
+.logo-wm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+    margin: 0;
+}
+
+.logo-wm__svg {
+    width: 100%;
+    max-width: calc(var(--card-min-width-sm) * 3);
+    height: auto;
+    overflow: visible;
+}
+
+.logo-wm__letter {
+    fill: var(--ds-text);
+    font-family: var(--type-family-body), sans-serif;
+    font-size: 1000px;
+}
+
+.logo-wm__letter--square { font-variation-settings: 'ROND' 0, 'opsz' 48; }
+.logo-wm__letter--round { font-variation-settings: 'ROND' 100, 'opsz' 48; }
+
+.logo-wm__outline { fill: var(--ds-text); }
+
+.logo-wm__line,
+.logo-wm__dash {
+    fill: none;
+    stroke: var(--ds-border-danger);
+    stroke-width: var(--border-width-default);
+    vector-effect: non-scaling-stroke;
+}
+
+.logo-wm__dash { stroke-dasharray: 4 3; opacity: 0.7; }
+.logo-wm__band { fill: var(--ds-border-danger); fill-opacity: 0.18; stroke: none; }
+
+.logo-wm__label {
+    fill: var(--ds-text);
+    font-family: var(--type-family-body), sans-serif;
+    font-size: 82px;
+    font-weight: 600;
+    paint-order: stroke;
+    stroke: var(--ds-surface-sunken);
+    stroke-width: 26px;
+    stroke-linejoin: round;
+    text-anchor: middle;
+}
+
+/* Lockup size row */
+.logo-lockups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--stack-2xl) var(--inline-2xl);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.logo-lockups__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--stack-sm);
+}
+
+.logo-wm__caption {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}
+
+/* Lockup rule: the real lockup at 96 with guides over it, 1:1 (the Logo svg is as wide as its view box). */
+.logo-rule { display: inline-block; padding: var(--stack-2xl); }
+
+.logo-rule__stage { position: relative; display: inline-block; }
+
+.logo-rule__overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.logo-rule__label {
+    fill: var(--ds-text-subtle);
+    font: var(--body-sm);
+    text-anchor: middle;
+}
+
+/* Don't figures */
+.logo-dont {
+    display: inline-flex;
+    align-items: center;
+}
+
+.logo-dont__typed {
+    margin-inline-start: var(--stack-md);
+    font: var(--heading-lg);
+    color: var(--ds-text);
+}
+
+.logo-dont__tracked { fill: var(--ds-text); }
