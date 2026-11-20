@@ -76,4 +76,27 @@ describe('settleAnimations', () => {
         await run;
         expect(settled).toBe(true);
     });
+
+    it('waits for a PresenceSlot that is entering even when no animation is running', async () => {
+        vi.useFakeTimers();
+        let phase = 'entering';
+        const element = {
+            getAnimations: () => [],
+            querySelector: () => (phase === 'entering' ? {} : null),
+            querySelectorAll: () => [],
+        };
+
+        let settled = false;
+        const run = settleAnimations(element, 1000).then(() => {
+            settled = true;
+        });
+
+        await vi.advanceTimersByTimeAsync(100);
+        expect(settled).toBe(false);
+
+        phase = 'settled';
+        await vi.advanceTimersByTimeAsync(20);
+        await run;
+        expect(settled).toBe(true);
+    });
 });
