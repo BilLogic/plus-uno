@@ -10,7 +10,7 @@ import { FIGURES } from './layout-figure-data.js';
  */
 const paint = (role) => (role ? PAINT[role] : 'none');
 const strokeStyle = (width) => (width === 1 ? HAIRLINE : { strokeWidth: `calc(var(--stroke-hairline) * ${width})` });
-const SANS_LABEL_FONT = { fontFamily: 'var(--type-family-body)', fontSize: 'var(--type-size-075)' };
+const SANS_LABEL_FONT = { fontFamily: 'var(--type-family-body)', fontSize: 'var(--font-size-xs)' };
 
 const draw = (ops) => {
     const out = [];
@@ -117,7 +117,7 @@ const matrixCell = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    minBlockSize: 'var(--height-500)',
+    minBlockSize: 'var(--example-size-80)',
     paddingBlock: 'var(--stack-md)',
     borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
 };

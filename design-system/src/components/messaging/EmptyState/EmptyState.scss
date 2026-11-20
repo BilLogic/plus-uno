@@ -39,12 +39,12 @@
 
     &__icon {
         color: var(--ds-icon-subtle);
-        font-size: var(--type-size-200);
+        font-size: var(--font-size-3xl);
         line-height: 1;
     }
 
     &--compact &__icon {
-        font-size: var(--type-size-150);
+        font-size: var(--font-size-xl);
     }
 
     &__text {

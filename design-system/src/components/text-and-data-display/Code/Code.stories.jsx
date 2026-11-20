@@ -80,7 +80,7 @@ InHeading.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- wrapping */
 
 export const WrapsAtTheEdge = () => (
-    <p className="body-default" style={{ margin: 0, width: 'var(--width-1000)' }}>
+    <p className="body-default" style={{ margin: 0, width: 'var(--example-size-160)' }}>
         <Code>a_very_long_identifier_with_no_spaces_in_it</Code>
     </p>
 );

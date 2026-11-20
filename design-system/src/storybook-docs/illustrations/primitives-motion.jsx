@@ -11,7 +11,7 @@ import { Rect } from './primitives.jsx';
  */
 
 /** The chart line's weight, from the stroke the charts draw a series with. */
-const SERIES = { strokeWidth: 'var(--stroke-2)', strokeLinejoin: 'round', strokeLinecap: 'round' };
+const SERIES = { strokeWidth: 'var(--border-width-selected)', strokeLinejoin: 'round', strokeLinecap: 'round' };
 const RING = { strokeWidth: 'var(--focus-ring-width)' };
 
 /**

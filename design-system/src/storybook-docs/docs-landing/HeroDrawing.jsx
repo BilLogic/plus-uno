@@ -27,7 +27,7 @@ const STAGE_ORIGIN = {
 };
 
 /** One unit is 2px here, so half of `--stroke-1` draws a 1px line (see `HAIRLINE` in paint.js). */
-const HERO_STROKE = { '--hero-stroke': 'calc(var(--stroke-1) / 2)' };
+const HERO_STROKE = { '--hero-stroke': 'var(--border-width-hairline)' };
 
 /**
  * How a drawing fits a box of another shape. The landing's 5:2 frame meets its

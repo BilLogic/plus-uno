@@ -113,7 +113,7 @@ const expectTokenColors = (canvasElement, characters) => inEveryColorModeOf(canv
 
 const gallery = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, var(--width-1000))',
+    gridTemplateColumns: 'repeat(4, var(--example-size-160))',
     columnGap: '120px' /* token gap: 120px */,
     rowGap: '96px',
     padding: '48px 64px 96px',

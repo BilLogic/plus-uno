@@ -1157,9 +1157,9 @@ Truncation.play = async ({ canvasElement }) => {
  */
 const thumbnail = {
     position: 'relative',
-    width: 'var(--width-3000)',
+    width: 'var(--example-size-480)',
     maxWidth: '100%',
-    height: 'var(--width-1000)',
+    height: 'var(--example-size-160)',
     borderRadius: 'var(--radius-lg)',
     overflow: 'hidden',
 };

@@ -270,7 +270,7 @@ export const EmptyNothingToCreate = {
 export const EmptyWithStickyColumn = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <TableShell empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--width-1500)">
+        <TableShell empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--example-size-240)">
             {tableContent}
         </TableShell>
     ),
@@ -386,9 +386,9 @@ export const RowStates = {
  */
 export const Sticky = {
     render: () => (
-        <div style={{ maxWidth: 'var(--width-3000)' }}>
+        <div style={{ maxWidth: 'var(--example-size-480)' }}>
             <Section title="Tutors">
-                <TableShell stickyHeader stickyColumn maxHeight="var(--width-1500)">
+                <TableShell stickyHeader stickyColumn maxHeight="var(--example-size-240)">
                     {wideTable}
                 </TableShell>
             </Section>

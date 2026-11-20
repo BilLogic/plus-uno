@@ -208,7 +208,7 @@ Interactive.args = {
  * 16px icon whatever the text size beside it.
  */
 export const DismissPlacement = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-400)' }}>
         <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
             The × centers on the title line, not on the message.
         </SectionMessage>
@@ -267,7 +267,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-400)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
             <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`icon-${appearance}`}>
                 Thursday&apos;s math session starts at 4:00 PM ET.

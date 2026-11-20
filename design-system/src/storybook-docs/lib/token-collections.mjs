@@ -55,7 +55,7 @@ export function placeToken(name, record = {}) {
   if (/^--type-(size|line-height)-\d/.test(name) || /^--type-(family|weight|tracking)-/.test(name)) {
     return place('typography', 'primitive');
   }
-  if (/^--(heading|body|metric|code)(-|$)/.test(name)) return place('typography', 'semantic', 'global');
+  if (/^--(heading|body|metric|code|font-size)(-|$)/.test(name)) return place('typography', 'semantic', 'global');
 
   if (/^--motion-spring-/.test(name)) return place('motion', 'primitive');
 
@@ -66,7 +66,7 @@ export function placeToken(name, record = {}) {
     return place('spacing', 'primitive');
   }
   if (TEMPLATE_PREFIXES.some((p) => name.startsWith(`--${p}-`))) return place('spacing', 'semantic', 'templates');
-  if (/^--(pad|stack|inline|radius|control|footer|focus-ring|grid|screen|content|border|breakpoint|col)-/.test(name)) {
+  if (/^--(pad|stack|inline|radius|control|footer|focus-ring|grid|screen|content|border|breakpoint|col|example-size)-/.test(name)) {
     return place('spacing', 'semantic', 'global');
   }
   // Card, modal, popup, table, blanket, panel and every per-component size

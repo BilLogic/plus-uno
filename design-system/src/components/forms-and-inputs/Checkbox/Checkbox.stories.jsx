@@ -78,10 +78,10 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: 'var(--size-2500)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: 'var(--example-size-400)' };
 
 export const Overview = () => (
-    <div style={{ maxWidth: 'var(--size-4000)' }}>
+    <div style={{ maxWidth: 'var(--example-size-640)' }}>
         <Checkbox id="cb-overview" name="cb-overview" label="Email session recap" defaultChecked />
     </div>
 );

@@ -406,7 +406,7 @@ MinimalHeaderAndBody.play = async ({ canvasElement }) => {
 
 /** Width from the provider: a Panel with no width of its own takes `PanelProvider`'s, shared by every Panel under it. */
 export const WidthFromProvider = () => (
-    <PanelProvider defaultWidth="var(--width-3000)">
+    <PanelProvider defaultWidth="var(--example-size-480)">
         <PanelContainer id="panel-provider-width">
             <PanelHeader title="Wide Panel" />
             <PanelBody>Session notes and lesson materials follow the PanelProvider width.</PanelBody>

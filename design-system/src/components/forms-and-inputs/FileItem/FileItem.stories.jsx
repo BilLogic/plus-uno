@@ -7,8 +7,8 @@ import FileItem, {
     FILE_ITEM_STATUSES,
 } from './FileItem';
 
-const wrap = { maxWidth: 'var(--size-4000)' };
-const narrowWrap = { maxWidth: 'var(--size-2000)' };
+const wrap = { maxWidth: 'var(--example-size-640)' };
+const narrowWrap = { maxWidth: 'var(--example-size-320)' };
 const rowOf = (canvasElement) => canvasElement.querySelector('.plus-file-item');
 const heightOf = (el) => Math.round(el.getBoundingClientRect().height);
 

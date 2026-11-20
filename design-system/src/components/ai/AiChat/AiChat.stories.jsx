@@ -117,7 +117,7 @@ const press = (scope, name) => userEvent.click(scope.getByRole('button', { name 
 
 /** Overview: chat closed, the button at the bottom right of the Page. A short, wide Page: the button sits in its corner. */
 export const Overview = {
-    args: { height: 'var(--width-1500)' },
+    args: { height: 'var(--example-size-240)' },
 };
 
 /** Docs: the popup, open, in an inline frame. Nothing is remembered. */

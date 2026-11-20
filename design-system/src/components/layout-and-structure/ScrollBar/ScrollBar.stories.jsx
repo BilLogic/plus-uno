@@ -110,7 +110,7 @@ function WideContent({ count = 12 }) {
                     key={i}
                     style={{
                         ...demoBox,
-                        minWidth: 'var(--width-1000)',
+                        minWidth: 'var(--example-size-160)',
                         backgroundColor: 'var(--ds-surface-sunken)'
                     }}
                 >
@@ -139,7 +139,7 @@ export const Layout = () => (
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
             <div style={demoBox}>
-                <ScrollBar maxHeight="var(--width-1000)">
+                <ScrollBar maxHeight="var(--example-size-160)">
                     <TallContent />
                 </ScrollBar>
             </div>
@@ -198,7 +198,7 @@ export const Interactive = {
 
 
 const Subject = (props) => (
-    <ScrollBar maxHeight="var(--width-1000)" aria-label="Session notes" {...props}>
+    <ScrollBar maxHeight="var(--example-size-160)" aria-label="Session notes" {...props}>
         {sessionRows.map((row, i) => <p key={i}>{row}</p>)}
     </ScrollBar>
 );

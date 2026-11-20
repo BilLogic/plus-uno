@@ -48,13 +48,13 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: 'var(--width-1400)' }}>
+    <div style={{ maxWidth: 'var(--example-size-224)' }}>
         <TimePicker placeholder="__ : __" aria-label="Time" />
     </div>
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-1400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-224)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
@@ -110,7 +110,7 @@ export const PickTime = () => {
     const [value, setValue] = useState('');
 
     return (
-        <div style={{ maxWidth: 'var(--width-1400)' }}>
+        <div style={{ maxWidth: 'var(--example-size-224)' }}>
             <h6 style={{ marginBottom: 'var(--stack-xl)' }}>Set a reminder time</h6>
             <TimePicker aria-label="Reminder time" value={value} onChange={setValue} />
             {value && (
@@ -165,7 +165,7 @@ TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: 'var(--width-1400)' };
+const wrap = { maxWidth: 'var(--example-size-224)' };
 const input = (canvasElement) => within(canvasElement).getByRole('combobox');
 
 export const Default = {

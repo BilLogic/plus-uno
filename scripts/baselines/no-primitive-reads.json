@@ -1,28 +1,10 @@
 {
-  "why": "Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>) in design-system/src/components and design-system/src/templates, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.",
+  "why": "Reads of a primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>, --palette-*) in components, templates, stories, design-system/src/storybook-docs and design-system/src/styles, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.",
   "sets": {
     "main": {
       "entries": {
-        "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/Select/Select.scss": {
-          "count": 2
-        },
         "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
           "count": 3
-        },
-        "design-system/src/components/images-and-icons/Avatar/Avatar.scss": {
-          "count": 6
-        },
-        "design-system/src/components/messaging/EmptyState/EmptyState.scss": {
-          "count": 2
-        },
-        "design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss": {
-          "count": 1
-        },
-        "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss": {
-          "count": 1
         }
       }
     }

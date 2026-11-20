@@ -376,7 +376,7 @@ const SWATCHES = [
     {
         label: 'Text on surface',
         tokens: ['--ds-text', '--ds-surface'],
-        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', border: 'var(--stroke-1) solid var(--ds-border)' },
+        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', border: 'var(--border-width-default) solid var(--ds-border)' },
     },
     {
         label: 'Raised surface',
@@ -396,7 +396,7 @@ const SWATCHES = [
     {
         label: 'Focused border',
         tokens: ['--ds-border-focused'],
-        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', outline: 'var(--stroke-2) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' },
+        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', outline: 'var(--focus-ring-width) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-width)' },
     },
 ];
 

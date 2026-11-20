@@ -765,6 +765,10 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
+        "--font-size-3xl",
+        "--font-size-md",
+        "--font-size-sm",
+        "--font-size-xs",
         "--heading-xs",
         "--icon-lg",
         "--icon-md",
@@ -774,11 +778,7 @@
         "--image-sm",
         "--image-xxs",
         "--radius-full",
-        "--radius-xxl",
-        "--type-size-075",
-        "--type-size-0875",
-        "--type-size-100",
-        "--type-size-200"
+        "--radius-xxl"
       ]
     },
     {
@@ -3134,13 +3134,13 @@
         "--ds-text-code-default",
         "--ds-text-code-gutter",
         "--focus-ring-width",
+        "--font-size-sm",
         "--pad-x-lg",
         "--pad-x-md",
         "--pad-y-lg",
         "--plus-code-block-digits",
         "--plus-code-block-gutter",
-        "--type-line-height-125",
-        "--type-size-0875"
+        "--type-line-height-125"
       ]
     },
     {
@@ -3857,12 +3857,12 @@
       "tokens": [
         "--border-width-default",
         "--calendar-day-sm",
+        "--date-range-presets-width",
         "--ds-icon-subtle",
         "--inline-md",
         "--pad-x-md",
         "--popup-pad",
-        "--popup-width-range",
-        "--width-1000"
+        "--popup-width-range"
       ]
     },
     {
@@ -5273,6 +5273,8 @@
         "--ds-icon-subtle",
         "--ds-text",
         "--ds-text-subtle",
+        "--font-size-3xl",
+        "--font-size-xl",
         "--heading-md",
         "--heading-sm",
         "--inline-md",
@@ -5283,9 +5285,7 @@
         "--section-min-width-main",
         "--stack-md",
         "--stack-sm",
-        "--stack-xl",
-        "--type-size-150",
-        "--type-size-200"
+        "--stack-xl"
       ]
     },
     {
@@ -7726,6 +7726,7 @@
       "tokens": [
         "--body-default",
         "--border-width-default",
+        "--control-lg",
         "--control-md",
         "--ds-background-neutral-subtle-hovered",
         "--ds-motion-appearance-fast",
@@ -7734,7 +7735,6 @@
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtlest",
-        "--height-250",
         "--pad-x-md",
         "--radius-control-lg",
         "--radius-md",
@@ -13365,9 +13365,9 @@
         "--pad-x-xs",
         "--pad-y-md",
         "--radius-md",
+        "--select-check-size",
         "--stack-md",
-        "--stack-sm",
-        "--type-size-0875"
+        "--stack-sm"
       ]
     },
     {
