@@ -114,23 +114,27 @@ body,
 
 .sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-md) !important;
+    letter-spacing: var(--heading-md-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 /* FoundationSubsection h3 renders at --heading-md, so an h4 nested inside it steps down to --heading-sm. */
 .sbdocs .sb-docs-subsection h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-sm) !important;
+    letter-spacing: var(--heading-sm-tracking) !important;
     color: var(--ds-text) !important;
     margin: 0 !important;
 }
 
 .sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-sm) !important;
+    letter-spacing: var(--heading-sm-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-xs) !important;
+    letter-spacing: var(--heading-xs-tracking) !important;
     color: var(--ds-text) !important;
 }
 

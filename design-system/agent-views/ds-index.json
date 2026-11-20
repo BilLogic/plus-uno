@@ -15490,7 +15490,7 @@
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xl` · `--heading-xl-tracking` · `--heading-xs` · `--heading-xxl` · `--heading-xxl-tracking` · `--heading-xxs`\n",
+					"`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xl` · `--heading-xl-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--heading-xxl` · `--heading-xxl-tracking` · `--heading-xxs` · `--heading-xxs-tracking`\n",
 					"\n",
 					"From `design-system/src/components/text-and-data-display/Heading/Heading.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",
@@ -46689,16 +46689,34 @@
 			"value": "var(--type-weight-regular) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-body)"
 		},
 		{
+			"name": "--body-default-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-open)"
+		},
+		{
 			"name": "--body-lg",
 			"tier": "semantic",
 			"group": "Type Scale",
 			"value": "var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-150) var(--type-family-body)"
 		},
 		{
+			"name": "--body-lg-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-none)"
+		},
+		{
 			"name": "--body-sm",
 			"tier": "semantic",
 			"group": "Type Scale",
 			"value": "var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body)"
+		},
+		{
+			"name": "--body-sm-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-loose)"
 		},
 		{
 			"name": "--border-width-default",
@@ -51610,49 +51628,67 @@
 			"name": "--heading-lg",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
 		},
 		{
 			"name": "--heading-lg-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-tight)"
+			"value": "var(--type-tracking-close)"
 		},
 		{
 			"name": "--heading-md",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading)"
+		},
+		{
+			"name": "--heading-md-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-snug)"
 		},
 		{
 			"name": "--heading-sm",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+		},
+		{
+			"name": "--heading-sm-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-none)"
 		},
 		{
 			"name": "--heading-xl",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
 		},
 		{
 			"name": "--heading-xl-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-tight)"
+			"value": "var(--type-tracking-tighter)"
 		},
 		{
 			"name": "--heading-xs",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading)"
+		},
+		{
+			"name": "--heading-xs-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-none)"
 		},
 		{
 			"name": "--heading-xxl",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading)"
 		},
 		{
 			"name": "--heading-xxl-tracking",
@@ -51664,7 +51700,13 @@
 			"name": "--heading-xxs",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading)"
+		},
+		{
+			"name": "--heading-xxs-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-loose)"
 		},
 		{
 			"name": "--height-100",
@@ -51985,19 +52027,37 @@
 			"name": "--metric-lg",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
+		},
+		{
+			"name": "--metric-lg-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-tight)"
 		},
 		{
 			"name": "--metric-md",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
+		},
+		{
+			"name": "--metric-md-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-tight)"
 		},
 		{
 			"name": "--metric-sm",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+			"value": "var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+		},
+		{
+			"name": "--metric-sm-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-none)"
 		},
 		{
 			"name": "--modal-body-min-height",
@@ -54829,10 +54889,34 @@
 			"value": "2rem"
 		},
 		{
+			"name": "--type-tracking-close",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "-0.015em"
+		},
+		{
+			"name": "--type-tracking-loose",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "0.01em"
+		},
+		{
 			"name": "--type-tracking-none",
 			"tier": "semantic",
 			"group": "Type Scale",
 			"value": "0em"
+		},
+		{
+			"name": "--type-tracking-open",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "0.005em"
+		},
+		{
+			"name": "--type-tracking-snug",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "-0.005em"
 		},
 		{
 			"name": "--type-tracking-tight",
@@ -58418,7 +58502,7 @@
 				"\n",
 				"## Overview\n",
 				"\n",
-				"PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings are semibold (600). Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
+				"PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
 				"\n",
 				"```css\n",
 				"font: var(--heading-md);\n",
@@ -58430,7 +58514,7 @@
 				"\n",
 				"## Type scale\n",
 				"\n",
-				"Every text style binds to a typography variable and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.\n",
+				"Every text style binds to a typography variable (family, weight, size, line height and letter spacing) and is sized in `rem` (1 rem = 16 px) so text scales with browser settings. Never type a raw size or detach a style.\n",
 				"\n",
 				"### Body, metric and weights\n",
 				"\n",
@@ -58458,14 +58542,21 @@
 				"| `--type-family-body` | Google Sans Flex | Body text |\n",
 				"| `--type-family-code` | Google Sans Code | Code |\n",
 				"| `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |\n",
-				"| `--type-weight-regular` | 400 | Body text |\n",
-				"| `--type-weight-medium` | 500 | Labels and icon-paired text |\n",
-				"| `--type-weight-semibold` | 600 | Headings, metrics, bold body |\n",
-				"| `--heading-xxl-tracking` · `-xlarge-tracking` · `-large-tracking` | −2% · −1% · −1% | Companion letter-spacing for headings 32, 28 and 24 (20 and below use 0) |\n",
+				"| `--type-weight-regular` | 400 | Body text and headings xxl, xl and lg |\n",
+				"| `--type-weight-medium` | 500 | Headings md to xxs, metrics, labels and icon-paired text |\n",
+				"| `--type-weight-semibold` | 600 | Inline bold emphasis only, not a text style |\n",
+				"| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |\n",
+				"| `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |\n",
+				"| `--heading-lg-tracking` | −1.5% | Heading 24 |\n",
+				"| `--heading-md-tracking` | −0.5% | Heading 20 |\n",
+				"| `--heading-sm-tracking` · `--heading-xs-tracking` | 0 | Headings 16 and 14 |\n",
+				"| `--heading-xxs-tracking` | +1% | Heading 12 |\n",
+				"| `--body-lg-tracking` · `--body-default-tracking` · `--body-sm-tracking` | 0 · +0.5% · +1% | Body 16, 14 and 12 |\n",
+				"| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −1% · −1% · 0 | Metrics 28, 24 and 16 |\n",
 				"\n",
 				"### Text-style classes\n",
 				"\n",
-				"Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and tracking together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, and add `font-variant-numeric: tabular-nums` to a metric.\n",
+				"Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and `letter-spacing` together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.\n",
 				"\n",
 				"```jsx\n",
 				"<p className=\"body-default\">Helper text</p>\n",
@@ -58537,13 +58628,13 @@
 				"\n",
 				"### Headings\n",
 				"\n",
-				"Every heading level is Google Sans Flex at weight 600. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
+				"Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
 				"\n",
-				"Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 700 weight.\n",
+				"Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.\n",
 				"\n",
 				"### Numbers\n",
 				"\n",
-				"Metric styles are Google Sans Flex 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration (\"3:30 to 4:30\", \"12 min\") takes the body or heading style of its context, never mono.\n",
+				"Metric styles are Google Sans Flex 500 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration (\"3:30 to 4:30\", \"12 min\") takes the body or heading style of its context, never mono.\n",
 				"\n",
 				"Do: Metric/large for the figure.\n",
 				"\n",

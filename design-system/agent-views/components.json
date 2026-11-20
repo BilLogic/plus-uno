@@ -7091,13 +7091,17 @@
         "--heading-lg",
         "--heading-lg-tracking",
         "--heading-md",
+        "--heading-md-tracking",
         "--heading-sm",
+        "--heading-sm-tracking",
         "--heading-xl",
         "--heading-xl-tracking",
         "--heading-xs",
+        "--heading-xs-tracking",
         "--heading-xxl",
         "--heading-xxl-tracking",
-        "--heading-xxs"
+        "--heading-xxs",
+        "--heading-xxs-tracking"
       ]
     },
     {

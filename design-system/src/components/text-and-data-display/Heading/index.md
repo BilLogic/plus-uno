@@ -128,7 +128,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xl` · `--heading-xl-tracking` · `--heading-xs` · `--heading-xxl` · `--heading-xxl-tracking` · `--heading-xxs`
+`--ds-text` · `--ds-text-inverse` · `--ds-text-warning-inverse` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xl` · `--heading-xl-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--heading-xxl` · `--heading-xxl-tracking` · `--heading-xxs` · `--heading-xxs-tracking`
 
 From `design-system/src/components/text-and-data-display/Heading/Heading.scss`. Override these through the token layer, never with a literal.
 

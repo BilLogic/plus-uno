@@ -66,7 +66,7 @@ export function chartGroups(tokens) {
  * size and line-height tokens, resolved to their values.
  *
  * @returns {{title: string, family: string, familyToken: string, weightToken: string,
- *   styles: {token: string, sizeToken: string, size: string, lineHeight: string}[]}[]}
+ *   styles: {token: string, sizeToken: string, size: string, lineHeight: string, tracking?: string}[]}[]}
  */
 export function typeGroups(tokens) {
   const decl = new Map(tokens.map((t) => [t.name, t.raw]));
@@ -83,7 +83,9 @@ export function typeGroups(tokens) {
       const family = resolve(familyToken).split(',')[0].replace(/["']/g, '').trim();
       families.set(key, { category: m[1], family, familyToken, weightToken, weight: resolve(weightToken), styles: [] });
     }
-    families.get(key).styles.push({ token: name, name: m[2], sizeToken, size: resolve(sizeToken), lineHeight: resolve(lineToken) });
+    const tracking = decl.get(`${name}-tracking`)?.match(/^var\((--type-tracking-[a-z]+)\)$/)?.[1];
+    const percent = tracking ? `${+(parseFloat(resolve(tracking)) * 100).toFixed(2)}%` : undefined;
+    families.get(key).styles.push({ token: name, name: m[2], sizeToken, size: resolve(sizeToken), lineHeight: resolve(lineToken), tracking: percent });
   }
   return [...families.values()].map((g) => {
     const first = g.styles[0].name;

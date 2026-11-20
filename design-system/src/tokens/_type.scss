@@ -1,7 +1,8 @@
 /**
  * Type Tokens
  * Generated from the Figma `typography` collection and its bound text styles.
- * A text style is a `font` shorthand: weight, size / line height, family.
+ * A text style is a `font` shorthand: weight, size / line height, family;
+ * its letter spacing is the `-tracking` companion beside it.
  */
 
 :root {
@@ -34,28 +35,42 @@
     --type-weight-medium: 500;
     --type-weight-semibold: 600;
 
-    /* Letter spacing (a `font` shorthand cannot carry it; a text style that has one gets a `-tracking` companion) */
+    /* Letter spacing (a `font` shorthand cannot carry it; every text style gets a `-tracking` companion) */
     --type-tracking-tighter: -0.02em;
+    --type-tracking-close: -0.015em;
     --type-tracking-tight: -0.01em;
+    --type-tracking-snug: -0.005em;
     --type-tracking-none: 0em;
+    --type-tracking-open: 0.005em;
+    --type-tracking-loose: 0.01em;
 
     /* Text styles */
     --heading-xxl-tracking: var(--type-tracking-tighter);
-    --heading-xxl: var(--type-weight-semibold) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading);
-    --heading-xl-tracking: var(--type-tracking-tight);
-    --heading-xl: var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
-    --heading-lg-tracking: var(--type-tracking-tight);
-    --heading-lg: var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
-    --heading-md: var(--type-weight-semibold) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading);
-    --heading-sm: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
-    --heading-xs: var(--type-weight-semibold) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
-    --heading-xxs: var(--type-weight-semibold) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
+    --heading-xxl: var(--type-weight-regular) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading);
+    --heading-xl-tracking: var(--type-tracking-tighter);
+    --heading-xl: var(--type-weight-regular) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
+    --heading-lg-tracking: var(--type-tracking-close);
+    --heading-lg: var(--type-weight-regular) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
+    --heading-md-tracking: var(--type-tracking-snug);
+    --heading-md: var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading);
+    --heading-sm-tracking: var(--type-tracking-none);
+    --heading-sm: var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-xs-tracking: var(--type-tracking-none);
+    --heading-xs: var(--type-weight-medium) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-xxs-tracking: var(--type-tracking-loose);
+    --heading-xxs: var(--type-weight-medium) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
+    --body-lg-tracking: var(--type-tracking-none);
     --body-lg: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-150) var(--type-family-body);
+    --body-default-tracking: var(--type-tracking-open);
     --body-default: var(--type-weight-regular) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-body);
+    --body-sm-tracking: var(--type-tracking-loose);
     --body-sm: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body);
-    --metric-lg: var(--type-weight-semibold) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
-    --metric-md: var(--type-weight-semibold) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
-    --metric-sm: var(--type-weight-semibold) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --metric-lg-tracking: var(--type-tracking-tight);
+    --metric-lg: var(--type-weight-medium) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
+    --metric-md-tracking: var(--type-tracking-tight);
+    --metric-md: var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
+    --metric-sm-tracking: var(--type-tracking-none);
+    --metric-sm: var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
 
     /* Code only (CODE_ONLY_TYPE_STYLES) */
     --code-default: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
@@ -65,15 +80,15 @@
 .heading-xxl { font: var(--heading-xxl); letter-spacing: var(--heading-xxl-tracking); }
 .heading-xl { font: var(--heading-xl); letter-spacing: var(--heading-xl-tracking); }
 .heading-lg { font: var(--heading-lg); letter-spacing: var(--heading-lg-tracking); }
-.heading-md { font: var(--heading-md); }
-.heading-sm { font: var(--heading-sm); }
-.heading-xs { font: var(--heading-xs); }
-.heading-xxs { font: var(--heading-xxs); }
-.body-lg { font: var(--body-lg); }
-.body-default { font: var(--body-default); }
-.body-sm { font: var(--body-sm); }
-.metric-lg { font: var(--metric-lg); font-variant-numeric: tabular-nums; }
-.metric-md { font: var(--metric-md); font-variant-numeric: tabular-nums; }
-.metric-sm { font: var(--metric-sm); font-variant-numeric: tabular-nums; }
+.heading-md { font: var(--heading-md); letter-spacing: var(--heading-md-tracking); }
+.heading-sm { font: var(--heading-sm); letter-spacing: var(--heading-sm-tracking); }
+.heading-xs { font: var(--heading-xs); letter-spacing: var(--heading-xs-tracking); }
+.heading-xxs { font: var(--heading-xxs); letter-spacing: var(--heading-xxs-tracking); }
+.body-lg { font: var(--body-lg); letter-spacing: var(--body-lg-tracking); }
+.body-default { font: var(--body-default); letter-spacing: var(--body-default-tracking); }
+.body-sm { font: var(--body-sm); letter-spacing: var(--body-sm-tracking); }
+.metric-lg { font: var(--metric-lg); letter-spacing: var(--metric-lg-tracking); font-variant-numeric: tabular-nums; }
+.metric-md { font: var(--metric-md); letter-spacing: var(--metric-md-tracking); font-variant-numeric: tabular-nums; }
+.metric-sm { font: var(--metric-sm); letter-spacing: var(--metric-sm-tracking); font-variant-numeric: tabular-nums; }
 /* Numbers that line up vertically: table columns, times, counts in lists. Running text keeps proportional figures. */
 .num { font-variant-numeric: tabular-nums; }

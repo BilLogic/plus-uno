@@ -74,14 +74,17 @@ h3 {
 
 h4 {
     font: var(--heading-md);
+    letter-spacing: var(--heading-md-tracking);
 }
 
 h5 {
     font: var(--heading-sm);
+    letter-spacing: var(--heading-sm-tracking);
 }
 
 h6 {
     font: var(--heading-xs);
+    letter-spacing: var(--heading-xs-tracking);
 }
 
 :is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {

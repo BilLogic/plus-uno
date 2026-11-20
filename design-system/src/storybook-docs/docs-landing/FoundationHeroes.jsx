@@ -542,13 +542,13 @@ export const TypographyHero = () => (
     />
     <Specimen
       x={35}
-      family="var(--type-family-brand-heading)"
-      weight="var(--type-weight-medium)"
+      family="var(--type-family-heading)"
+      weight="var(--type-weight-regular)"
     />
     <Specimen
       x={265}
-      family="var(--type-family-body)"
-      weight="var(--type-weight-regular)"
+      family="var(--type-family-heading)"
+      weight="var(--type-weight-medium)"
     />
     <line
       x1={-100}

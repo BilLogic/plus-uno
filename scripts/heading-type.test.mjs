@@ -1,7 +1,7 @@
 /**
  * The bare heading elements take the Heading size paired with their level:
  * h1 xxl (32), h2 xl (28), h3 lg (24), h4 md (20), h5 sm (16),
- * h6 xs (14). Every level is Google Sans Flex at 600.
+ * h6 xs (14). Every level is Google Sans Flex: 400 at xxl to lg, 500 below.
  *
  * `_fonts.scss` gives each bare `h1`-`h6` a heading text style. This compiles
  * it and reads what each element's `font` resolves to, so a heading that drifts
@@ -58,8 +58,9 @@ for (const [level, size] of Object.entries(LEVEL_SIZES)) {
 }
 
 for (const level of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
-  test(`${level} is Google Sans Flex at 600`, () => {
-    assert.match(font(level), /^600 \S+ \/ \S+ "Google Sans Flex"/);
+  const weight = ['h1', 'h2', 'h3'].includes(level) ? 400 : 500;
+  test(`${level} is Google Sans Flex at ${weight}`, () => {
+    assert.match(font(level), new RegExp(`^${weight} \\S+ \\/ \\S+ "Google Sans Flex"`));
   });
 }
 

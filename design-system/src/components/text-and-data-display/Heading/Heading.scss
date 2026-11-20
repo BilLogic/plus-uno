@@ -24,18 +24,22 @@
 
     &[data-size='md'] {
         font: var(--heading-md);
+        letter-spacing: var(--heading-md-tracking);
     }
 
     &[data-size='sm'] {
         font: var(--heading-sm);
+        letter-spacing: var(--heading-sm-tracking);
     }
 
     &[data-size='xs'] {
         font: var(--heading-xs);
+        letter-spacing: var(--heading-xs-tracking);
     }
 
     &[data-size='xxs'] {
         font: var(--heading-xxs);
+        letter-spacing: var(--heading-xxs-tracking);
     }
 
     &[data-color='color.text'] {

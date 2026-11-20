@@ -50,12 +50,12 @@ describe('Foundations heroes', () => {
         expect(container.textContent).toBe('');
     });
 
-    it('Typography sets the full specimen: Aa twice, brand serif and sans', () => {
+    it('Typography sets the full specimen: Aa twice, one family in weight 400 and 500', () => {
         const { container } = render(React.createElement(HEROES['foundations-visual-typography'].Hero));
         const glyphs = [...container.querySelectorAll('text')];
         expect(glyphs.map((t) => t.textContent)).toEqual(['Aa', 'Aa']);
-        expect(glyphs[0].style.fontFamily).toContain('brand-heading');
-        expect(glyphs[1].style.fontFamily).not.toContain('brand-heading');
+        expect(glyphs[0].style.fontFamily).toBe(glyphs[1].style.fontFamily);
+        expect(glyphs.map((t) => t.style.fontWeight)).toEqual(['var(--type-weight-regular)', 'var(--type-weight-medium)']);
     });
 
     it.each(FOUNDATION_IDS)('%s paints only through tokens', (id) => {

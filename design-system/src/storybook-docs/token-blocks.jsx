@@ -36,7 +36,7 @@ export const TypeScaleBlocks = () => (
                     {g.title} · {g.family} {g.weight}
                 </h4>
                 <p style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', margin: 0 }}>
-                    {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}`).join(' · ')}
+                    {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}${s.tracking ? ` ${s.tracking.replace('-', '\u2212')}` : ''}`).join(' · ')}
                 </p>
                 <Typeset
                     fontFamily={`var(${g.familyToken})`}
