@@ -1,7 +1,7 @@
 /**
  * Page template (Templates/Page)
- * One Page surface: `--ds-surface` edge to edge, `--page-pad` on every side,
- * no radius, border or shadow; stack stays `--page-stack-sm · md · lg`.
+ * One Page surface: `--ds-surface` edge to edge, `--page-pad` on every side (none inside a Frame,
+ * which owns the pad); no radius, border or shadow; stack stays `--page-stack-sm · md · lg`.
  */
 
 @use '../../styles/navigation-motion';
