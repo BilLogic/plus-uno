@@ -110,8 +110,21 @@ export const Collapse = () => (
  * scoping to the menu surface itself rather than to `list`.
  */
 const menuRow = (list, words) => within(list.ownerDocument.body).queryAllByText(words)
-    .find((el) => el.closest('.plus-dropdown-menu')
+    .find((el) => el.closest('.plus-dropdown-menu:not([data-closed], [data-ending-style])')
         && el.checkVisibility({ visibilityProperty: true })) ?? null;
+
+/**
+ * The line for `words` once the `+n` menu is open and takes presses. A menu
+ * that was just closed stays in the page while it fades out, with
+ * `pointer-events: none`, and a reopened one mounts beside it: `menuRow` skips
+ * the closing one, and this waits for the open one to be there and live.
+ */
+const pressableRow = (list, words) => waitFor(() => {
+    const row = menuRow(list, words);
+    expect(row, `${words} is in the open menu`).not.toBeNull();
+    expect(getComputedStyle(row).pointerEvents, `${words} takes presses`).not.toBe('none');
+    return row;
+});
 
 /** How many tags a person can see, and what `+n` says is hidden. */
 const readCollapse = (canvasElement) => {
@@ -411,15 +424,14 @@ export const MenuKeepsActions = {
         const list = canvas.getByRole('list', { name: 'Filters' });
         for (const s of ['Geography', 'Music']) {
             await expect(body.queryByRole('button', { name: s }), `${s} is not a button`).toBeNull();
-            const row = menuRow(list, s);
-            await expect(row, `${s} is listed`).not.toBeNull();
+            const row = await pressableRow(list, s);
             // Scoped to the row's own `menuitem`, not `.closest()` all the way
             // up: the popup itself carries `tabindex="-1"` as an ancestor of
             // every row, focusable or not.
             const owner = row.closest('[role="menuitem"]');
             await expect(owner.matches('button, a, [tabindex]:not([tabindex="-1"])'), `${s} is not focusable`).toBe(false);
         }
-        await userEvent.click(menuRow(list, 'Music'));
+        await userEvent.click(await pressableRow(list, 'Music'));
         await waitFor(() => expect(more, 'a plain row does not close the menu').toHaveAttribute('aria-expanded', 'true'));
         await expect(body.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
         await expect(args.onRemove).not.toHaveBeenCalled();
