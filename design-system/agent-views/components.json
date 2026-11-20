@@ -9645,14 +9645,19 @@
         "--body-sm",
         "--border-width-default",
         "--ds-border",
+        "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-text-subtle",
+        "--frame-sidebar-width",
+        "--inbox-width",
+        "--layer-dialog",
         "--panel-inline-lg",
         "--panel-inline-md",
         "--panel-inline-sm",
         "--panel-pad",
         "--panel-pad-y",
-        "--panel-subheader-pad-y"
+        "--panel-subheader-pad-y",
+        "--panel-width-default"
       ]
     },
     {
@@ -13905,6 +13910,7 @@
         "--pad-x-xs",
         "--radius-sm",
         "--stack-md",
+        "--stack-sm",
         "--type-weight-medium"
       ]
     },

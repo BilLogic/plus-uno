@@ -620,8 +620,9 @@ button.plus-template-sidebar__title {
     margin-inline-start: auto;
 }
 
-// The bell's glyph with the unread count riding its top corner, so the button
-// stays 32 wide and its center stays on the trailing column.
+// The bell's glyph with the unread count riding its top corner, 4 inside the
+// button's edges so it never touches them; the button stays 32 wide and its
+// center stays on the trailing column.
 .plus-sidebar-account__bell-glyphs {
     position: relative;
     display: inline-grid;
@@ -634,6 +635,6 @@ button.plus-template-sidebar__title {
 
 .plus-sidebar-account__bell-count {
     position: absolute;
-    inset-block-start: calc(-1 * var(--stack-md));
-    inset-inline-start: 50%;
+    inset-block-start: calc(-1 * var(--stack-sm));
+    inset-inline-start: calc(-1 * var(--inline-sm));
 }

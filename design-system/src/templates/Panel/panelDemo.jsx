@@ -162,7 +162,7 @@ export const DetailsFrame = ({ editing: start = false, ...frame }) => {
 };
 
 /** The Inbox, opened from the Sidebar's bell: the Notifications pattern's picture, drawn here for the Panel's start-side placement. */
-export { InboxInSidebar as InboxFrame } from '@/storybook-docs/patterns/Notifications/notificationsDemo.jsx';
+export { InboxInSidebar as InboxFrame } from '@/storybook-docs/lib/inbox-demo.jsx';
 
 /** The record is gone: the same Panel shows its empty state. */
 export const GoneFrame = (frame) => <PanelFrame label="Session" panel={<GonePanel />} behind={<SessionsBehind picked={-1} />} {...frame} />;

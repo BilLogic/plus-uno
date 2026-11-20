@@ -100,8 +100,10 @@ export const MOTION_REGISTRY = [
     events: {
       'docked-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket.' },
       'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
-      'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
+      'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details slides in from its edge over the page. A quick look promoted to its record grows from the Panel itself.' },
       'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
+      'start-enter': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The Inbox, opened from the Sidebar bell, fades in beside the Sidebar with no travel, like a menu. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.' },
+      'start-exit': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place, the same as the enter.' },
       'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket.' },
       'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
     },

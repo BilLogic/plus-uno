@@ -184,7 +184,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/templates';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
 The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one, decides whether it docks or floats, and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
@@ -200,7 +200,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 <tr><td><code>subheader</code> (<code>PanelSubheader</code>)</td><td>The record's StatusTag under the title</td><td>None: the Unread and All tabs sit under the header</td></tr>
 <tr><td><code>body</code></td><td>Sections of the record; the form while editing</td><td>Items grouped by day, in Unread and All tabs</td></tr>
 <tr><td><code>footer</code> · <code>disclaimer</code> (<code>PanelFooter</code>, <code>PanelDisclaimer</code>)</td><td>Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. <PlannedTag /> Planned as a prop. A <code>PanelDisclaimer</code> carries small print beside the actions.</td><td>None</td></tr>
-<tr><td>Placement</td><td>Right. Docked from 1168; floating under it. <PlannedTag /> Floating at every width is Planned.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. It opens from the Sidebar's bell, not from the Frame's Panel area.</td></tr>
+<tr><td>Placement</td><td>Right. Docked from 1168; floating under it. <PlannedTag /> Floating at every width is Planned.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. <code>PanelOverlay</code> with <code>placement="start"</code>, opened from the Sidebar's bell rather than the Frame's Panel area.</td></tr>
 <tr><td>Beside the AI panel <PlannedTag /></td><td>Planned. The Frame has one Panel area.</td><td>Planned.</td></tr>
 </tbody>
 </DocsTable>
@@ -245,6 +245,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+6. **Overlay** (`PanelOverlay`). A Panel that floats over the Page with no Blanket, opened from a trigger. `placement="start"` docks it on the Sidebar's end edge at `--inbox-width`; `"end"` opens at the far edge. Escape and a press outside close it, a press on the trigger is its own toggle, and focus returns to the trigger. It fades on `appearance.fast`, like a menu.
 
 ### States
 
@@ -303,7 +304,7 @@ The page keeps scrolling and stays clickable. A press on the page outside the Pa
 
 <RuleTag kind="automatic" />
 
-Another row swaps the content; the Inbox replaces Details. The overlay module keeps a second overlay closed.
+Another row swaps the content; opening the Inbox replaces Details, and opening Details replaces the Inbox. The overlay module keeps a second overlay closed.
 
 <DoDontPair
     stacked="Each figure is a full page with a Panel over it, too wide to halve."
@@ -358,11 +359,11 @@ The docked AI panel here is a second Panel in the docked slot; its own placement
 
 If the person must not look at anything outside it, it is a Modal.
 
-### Grow the Inbox out of the Sidebar.
+### Dock the Inbox against the Sidebar.
 
 <RuleTag kind="review" />
 
-Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
+Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right.
 
 ### Give the Panel room to read.
 
@@ -441,7 +442,7 @@ For the step up when the quick look is not enough.
 
 ## Accessibility
 
-- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
+- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or to the bell for the start-side Inbox, on close.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.

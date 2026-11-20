@@ -15,7 +15,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { FormInPanel } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
-import { INBOX_STAGE } from '@/storybook-docs/patterns/Notifications/notificationsDemo.jsx';
+import { INBOX_STAGE } from '@/storybook-docs/lib/inbox-demo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from './Panel';
 
@@ -95,7 +95,7 @@ export const TypeDetails = {
     },
 };
 
-/** Notifications: the Inbox, opened from the bell beside the account name and docked beside the Sidebar, 360 wide, over the page with no Blanket. */
+/** Notifications: the Inbox, a start-side `PanelOverlay` opened from the bell beside the account name: beside the Sidebar, 360 wide, over the page with no Blanket. Escape and an outside press close it and focus returns to the bell. */
 export const TypeNotifications = {
     name: 'Type: Notifications',
     render: () => sized(<InboxFrame />, INBOX_STAGE),
@@ -103,7 +103,7 @@ export const TypeNotifications = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        const inbox = canvas.getByRole('region', { name: 'Inbox' });
+        const inbox = canvas.getByRole('complementary', { name: 'Inbox' });
         const sidebar = canvasElement.querySelector('.plus-frame__sidebar');
         await expect(rect(inbox).width, '360 wide (--inbox-width)').toBeCloseTo(tokenLength(canvasElement, '--inbox-width'), 0);
         await expect(rect(inbox).left, 'docked beside the Sidebar, on its end edge').toBeCloseTo(rect(sidebar).right, 0);
@@ -119,15 +119,30 @@ export const TypeNotifications = {
         await expect(p.getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
         await expect(p.queryByRole('button', { name: /^Show/ }), 'no Show filter').toBeNull();
         await expect(p.queryByRole('button', { name: 'Archive all' }), 'no Archive all').toBeNull();
-        await expect(p.queryByRole('option', { name: 'Mentions' })).toBeNull();
+        await expect(p.getByRole('button', { name: /settings/i }), 'the settings gear stays').toBeInTheDocument();
 
         // Escape closes it and returns focus to the bell.
         p.getByRole('tab', { name: /Unread/ }).focus();
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(canvas.queryByRole('region', { name: 'Inbox' })).toBeNull());
-        await expect(bell, 'focus returns to the bell').toHaveFocus();
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Inbox' })).toBeNull());
+        await expect(bell, 'Escape returns focus to the bell').toHaveFocus();
+
+        // A press on the bell opens it again; a press outside closes it and leaves focus where it landed.
         await userEvent.click(bell);
-        await expect(canvas.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
+        await expect(canvas.getByRole('complementary', { name: 'Inbox' })).toBeInTheDocument();
+        await expect(bell, 'the bell is its own toggle, not an outside press').toHaveAttribute('aria-pressed', 'true');
+        await userEvent.click(canvas.getByRole('heading', { name: 'Sessions' }));
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Inbox' })).toBeNull());
+        await expect(bell, 'an outside press does not pull focus back').not.toHaveFocus();
+
+        // From the keyboard it opens with no animation, and Close returns focus to the bell.
+        bell.focus();
+        await userEvent.keyboard('{Enter}');
+        const opened = await canvas.findByRole('complementary', { name: 'Inbox' });
+        await expect(opened, 'a keyboard open is unanimated').toHaveAttribute('data-instant', 'keyboard');
+        await userEvent.click(within(opened).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Inbox' })).toBeNull());
+        await expect(bell, 'Close returns focus to the bell').toHaveFocus();
     },
 };
 
@@ -177,7 +192,7 @@ export const AnatomyNotifications = {
         await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_INBOX_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_INBOX_PARTS);
-        const inbox = within(canvasElement).getByRole('region', { name: 'Inbox' });
+        const inbox = within(canvasElement).getByRole('complementary', { name: 'Inbox' });
         const p = within(inbox);
         await userEvent.click(p.getByRole('tab', { name: 'All' }));
         await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(4);

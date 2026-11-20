@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { InboxInSidebar } from './notificationsDemo.jsx';
+import { InboxInSidebar } from '@/storybook-docs/lib/inbox-demo.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -13,13 +13,13 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         const user = userEvent.setup();
         render(<InboxInSidebar />);
 
-        const inbox = screen.getByRole('region', { name: 'Inbox' });
+        const inbox = screen.getByRole('complementary', { name: 'Inbox' });
         expect(inbox).toBeInTheDocument();
-        expect(inbox.style.width).toBe('var(--inbox-width)');
+        expect(inbox).toHaveClass('plus-panel-overlay--start');
 
         // Header controls: Mark all as read, settings, close
         expect(within(inbox).getByRole('button', { name: 'Mark all as read' })).toBeInTheDocument();
-        expect(within(inbox).queryByRole('button', { name: /settings/i })).toBeNull();
+        expect(within(inbox).getByRole('button', { name: /settings/i })).toBeInTheDocument();
         expect(within(inbox).getByRole('button', { name: 'Close' })).toBeInTheDocument();
 
         // Tabs: Unread (with count) and All
@@ -48,7 +48,7 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         const user = userEvent.setup();
         render(<InboxInSidebar />);
 
-        const inbox = screen.getByRole('region', { name: 'Inbox' });
+        const inbox = screen.getByRole('complementary', { name: 'Inbox' });
         const markReadButtons = within(inbox).getAllByRole('button', { name: 'Mark as read' });
         expect(markReadButtons).toHaveLength(3);
 
@@ -75,23 +75,23 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         const user = userEvent.setup();
         render(<InboxInSidebar />);
 
-        const inbox = screen.getByRole('region', { name: 'Inbox' });
+        const inbox = screen.getByRole('complementary', { name: 'Inbox' });
         const inboxTrigger = screen.getByRole('button', { name: /^Inbox, 3 unread/ });
         expect(screen.queryByRole('button', { name: 'Inbox' }), 'no Inbox row in the nav').toBeNull();
 
         // Focus inside Inbox, then press Escape -> closes and restores focus to the bell
         within(inbox).getByRole('tab', { name: /Unread/i }).focus();
         await user.keyboard('{Escape}');
-        expect(screen.queryByRole('region', { name: 'Inbox' })).toBeNull();
+        expect(screen.queryByRole('complementary', { name: 'Inbox' })).toBeNull();
         expect(inboxTrigger).toHaveFocus();
 
         // Reopens from the bell
         await user.click(inboxTrigger);
-        expect(screen.getByRole('region', { name: 'Inbox' })).toBeInTheDocument();
+        expect(screen.getByRole('complementary', { name: 'Inbox' })).toBeInTheDocument();
 
         // Closes on outside click (the page behind has no blanket)
         await user.click(screen.getByRole('heading', { name: 'Sessions' }));
-        expect(screen.queryByRole('region', { name: 'Inbox' })).toBeNull();
+        expect(screen.queryByRole('complementary', { name: 'Inbox' })).toBeNull();
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Notifications.mdx', () => {
