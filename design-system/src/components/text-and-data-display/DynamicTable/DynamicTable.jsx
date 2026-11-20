@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import EmptyState from '@/components/messaging/EmptyState';
 import Pagination from '@/components/navigation/Pagination';
@@ -205,6 +205,14 @@ const DynamicTable = ({
     const [hasShownBulkBar, setHasShownBulkBar] = useState(false);
     if (showsBulkBar && !hasShownBulkBar) setHasShownBulkBar(true);
 
+    // A header on several lines makes the head row taller than a row. The bar
+    // takes that height, so the row does not shrink when it swaps in.
+    const headRowRef = useRef(null);
+    const headRowHeight = useRef(0);
+    useLayoutEffect(() => {
+        if (!showsBulkBar && headRowRef.current) headRowHeight.current = headRowRef.current.offsetHeight;
+    });
+
     const highlighted = [].concat(highlightedRowIndex ?? []);
 
     const bodyState = deriveState(state, isLoading, rows.length);
@@ -319,7 +327,7 @@ const DynamicTable = ({
                     ))}
                 </colgroup>
                 <thead>
-                    <tr className={classes(showsBulkBar && 'plus-dynamic-table-head--bulk', !showsBulkBar && hasShownBulkBar && 'plus-dynamic-table-head--returned')}>
+                    <tr ref={headRowRef} className={classes(showsBulkBar && 'plus-dynamic-table-head--bulk', !showsBulkBar && hasShownBulkBar && 'plus-dynamic-table-head--returned')}>
                         {isSelectable && (
                             <th scope="col" className="plus-table-head-cell plus-table-cell--align-icon plus-dynamic-table-select">
                                 <Checkbox
@@ -334,6 +342,7 @@ const DynamicTable = ({
                         {showsBulkBar ? (
                             <th
                                 colSpan={head.cells.length}
+                                style={headRowHeight.current ? { height: headRowHeight.current } : undefined}
                                 className={classes(
                                     'plus-table-head-cell plus-dynamic-table-bulk',
                                     // A sort button is as tall as the row inside the cell's rule; the bar matches it.
@@ -352,7 +361,7 @@ const DynamicTable = ({
                                 onSort={cell.isSortable ? handleSort(cell.key) : undefined}
                                 align={cell.align}
                                 width={cell.width}
-                                shouldTruncate={cell.shouldTruncate ?? true}
+                                shouldTruncate={cell.shouldTruncate ?? false}
                                 className={classes(
                                     !isFixedSize && !anyWidth && index > 0 && 'plus-dynamic-table-col--fit'
                                 )}

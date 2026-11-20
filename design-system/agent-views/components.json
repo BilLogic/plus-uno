@@ -5180,6 +5180,7 @@
         "Pressed",
         "Focused",
         "DisabledRow",
+        "WrappedHeaders",
         "Interactive",
         "Overflow"
       ]
