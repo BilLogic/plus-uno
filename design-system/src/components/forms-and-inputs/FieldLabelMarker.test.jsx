@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { FieldLabel, LabelMarker } from './_internal/FieldFrame';
+import { FieldLabel, LabelMarker } from '@/lib/field';
 import Fieldset from './Fieldset';
 import TextField from './TextField';
 import TextArea from './TextArea';
@@ -143,7 +143,7 @@ describe('Form label minority markers', () => {
         const span = container.querySelector('.plus-field-marker');
         expect(span).toHaveTextContent('(optional)');
         expect(span.querySelector('svg, i')).toBeNull();
-        const scss = readFileSync(join(__dirname, '_internal/FieldFrame.scss'), 'utf8');
+        const scss = readFileSync(join(__dirname, '../../lib/field/FieldFrame.scss'), 'utf8');
         expect(scss).toMatch(/\.plus-field-marker\s*\{[^}]*color:\s*var\(--ds-text-subtle\)/);
         expect(render(<LabelMarker />).container).toBeEmptyDOMElement();
     });
@@ -153,8 +153,8 @@ describe('Form label minority markers', () => {
             const full = join(dir, f);
             return statSync(full).isDirectory() ? walk(full) : [full];
         });
-        const offenders = walk(__dirname)
-            .filter((f) => /\.jsx?$/.test(f) && !/(stories|test)\./.test(f) && !f.endsWith('_internal/FieldFrame.jsx'))
+        const offenders = [...walk(__dirname), ...walk(join(__dirname, '../../lib/field'))]
+            .filter((f) => /\.jsx?$/.test(f) && !/(stories|test)\./.test(f) && !f.endsWith('field/FieldFrame.jsx'))
             .filter((f) => /\(\$\{\w*[mM]arker\w*\}\)/.test(readFileSync(f, 'utf8')));
         expect(offenders).toEqual([]);
     });

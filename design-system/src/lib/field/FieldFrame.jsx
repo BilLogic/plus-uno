@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
-import Icon from '../../images-and-icons/Icon';
+import Tooltip from '@/components/overlays-and-layering/Tooltip';
+import Icon from '@/components/images-and-icons/Icon';
 import './FieldFrame.scss';
 
 /**

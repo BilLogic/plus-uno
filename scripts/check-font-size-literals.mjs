@@ -45,7 +45,7 @@ import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles'];
+const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles', 'design-system/src/lib/field', 'design-system/src/lib/menu'];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 

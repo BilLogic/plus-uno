@@ -54,7 +54,7 @@ export { REPO_ROOT };
 /** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/state-mixin.json';
 
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates'];
+export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/lib/field', 'design-system/src/lib/menu'];
 export const SEARCHED = /\.scss$/;
 /** The mixin's own file: the one place these three patterns are meant to live. */
 const MIXIN_FILE = 'design-system/src/styles/_state.scss';

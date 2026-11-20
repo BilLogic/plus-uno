@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import MenuGroup, { ButtonItem, LinkItem, Section } from './MenuGroup';
+import { MenuGroup, ButtonItem, LinkItem, Section } from './index';
 
 describe('MenuGroup', () => {
     it('renders ButtonItem and LinkItem rows with the menuitem role', () => {

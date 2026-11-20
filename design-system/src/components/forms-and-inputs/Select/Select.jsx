@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import FieldBox from '../_internal/FieldBox';
+import { FieldBox, FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '@/lib/field';
 import clearLabel from '../_internal/clearLabel';
-import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox from '../_internal/Listbox';
 import SelectTags from '../_internal/SelectTags';
 import { SEARCH_FIRST_ABOVE, selectList } from '../_internal/selectList';

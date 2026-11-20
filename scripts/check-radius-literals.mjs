@@ -44,7 +44,7 @@ import { byRoot, main } from './lib/findings.mjs';
 import { absentMessage, openRatchet } from './lib/ratchet.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/templates'];
+const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/lib/field', 'design-system/src/lib/menu'];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 
@@ -68,7 +68,7 @@ const heldKey = (file, token) => `${file}|${token}`;
 
 /** Raw semantic scale reads in component SCSS, plus the findings of a held count that rose or went stale. */
 export function roleRadii(files, { exceptions = radiusExceptions(), ratchet = openRatchet({ file: RADIUS_RECORD }) } = {}) {
-  const reads = files.filter((f) => f.path.endsWith('.scss') && f.path.startsWith('design-system/src/components/'))
+  const reads = files.filter((f) => f.path.endsWith('.scss') && /^design-system\/src\/(components|lib\/(field|menu))\//.test(f.path))
     .flatMap(({ path: file, text }) => {
       const source = stripComments(text, false);
       return [...source.matchAll(/--radius-(?:\d+|sm|md|lg|xl|xxl)(?![\w-])/g)].map((m) => ({

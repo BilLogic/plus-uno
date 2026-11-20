@@ -72,6 +72,8 @@ import '@/styles/globals.scss';
 (`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
 alias.
 
+Pieces several groups share live in the design system's `lib`, not in a group's `_internal/`: `@/lib/field` (the field frame, box and inline-edit hook) and `@/lib/menu` (the menu item list). They are internal and stay out of `@/components`; import them by module from any group.
+
 One case is not a violation: a component importing its own siblings inside
 `design-system/src/components/`.
 

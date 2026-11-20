@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import Popup from '@/components/overlays-and-layering/Popup/Popup';
-import FieldBox from '../_internal/FieldBox';
+import { FieldBox } from '@/lib/field';
 import Calendar from '../_internal/Calendar';
 import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import clearLabel from '../_internal/clearLabel';

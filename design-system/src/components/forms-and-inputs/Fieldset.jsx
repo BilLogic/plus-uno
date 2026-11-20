@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';
 import useFieldId from './useFieldId';
-import { LabelMarker } from './_internal/FieldFrame';
+import { LabelMarker } from '@/lib/field';
 import './Fieldset.scss';
 
 /**

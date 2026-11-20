@@ -4,7 +4,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/lib/menu';
 import OptionRow from '@/components/forms-and-inputs/_internal/OptionRow';
 import { Checkbox } from '@/components';
 import { iconClass } from '../../../lib/icon';

@@ -2,8 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
 import useFieldId from '../../forms-and-inputs/useFieldId';
-import FieldBox from '../../forms-and-inputs/_internal/FieldBox';
-import { FieldFrame } from '../../forms-and-inputs/_internal/FieldFrame';
+import { FieldBox, FieldFrame } from '@/lib/field';
 import GenerativeBorder from '../GenerativeBorder';
 import './PromptInput.scss';
 

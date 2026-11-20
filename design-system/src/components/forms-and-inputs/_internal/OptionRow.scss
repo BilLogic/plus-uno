@@ -4,7 +4,7 @@
  * line, inset in its list, with every state's fill on the row's own radius.
  */
 @use '../../../styles/state' as *;
-@use 'row-spacing';
+@use '../../../lib/menu/row-spacing';
 
 .plus-option-row {
     /* Figma Tree/indent and Tree/toggle, which alias these spacing steps. */

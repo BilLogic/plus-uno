@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button/Button';
 import useFieldId from '../useFieldId';
-import FieldBox from '../_internal/FieldBox';
-import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
+import { FieldBox, FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps, useInlineEdit } from '@/lib/field';
 import renderFieldElem from '../_internal/fieldSlots';
-import useInlineEdit from '../_internal/useInlineEdit';
 
 export const TEXT_FIELD_APPEARANCES = ['standard', 'subtle'];
 export const TEXT_FIELD_SPACINGS = ['default', 'compact'];

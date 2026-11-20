@@ -44,6 +44,8 @@ export const BASELINE = 'scripts/baselines/no-primitive-reads.json';
 export const SEARCH_ROOTS = [
   'design-system/src/components',
   'design-system/src/templates',
+  'design-system/src/lib/field',
+  'design-system/src/lib/menu',
   'design-system/src/storybook-docs',
   'design-system/src/styles',
 ];
