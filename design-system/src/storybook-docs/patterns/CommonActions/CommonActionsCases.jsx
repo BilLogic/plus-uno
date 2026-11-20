@@ -1,4 +1,5 @@
 import React from 'react';
+import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
@@ -40,7 +41,7 @@ export const PageButtonsLeftCase = () => <OnSurface><Example.PageButtonsLeft /><
 export const PageButtonsFarRightCase = () => <OnSurface><Example.PageButtonsFarRight /></OnSurface>;
 
 /** Do: two buttons filling the Modal footer's four equal tracks. */
-export const ModalFooterTracksCase = () => <OnScreen><Example.ModalFooterTracks /></OnScreen>;
+export const ModalFooterTracksCase = () => <OnScreen>{inlineModals(Example.ModalFooterTracks())}</OnScreen>;
 
 /** Don't: small buttons in a group, with spare footer around them instead of filling the tracks. */
-export const ModalFooterInsetCase = () => <OnScreen><Example.ModalFooterInset /></OnScreen>;
+export const ModalFooterInsetCase = () => <OnScreen>{inlineModals(Example.ModalFooterInset())}</OnScreen>;

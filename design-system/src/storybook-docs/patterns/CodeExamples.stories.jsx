@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Banner, Breadcrumb, Button, EmptyState,
-    SearchField, Skeleton, StaticTable, StatusTag, TextField,
+    SearchField, Select, Skeleton, StaticTable, StatusTag, TextField,
 } from '@/components';
 import { Card, Section, Table } from '@/templates';
 
@@ -54,10 +54,10 @@ export const CommonActions = {
     render: function ActionsExample() {
         return (
             <Card title="Review notes" footer={
-                <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
-                    <Button text="Cancel" />
-                    <Button text="Save notes" appearance="primary" />
-                </div>
+                <>
+                    <Button text="Discard" spacing="compact" />
+                    <Button text="Save notes" spacing="compact" />
+                </>
             }>
                 <TextField label="Notes" defaultValue="Start with unit rates." />
             </Card>
@@ -133,8 +133,8 @@ export const Disabled = {
     render: function DisabledExample() {
         return (
             <div>
-                <p id="review-reason">Add review notes before saving.</p>
-                <Button text="Save review" isDisabled aria-describedby="review-reason" />
+                <Select label="Group" options={[]} value={null} onChange={() => {}} isDisabled caption="Choose a school first." />
+                <Button text="Save review" />
             </div>
         );
     },

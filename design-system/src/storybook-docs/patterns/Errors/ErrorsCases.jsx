@@ -2,6 +2,7 @@ import React from 'react';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './ErrorsExamples.jsx';
 import examplesSource from './ErrorsExamples.jsx?raw';
@@ -40,7 +41,7 @@ export const FailureInSlot = () => <Example.FailureInSlot />;
 export const FailureInModal = () => (
     <FitStage width={SCREEN.width} reflow={false}>
         <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': `${SCREEN.height}px` }}>
-            <Example.FailureInModal />
+            {inlineModals(Example.FailureInModal())}
         </div>
     </FitStage>
 );

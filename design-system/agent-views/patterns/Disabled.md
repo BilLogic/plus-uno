@@ -119,13 +119,13 @@ Disabled fades and leaves the tab order; read-only stays readable at full contra
 From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Disabled`.
 
 ```jsx
-import { Button } from '@/components';
+import { Button, Select } from '@/components';
 
 function DisabledExample() {
     return (
         <div>
-            <p id="review-reason">Add review notes before saving.</p>
-            <Button text="Save review" isDisabled aria-describedby="review-reason" />
+            <Select label="Group" options={[]} value={null} onChange={() => {}} isDisabled caption="Choose a school first." />
+            <Button text="Save review" />
         </div>
     );
 }

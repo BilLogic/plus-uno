@@ -1,6 +1,7 @@
 import React from 'react';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { holdMenuOpen } from '@/storybook-docs/lib/hold-menu-open.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './DisabledExamples.jsx';
 import examplesSource from './DisabledExamples.jsx?raw';
@@ -36,7 +37,7 @@ export const ReasonInTooltipCase = () => (
 );
 
 /** Do: actions a role can never take are left out of the menu. */
-export const LeftOutOfMenuCase = () => <MenuStage><Example.LeftOutOfMenu /></MenuStage>;
+export const LeftOutOfMenuCase = () => <MenuStage>{holdMenuOpen(Example.LeftOutOfMenu())}</MenuStage>;
 
 /** Don't: dimming an action a role can never take leaves a dead row in the menu. */
-export const DimmedInMenuCase = () => <MenuStage><Example.DimmedInMenu /></MenuStage>;
+export const DimmedInMenuCase = () => <MenuStage>{holdMenuOpen(Example.DimmedInMenu())}</MenuStage>;

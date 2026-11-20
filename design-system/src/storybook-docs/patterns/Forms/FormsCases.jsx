@@ -2,6 +2,7 @@ import React from 'react';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import { Skeleton } from '@/components';
 import { Section } from '@/templates';
@@ -41,7 +42,7 @@ const OnScreen = ({ children, height = SCREEN.height }) => (
 /** The page rows a Modal's Blanket covers; the Panel example carries its own. */
 const Behind = () => (
     <div style={{ padding: 'var(--page-pad)' }}>
-        <Section title="Sessions"><Skeleton preset="text" lines={3} /></Section>
+        <Section title="Sessions"><Skeleton shape="text" lines={3} /></Section>
     </div>
 );
 
@@ -69,16 +70,16 @@ export const EditInModal = () => (
     <HeadingLevelContext.Provider value={4}>
         <OnScreen height={EDIT_SCREEN}>
             <div style={{ gridArea: '1 / 1', padding: 'var(--page-pad)', background: 'var(--ds-surface)' }}><Behind /></div>
-            <Example.EditInModal />
+            {inlineModals(Example.EditInModal())}
         </OnScreen>
     </HeadingLevelContext.Provider>
 );
 
 /** Do: the message under the field, in the same Modal. */
-export const ErrorOnField = () => <OnScreen><Example.ErrorOnField /></OnScreen>;
+export const ErrorOnField = () => <OnScreen>{inlineModals(Example.ErrorOnField())}</OnScreen>;
 
 /** Don't: a second dialog over the first, with the field left unexplained. */
-export const ErrorInSecondDialog = () => <OnScreen><Example.ErrorInSecondDialog /></OnScreen>;
+export const ErrorInSecondDialog = () => <OnScreen>{inlineModals(Example.ErrorInSecondDialog())}</OnScreen>;
 
 /** The fields sit in one column, as they do in a Modal body or a Panel. */
 const FieldColumn = ({ children }) => (

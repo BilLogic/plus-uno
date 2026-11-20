@@ -49,19 +49,15 @@ const menuTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle"
 
 export const MenuOneRow = () => (
     <DropdownMenu
-        // isOpen forces the menu open so the page can show it; a real menu opens from its trigger.
-        isOpen
         isLoading
-        placement="bottom-start" minWidth="var(--menu-group-min-width)"
+        placement="bottom-end" minWidth="var(--menu-group-min-width)"
         trigger={menuTrigger}
     />
 );
 
 export const MenuSkeletonRows = () => (
     <DropdownMenu
-        // isOpen forces the menu open so the page can show it; a real menu opens from its trigger.
-        isOpen
-        placement="bottom-start"
+        placement="bottom-end"
         minWidth="var(--menu-group-min-width)"
         trigger={menuTrigger}
     >
