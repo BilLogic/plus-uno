@@ -14,8 +14,14 @@ PLUS is all sans. Every heading, metric and body style is Google Sans Flex with 
 
 ```css
 font: var(--heading-md);
+letter-spacing: var(--heading-md-tracking);
+
 font: var(--body-default);
+letter-spacing: var(--body-default-tracking);
+
 font: var(--metric-lg);
+letter-spacing: var(--metric-lg-tracking);
+font-variant-numeric: tabular-nums;
 ```
 
 Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (Tokens: Typography).
@@ -40,7 +46,7 @@ Every text style binds to a typography variable (family, weight, size, line heig
 
 ## In code
 
-Set component text with `font: var(--heading-sm)` or `font: var(--body-default)`, and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
+Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
 
 ### Family, weight and tracking tokens
 
@@ -88,7 +94,7 @@ Every page has one `h1` (visually hidden when a tab strip replaces a visible pag
 
 ## Labels
 
-Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
+Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); letter-spacing: var(--body-default-tracking); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
 Do: Body/default/medium on a button or tab label.
 
