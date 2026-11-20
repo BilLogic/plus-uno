@@ -437,7 +437,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-forms-internals.mjs',
-    floors: { MIN_FILES: 1000 },
+    floors: { MIN_FILES: 1200 },
     guards: 'nothing outside the forms-and-inputs folder importing its `_internal`; a shared piece goes through lib/field or lib/menu.',
   },
   {

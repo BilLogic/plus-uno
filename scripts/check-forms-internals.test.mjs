@@ -36,8 +36,8 @@ test('flags SCSS @use, @import and url()', () => {
 
 test('flags stories and mdx files', () => {
   const imp = "import { expectRest } from '../../forms-and-inputs/_internal/fieldStatePlays';\n";
-  assert.deepEqual(flagged('design-system/src/components/overlays/Modal/Modal.stories.jsx', imp), [1]);
-  assert.deepEqual(flagged('design-system/src/components/overlays/Modal/Modal.mdx', imp), [1]);
+  assert.deepEqual(flagged('design-system/src/components/navigation/Modal/Modal.stories.jsx', imp), [1]);
+  assert.deepEqual(flagged('design-system/src/components/navigation/Modal/Modal.mdx', imp), [1]);
 });
 
 test('flags a bare-package style path naming the folder', () => {
@@ -57,23 +57,72 @@ test('reads every specifier shape', () => {
   assert.deepEqual(specifiers(text).map((s) => s.spec).sort(), ['a', 'b', 'c', 'd', 'e']);
 });
 
-test('run() fails on a fixture tree with an outside import and passes without it', () => {
+test('an import commented out is not an import', () => {
+  const file = 'design-system/src/components/navigation/Tabs/Tabs.jsx';
+  const imp = "from '../../forms-and-inputs/_internal/dates'";
+  assert.deepEqual(flagged(file, `// import x ${imp};\n/* import y ${imp}; */\nconst a = 1;\n`), []);
+  assert.deepEqual(flagged('design-system/src/a/a.scss', "// @use '../../forms-and-inputs/_internal/x';\n/* @import '../../forms-and-inputs/_internal/x'; */\n"), []);
+  assert.deepEqual(flagged('design-system/src/a/a.mdx', "{/* import x from '../../forms-and-inputs/_internal/x'; */}\n<!-- import y from '../../forms-and-inputs/_internal/y' -->\n"), []);
+});
+
+test('a real import after a block comment is still flagged, on its own line', () => {
+  const text = `/* one\n two */\nimport x ${"from '../../forms-and-inputs/_internal/dates'"};\n`;
+  assert.deepEqual(flagged('design-system/src/components/navigation/Tabs/Tabs.jsx', text), [3]);
+});
+
+test('a bare specifier is anchored to the folder name', () => {
+  assert.equal(reachesInternal('prototypes/a.jsx', 'my-forms-and-inputs/_internal/Listbox'), false);
+  assert.equal(reachesInternal('prototypes/a.jsx', 'forms-and-inputs/_internal'), true);
+  assert.equal(reachesInternal('prototypes/a.jsx', 'pkg/forms-and-inputs/_internal/x'), true);
+  assert.equal(reachesInternal('prototypes/a.jsx', 'forms-and-inputs/_internals/x'), false);
+});
+
+test('flags import.meta.glob, module mocks and an import with a comment inside', () => {
+  const text = [
+    "const a = import.meta.glob('../../forms-and-inputs/_internal/*.js');",
+    "const b = import.meta.glob(['./x/*.js', '!../../forms-and-inputs/_internal/dates.js']);",
+    "vi.mock('../../forms-and-inputs/_internal/dates');",
+    "jest.mock(\"../../forms-and-inputs/_internal/dates\", () => ({}));",
+    "const c = await import(/* webpackChunkName: 'x' */ '../../forms-and-inputs/_internal/dates');",
+  ].join('\n');
+  assert.deepEqual(flagged('design-system/src/components/navigation/Tabs/Tabs.test.jsx', text), [1, 2, 3, 4, 5]);
+  assert.deepEqual(flagged('design-system/src/components/navigation/Tabs/Tabs.test.jsx', "vi.mock('./thing');\nimport.meta.glob('./*.jsx');\n"), []);
+});
+
+/** A scratch tree, removed when `body` returns or throws. */
+function withTree(files, body) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'forms-internals-'));
-  const put = (rel, text) => {
-    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
-    fs.writeFileSync(path.join(root, rel), text);
-  };
-  put(`${F}/_internal/dates.js`, 'export const d = 1;\n');
-  put(`${F}/TextField/TextField.jsx`, "import { d } from '../_internal/dates';\n");
-  put('design-system/src/components/navigation/Tabs/Tabs.jsx', "import { d } from '../../forms-and-inputs/_internal/dates';\n");
-  assert.equal(run({ repoRoot: root, minFiles: 0 }).length, 1);
-  assert.equal(run({ repoRoot: root, minFiles: 0 })[0].file, 'design-system/src/components/navigation/Tabs/Tabs.jsx');
-  fs.rmSync(path.join(root, 'design-system/src/components/navigation'), { recursive: true });
-  // a fresh root: the reader caches per root
-  const clean = fs.mkdtempSync(path.join(os.tmpdir(), 'forms-internals-'));
-  fs.mkdirSync(path.join(clean, F, 'TextField'), { recursive: true });
-  fs.writeFileSync(path.join(clean, F, 'TextField/TextField.jsx'), "import { d } from '../_internal/dates';\n");
-  assert.deepEqual(run({ repoRoot: clean, minFiles: 0 }), []);
+  try {
+    for (const [rel, text] of Object.entries(files)) {
+      fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+      fs.writeFileSync(path.join(root, rel), text);
+    }
+    return body(root);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+const OWN = { [`${F}/TextField/TextField.jsx`]: "import { d } from '../_internal/dates';\n", [`${F}/_internal/dates.js`]: 'export const d = 1;\n' };
+
+test('run() fails on a fixture tree with an outside import', () => {
+  const files = { ...OWN, 'design-system/src/components/navigation/Tabs/Tabs.jsx': "import { d } from '../../forms-and-inputs/_internal/dates';\n" };
+  withTree(files, (root) => {
+    const found = run({ repoRoot: root, minFiles: {} });
+    assert.equal(found.length, 1);
+    assert.equal(found[0].file, 'design-system/src/components/navigation/Tabs/Tabs.jsx');
+  });
+});
+
+test('run() passes on a fixture tree whose only users are inside the folder', () => {
+  withTree(OWN, (root) => assert.deepEqual(run({ repoRoot: root, minFiles: {} }), []));
+});
+
+test('run() names a root that holds fewer files than its floor', () => {
+  withTree(OWN, (root) => {
+    const found = run({ repoRoot: root, minFiles: { '.storybook': 8 } });
+    assert.match(found[0].message, /under \.storybook, fewer than the 8/);
+  });
 });
 
 test('run() over this checkout passes', () => {
