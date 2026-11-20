@@ -8,7 +8,7 @@ One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: reg
 
 **Used in:** Modal (`ds guide modal`); Panel (`ds guide panel`); Section (`ds guide section`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); +2 more
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/components/images-and-icons/Icon/Icon.jsx`
 

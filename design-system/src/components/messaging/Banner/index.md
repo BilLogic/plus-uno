@@ -10,7 +10,7 @@ Also asked as: announcement, top of page, system message, outage.
 
 **Used in:** Frame (`ds guide frame`); Page (`ds guide page`)
 
-**Governed by:** Errors (`ds guide errors`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Errors (`ds guide errors`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/messaging/Banner/Banner.jsx`
 

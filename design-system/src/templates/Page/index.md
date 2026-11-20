@@ -10,7 +10,7 @@ Also asked as: surface.
 
 **Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +3 more
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +1 more
 
 **Source:** `design-system/src/templates/Page/Page.jsx`
 

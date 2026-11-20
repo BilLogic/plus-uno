@@ -6,7 +6,7 @@ Cascader: a field that picks one path through nested options, one level at a tim
 
 **Import:** `import { Cascader } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx`
 

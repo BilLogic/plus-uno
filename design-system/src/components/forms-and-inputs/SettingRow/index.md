@@ -6,7 +6,7 @@ SettingRow — puts a setting's name and one-line description at the start and i
 
 **Import:** `import { SettingRow } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx`
 

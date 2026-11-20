@@ -10,7 +10,7 @@ Also asked as: filter dropdown.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx`
 

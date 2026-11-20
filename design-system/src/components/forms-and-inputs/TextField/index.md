@@ -8,7 +8,7 @@ Also asked as: search box, single-line, text box.
 
 **Import:** `import { TextField } from '@/components';`
 
-**Governed by:** Errors (`ds guide errors`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
+**Governed by:** Errors (`ds guide errors`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TextField/TextField.jsx`
 

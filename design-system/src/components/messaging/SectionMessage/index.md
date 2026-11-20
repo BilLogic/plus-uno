@@ -8,7 +8,7 @@ Also asked as: callout, inline alert, warning box.
 
 **Import:** `import { SectionMessage } from '@/components';`
 
-**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 

@@ -6,7 +6,7 @@ Button group: a visually connected row of related actions. A plain container for
 
 **Import:** `import { ButtonGroup } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx`
 

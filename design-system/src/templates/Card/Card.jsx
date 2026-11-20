@@ -112,7 +112,7 @@ Card.propTypes = {
     description: PropTypes.node,
     /** Actions at the end of the header row: buttons, a pager or an overflow
      * @ds-context Used in: Card.actions (ds guide card)
-     * @ds-context Governed by: Common actions (ds guide common-actions); Overflow (ds guide overflow); Overflow (ds guide overflow); Overflow (ds guide overflow)
+     * @ds-context Governed by: Common actions (ds guide common-actions); Overflow (ds guide overflow)
      */
     actions: PropTypes.node,
     /** Custom header that replaces title, description and actions (tabs, a toolbar)

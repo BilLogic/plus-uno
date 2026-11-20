@@ -10,7 +10,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Used in:** Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 

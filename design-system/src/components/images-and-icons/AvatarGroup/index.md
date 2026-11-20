@@ -6,7 +6,7 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 **Import:** `import { AvatarGroup } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx`
 

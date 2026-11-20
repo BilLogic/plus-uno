@@ -10,7 +10,7 @@ Also asked as: popover, flyout, inline dialog.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+**Governed by:** Common actions (`ds guide common-actions`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 

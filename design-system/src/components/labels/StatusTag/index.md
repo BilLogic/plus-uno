@@ -10,7 +10,7 @@ Also asked as: lozenge, pill, state label.
 
 **Used in:** Page (`ds guide page`); Panel (`ds guide panel`)
 
-**Governed by:** Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 

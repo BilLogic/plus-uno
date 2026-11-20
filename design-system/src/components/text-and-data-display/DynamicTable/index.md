@@ -10,7 +10,7 @@ Also asked as: data table, interactive table.
 
 **Used in:** Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx`
 

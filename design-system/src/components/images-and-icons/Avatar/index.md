@@ -8,7 +8,7 @@ Also asked as: user photo, initials, profile image, user picture, tutor photo, s
 
 **Import:** `import { Avatar } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/images-and-icons/Avatar/Avatar.jsx`
 

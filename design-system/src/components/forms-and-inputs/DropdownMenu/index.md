@@ -10,7 +10,7 @@ Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions
 
 **Used in:** Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 

@@ -6,7 +6,7 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Import:** `import { Radio } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 

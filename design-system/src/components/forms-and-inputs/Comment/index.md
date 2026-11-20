@@ -6,7 +6,7 @@ Comment: one entry in a threaded discussion, with slots for the author, time, co
 
 **Import:** `import { Comment } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Comment/Comment.jsx`
 

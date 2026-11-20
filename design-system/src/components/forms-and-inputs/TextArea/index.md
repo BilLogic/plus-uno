@@ -8,7 +8,7 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Import:** `import { TextArea } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
+**Governed by:** Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 

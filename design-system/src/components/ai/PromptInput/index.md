@@ -8,7 +8,7 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Import:** `import { PromptInput } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/ai/PromptInput/PromptInput.jsx`
 

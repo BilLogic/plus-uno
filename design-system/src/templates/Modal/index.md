@@ -10,7 +10,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Used in:** Card (`ds guide card`); Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/templates/Modal/Modal.jsx`
 

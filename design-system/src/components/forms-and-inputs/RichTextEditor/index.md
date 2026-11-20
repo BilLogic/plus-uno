@@ -6,7 +6,7 @@ RichTextEditor: a text field with a formatting toolbar, for where the formatting
 
 **Import:** `import { RichTextEditor } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`
 

@@ -8,7 +8,7 @@ Also asked as: label, keyword.
 
 **Import:** `import { Tag } from '@/components';`
 
-**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 

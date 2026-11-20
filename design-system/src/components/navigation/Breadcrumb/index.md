@@ -10,7 +10,7 @@ Also asked as: path, navigation trail.
 
 **Used in:** Frame (`ds guide frame`); Page (`ds guide page`)
 
-**Governed by:** Disabled (`ds guide disabled`); Navigation (`ds guide navigation`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+**Governed by:** Disabled (`ds guide disabled`); Navigation (`ds guide navigation`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
