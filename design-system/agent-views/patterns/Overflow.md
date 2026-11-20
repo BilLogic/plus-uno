@@ -147,7 +147,7 @@ A field that grows adds a whole line or a whole tag row and never a blank one: t
 
 **Checked:** Review
 
-A text field the person types in, such as a Text field, a Search field, a Select you type in or a Time picker, has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is picked from, such as a Select with `isSearchable` off, a Popup select, a Tree select, a Cascader, a Date picker, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
+A text field the person types in, such as a Text field, a Search field, a Select you type in, or a Date, Time or Date time picker, has no Tooltip, because focus reaches the value: the caret walks to the end and the field scrolls with it. A control that is picked from, such as a Select with `isSearchable` off, a Popup select, a Tree select, a Cascader, a Filter button, a menu item or a file row, opens the full text in a Tooltip on hover and focus, only while it is clipped. Slot elements, the chevron and the clear button keep their places and stay visible at the end.
 
 The one exception is a Button, Link button, Split button or Button group: its label ends in an ellipsis with no Tooltip, so shorten the label. The full label stays in the accessible name.
 

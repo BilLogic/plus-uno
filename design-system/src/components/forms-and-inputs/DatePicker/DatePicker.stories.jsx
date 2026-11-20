@@ -8,7 +8,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date picker',
@@ -1028,7 +1028,7 @@ export const Overflow = {
         const input = within(canvasElement).getByRole('combobox');
         await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
         await expect(input.value).toBe('11/19/2026');
-        await expectFullTextReachable(canvasElement, input, '11/19/2026');
+        await expectReachableByFocus(canvasElement, input, '11/19/2026');
         await expectTrailingKept(box, within(box).getByRole('button'));
     },
 };

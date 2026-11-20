@@ -8,6 +8,8 @@ Also asked as: date and time, schedule.
 
 **Import:** `import { DateTimePicker } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx`
 
 **Stories:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.stories.jsx` — Overview, Spacing, Validation, InteractionStates, TimeZones, Interactive, Default, WithValue, Compact, Invalid, Valid, ReadOnly, Disabled, HoveredState, KeyboardFocus, Overflow
@@ -89,7 +91,7 @@ Don't: A bare 'Invalid' does not say what to change.
 
 ### Let a `DateTimePicker` keep one line in a narrow slot. {#let-a-datetimepicker-keep-one-line-in-a-narrow-slot}
 
-The date and the time keep one line each, a clipped date opens its full value in a Tooltip, and the field stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The date and the time keep one line each, the fields are typed in, so focus reaches a clipped value, and the field stays inside its slot. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 
