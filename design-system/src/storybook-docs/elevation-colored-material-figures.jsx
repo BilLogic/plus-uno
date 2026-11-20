@@ -26,7 +26,7 @@ const TEXT_OF = { warning: "--ds-text-warning-inverse" };
 
 const picture = {
   position: "relative",
-  minHeight: "var(--width-1000)",
+  minHeight: "160px" /* docs-literal: a demo frame, not a role */,
   borderRadius: "var(--radius-lg)",
   overflow: "hidden",
   backgroundImage:
@@ -147,7 +147,7 @@ const FloatingPanelDontFigure = () => (
     <div
       style={{
         margin: "var(--pad-y-md) var(--pad-x-md)",
-        minHeight: "var(--width-500)",
+        minHeight: "80px" /* docs-literal: a demo frame, not a role */,
         padding: "var(--pad-y-md) var(--pad-x-md)",
         borderRadius: "var(--radius-lg)",
         border: "var(--border-width-default) solid var(--ds-border-material)",

@@ -147,7 +147,7 @@ const statusOptions = [
 
 const grid = { pointerEvents: 'auto', display: 'grid', gap: '20px' /* token gap: 20px */, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
 
-const field = { maxWidth: 'var(--width-2500)' };
+const field = { maxWidth: '400px' /* demo frame */ };
 
 /** One story per value, for the Examples tab. */
 export const Empty = {
@@ -199,7 +199,7 @@ export const Multi = {
 };
 
 const longTags = sampleOptions.map((o) => o.value);
-const narrow = { width: 'var(--width-2000)' };
+const narrow = { width: '320px' /* demo frame */ };
 
 /** A set of tags that does not fit one row: the field grows by whole tag rows and the typing input shares the last one. */
 export const MultiRows = {
@@ -414,7 +414,7 @@ const people = tutorNames.map((name, i) => ({ value: `p${i + 1}`, label: name })
 /** LongList — past 50 options, Recent and Suggested come first and typing searches the rest. */
 export const LongList = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */ }}>
             <Select label="Tutor" options={people} recent={['p3']} suggested={['p8', 'p21']} />
         </div>
     )
@@ -463,7 +463,7 @@ const loadStudents = (query, { offset, limit }) => new Promise((resolve) => {
  */
 export const Async = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */ }}>
             <Select label="Student" loadOptions={loadStudents} />
         </div>
     ),
@@ -487,7 +487,7 @@ export const Async = {
 /** AsyncCreatable — `isCreatable` works over loaded options: what nothing matches can be created. */
 export const AsyncCreatable = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */ }}>
             <Select label="Student" isCreatable loadOptions={loadStudents} />
         </div>
     ),
@@ -503,7 +503,7 @@ export const AsyncCreatable = {
 /** Until the first page arrives, the list shows one "Loading options" row. Never skeleton rows. */
 export const AsyncLoading = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */ }}>
             <Select label="Teacher" options={[]} isLoading defaultOpen />
         </div>
     ),
@@ -522,7 +522,7 @@ export const AsyncFailed = {
             return calls.current === 1 ? Promise.reject(new Error('offline')) : loadStudents(query, paging);
         };
         return (
-            <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
+            <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */ }}>
                 <Select label="Student" loadOptions={loadOptions} />
             </div>
         );
@@ -542,7 +542,7 @@ export const Overview = {
     render: () => (
         <div
             className="sb-select-interactive-override"
-            style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)', width: '100%' }}
+            style={{ pointerEvents: 'auto', maxWidth: '400px' /* demo frame */, width: '100%' }}
         >
             <Select aria-label="Site" options={sampleOptions} placeholder="Select a site" />
         </div>
@@ -567,7 +567,7 @@ export const Interactive = {
         }, [args.isMulti]);
 
         return (
-            <div style={{ maxWidth: 'var(--width-2500)' }}>
+            <div style={{ maxWidth: '400px' /* demo frame */ }}>
                 <p style={{ margin: '0 0 var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.isMulti
                         ? (value.length > 0 ? value.join(', ') : 'None')
@@ -614,7 +614,7 @@ const COLOR_OPTIONS = [
 export const Colors = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: 'var(--width-2000)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '320px' /* demo frame */ }}>
             <Select label="Site" options={COLOR_OPTIONS} placeholder="Pick a site" />
             <Select label="Sites" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['lincoln-middle']} />
         </div>
@@ -653,7 +653,7 @@ export const Colors = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Site' });
-const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><Select id="select-ex-rest" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,

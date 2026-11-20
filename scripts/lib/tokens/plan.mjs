@@ -449,6 +449,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--size-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
   { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
   { tier: 'components', group: 'Progress ring', new: '--progress-ring-stroke', old: null, value: '--stroke-2', use: 'Stroke width of a ProgressRing track and fill.' },
+  { tier: 'components', group: 'Select', new: '--select-check-size', old: null, codeOnly: true, ref: '14px', note: 'the OptionRow check mark (14), as Radio keeps its own 14', use: 'Size of the check box in a Select option.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100', use: 'Stacking order of a card raised above page content, such as a sticky table part.' },

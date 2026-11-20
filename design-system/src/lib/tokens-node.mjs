@@ -335,6 +335,7 @@ export const FAMILIES = [
   { family: 'calendar', prefix: '--calendar-', what: 'calendar day and navigation button sizes' },
   { family: 'checkbox', prefix: '--checkbox-', what: 'the checkbox box size' },
   { family: 'radio', prefix: '--radio-', what: 'the radio dot size, and the RadioGroup size steps' },
+  { family: 'select', prefix: '--select-', what: 'the check box size in a Select option' },
   { family: 'choice-tile', prefix: '--choice-tile-', what: 'the choice tile width' },
   { family: 'file-item', prefix: '--file-item-', what: 'the FileItem row height' },
   { family: 'choice-grid', prefix: '--choice-grid-', what: 'the Choice grid control width at each size' },

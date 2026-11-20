@@ -93,7 +93,7 @@ const dialogDocsHostStyle = {
     padding: 'var(--pad-x-lg)',
 };
 
-function InlineDialogCanvas({ minHeight = 'var(--width-2500)', dialog }) {
+function InlineDialogCanvas({ minHeight = '400px' /* demo frame */, dialog }) {
     return (
         <div style={{ ...dialogDocsHostStyle, minHeight }}>
             {dialog}
@@ -121,7 +121,7 @@ function DialogContentDemos() {
             <ContentVariantCanvas
                 title="Default + Buttons"
                 description="Use for short confirmation content with primary and secondary actions."
-                minHeight="var(--height-2000)"
+                minHeight="320px" /* demo frame */
                 dialog={
                     <Dialog
                         title="Publish session notes?"
@@ -167,7 +167,7 @@ function DialogContentDemos() {
             <ContentVariantCanvas
                 title="Default + No Buttons"
                 description="Use for informational content where closing from the header is sufficient."
-                minHeight="var(--height-2000)"
+                minHeight="320px" /* demo frame */
                 dialog={
                     <Dialog
                         title="Session notes saved"
@@ -210,7 +210,7 @@ function DialogLayoutDemos() {
             />
 
             <InlineDialogCanvas
-                minHeight="var(--width-2500)"
+                minHeight="400px" /* demo frame */
                 dialog={
                     <Dialog
                         title="Publish session plan?"
@@ -270,7 +270,7 @@ Width10Col.storyName = 'Width 10-col';
 
 const heightStory = (height, title, body) => ({
     render: () => (
-        <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, '--dialog-max-height': 'var(--height-2000)', width: '100%' }}>
+        <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, '--dialog-max-height': '320px' /* demo frame */, width: '100%' }}>
             <Dialog height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
         </div>
     ),
@@ -374,7 +374,7 @@ export const Content = () => (
 export const Layout = () => <div style={col}><DialogLayoutDemos /></div>;
 
 const dialogDocsShellStyle = {
-    minHeight: 'var(--width-2500)',
+    minHeight: '400px' /* demo frame */,
     width: '100%',
 };
 

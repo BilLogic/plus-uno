@@ -51,7 +51,7 @@ const rowsOf = (elements) => {
 /* -------------------------------------------------------------------- wrap */
 
 export const Wrapping = () => (
-    <div style={{ width: 'var(--width-2000)' }}>
+    <div style={{ width: '320px' /* demo frame */ }}>
         <TagGroup label="Subjects">
             {SUBJECTS.map((s) => <Tag key={s} color="blue" data-testid={`tag-${s}`}>{s}</Tag>)}
         </TagGroup>
@@ -204,7 +204,7 @@ Collapse.play = async ({ canvasElement }) => {
  * it, Tab reaches the hidden tags, Escape closes it and puts focus back.
  */
 export const CollapseMenu = () => (
-    <div style={{ width: '300px' /* token gap: 300px */, paddingBottom: 'var(--width-1500)' }}>
+    <div style={{ width: '300px' /* token gap: 300px */, paddingBottom: '240px' /* demo frame */ }}>
         <TagGroup label="Subjects" overflow="collapse">
             {SUBJECTS.map((s) => (
                 <Tag key={s} href={`#${s}`} onClick={(e) => e.preventDefault()} color="green">{s}</Tag>
@@ -262,7 +262,7 @@ CollapseMenu.play = async ({ canvasElement }) => {
 export const CollapseWithSuggestions = {
     args: { onAccept: fn() },
     render: ({ onAccept }) => (
-        <div data-testid="frame" style={{ width: '420px' /* token gap: 420px */, paddingBottom: 'var(--width-1500)' }}>
+        <div data-testid="frame" style={{ width: '420px' /* token gap: 420px */, paddingBottom: '240px' /* demo frame */ }}>
             <TagGroup label="Subjects" overflow="collapse">
                 {SUBJECTS.slice(0, 2).map((s) => <Tag key={s} color="green" data-testid={`tag-${s}`}>{s}</Tag>)}
                 <Suggestion label="Fractions" onAccept={onAccept} />
@@ -342,7 +342,7 @@ export const MenuKeepsActions = {
     render: function Render({ onRemove, onFollow, onSaving }) {
         const [picked, setPicked] = useState(false);
         return (
-            <div style={{ width: '600px' /* token gap: 600px */, paddingBottom: 'var(--width-1500)' }}>
+            <div style={{ width: '600px' /* token gap: 600px */, paddingBottom: '240px' /* demo frame */ }}>
                 <TagGroup label="Filters" overflow="collapse" maxVisible={1}>
                     <Tag color="blue">Science</Tag>
                     <Tag  color="blue" isSelected={picked} onClick={() => setPicked((p) => !p)}>
@@ -574,7 +574,7 @@ ConditionalChildrenAreNotCounted.play = async ({ canvasElement }) => {
  * reports expanded, never pressed.
  */
 export const OverflowTag = () => (
-    <div style={{ width: 'var(--width-1500)' }}>
+    <div style={{ width: '240px' /* demo frame */ }}>
         <TagGroup label="Subjects" overflow="collapse" maxVisible={2}>
             {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
         </TagGroup>
@@ -619,7 +619,7 @@ const MANY = ['Math', 'ELA', 'Art', 'ESL', 'STEM', 'Band', 'Code', 'Film', 'Gym'
  * loses a digit.
  */
 export const DigitBoundary = () => (
-    <div data-testid="frame" style={{ width: 'var(--width-1000)' }}>
+    <div data-testid="frame" style={{ width: '160px' /* demo frame */ }}>
         <TagGroup label="Subjects" overflow="collapse">
             {MANY.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
         </TagGroup>
@@ -756,7 +756,7 @@ SqueezedFirstReplaced.play = async ({ canvasElement }) => {
  * table column: every wrapped row, and the `+n` of a collapsed one.
  */
 export const AlignmentRight = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', width: 'var(--width-2000)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', width: '320px' /* demo frame */ }}>
         <TagGroup label="Wrapped subjects" alignment="end">
             {SUBJECTS.map((s) => <Tag key={s} color="purple" data-testid={`wrap-${s}`}>{s}</Tag>)}
         </TagGroup>

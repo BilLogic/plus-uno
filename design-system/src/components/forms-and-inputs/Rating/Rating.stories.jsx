@@ -63,7 +63,7 @@ export const Overview = () => {
     const [value, setValue] = useState(3);
 
     return (
-        <div style={{ ...ratingCol, maxWidth: 'var(--width-3000)' }}>
+        <div style={{ ...ratingCol, maxWidth: '480px' /* demo frame */ }}>
             <Rating
                 id="rating-overview"
                 label="How was the session?"
@@ -151,7 +151,7 @@ export const Interactive = (args) => {
     }, [args.type]);
 
     return (
-        <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <Rating
                 label={args.label}
                 isRequired={args.isRequired}
@@ -220,7 +220,7 @@ PropsRender.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: 'var(--width-3000)' };
+const frame = { maxWidth: '480px' /* demo frame */ };
 
 const stateRender = (id, type, props) => () => (
     <div style={frame}>

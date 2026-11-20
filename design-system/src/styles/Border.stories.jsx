@@ -156,7 +156,7 @@ export const SidebarEdges = {
         <DoDont>
             <Do caption="One hairline on the sidebar edge.">
                 <InAppFrame
-                    height="var(--height-2000)"
+                    height="320px" /* demo frame */
                     panelStorageKey={null}
                     breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
                 >
@@ -254,7 +254,7 @@ const AFilledFieldDontFigure = () => (
 const ALineUnderDontFigure = () => (
     <>
         <InAppFrame
-            height="var(--height-2000)"
+            height="320px" /* demo frame */
             panelStorageKey={null}
             contentAs="div"
             header={(

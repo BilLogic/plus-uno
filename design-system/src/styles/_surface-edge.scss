@@ -8,5 +8,5 @@
  *     }
  */
 @mixin surface-edge {
-    box-shadow: 0 0 0 var(--stroke-2) var(--ds-border-surface);
+    box-shadow: 0 0 0 var(--page-border-width) var(--ds-border-surface);
 }

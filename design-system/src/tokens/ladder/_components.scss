@@ -217,6 +217,9 @@
 
     /* Progress ring */
     --progress-ring-stroke: var(--stroke-2);
+
+    /* Select */
+    --select-check-size: 14px; /* the OptionRow check mark (14), as Radio keeps its own 14 */
 }
 
 /* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */

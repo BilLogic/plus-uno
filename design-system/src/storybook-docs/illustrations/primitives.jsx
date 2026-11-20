@@ -24,7 +24,7 @@ export const HeroGround = createContext(false);
 const clampedCorner = (token, w, h) => (token ? `min(${token}, ${Math.min(w, h) / 2}px)` : undefined);
 
 /** The accent ring is the one outline heavier than a hairline: a kit unit (2px in a hero). */
-const ACCENT_STROKE = { strokeWidth: 'var(--stroke-1)' };
+const ACCENT_STROKE = { strokeWidth: 'var(--border-width-default)' };
 
 const Rect = ({ x, y, w, h, fill, stroke, corner, opacity }) => {
   const radius = clampedCorner(CORNER[corner], w, h);
@@ -315,7 +315,7 @@ export const StickyHeader = ({ x, y, w, h = 64, accent = false }) => (
   </g>
 );
 
-/** A single-line field: --height-250 (40) halved. */
+/** A single-line field: --control-lg (40) halved. */
 const FIELD_H = 20;
 
 export const Field = ({ x, y, w, accent = false, invalid = false }) => (

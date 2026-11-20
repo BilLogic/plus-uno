@@ -114,7 +114,7 @@ export const Overview = () => {
     const [value, setValue] = useState([]);
 
     return (
-        <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <TreeSelect
                 id="tree-select-overview"
                 aria-label="Topic"
@@ -128,7 +128,7 @@ export const Overview = () => {
     );
 };
 
-const fieldWrap = { maxWidth: 'var(--width-2500)' };
+const fieldWrap = { maxWidth: '400px' /* demo frame */ };
 
 /** Single select: clicking any node selects it and closes the panel. */
 export const SingleSelect = () => {
@@ -184,7 +184,7 @@ export const Interactive = (args) => {
         : (value || '');
 
     return (
-        <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <TreeSelect
                 id="tree-select-interactive"
                 label={args.label}
@@ -219,7 +219,7 @@ Interactive.args = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Topic' });
-const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><TreeSelect id="treeselect-ex-rest" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,

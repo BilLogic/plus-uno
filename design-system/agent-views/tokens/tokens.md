@@ -216,6 +216,7 @@ Tokens one component owns, named for it.
 --rich-text-editor-max-width  /* Maximum width of a RichTextEditor unless fullWidth is set. */
 --scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
 --scroll-bar-size  /* Thickness of a scroll bar. */
+--select-check-size  /* Size of the check box in a Select option. */
 --setting-row-end-min-height  /* Minimum height of a SettingRow end slot so compact controls align with the first line of the label. */
 --setting-row-pad-y  /* Vertical padding of a SettingRow. */
 --setting-row-select-min-width  /* Minimum width of a compact Select inside a SettingRow end slot. */

@@ -44,7 +44,7 @@ export default {
     },
 };
 
-const fieldWrap = { maxWidth: 'var(--width-2500)' };
+const fieldWrap = { maxWidth: '400px' /* demo frame */ };
 const px = (value) => Math.round(parseFloat(value));
 
 export const Overview = () => (
@@ -248,7 +248,7 @@ Interactive.args = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', { name: 'Notes' });
-const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><TextArea id="textarea-ex-rest" label="Notes" placeholder="What did you cover?" /></div>,

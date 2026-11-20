@@ -32,7 +32,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 const HEIGHT = 900;
 
-const slot = (label, minHeight = 'var(--height-500)') => (
+const slot = (label, minHeight = '80px' /* demo frame */) => (
     <div
         style={{
             display: 'flex',
@@ -241,7 +241,7 @@ export const ColorModes = {
         await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024, in flow').not.toBe('absolute'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
-        const surfaceEdge = '0 0 0 var(--stroke-2) var(--ds-border-surface)';
+        const surfaceEdge = '0 0 0 var(--page-border-width) var(--ds-border-surface)';
         const edgeLine = 'var(--border-width-default) 0 0 0 var(--ds-border)';
         await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--border-width-default'));

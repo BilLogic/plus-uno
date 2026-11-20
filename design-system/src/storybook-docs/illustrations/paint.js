@@ -229,7 +229,7 @@ export const scaledCorner = (role, factor) => `calc(${CORNER_TOKEN[role]} * ${fa
 export const HAIRLINE = { strokeWidth: 'var(--stroke-hairline)' };
 
 /** The hairline a hero sets on its drawing: half a stroke, since one unit is 2px there. */
-export const HERO_HAIRLINE = 'calc(var(--stroke-1) / 2)';
+export const HERO_HAIRLINE = 'calc(var(--border-width-default) / 2)';
 
 /** A selected tab's underline: the Tabs component's selected-border width, halved. */
 export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };

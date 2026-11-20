@@ -60,7 +60,7 @@ export default {
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
-const fieldWrap = { maxWidth: 'var(--width-2500)' };
+const fieldWrap = { maxWidth: '400px' /* demo frame */ };
 
 /** Overview: a labeled field with a placeholder and an element after the control. */
 export const Overview = () => (
@@ -563,7 +563,7 @@ NumberReadOnly.play = async ({ canvasElement }) => {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', { name: 'Your name' });
-const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><TextField id="textfield-ex-rest" label="Your name" placeholder="Name" /></div>,

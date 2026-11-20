@@ -374,7 +374,7 @@ export const Widths = {
     render: (args) => (
         <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)' }}>
             {[
-                [480, 'var(--width-3000)'],
+                [480, '480px' /* demo frame */],
                 [768, '768px' /* token gap: 768px */],
                 [1024, '1024px' /* token gap: 1024px */],
                 [1920, '1920px' /* token gap: 1920px */],
@@ -483,7 +483,7 @@ export const StickyHeaderAndFrozenColumn = {
         stickyHeader: true,
         maxHeight: 200
     },
-    render: (args) => <div style={{ width: 'var(--width-3000)' }}><DynamicTable {...args} /></div>,
+    render: (args) => <div style={{ width: '480px' /* demo frame */ }}><DynamicTable {...args} /></div>,
     parameters: { docs: { description: { story: 'The head row stays pinned while the rows scroll under it inside the table\'s own region. The checkboxes and the title column stay frozen on an opaque surface; while the table scrolls sideways their edge draws a stronger divider and the overflow shadow.' } } },
     play: async ({ canvasElement }) => {
         const scroll = canvasElement.querySelector('.plus-table-shell-scroll');

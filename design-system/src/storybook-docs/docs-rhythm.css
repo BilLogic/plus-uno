@@ -219,18 +219,15 @@
     --stroke-hairline: var(--border-width-default);
 }
 
-/* Docs chrome roles over the size scale: the docs' own measures, named for the job
-   so no docs stylesheet reads a size primitive. */
+/* Docs chrome measures: the docs' own sizes, named for the job. The browser tab and
+   field widths are field widths; the loop figures take their own literal sizes. */
 :root {
-    /* token gap: text size alone, no role token (the roles are whole font shorthands) */
-    --docs-text-size: var(--type-size-100);
-    --docs-code-size: var(--type-size-075);
-    --docs-header-offset: var(--height-500);
-    --docs-browser-tab-width: var(--width-1500);
-    --docs-browser-field-width: var(--width-3000);
-    --loop-stage-height: calc(var(--height-100) * 9);
-    --loop-puck-size: var(--height-500);
-    --loop-bar-height: var(--height-150);
+    --docs-header-offset: 80px; /* docs-literal: the sticky docs header's height, which no role token holds */
+    --docs-browser-tab-width: var(--field-width-md);
+    --docs-browser-field-width: var(--field-width-xl);
+    --loop-stage-height: 144px; /* docs-literal: nine rows of 16, the loop figure's own stage; no role token is a stage height */
+    --loop-puck-size: 80px; /* docs-literal: the loop figure's puck, drawn at its own size */
+    --loop-bar-height: var(--control-sm);
 }
 
 /* The illustration kit's label type: a real label's size, sans and mono, and the
@@ -239,8 +236,8 @@
    size. Construction drawings (mono labels) are drawn 1:1, so the mono drawing size
    is the real mono size. */
 :root {
-    --kit-label-size: var(--type-size-0875);
-    --kit-label-mono-size: var(--type-size-075);
+    --kit-label-size: 0.875rem; /* docs-literal: the label's size alone, drawn halved in a drawing; the text roles are whole font shorthands */
+    --kit-label-mono-size: 0.75rem; /* docs-literal: see above */
     --kit-label-drawing-size: calc(var(--kit-label-size) / 2);
     --kit-label-mono-drawing-size: var(--kit-label-mono-size);
 }
@@ -252,7 +249,7 @@
 .sbdocs .sb-docs-hero,
 .sbdocs .sb-docs-hero__pane {
     background-color: var(--ds-surface-sunken);
-    background-image: radial-gradient(circle, var(--ds-border) var(--stroke-1), transparent calc(var(--stroke-1) * 1.5));
+    background-image: radial-gradient(circle, var(--ds-border) var(--border-width-default), transparent calc(var(--border-width-default) * 1.5));
     background-size: var(--stack-md) var(--stack-md);
 }
 

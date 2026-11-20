@@ -33,7 +33,7 @@ export default {
     },
 };
 
-const wrap = { maxWidth: 'var(--width-3000)' };
+const wrap = { maxWidth: '480px' /* demo frame */ };
 
 /* ----------------------------------------------------------------- default */
 

@@ -316,6 +316,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spinner | `--spinner-size-lg` |  |
 | Progress bar | `--progress-bar-height` |  |
 | Progress ring | `--progress-ring-stroke` |  |
+| Select | `--select-check-size` | the OptionRow check mark (14), as Radio keeps its own 14 |
 
 ## Layers
 

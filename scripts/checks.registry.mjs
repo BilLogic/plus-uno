@@ -602,9 +602,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-no-primitive-reads.mjs',
-    baseline: 'scripts/baselines/no-primitive-reads.json',
-    update: 'node scripts/check-no-primitive-reads.mjs --update',
-    guards: 'components and patterns reading a numbered primitive instead of a tier token, counted per file; the residue may fall and never rise.',
+    guards: 'components, templates, stories and docs reading a primitive (a numbered scale step or a palette color) instead of a tier token; held at zero, with no baseline.',
   },
   {
     name: 'check:unspread-rest',

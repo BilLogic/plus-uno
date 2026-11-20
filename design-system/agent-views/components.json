@@ -765,7 +765,10 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
+        "--heading-sm",
         "--heading-xs",
+        "--heading-xxl",
+        "--heading-xxs",
         "--icon-lg",
         "--icon-md",
         "--icon-sm",
@@ -774,11 +777,7 @@
         "--image-sm",
         "--image-xxs",
         "--radius-full",
-        "--radius-xxl",
-        "--type-size-075",
-        "--type-size-0875",
-        "--type-size-100",
-        "--type-size-200"
+        "--radius-xxl"
       ]
     },
     {
@@ -3123,9 +3122,9 @@
         "WrapNotFocusable"
       ],
       "tokens": [
+        "--body-default",
         "--border-width-default",
         "--card-radius",
-        "--code-default",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
         "--ds-background-code-highlight",
@@ -3139,8 +3138,8 @@
         "--pad-y-lg",
         "--plus-code-block-digits",
         "--plus-code-block-gutter",
-        "--type-line-height-125",
-        "--type-size-0875"
+        "--type-family-code",
+        "--type-line-height-125"
       ]
     },
     {
@@ -3858,11 +3857,11 @@
         "--border-width-default",
         "--calendar-day-sm",
         "--ds-icon-subtle",
+        "--field-width-sm",
         "--inline-md",
         "--pad-x-md",
         "--popup-pad",
-        "--popup-width-range",
-        "--width-1000"
+        "--popup-width-range"
       ]
     },
     {
@@ -5275,6 +5274,8 @@
         "--ds-text-subtle",
         "--heading-md",
         "--heading-sm",
+        "--icon-lg",
+        "--image-md",
         "--inline-md",
         "--page-stack-lg",
         "--page-stack-md",
@@ -5283,9 +5284,7 @@
         "--section-min-width-main",
         "--stack-md",
         "--stack-sm",
-        "--stack-xl",
-        "--type-size-150",
-        "--type-size-200"
+        "--stack-xl"
       ]
     },
     {
@@ -7726,6 +7725,7 @@
       "tokens": [
         "--body-default",
         "--border-width-default",
+        "--control-lg",
         "--control-md",
         "--ds-background-neutral-subtle-hovered",
         "--ds-motion-appearance-fast",
@@ -7734,7 +7734,6 @@
         "--ds-surface-overlay",
         "--ds-text",
         "--ds-text-subtlest",
-        "--height-250",
         "--pad-x-md",
         "--radius-control-lg",
         "--radius-md",
@@ -13365,9 +13364,9 @@
         "--pad-x-xs",
         "--pad-y-md",
         "--radius-md",
+        "--select-check-size",
         "--stack-md",
-        "--stack-sm",
-        "--type-size-0875"
+        "--stack-sm"
       ]
     },
     {

@@ -106,7 +106,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: 'var(--size-4000)' }}>
+    <div style={{ maxWidth: '640px' /* demo frame */ }}>
         <DateTimePicker id="datetime-overview" label="Session start" isRequired showSectionLabels={false} />
     </div>
 );
@@ -117,7 +117,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <DateTimePicker id="dt-default" label="Session start" isRequired spacing="default" showSectionLabels={false} />
@@ -130,7 +130,7 @@ export const Spacing = () => (
 );
 
 export const Validation = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         <div>
             <DemoLabel>INVALID</DemoLabel>
             <DateTimePicker
@@ -157,7 +157,7 @@ export const Validation = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <DateTimePicker id="datetime-default" label="Session start" isRequired showSectionLabels={false} />
@@ -174,7 +174,7 @@ export const InteractionStates = () => (
 );
 
 export const TimeZones = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-4000)', paddingBottom: 'var(--size-1900)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '640px' /* demo frame */, paddingBottom: '304px' /* demo frame */ }}>
         <DateTimePicker
             id="datetime-tz-same"
             label="Session start"
@@ -206,7 +206,7 @@ export const Interactive = (args) => {
     const [value, setValue] = useState(null);
 
     return (
-        <div style={{ maxWidth: 'var(--size-4000)' }}>
+        <div style={{ maxWidth: '640px' /* demo frame */ }}>
             <DateTimePicker
                 {...args}
                 onChange={(data) => {
@@ -246,7 +246,7 @@ Interactive.args = {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: 'var(--size-4000)' };
+const wrap = { maxWidth: '640px' /* demo frame */ };
 const dateInput = (canvasElement) => canvasElement.querySelectorAll('input')[0];
 const timeInput = (canvasElement) => canvasElement.querySelectorAll('input')[1];
 

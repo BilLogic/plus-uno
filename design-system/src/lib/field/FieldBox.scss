@@ -6,7 +6,7 @@
  *
  * One 1px border (`--border-width-default`) in `border.input` on one fill,
  * `background.input`. Hover turns the border `border.focused`. Focus draws
- * the focus ring, 2px (`--stroke-2`) and 2px off the box onto
+ * the focus ring, 2px (`--focus-ring-width`) and 2px off the box onto
  * the surface, in `border.focused`: the ring is never drawn inset. Hover and
  * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
  * placeholder `text.subtlest`, helper text `text.subtle`, read-only

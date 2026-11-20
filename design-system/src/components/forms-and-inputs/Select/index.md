@@ -275,7 +275,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--radius-md` · `--stack-md` · `--stack-sm` · `--type-size-0875`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--radius-md` · `--select-check-size` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 

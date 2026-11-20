@@ -8,7 +8,7 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const narrowOverlay = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
+const narrowOverlay = { '--plus-overlay-screen': '480px' /* demo frame */, width: '100%' };
 
 /** Every message has a title, body and action. */
 export const Anatomy = {
