@@ -155,7 +155,7 @@ export const OneTabSystem = () => {
             header={(
                 <PageHeader
                     title="Maya Rodriguez"
-                        bottomBar={(
+                    bottomBar={(
                         <Tabs activeKey={tab} onSelect={setTab} aria-label="Student pages">
                             <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
                             <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
@@ -187,7 +187,7 @@ export const TwoTabSystems = () => {
             header={(
                 <PageHeader
                     title="Maya Rodriguez"
-                        bottomBar={(
+                    bottomBar={(
                         <Tabs activeKey={tab} onSelect={setTab} aria-label="Student pages">
                             <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
                             <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>

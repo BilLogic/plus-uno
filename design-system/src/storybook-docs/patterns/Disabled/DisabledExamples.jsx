@@ -12,7 +12,7 @@ export const ReasonInCaption = () => (
 );
 
 export const ReasonInTooltip = () => (
-    <Tooltip text="Choose a school first." placement="bottom" show>
+    <Tooltip text="Choose a school first." placement="bottom">
         <div style={{ inlineSize: '100%' }}>
             <Select label="Group" options={[]} value={null} onChange={() => {}} isDisabled />
         </div>

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { BannerDo, BannerDont, CODE, FlagDo, FlagDont } from './NotificationsCases.jsx';
 
@@ -12,6 +12,18 @@ describe('Notifications do and don\'t examples', () => {
         flag.unmount();
         render(<FlagDont />);
         expect(screen.getByRole('button', { name: 'Move' })).toBeInTheDocument();
+    });
+
+    it('keeps both Flag pictures on screen past the autohide delay', () => {
+        vi.useFakeTimers();
+        try {
+            render(<><FlagDo /><FlagDont /></>);
+            act(() => { vi.advanceTimersByTime(20000); });
+            expect(screen.getByText('Session logged')).toBeInTheDocument();
+            expect(screen.getByText('Move this session to 4:30 PM?')).toBeInTheDocument();
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it('BannerDo is one Banner; BannerDont stacks two', () => {
