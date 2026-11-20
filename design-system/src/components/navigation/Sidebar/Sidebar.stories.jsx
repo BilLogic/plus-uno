@@ -114,6 +114,8 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
                 groups={groups(view)}
                 account={account ?? (view === 'tutor' ? TUTOR : ACCOUNT)}
                 helpHref="https://www.notion.so/"
+                inboxCount={3}
+                onInbox={() => {}}
                 onToggle={() => {}}
                 {...args}
                 tabs={tabs}
@@ -164,6 +166,8 @@ export default {
         activeId: { control: 'text', table: { category: 'Behavior' } },
         activeTabId: { control: 'text', table: { category: 'Behavior' } },
         helpHref: { control: 'text', table: { category: 'Content' } },
+        inboxCount: { control: 'number', table: { category: 'Content' } },
+        isInboxOpen: { control: 'boolean', table: { category: 'Behavior' } },
         homeHref: { control: 'text', table: { category: 'Content' } },
         slackUrl: { control: 'text', table: { category: 'Content' } },
         storageKey: { control: 'text', table: { category: 'Behavior' } },
@@ -245,7 +249,7 @@ export const Overview = {
 /**
  * The grid, measured at 1x: icon center x 32, label x 48, trailing center x
  * 208, thread x 32, section title x 20, logo mark x 20 to 44, toggle center x
- * 208, Help Center center x 208, the docked edge one 1px `--ds-border`.
+ * 208, bell center x 208, the docked edge one 1px `--ds-border`.
  */
 export const Geometry = {
     args: { tabSet: 'many' },
@@ -262,8 +266,8 @@ export const Geometry = {
         await expect(px(getComputedStyle(mark).height), 'lockup height 24').toBeCloseTo(24, 0);
         const toggle = within(canvasElement).getByRole('button', { name: 'Close sidebar' });
         await expect(centerX(canvasElement, toggle), 'toggle on the trailing column').toBeCloseTo(208, 0);
-        const help = within(canvasElement).getByRole('link', { name: /Help Center/ });
-        await expect(centerX(canvasElement, help), 'Help Center on the trailing column').toBeCloseTo(208, 0);
+        const bell = within(canvasElement).getByRole('button', { name: /^Inbox/ });
+        await expect(centerX(canvasElement, bell), 'the bell on the trailing column').toBeCloseTo(208, 0);
         const avatar = canvasElement.querySelector('.plus-sidebar-account .plus-avatar');
         await expect(centerX(canvasElement, avatar), 'avatar on the icon column').toBeCloseTo(32, 0);
         const edge = getComputedStyle(canvasElement.querySelector('.plus-frame__sidebar'));
@@ -282,7 +286,7 @@ export const Geometry = {
         const account = getComputedStyle(canvasElement.querySelector('.plus-sidebar-account'));
         await expect([px(account.paddingTop), px(account.paddingRight), px(account.paddingBottom), px(account.paddingLeft)], 'account row pad 8 16 12 12').toEqual([8, 16, 12, 12]);
         await expect(px(account.marginTop), 'account row sits 8 under the nav').toBeCloseTo(8, 0);
-        const measured = { ...grid, thread: threadX, toggle: centerX(canvasElement, toggle), help: centerX(canvasElement, help) };
+        const measured = { ...grid, thread: threadX, toggle: centerX(canvasElement, toggle), bell: centerX(canvasElement, bell) };
         // The PR quotes these.
         // eslint-disable-next-line no-console
         console.info('[Sidebar geometry]', JSON.stringify(measured));
@@ -645,7 +649,7 @@ export const ClosingTabs = {
 
 /* ------------------------------------------------------------- account row */
 
-/** The account button hugs avatar · name · role: its hover fill ends within 8 of the role; Help stays on x 208. */
+/** The account button hugs avatar · name · role: its hover fill ends within 8 of the role; the bell stays on x 208. */
 export const AccountHug = {
     args: { account: { id: 'story-hug', name: 'Maria Lopez', role: 'Tutor' } },
     play: async ({ canvasElement }) => {
@@ -659,14 +663,14 @@ export const AccountHug = {
         await expect(avatar.getBoundingClientRect().left - trigger.getBoundingClientRect().left, 'the avatar sits 8 in').toBeCloseTo(eight, 0);
         await expect(px(getComputedStyle(trigger).height), 'the button is 32 high').toBeCloseTo(tokenLength(canvasElement, '--size-200'), 0);
         await expect(avatar.getBoundingClientRect().height, 'the avatar is 24').toBeCloseTo(tokenLength(canvasElement, '--size-150'), 0);
-        const help = within(canvasElement).queryByRole('link', { name: /Help Center/ }) ?? within(canvasElement).getByRole('button', { name: 'Help Center' });
-        await expect(centerX(canvasElement, help), 'Help stays centered on x 208').toBeCloseTo(208, 0);
+        const bell = within(canvasElement).getByRole('button', { name: /^Inbox/ });
+        await expect(centerX(canvasElement, bell), 'the bell stays centered on x 208').toBeCloseTo(208, 0);
     },
 };
 
-/** Initials avatar, first name · role, the menu (Profile, Sign out) and Help Center. */
+/** Initials avatar, first name · role, the menu (Profile, Help Center, Sign out) and the Inbox bell with its count. */
 export const AccountRow = {
-    args: { onProfile: fn(), onSignOut: fn(), account: { id: 'story-long', name: 'Maria-Guadalupe Fernández-Castellanos', role: 'Admin' } },
+    args: { onProfile: fn(), onSignOut: fn(), onInbox: fn(), inboxCount: 3, account: { id: 'story-long', name: 'Maria-Guadalupe Fernández-Castellanos', role: 'Admin' } },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         const trigger = canvas.getByRole('button', { name: /Maria-Guadalupe Fernández-Castellanos, Admin: account menu/ });
@@ -685,15 +689,17 @@ export const AccountRow = {
         await expect(getComputedStyle(trigger).backgroundColor, 'menu open: the selected fill').toBe(tokenColor(canvasElement, '--ds-background-selected'));
         const signOut = await within(document.body).findByRole('menuitem', { name: 'Sign out' });
         await expect(signOut.closest('.plus-dropdown-menu')).toHaveTextContent('Maria-Guadalupe Fernández-Castellanos · Admin');
+        const helpItem = within(document.body).getByRole('menuitem', { name: /Help Center/ });
+        await expect(helpItem, 'Help Center is in the account menu').toHaveAttribute('href', 'https://www.notion.so/');
+        await expect(helpItem).toHaveAttribute('target', '_blank');
         await userEvent.click(signOut);
         await expect(args.onSignOut).toHaveBeenCalledTimes(1);
-        const help = canvas.getByRole('link', { name: /Help Center/ });
-        await expect(help).toHaveAttribute('target', '_blank');
-        const rest = help.querySelector('.plus-sidebar-account__help-rest');
-        const go = help.querySelector('.plus-sidebar-account__help-go');
-        await expect(getComputedStyle(go).visibility, 'the question mark at rest').toBe('hidden');
-        const hovered = withForcedPseudo(help, ':hover', () => [getComputedStyle(rest).visibility, getComputedStyle(go).visibility]);
-        await expect(hovered, 'the external icon on hover').toEqual(['hidden', 'visible']);
+        const bell = canvas.getByRole('button', { name: 'Inbox, 3 unread notifications' });
+        await expect(bell.querySelector('.plus-count'), 'the count rides the bell').toHaveTextContent('3');
+        await expect(canvas.queryByRole('link', { name: /Help Center/ }), 'no Help Center beside the account').toBeNull();
+        await expect(bell, 'closed: not pressed').toHaveAttribute('aria-pressed', 'false');
+        await userEvent.click(bell);
+        await expect(args.onInbox).toHaveBeenCalledTimes(1);
         const divider = getComputedStyle(canvasElement.querySelector('.plus-sidebar-account'));
         await expect(px(divider.borderTopWidth), 'the divider above the account row').toBeCloseTo(1, 0);
         await expect(divider.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border'));

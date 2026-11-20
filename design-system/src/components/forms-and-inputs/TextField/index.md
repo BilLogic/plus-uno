@@ -112,7 +112,7 @@ Don't: Disabled fades a value people need to read.
   accessible name whether or not you show it. If the visible label is rendered
   by the caller instead, point it at the input with `htmlFor`; if there is no
   text anywhere, pass `aria-label`.
-- **`isRequired` sets `aria-required` regardless of the label marker.** Pair it
+- **`isRequired` sets `required` and `aria-required` regardless of the label marker.** An empty required field fails the form's own check: submit is blocked and the field draws itself invalid until it is typed in. Pair it
   with `labelMarker="required"` only when required fields are the minority in
   the form; when most fields are required, mark the optional ones with
   `labelMarker="optional"` instead.
@@ -188,7 +188,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `name` | string | — | Form key of the input. Number steppers also report it in the `onChange` event. |
 | `label` | node | — | Visible label above the field. A string label also names the number steppers, as "Increase" and "Decrease" followed by the label. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
-| `isRequired` | bool | `false` | Sets `aria-required` on the input. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
+| `isRequired` | bool | `false` | Marks the input `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isLabelHidden` | bool | `false` | Hides the label visually. It is still rendered and still names the input. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |

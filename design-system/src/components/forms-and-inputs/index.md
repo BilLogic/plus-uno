@@ -17,7 +17,7 @@ authored half, counted rather than assumed.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
   - For large illustrated choices with a title and an illustration, use `ChoiceGrid` (or `RadioGroup` / `CheckboxGroup` in `tile` appearance).
-- **[Calendar](Calendar/index.md)** — Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
+- **[Calendar](Calendar/index.md)** — The days are one tab stop (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
   - For a date or date range field that opens this grid in a popup, use `DatePicker`.
   - For a combined date and time answer, use `DateTimePicker`.
 - **[Cascader](Cascader/index.md)** — Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
@@ -188,7 +188,7 @@ authored half, counted rather than assumed.
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 14 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [SearchField](SearchField/index.md) | 33 | ✅ | ✅ | ✅ |
+| [SearchField](SearchField/index.md) | 34 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 45 | ✅ | ✅ | ✅ |
 | [SettingRow](SettingRow/index.md) | 11 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |

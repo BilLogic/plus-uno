@@ -363,6 +363,7 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
   open, move through and close the list; Backspace removes the last Tag in a
   multi-select with an empty filter; Delete clears the field when
   `clearable`.
+- **`isRequired` holds the form to a pick.** The combobox sets `aria-required`, and an empty required `Select` (a multi-select needs at least one pick) fails the form's own check: submit is blocked, focus returns to the field and it draws itself invalid until something is picked.
 - **Clearing by keyboard and screen reader.** When a live field is `clearable`
   (on by default except on a required single `Select`) and holds a value, the
   field's plain ✕ `IconButton` (`xmark` at `--icon-sm`) is named

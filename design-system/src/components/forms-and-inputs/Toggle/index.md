@@ -8,7 +8,7 @@ Also asked as: enable disable, on/off setting.
 
 **Import:** `import { Toggle } from '@/components';`
 
-**Used in:** Frame (`ds guide frame`)
+**Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`)
 
 **Governed by:** Forms (`ds guide forms`); Read-only (`ds guide read-only`)
 

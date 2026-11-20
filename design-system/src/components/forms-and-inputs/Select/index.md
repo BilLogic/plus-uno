@@ -14,7 +14,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen, RequiredBlocksSubmit
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -144,6 +144,7 @@ Don't: Disabled fades a value people need to read.
   open, move through and close the list; Backspace removes the last Tag in a
   multi-select with an empty filter; Delete clears the field when
   `clearable`.
+- **`isRequired` holds the form to a pick.** The combobox sets `aria-required`, and an empty required `Select` (a multi-select needs at least one pick) fails the form's own check: submit is blocked, focus returns to the field and it draws itself invalid until something is picked.
 - **Clearing by keyboard and screen reader.** When a live field is `clearable`
   (on by default except on a required single `Select`) and holds a value, the
   field's plain ✕ `IconButton` (`xmark` at `--icon-sm`) is named
@@ -239,7 +240,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isDisabled` | bool | `false` | Dims the field and blocks opening and changing it. |
 | `isReadOnly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
-| `isRequired` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the combobox and makes an empty field fail the form's own check: submit is blocked and the field draws itself invalid. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `info` | node | — | Text for the info tooltip beside the label. |
 | `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
 | `errorMessage` | node | — | The caption shown under the field while `isInvalid` is set. It is announced. |
