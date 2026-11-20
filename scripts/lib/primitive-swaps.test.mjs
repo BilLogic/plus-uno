@@ -35,34 +35,53 @@ function px(value) {
 }
 const of = (name) => px(`var(${name})`);
 
-/** old primitive -> the role token every source now reads in its place. */
-const SWAPS = {
-  '--size-500': '--example-size-80', '--width-500': '--example-size-80', '--height-500': '--example-size-80',
-  '--size-750': '--example-size-120', '--height-750': '--example-size-120',
-  '--size-1000': '--example-size-160', '--width-1000': '--example-size-160',
-  '--size-1400': '--example-size-224', '--width-1400': '--example-size-224',
-  '--size-1500': '--example-size-240', '--width-1500': '--example-size-240',
-  '--size-1900': '--example-size-304', '--width-1900': '--example-size-304',
-  '--size-2000': '--example-size-320', '--width-2000': '--example-size-320', '--height-2000': '--example-size-320',
-  '--size-2500': '--example-size-400', '--width-2500': '--example-size-400',
-  '--size-3000': '--example-size-480', '--width-3000': '--example-size-480',
-  '--size-4000': '--example-size-640', '--size-5400': '--example-size-864',
-  '--height-100': '--example-size-16', '--height-150': '--example-size-24', '--height-250': '--example-size-40',
-  '--type-size-075': '--font-size-xs', '--type-size-0875': '--font-size-sm', '--type-size-100': '--font-size-md',
-  '--type-size-150': '--font-size-xl',
-  '--type-size-200': '--font-size-3xl',
-  '--stroke-1': '--border-width-default', '--stroke-2': '--border-width-selected',
-};
+/** The size a `font` text role sets, in px: the `--type-size-*` its shorthand names. */
+function fontSize(role) {
+  const size = declarations.get(role)?.match(/var\((--type-size-\d+)\)/)?.[1];
+  return size ? of(size) : assert.fail(`${role} names no --type-size`);
+}
 
-for (const [old, role] of Object.entries(SWAPS)) {
+/** Old primitive -> the existing role token every source now reads in its place. */
+const ROLE_SWAPS = {
+  '--height-250': '--control-lg', // InlineEdit, FieldBox
+  '--width-1000': '--field-width-sm', // range picker presets column
+  '--width-1500': '--field-width-md', // docs browser tab
+  '--width-3000': '--field-width-xl', // docs browser field
+  '--height-150': '--control-sm', // docs loop bar
+  '--stroke-1': '--border-width-default', // illustration strokes, docs dot ground, Colors border
+  '--stroke-2': '--border-width-selected', // illustration series stroke
+  '--type-size-200': '--image-md', // EmptyState and Carousel story glyph, 32
+  '--type-size-150': '--icon-lg', // compact EmptyState glyph, 24
+};
+for (const [old, role] of Object.entries(ROLE_SWAPS)) {
   test(`${old} and ${role} are the same length`, () => assert.equal(of(role), of(old)));
 }
 
-test('the component and template reads keep their length', () => {
-  assert.equal(of('--control-lg'), of('--height-250'), 'InlineEdit height');
-  assert.equal(of('--date-range-presets-width'), of('--width-1000'), 'range presets column');
-  assert.equal(of('--select-check-size'), of('--type-size-0875'), 'Select check box');
-  assert.equal(of('--page-border-width'), of('--stroke-2'), 'surface edge ring');
+test('the ring and outline reads keep their width', () => {
+  assert.equal(of('--page-border-width'), of('--stroke-2'), 'surface edge ring, Frame story');
   assert.equal(of('--focus-ring-width'), of('--stroke-2'), 'Colors story outline');
-  assert.equal(of('--border-width-hairline'), of('--stroke-1') / 2, 'hero hairline');
+  assert.equal(of('--select-check-size'), of('--type-size-0875'), 'Select check box');
+  assert.equal(px('calc(var(--border-width-default) / 2)'), of('--stroke-1') / 2, 'hero hairline');
 });
+
+/** Old font-size primitive -> the text role whose shorthand sets that size. */
+const TYPE_SWAPS = [
+  ['--type-size-075', ['--heading-xxs', '--body-sm']], // Avatar 16 and 24, docs code caption, figure labels
+  ['--type-size-0875', ['--heading-xs', '--body-default']], // Avatar 32, CodeBlock
+  ['--type-size-100', ['--heading-sm', '--body-lg']], // Avatar 40, docs prose and tabs
+  ['--type-size-200', ['--heading-xxl']], // Avatar 96 and 128
+];
+for (const [old, roles] of TYPE_SWAPS) {
+  for (const role of roles) test(`${role} sets ${old}'s size`, () => assert.equal(fontSize(role), of(old)));
+}
+
+/** Demo frames kept as literals: each literal is the px of the primitive it replaced. */
+const DEMO_FRAMES = {
+  '16px': '--height-100', '24px': '--height-150', '40px': '--height-250', '80px': '--size-500',
+  '120px': '--height-750', '160px': '--size-1000', '224px': '--size-1400', '240px': '--size-1500',
+  '304px': '--size-1900', '320px': '--size-2000', '400px': '--size-2500', '480px': '--size-3000',
+  '640px': '--size-4000', '864px': '--size-5400', '144px': '--height-100', // 144 = nine of --height-100
+};
+for (const [literal, old] of Object.entries(DEMO_FRAMES)) {
+  test(`${literal} keeps ${old}'s length`, () => assert.equal(px(literal), literal === '144px' ? of(old) * 9 : of(old)));
+}

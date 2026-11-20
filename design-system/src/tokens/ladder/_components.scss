@@ -218,11 +218,8 @@
     /* Progress ring */
     --progress-ring-stroke: var(--stroke-2);
 
-    /* Date range popup */
-    --date-range-presets-width: var(--width-1000);
-
     /* Select */
-    --select-check-size: var(--type-size-0875); /* 14px, in rem */
+    --select-check-size: 14px; /* the OptionRow check mark (14), as Radio keeps its own 14 */
 }
 
 /* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */

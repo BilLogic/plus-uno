@@ -25,9 +25,9 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: 'var(--example-size-480)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: '480px' /* demo frame */ };
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'flex-start' };
-const cell = { minWidth: 'var(--example-size-160)' };
+const cell = { minWidth: '160px' /* demo frame */ };
 
 export const Overview = () => (
     <div style={stack}>

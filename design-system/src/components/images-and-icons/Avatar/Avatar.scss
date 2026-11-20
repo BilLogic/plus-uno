@@ -8,12 +8,12 @@
 @use '../../../styles/state' as *;
 
 $avatar-sizes: (
-    16: (var(--image-xxs), var(--icon-sm), var(--icon-sm)),
-    24: (var(--image-sm), var(--font-size-xs), var(--icon-md)),
-    32: (var(--image-md), var(--font-size-sm), var(--icon-md)),
-    40: (var(--image-lg), var(--font-size-md), var(--icon-lg)),
-    96: (var(--avatar-size-96), var(--font-size-3xl), var(--icon-lg)),
-    128: (var(--avatar-size-128), var(--font-size-3xl), var(--icon-lg)),
+    16: (var(--image-xxs), var(--heading-xxs), var(--icon-sm)),
+    24: (var(--image-sm), var(--heading-xxs), var(--icon-md)),
+    32: (var(--image-md), var(--heading-xs), var(--icon-md)),
+    40: (var(--image-lg), var(--heading-sm), var(--icon-lg)),
+    96: (var(--avatar-size-96), var(--heading-xxl), var(--icon-lg)),
+    128: (var(--avatar-size-128), var(--heading-xxl), var(--icon-lg)),
 );
 
 // The initials and icon grounds, per Tag color: ground, ink.
@@ -42,8 +42,9 @@ $avatar-colors: (
     vertical-align: middle;
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
-    @include ds-type(var(--heading-xs));
-    font-size: var(--avatar-font, var(--font-size-sm));
+    // Initials are set in the semibold text style nearest the avatar's size;
+    // each size sets --avatar-font to that style.
+    @include ds-type(var(--avatar-font, var(--heading-xs)));
     border-radius: var(--radius-full);
     --avatar-glyph: var(--icon-md);
 }

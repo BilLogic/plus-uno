@@ -1,5 +1,5 @@
 /**
- * `npm run check:no-primitive-reads` — the ratchet on components and patterns
+ * `npm run check:no-primitive-reads` — components, patterns, stories and docs
  * reading a primitive (ADR-038): a component or pattern reads a tier
  * token (components, templates, semantics), never `--space-*`, `--radius-<n>`,
  * `--size-<n>` or `--stroke-<n>` directly.
@@ -24,9 +24,8 @@
  * (`--type-size-<n>`), or a `--palette-*` color. `--radius-full` is not one: the
  * ladder's Radius/full row carries the primitive's own name (plan.mjs).
  *
- * THE RATCHET. A count may fall and never rise, read through
- * `scripts/lib/ratchet.mjs`; the baseline holds only the residue a pending
- * move has not cleared yet.
+ * ZERO. There is no baseline and no exemption: one read of a primitive in a counted file fails
+ * the check. A demo-only frame in a story is a literal, not a read.
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -34,12 +33,10 @@ import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
-import { openRatchet } from './lib/ratchet.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 export { REPO_ROOT };
 
-export const BASELINE = 'scripts/baselines/no-primitive-reads.json';
 export const SEARCH_ROOTS = [
   'design-system/src/components',
   'design-system/src/templates',
@@ -85,40 +82,22 @@ export function measure(sources) {
   return found;
 }
 
-const asRecord = (found) =>
-  Object.fromEntries([...found.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, v.count]));
-
-const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
-
 export const REMEDY =
   '  -> read the tier token: a component token if the component has one, else the template token, else a\n' +
   '     semantics step. When none holds the value, add a row to scripts/lib/tokens/plan.mjs and regenerate\n' +
-  '     (design-system/src/styles/Spacing.mdx § Fallback rule, ADR-038).';
+  '     (design-system/src/styles/Spacing.mdx § Fallback rule, ADR-038). A demo-only frame in a story stays a\n' +
+  '     literal with a `/* demo frame */` note (design-system/guidelines/foundations/overview.md).';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
-  const ratchet = ratchetFor(repoRoot);
-  const findings = ratchet.failures(asRecord(found)).map((failure) => {
-    if (failure.kind === 'absent') return { message: failure.message };
-    return {
-      file: failure.key,
-      line: found.get(failure.key)?.line,
-      message:
-        failure.kind === 'new'
-          ? `primitive read: ${failure.count} use(s) in a file the baseline does not hold (new code reads a tier token)`
-          : `primitive reads rose: ${failure.count} use(s) against a baseline of ${failure.recorded}`,
-    };
-  });
-  if (!ratchet.absent) {
-    for (const entry of ratchet.stale(asRecord(found))) {
-      findings.push({
-        file: entry.key,
-        message: `primitive reads fell (baseline held ${entry.recorded}); record it with \`npm run check:no-primitive-reads -- --update\``,
-      });
-    }
-  }
-  return findings;
+  return [...found.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([file, { count, line }]) => ({
+      file,
+      line,
+      message: `primitive read: ${count} use(s) of a primitive; read a tier token`,
+    }));
 }
 
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
@@ -127,22 +106,4 @@ export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   return `${now} primitive read(s) in ${found.size} file(s)`;
 }
 
-function record() {
-  const found = asRecord(measure(sourcesOf(REPO_ROOT)));
-  const ratchet = ratchetFor(REPO_ROOT);
-  const rising = ratchet.absent ? [] : ratchet.failures(found).filter((f) => f.kind === 'new' || f.kind === 'rose');
-  if (rising.length) {
-    console.error(`[check-no-primitive-reads] not recorded: ${rising.length} file(s) rose or are new. Read a tier token instead.`);
-    return;
-  }
-  ratchet.update(found, {
-    seed: {
-      why:
-        'Reads of a primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>, --palette-*) in components, templates, stories, ' +
-        'design-system/src/storybook-docs and design-system/src/styles, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
-    },
-  });
-  console.log(`[check-no-primitive-reads] baseline recorded: ${Object.keys(found).length} file(s)`);
-}
-
-main(import.meta.url, 'check:no-primitive-reads', { run, summary, remedy: REMEDY, fallThrough: { '--update': record } });
+main(import.meta.url, 'check:no-primitive-reads', { run, summary, remedy: REMEDY });

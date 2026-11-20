@@ -30,7 +30,7 @@ export default {
     },
 };
 
-const column = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-3xl)', maxWidth: 'var(--example-size-400)' };
+const column = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-3xl)', maxWidth: '400px' /* demo frame */ };
 
 const height = (el) => Math.round(el.getBoundingClientRect().height);
 

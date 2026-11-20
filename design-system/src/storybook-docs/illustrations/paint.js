@@ -165,7 +165,7 @@ const ROLES = {
  * height to it. Only roles whose real component sets a height token are here.
  */
 export const HEIGHTS = {
-  field: ['--height-250', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
+  field: ['--control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
   button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
   tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
   count: ['--label-height-sm', 'components/labels/_label-heights.scss', 8],
@@ -229,7 +229,7 @@ export const scaledCorner = (role, factor) => `calc(${CORNER_TOKEN[role]} * ${fa
 export const HAIRLINE = { strokeWidth: 'var(--stroke-hairline)' };
 
 /** The hairline a hero sets on its drawing: half a stroke, since one unit is 2px there. */
-export const HERO_HAIRLINE = 'var(--border-width-hairline)';
+export const HERO_HAIRLINE = 'calc(var(--border-width-default) / 2)';
 
 /** A selected tab's underline: the Tabs component's selected-border width, halved. */
 export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };

@@ -171,10 +171,7 @@ body,
  */
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--type-family-body);
-    font-size: var(--docs-text-size);
-    line-height: var(--type-line-height-150);
-    font-weight: var(--type-weight-regular);
+    font: var(--body-lg);
     color: var(--ds-text);
     max-width: 55ch;
 }
@@ -946,8 +943,8 @@ a.sbdocs-a {
     border-bottom: var(--border-width-selected) solid transparent;
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
+    font: var(--body-lg);
     font-family: var(--type-family-heading);
-    font-size: var(--docs-text-size);
     font-weight: var(--type-weight-medium);
     line-height: 1.5;
     white-space: nowrap;
@@ -1012,10 +1009,8 @@ a.sbdocs-a {
     display: block;
     margin-top: var(--stack-md);
     color: var(--ds-text-subtlest);
+    font: var(--body-sm);
     font-family: var(--type-family-code);
-    font-size: var(--docs-code-size);
-    font-weight: var(--type-weight-regular);
-    line-height: var(--type-line-height-100);
 }
 
 

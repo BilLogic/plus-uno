@@ -71,14 +71,28 @@ test('a docs file reads no size, stroke, height or type-size primitive either', 
 });
 
 test('the role tokens that replaced those reads are not primitives', () => {
-  for (const name of ['--example-size-240', '--font-size-md', '--border-width-hairline', '--control-lg', '--page-border-width']) {
+  for (const name of ['--field-width-sm', '--body-lg', '--control-lg', '--page-border-width', '--select-check-size']) {
     assert.ok(!isPrimitive(name), name);
   }
 });
 
-test('a read in a story or docs file the baseline does not hold fails the check', () => {
+test('a read in a story or docs file fails the check, with no baseline to hold it', () => {
   const findings = run({
     sources: [{ path: 'design-system/src/storybook-docs/fig.jsx', text: "gap: 'var(--space-100)'" }],
   });
   assert.ok(findings.some((f) => f.file === 'design-system/src/storybook-docs/fig.jsx'));
+});
+
+test('a literal demo frame is not a read, and a clean tree has no findings', () => {
+  assert.deepEqual(
+    run({ sources: [{ path: 'a/A.stories.jsx', text: "maxWidth: '864px' /* demo frame */" }] }),
+    [],
+  );
+});
+
+test('a file with a read fails even in a component that once sat in a baseline', () => {
+  const findings = run({
+    sources: [{ path: 'design-system/src/components/forms-and-inputs/_internal/FieldBox.scss', text: 'height: var(--height-250);' }],
+  });
+  assert.equal(findings.length, 1);
 });

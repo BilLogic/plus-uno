@@ -49,9 +49,9 @@ const calloutCanvas = {
     display: 'flex',
     justifyContent: 'center',
     padding: 'calc(var(--pad-x-lg) * 4)',
-    minHeight: 'var(--example-size-400)',
+    minHeight: '400px' /* demo frame */,
 };
-const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--example-size-480)' };
+const calloutCanvasTall = { ...calloutCanvas, minHeight: '480px' /* demo frame */ };
 
 export const Basic = () => (
     <SpotlightProvider>

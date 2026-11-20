@@ -107,7 +107,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ paddingBottom: 'var(--example-size-304)', maxWidth: 'var(--example-size-304)' }}>
+    <div style={{ paddingBottom: '304px' /* demo frame */, maxWidth: '304px' /* demo frame */ }}>
         <DatePicker placeholder="MM/DD/YYYY" />
     </div>
 );
@@ -118,7 +118,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: 'var(--example-size-304)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: '304px' /* demo frame */ }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <DatePicker spacing="default" placeholder="MM/DD/YYYY" />
@@ -131,7 +131,7 @@ export const Spacing = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: 'var(--example-size-304)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: '304px' /* demo frame */ }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
@@ -160,7 +160,7 @@ export const PickDate = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--example-size-304)', maxWidth: 'var(--example-size-304)' }}>
+        <div style={{ paddingBottom: '304px' /* demo frame */, maxWidth: '304px' /* demo frame */ }}>
             <DatePicker aria-label="Session date" value={date} onChange={setDate} placeholder="Select a date" />
             {date && (
                 <div
@@ -193,7 +193,7 @@ export const PickRange = () => {
     const [start, end] = range;
 
     return (
-        <div style={{ paddingBottom: 'var(--example-size-304)', maxWidth: 'var(--field-width-lg)' }}>
+        <div style={{ paddingBottom: '304px' /* demo frame */, maxWidth: 'var(--field-width-lg)' }}>
             <p className="heading-xxs" style={{ marginBottom: 'var(--stack-xl)' }}>Select a Date Range</p>
             <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
                 Click a first day, then a last day. The days between are marked.
@@ -229,7 +229,7 @@ export const Bounds = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--example-size-304)', maxWidth: 'var(--example-size-304)' }}>
+        <div style={{ paddingBottom: '304px' /* demo frame */, maxWidth: '304px' /* demo frame */ }}>
             <DatePicker
                 value={date}
                 onChange={setDate}
@@ -253,7 +253,7 @@ export const Interactive = (args) => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--example-size-304)' }}>
+        <div style={{ paddingBottom: '304px' /* demo frame */ }}>
             <p className="body-default">Selected Date: {date || 'None'}</p>
             <DatePicker {...args} value={date} onChange={setDate} />
         </div>
@@ -301,7 +301,7 @@ CalendarColors.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: 'var(--example-size-304)' };
+const wrap = { maxWidth: '304px' /* demo frame */ };
 const field = (canvasElement) => within(canvasElement).getByRole('combobox');
 
 export const Default = {
@@ -697,7 +697,7 @@ export const RangePopup = {
     render: ({ onChange, today }) => {
         const [range, setRange] = useState([null, null]);
         return (
-            <div style={{ paddingBottom: 'var(--example-size-400)' }}>
+            <div style={{ paddingBottom: '400px' /* demo frame */ }}>
                 <DatePicker
                     range
                     presets
@@ -790,7 +790,7 @@ export const RangePopupPresetKeyboard = {
     render: ({ onChange, today }) => {
         const [range, setRange] = useState([null, null]);
         return (
-            <div style={{ paddingBottom: 'var(--example-size-400)' }}>
+            <div style={{ paddingBottom: '400px' /* demo frame */ }}>
                 <DatePicker
                     range
                     presets
@@ -857,7 +857,7 @@ export const RangePopupClearCommits = {
     render: ({ onChange, today }) => {
         const [range, setRange] = useState(['2026-10-08', '2026-10-13']);
         return (
-            <div style={{ paddingBottom: 'var(--example-size-400)' }}>
+            <div style={{ paddingBottom: '400px' /* demo frame */ }}>
                 <DatePicker
                     range
                     presets
@@ -912,7 +912,7 @@ export const RangePopupPresetBounds = {
     render: ({ onChange, today }) => {
         const [range, setRange] = useState([null, null]);
         return (
-            <div style={{ paddingBottom: 'var(--example-size-400)', display: 'flex', gap: 'var(--inline-lg)' }}>
+            <div style={{ paddingBottom: '400px' /* demo frame */, display: 'flex', gap: 'var(--inline-lg)' }}>
                 <DatePicker
                     range
                     presets

@@ -88,7 +88,7 @@ export const Overview = () => {
     const [radioValues, setRadioValues] = useState({ 'row-1': 'col-2' });
 
     return (
-        <div style={{ maxWidth: 'var(--example-size-864)' }}>
+        <div style={{ maxWidth: '864px' /* demo frame */ }}>
             <ChoiceGrid
                 id="choice-grid-overview"
                 name="choice-grid-overview"
@@ -116,7 +116,7 @@ export const Variants = () => {
     });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-864)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
             <div>
                 <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
@@ -150,7 +150,7 @@ export const Variants = () => {
 };
 
 export const Layout = () => (
-    <div style={{ maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ maxWidth: '864px' /* demo frame */ }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Multiple rows share the same columns; each row tracks its own selection.
         </p>
@@ -176,7 +176,7 @@ export const Layout = () => (
 
 /** `size` sets the option-label font and the control width that goes with it. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
                 <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
@@ -202,7 +202,7 @@ Size.play = async ({ canvasElement }) => {
 };
 
 export const InteractionStates = () => (
-    <div style={{ maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ maxWidth: '864px' /* demo frame */ }}>
         <ChoiceGrid
             id="choice-grid-disabled"
             name="choice-grid-disabled"
@@ -223,7 +223,7 @@ export const TwoGridsWithoutIds = () => {
     const [first, setFirst] = useState({});
     const [second, setSecond] = useState({});
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-864)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
             <ChoiceGrid
                 type="radio"
                 rows={singleRow}
@@ -256,7 +256,7 @@ TwoGridsWithoutIds.play = async ({ canvasElement }) => {
 
 /** Read-only: the answers show, and clicking a cell does not change them. */
 export const ReadOnly = () => (
-    <div style={{ maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ maxWidth: '864px' /* demo frame */ }}>
         <ChoiceGrid
             id="choice-grid-readonly"
             type="checkbox"
@@ -293,7 +293,7 @@ export const Interactive = (args) => {
     const cols = columns.slice(0, args.columnCount || columns.length);
 
     return (
-        <div style={{ maxWidth: 'var(--example-size-864)' }}>
+        <div style={{ maxWidth: '864px' /* demo frame */ }}>
             <ChoiceGrid
                 id="choice-grid-interactive"
                 name="choice-grid-interactive"
@@ -324,7 +324,7 @@ export const Keyboard = () => {
     const [radioValues, setRadioValues] = useState({ 'row-1': 'col-1' });
 
     return (
-        <div style={{ maxWidth: 'var(--example-size-864)' }}>
+        <div style={{ maxWidth: '864px' /* demo frame */ }}>
             <ChoiceGrid
                 id="choice-grid-keyboard"
                 name="choice-grid-keyboard"
@@ -360,7 +360,7 @@ Keyboard.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: 'var(--example-size-864)' };
+const frame = { maxWidth: '864px' /* demo frame */ };
 const cell = (canvasElement, name, role = 'radio') => within(canvasElement).getByRole(role, { name });
 
 export const Unselected = {

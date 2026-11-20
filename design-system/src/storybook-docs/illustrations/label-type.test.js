@@ -24,8 +24,8 @@ describe('illustration kit label type', () => {
     });
 
     it('derives the sans drawing size by halving the real label size; mono draws 1:1', () => {
-        expect(rhythm).toMatch(/--kit-label-size:\s*var\(--type-size-0875\)/);
-        expect(rhythm).toMatch(/--kit-label-mono-size:\s*var\(--type-size-075\)/);
+        expect(rhythm).toMatch(/--kit-label-size:\s*0\.875rem/);
+        expect(rhythm).toMatch(/--kit-label-mono-size:\s*0\.75rem/);
         expect(rhythm).toMatch(/--kit-label-drawing-size:\s*calc\(var\(--kit-label-size\) \/ 2\)/);
         expect(rhythm).toMatch(/--kit-label-mono-drawing-size:\s*var\(--kit-label-mono-size\);/);
     });

@@ -116,6 +116,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
 | — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` | 24 / 32 / 40 calendar days by size |
 | — (code only) | `var(--join-row-width)` | 520, the Home Join button with the session Select beside it |
+| — (code only) | `var(--select-check-size)` | 14, the check box in a Select option, drawn as OptionRow draws its mark; Figma has no variable for it |
 
 ## Rules for create_design_system_rules
 

@@ -12,7 +12,6 @@ A token a plan defines carries its intent as a comment: the place or situation i
 Start here for space, size and radius (ADR-038). A component reads its component token, else a template token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
 
 ```css
---border-width-hairline  /* Width of the finest line in a drawing. */
 --content-list-indent  /* Left padding on ordered and unordered lists. */
 --content-max-width  /* Widest a page's main content column may grow. */
 --content-max-width-reading  /* Widest a column of running text may grow, to keep lines readable. */
@@ -23,27 +22,8 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --control-md  /* Height of a default control: 32px high. */
 --control-sm  /* Height of a small control: 24px high. */
 --control-xl  /* Height of an extra-large control: 48px high. */
---example-size-120  /* A 120px demo frame. */
---example-size-16  /* A 16px demo frame. */
---example-size-160  /* A 160px demo frame. */
---example-size-224  /* A 224px demo frame. */
---example-size-24  /* A 24px demo frame. */
---example-size-240  /* A 240px demo frame. */
---example-size-304  /* A 304px demo frame. */
---example-size-320  /* A 320px demo frame. */
---example-size-40  /* A 40px demo frame. */
---example-size-400  /* A 400px demo frame. */
---example-size-480  /* A 480px demo frame. */
---example-size-640  /* A 640px demo frame. */
---example-size-80  /* A 80px demo frame. */
---example-size-864  /* A 864px demo frame. */
 --focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
 --focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
---font-size-3xl  /* Font size of the largest heading. */
---font-size-md  /* Font size of large text. */
---font-size-sm  /* Font size of body text. */
---font-size-xl  /* Font size of a heading. */
---font-size-xs  /* Font size of a caption. */
 --footer-height  /* Height of a Modal, Panel or multi-step task footer: 48px, one spacious button with no padding of its own. */
 --grid-columns  /* Column count of the page grid. */
 --grid-gutter  /* Gap between columns of the page grid. */
@@ -180,7 +160,6 @@ Tokens one component owns, named for it.
 --comment-replies-stack  /* Vertical gap above nested replies in a Comment. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
 --count-tag-ring-width  /* Cutout ring width around a CountTag pinned to an icon or avatar. */
---date-range-presets-width  /* Width of the range picker's presets column. */
 --date-time-picker-section-gap  /* Vertical gap between the date and time sections of a DateTimePicker. */
 --dialog-body-min-height  /* Minimum height of a Dialog's body, so a short body does not collapse the dialog. */
 --dialog-inline-lg  /* Horizontal gap between columns in a Dialog. */

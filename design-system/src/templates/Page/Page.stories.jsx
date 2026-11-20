@@ -436,7 +436,7 @@ export const ResponsiveWidth = {
     },
     render: ({ width }) => (
         <ScrollStage width={width} data-probe="stage">
-            <div style={{ height: 'var(--example-size-480)' }}>
+            <div style={{ height: '480px' /* demo frame */ }}>
                 <Frame>
                     <DemoPageHeader title="Sessions" />
                     <CardsSection title="Upcoming sessions" />
@@ -584,13 +584,13 @@ const ScrollSpotDemo = () => (
                     </nav>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
                         <Section id="spot-overview" title="Overview">
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--example-size-80)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: '80px' /* demo frame */ }}>
                                 <Card title="Goal check-in" description="Started with two warm-up problems on linear expressions." />
                                 <Card title="Attendance" description="Arrived on time and stayed for the full hour." />
                             </div>
                         </Section>
                         <Section id="spot-practice" title="Practice">
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--example-size-80)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: '80px' /* demo frame */ }}>
                                 <Card title="Guided set" description="Completed four of five word problems independently." />
                                 <Card title="Exit check" description="Paused on negative coefficients." />
                             </div>
@@ -599,7 +599,7 @@ const ScrollSpotDemo = () => (
                             <Card title="Supervisor follow-up" description="Share curriculum packet for negative rational numbers before Tuesday." />
                         </Section>
                         <Section id="spot-next" title="Next steps">
-                            <div style={{ minBlockSize: 'var(--example-size-80)' }}>
+                            <div style={{ minBlockSize: '80px' /* demo frame */ }}>
                                 <Card title="Thursday plan" description="Revisit two-step inequalities with number lines." />
                             </div>
                         </Section>

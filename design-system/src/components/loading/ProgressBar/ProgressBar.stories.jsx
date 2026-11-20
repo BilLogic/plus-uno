@@ -56,7 +56,7 @@ export const Inverse = () => (
 
 /** For a visible percent or description, put the text beside the bar — the bar's own 8px height has no room for it. */
 export const WithACaption = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: 'var(--example-size-240)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '240px' /* demo frame */ }}>
         <ProgressBar value={68} ariaLabel="68% of goals met" />
         <span className="body-sm">68% of goals met</span>
     </div>
@@ -77,7 +77,7 @@ export const Interactive = {
         isIndeterminate: false,
     },
     render: (args) => (
-        <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: 'var(--example-size-480)' }}>
+        <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: '480px' /* demo frame */ }}>
             <ProgressBar {...args} />
         </div>
     ),
@@ -86,7 +86,7 @@ export const Interactive = {
 /* ------------------------------------------------------------------- states */
 
 
-const Subject = (props) => <div style={{ width: 'var(--example-size-240)' }}><ProgressBar value={50} ariaLabel="Goals met" {...props} /></div>;
+const Subject = (props) => <div style={{ width: '240px' /* demo frame */ }}><ProgressBar value={50} ariaLabel="Goals met" {...props} /></div>;
 const root = (canvasElement) => canvasElement.firstElementChild;
 
 /** Rest: progress bar. */

@@ -1,6 +1,6 @@
 /*
- * CodeBlock: the block. Typeface from the --code-default text style, with the block
- * line height; surface, ink, gutter and highlight from the code color roles.
+ * CodeBlock: the block. Size and line height from the --body-default text style, in the
+ * code typeface (--code-default sizes in em, so it would follow the parent); surface, ink, gutter and highlight from the code color roles.
  * The default width is the container's; lines scroll or wrap inside it.
  */
 
@@ -12,8 +12,8 @@
     margin: 0;
     padding: var(--pad-y-lg) 0;
     overflow-x: auto;
-    font: var(--code-default);
-    font-size: var(--font-size-sm);
+    font: var(--body-default);
+    font-family: var(--type-family-code);
     line-height: var(--type-line-height-125);
     background-color: var(--ds-background-code-default);
     color: var(--ds-text-code-default);

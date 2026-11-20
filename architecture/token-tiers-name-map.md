@@ -46,26 +46,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Border | `--border-width-default` (declared elsewhere) |  |
 | Border | `--border-width-selected` (declared elsewhere) |  |
 | Border | `--border-width-focused` (declared elsewhere) |  |
-| Border | `--border-width-hairline` | half the 1px stroke, 0.5px |
-| Font size | `--font-size-xs` | 12px, in rem |
-| Font size | `--font-size-sm` | 14px, in rem |
-| Font size | `--font-size-md` | 16px, in rem |
-| Font size | `--font-size-xl` | 24px, in rem |
-| Font size | `--font-size-3xl` | 32px, in rem |
-| Example size | `--example-size-16` | 16px |
-| Example size | `--example-size-24` | 24px |
-| Example size | `--example-size-40` | 40px |
-| Example size | `--example-size-80` | 80px |
-| Example size | `--example-size-120` | 120px |
-| Example size | `--example-size-160` | 160px |
-| Example size | `--example-size-224` | 224px |
-| Example size | `--example-size-240` | 240px |
-| Example size | `--example-size-304` | 304px |
-| Example size | `--example-size-320` | 320px |
-| Example size | `--example-size-400` | 400px |
-| Example size | `--example-size-480` | 480px |
-| Example size | `--example-size-640` | 640px |
-| Example size | `--example-size-864` | 864px |
 | Focus | `--focus-ring-width` | matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive |
 | Focus | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both |
 | Grid | `--grid-gutter` |  |
@@ -336,8 +316,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spinner | `--spinner-size-lg` |  |
 | Progress bar | `--progress-bar-height` |  |
 | Progress ring | `--progress-ring-stroke` |  |
-| Date range popup | `--date-range-presets-width` |  |
-| Select | `--select-check-size` | 14px, in rem |
+| Select | `--select-check-size` | the OptionRow check mark (14), as Radio keeps its own 14 |
 
 ## Layers
 

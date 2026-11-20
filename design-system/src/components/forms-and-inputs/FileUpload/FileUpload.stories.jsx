@@ -86,7 +86,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ maxWidth: '864px' /* demo frame */ }}>
         <FileUpload
             id="file-upload-overview"
             label="Upload files"
@@ -102,7 +102,7 @@ Overview.parameters = {
 };
 
 export const Content = () => (
-    <div style={{ maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ maxWidth: '864px' /* demo frame */ }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Label, minority marker, accepted formats, and button copy.
         </p>
@@ -117,7 +117,7 @@ export const Content = () => (
 );
 
 export const Styles = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         <div>
             <DemoLabel>INVALID</DemoLabel>
             <FileUpload
@@ -146,7 +146,7 @@ export const Styles = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--example-size-864)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <FileUpload
@@ -181,7 +181,7 @@ export const InteractionStates = () => (
     </div>
 );
 
-const wrap = { maxWidth: 'var(--example-size-640)' };
+const wrap = { maxWidth: '640px' /* demo frame */ };
 const fileInput = (canvasElement) => canvasElement.querySelector('input[type="file"]:not([webkitdirectory])');
 const container = (canvasElement) => canvasElement.querySelector('.plus-file-upload-container');
 

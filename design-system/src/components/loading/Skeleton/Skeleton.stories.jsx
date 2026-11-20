@@ -279,7 +279,7 @@ PresetNamesAShape.play = async ({ canvasElement }) => {
 
 /** `lines` repeats the text bar; the last line is shorter so it reads as text. */
 export const Paragraph = () => (
-    <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)', width: 'var(--example-size-240)' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)', width: '240px' /* demo frame */ }}>
         <Skeleton shape="text" lines={3} data-testid="lines" />
         <Skeleton preset="paragraph" data-testid="paragraph" />
     </div>

@@ -101,7 +101,7 @@ const tooltipPlaygroundPadding = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 'var(--example-size-120)',
+    minHeight: '120px' /* demo frame */,
 };
 
 export const Interactive = {

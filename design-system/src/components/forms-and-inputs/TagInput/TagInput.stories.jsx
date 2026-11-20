@@ -31,7 +31,7 @@ const TOPICS = [
     { value: 'dev-coordination', label: 'Dev coordination', color: 'teal' },
 ];
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: 'var(--example-size-400)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '400px' /* demo frame */ };
 
 const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 const tagsIn = (canvas, label) => within(canvas.getByRole('list', { name: `Selected: ${label}` }));
@@ -734,7 +734,7 @@ const tidyArgTypes = {
 export const OptionMenu = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--example-size-480)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: '480px' /* demo frame */ }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.menu) return;
         await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
@@ -745,7 +745,7 @@ export const OptionMenu = {
 export const Reordering = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--example-size-320)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: '320px' /* demo frame */ }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.reorder) return;
         const canvas = within(canvasElement);
@@ -802,7 +802,7 @@ export const Interactive = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Topics' });
-const wrap = { maxWidth: 'var(--example-size-400)', minHeight: 'var(--example-size-40)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><TagInput id="taginput-ex-rest" label="Topics" options={TOPICS} /></div>,

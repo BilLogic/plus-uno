@@ -109,7 +109,7 @@ export const Overview = () => {
     const [value, setValue] = useState([]);
 
     return (
-        <div style={{ maxWidth: 'var(--example-size-400)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <Cascader
                 id="cascader-overview"
                 aria-label="Location"
@@ -131,7 +131,7 @@ Overview.parameters = {
 export const EmptyPath = () => {
     const [value, setValue] = useState([]);
     return (
-        <div style={{ maxWidth: 'var(--example-size-400)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <Cascader id="cascader-empty" label="Location" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
@@ -141,20 +141,20 @@ export const EmptyPath = () => {
 export const PreselectedPath = () => {
     const [value, setValue] = useState(['north', 'lincoln', 'grade-6']);
     return (
-        <div style={{ maxWidth: 'var(--example-size-400)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <Cascader id="cascader-preselected" label="Location" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
 };
 
 export const SpacingDefault = () => (
-    <div style={{ maxWidth: 'var(--example-size-400)' }}>
+    <div style={{ maxWidth: '400px' /* demo frame */ }}>
         <Cascader id="cascader-default" label="Location" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
 
 export const SpacingCompact = () => (
-    <div style={{ maxWidth: 'var(--example-size-400)' }}>
+    <div style={{ maxWidth: '400px' /* demo frame */ }}>
         <Cascader id="cascader-compact" label="Location" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
@@ -171,7 +171,7 @@ export const Interactive = (args) => {
     }, [args.contentPreset]);
 
     return (
-        <div style={{ maxWidth: 'var(--example-size-400)' }}>
+        <div style={{ maxWidth: '400px' /* demo frame */ }}>
             <Cascader
                 id="cascader-interactive"
                 label={args.label}
@@ -206,7 +206,7 @@ Interactive.args = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Location' });
-const wrap = { maxWidth: 'var(--example-size-400)', minHeight: 'var(--example-size-40)' };
+const wrap = { maxWidth: '400px' /* demo frame */, minHeight: '40px' /* demo frame */ };
 
 export const Rest = {
     render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,

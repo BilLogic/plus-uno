@@ -32,7 +32,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 const HEIGHT = 900;
 
-const slot = (label, minHeight = 'var(--example-size-80)') => (
+const slot = (label, minHeight = '80px' /* demo frame */) => (
     <div
         style={{
             display: 'flex',

@@ -328,7 +328,7 @@ export const NarrowContainer = () => (
         <div data-testid="column" style={{ width: '120px' /* token gap: 120px */, border: 'var(--border-width-default) dashed var(--ds-border)' }}>
             <StatusTag appearance="info" data-testid="clamped">Waiting on the district data export</StatusTag>
         </div>
-        <div style={{ width: 'var(--example-size-400)' }}>
+        <div style={{ width: '400px' /* demo frame */ }}>
             <StatusTag appearance="info" maxWidth={100} data-testid="capped">Waiting on the district data export</StatusTag>
         </div>
     </div>

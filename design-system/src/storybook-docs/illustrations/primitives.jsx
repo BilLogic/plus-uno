@@ -315,7 +315,7 @@ export const StickyHeader = ({ x, y, w, h = 64, accent = false }) => (
   </g>
 );
 
-/** A single-line field: --height-250 (40) halved. */
+/** A single-line field: --control-lg (40) halved. */
 const FIELD_H = 20;
 
 export const Field = ({ x, y, w, accent = false, invalid = false }) => (

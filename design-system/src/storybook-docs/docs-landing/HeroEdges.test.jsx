@@ -134,7 +134,7 @@ describe('hero line weight', () => {
         for (const [id, { Hero }] of Object.entries(HEROES)) {
             const { container } = render(React.createElement(Hero));
             const svg = container.querySelector('svg');
-            expect(svg?.style.getPropertyValue('--stroke-hairline'), id).toBe('calc(var(--stroke-1) / 2)');
+            expect(svg?.style.getPropertyValue('--stroke-hairline'), id).toBe('calc(var(--border-width-default) / 2)');
         }
     });
 
