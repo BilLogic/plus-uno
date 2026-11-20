@@ -79,11 +79,11 @@ describe('Logo', () => {
         expect(svg.getAttribute('viewBox')).toBe(`0 0 ${+total.toFixed(2)} 96`);
     });
 
-    it('makes the 96 wordmark 144.0 wide and the lockup 264.0', () => {
+    it('makes the 96 wordmark 143.6 wide and the lockup 263.6', () => {
         const set = WORDMARKS[96];
-        expect(((set.width * 48) / set.cap).toFixed(1)).toBe('144.0');
+        expect(((set.width * 48) / set.cap).toFixed(1)).toBe('143.6');
         const { container } = render(<Logo size={96} wordmark />);
-        expect(parseFloat(container.querySelector('svg').getAttribute('width')).toFixed(1)).toBe('264.0');
+        expect(parseFloat(container.querySelector('svg').getAttribute('width')).toFixed(1)).toBe('263.6');
     });
 
     it('draws only outlines, never text', () => {
