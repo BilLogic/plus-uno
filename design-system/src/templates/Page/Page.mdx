@@ -5,7 +5,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
 import * as ReferenceScreenStories from './ReferenceScreens.stories.jsx';
-import * as HomeChecklistStories from './HomeChecklist.stories.jsx';
+import * as ChecklistStories from './Checklist.stories.jsx';
 import {
     AddInTitleRow,
     AddTwice,
@@ -146,15 +146,15 @@ Two whole screens built from the templates: a list that keeps search and quick f
 
 <div className="sb-ds-doc-section">
 
-## Home checklist
+## Checklist
 
 A checklist tracks setup or compliance steps in three layouts: a dismissible Card on Home, a persistent Card in a page, and a compact Card at the foot of the Sidebar.
 
-<ComponentExample of={HomeChecklistStories.ChecklistCardOnHome} title="Checklist: card on Home" description="Optional setup steps in a dismissible Card on Home: the title sits at the start, '2 of 5 done' and a 96-wide Progress bar sit beside the 32 dismiss Icon button so the bar's start edge lands on the 128 action column, open steps keep their order on top, and done steps move below with centered Completed text. Finish every step to shrink it to one line." />
+<ComponentExample of={ChecklistStories.ChecklistCardOnHome} title="Checklist: card on Home" description="Optional setup steps in a dismissible Card on Home: the title sits at the start, '2 of 5 done' and a 96-wide Progress bar sit beside the 32 dismiss Icon button so the bar's start edge lands on the 128 action column, open steps keep their order on top, and done steps move below with centered Completed text. Finish every step to shrink it to one line." />
 
-<ComponentExample of={HomeChecklistStories.ChecklistCardInPage} title="Checklist: card in a page" description="Required training or compliance steps in a persistent Card inside a page Section: the Progress bar fills the full 128 action column, and completing every step keeps the card on screen with all five steps ticked." />
+<ComponentExample of={ChecklistStories.ChecklistCardInPage} title="Checklist: card in a page" description="Required training or compliance steps in a persistent Card inside a page Section: the Progress bar fills the full 128 action column, and completing every step keeps the card on screen with all five steps ticked." />
 
-<ComponentExample of={HomeChecklistStories.ChecklistCompactInSidebar} title="Checklist: compact in the sidebar" description="At the foot of the Sidebar, a compact Card shows the count, the Progress bar and the next open step from any page; pressing it opens the full checklist." />
+<ComponentExample of={ChecklistStories.ChecklistCompactInSidebar} title="Checklist: compact in the sidebar" description="At the foot of the Sidebar, a compact Card shows the count, the Progress bar and the next open step from any page; pressing it opens the full checklist." />
 
 Build the checklist from `Card`, `Section` and `ProgressBar`:
 
@@ -175,6 +175,8 @@ Choose the layout by where the checklist appears:
 </tbody>
 </DocsTable>
 
+The action column is 128 wide with a floor of 120; beside a 32 dismiss Icon button the Progress bar is 96.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -193,7 +195,6 @@ Choose the layout by where the checklist appears:
 <tr><td><code>--content-max-width</code>, <code>--content-max-width-reading</code>, <code>--content-min-width</code></td><td>The default cap, the reading cap and the floor of the content grid. Full width has no cap.</td></tr>
 <tr><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--page-pad</code></td><td>The 12-column grid, its gutter and the pad.</td></tr>
 <tr><td><code>--ds-surface</code></td><td>The Page's one fill, with no shadow.</td></tr>
-<tr><td><code>--checklist-action-width</code>, <code>--checklist-action-min-width</code></td><td>The checklist's action column, 128 with a floor of 120; the Progress bar is 96 beside a 32 dismiss Icon button.</td></tr>
 </tbody>
 </DocsTable>
 

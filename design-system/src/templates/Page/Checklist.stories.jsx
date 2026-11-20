@@ -4,19 +4,19 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { CHECKLIST_FRAME_STAGE, ChecklistInPage, ChecklistInSidebar, ChecklistOnHome } from './homeChecklistDemo.jsx';
+import { CHECKLIST_FRAME_STAGE, ChecklistInPage, ChecklistInSidebar, ChecklistOnHome } from './checklistDemo.jsx';
 
 /**
- * The Home checklist: the Page docs' examples, run in the Storybook tests. Each
+ * The checklist: the Page docs' examples, run in the Storybook tests. Each
  * composes the real Card, Section and ProgressBar and asserts the ruling it
  * shows: one 128 action column, open steps above done steps, a dismissible
  * card on Home, a persistent card in a page and a compact card at the foot of
  * the Sidebar.
  *
- * Run: npx vitest run --project=storybook design-system/src/templates/Page/HomeChecklist.stories.jsx
+ * Run: npx vitest run --project=storybook design-system/src/templates/Page/Checklist.stories.jsx
  */
 export default {
-    title: 'Templates/Page/Home checklist',
+    title: 'Templates/Page/Checklist',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };
@@ -86,7 +86,7 @@ export const ChecklistCardOnHome = {
     },
 };
 
-/** Dismissing an optional Home checklist directly from its header X hides the card. */
+/** Dismissing an optional Home-page checklist directly from its header X hides the card. */
 export const ChecklistDismiss = {
     name: 'Checklist: dismiss',
     render: () => staged(<ChecklistOnHome />),

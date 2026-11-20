@@ -5,7 +5,7 @@ import { Frame, Card, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
 /**
- * The Home checklist: setup or compliance steps in three layouts (a
+ * The checklist: setup or compliance steps in three layouts (a
  * dismissible card on Home, a persistent card in a page, and a compact card at
  * the foot of the Sidebar), each built from Card, Section and ProgressBar.
  *

@@ -8,11 +8,11 @@ import {
     ChecklistOnHome,
     HOME_CHECKLIST_STEPS,
     ONE_DAY_MS,
-} from './homeChecklistDemo.jsx';
+} from './checklistDemo.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
-describe('Checklist (Templates › Page, Home)', () => {
+describe('Checklist (Templates › Page, Checklist)', () => {
     it('renders card on Home from Section and Card with open steps above done steps and dismiss X', () => {
         const { container } = render(<ChecklistOnHome />);
 
@@ -55,7 +55,7 @@ describe('Checklist (Templates › Page, Home)', () => {
         expect(within(card).queryByRole('button', { name: /completed/i })).toBeNull();
     });
 
-    it('dismisses the Home checklist when X is pressed', async () => {
+    it('dismisses the Home-page checklist when X is pressed', async () => {
         const user = userEvent.setup();
         render(<ChecklistOnHome />);
 

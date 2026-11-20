@@ -173,7 +173,6 @@ Drag the width control. Above the content cap, content centers at the cap; below
 | `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |
 | `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
 | `--ds-surface` | The Page's one fill, with no shadow. |
-| `--checklist-action-width`, `--checklist-action-min-width` | The checklist's action column, 128 with a floor of 120; the Progress bar is 96 beside a 32 dismiss Icon button. |
 
 ## Content guidelines
 

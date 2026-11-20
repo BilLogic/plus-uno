@@ -39,7 +39,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 - For a due or event date, use `DateTag`.
 - For a competency area, use `CompetencyTag`.
 - For something the AI proposes, use `Suggestion`.
-- For setup or compliance steps left to finish, use the Home checklist on the Page template.
+- For setup or compliance steps left to finish, use the Checklist on the Page template.
 
 ## Content guidelines
 

@@ -1,15 +1,15 @@
 ---
 embodiment: ide
-summary: A floating Panel keeps the page usable; Modal owns the Blanket and modal focus behavior; Drawer is retired.
+summary: A floating Panel keeps the page usable; Modal owns the Backdrop and modal focus behavior; Drawer is retired.
 status: active
-verified: 2026-11-13
+verified: 2026-11-20
 ---
 
-# ADR-044: A Panel floats and never takes a Blanket; Drawer retires (2026-11-13)
+# ADR-044: A Panel floats and never takes a Backdrop; Drawer retires (2026-11-13)
 
-> **Naming (2026-11-20).** The layer is the Blanket, as the code and the glossary have it; this ADR first wrote it as Backdrop, and the file name keeps that word so links resolve.
+> **Naming (2026-11-20).** The layer is the Blanket, as the code and the glossary have it. This ADR wrote it as Backdrop, and the file name keeps that word so links resolve.
 
-**Decision.** A floating Panel sits over the page without a Blanket. It does not register as a modal overlay. Drawer and its pattern tokens are retired. A confirmation opened from a Panel uses a Modal, which brings the Blanket and owns modal focus behavior.
+**Decision.** A floating Panel sits over the page without a Backdrop. It does not register as a modal overlay. Drawer and its pattern tokens are retired. A confirmation opened from a Panel uses a Modal, which brings the Backdrop and owns modal focus behavior.
 
 **Why.** A Panel keeps the page available while a record or AI conversation stays open. Treating it as a modal drawer would block that page and duplicate Modal's overlay behavior. The trade-off is deliberate: use a Modal when the task requires a blocking decision.
 
