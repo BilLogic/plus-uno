@@ -99,7 +99,7 @@ The button keeps its height, its icons stay at their ends and it never leaves it
 - `FooterActions`: use when placing spacious buttons across the four-track footer slot of a Modal or Panel.
 - `IconButton`: use when space allows only an icon with a tooltip label.
 - `LinkButton`: use when the control navigates to another page or URL.
-- `ButtonGroup`: use when related buttons sit together in a connected row.
+- `ButtonGroup`: use when related buttons sit together in a spaced row.
 - `DropdownMenu`: use when a trigger opens a list of actions.
 - `ProgressBar`: use when showing progress on the page rather than inside the button.
 

@@ -1,51 +1,17 @@
-@use '../../../styles/state' as *;
-
 /*
- * Button group: a connected row of Button children. The group itself paints
- * nothing — each button keeps its own appearance and spacing — it only
- * squares off the corners between neighbors so the row reads as one control.
- * Radius matches Button's own default (6); a child's own compact radius (4)
- * is left to that child, so a mixed-height group is a caller's choice to avoid.
+ * Button group: a plain row of spaced Button children. The group paints
+ * nothing and joins nothing: each button keeps its own appearance, spacing,
+ * radius and state. The gap is the inline spacing between items in a row.
  */
 .plus-button-group {
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
-    gap: 0;
+    gap: var(--inline-md);
     // Buttons that do not fit shrink and end their labels in an ellipsis, so the row keeps to its well.
     max-width: 100%;
 
     > .plus-btn {
         min-width: 0;
-        border-radius: var(--button-radius-default);
-        position: relative;
-
-        &:not(:first-child) {
-            margin-left: calc(-1 * var(--border-width-default));
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        &:not(:last-child) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-
-        // A neighbor's edge should never cover another button's selected
-        // border, focus ring or hover fill.
-        &.plus-btn--selected {
-            z-index: 1;
-        }
-
-        @include plus-state(
-            $states: (
-                hovered: (z-index: 1),
-            ),
-            $ring: false
-        );
-
-        &:focus-visible {
-            z-index: 1;
-        }
     }
 }

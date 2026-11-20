@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import './ButtonGroup.scss';
 
 /**
- * Button group: a visually connected row of related actions. A
- * plain container for `Button` children, each keeping its own `appearance`
- * and `spacing`. `label` names the group for assistive technology.
+ * Button group: a plain row of spaced buttons for related actions. A
+ * container for `Button` children, each keeping its own `appearance`
+ * and `spacing`. `label` names the group for assistive technology. To switch
+ * between views of the same content, use `SegmentedControl`.
  */
 const ButtonGroup = ({
     children,

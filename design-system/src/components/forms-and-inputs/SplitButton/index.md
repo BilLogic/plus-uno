@@ -32,7 +32,7 @@ SplitButton reads these motion tokens and no literal duration or curve.
 
 ## Alternatives
 
-- For a connected row of actions with no single primary, use `ButtonGroup`.
+- For a spaced row of actions with no single primary, use `ButtonGroup`.
 - For a single trigger that opens a menu of actions without a separate primary button, use `DropdownMenu`.
 - For a single action with no menu, use `Button`.
 

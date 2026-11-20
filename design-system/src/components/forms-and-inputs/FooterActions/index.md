@@ -43,13 +43,13 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 | Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | Table template, DynamicTable |
 | Empty state | centered; `default` 32 on a page, `compact` 24 in a card | Messaging/EmptyState, Docs/Empty |
 | Banner and Flag | `subtle` `compact` text actions after the message | Messaging/Banner, Messaging/Flag |
-| Button group | items hug; selected item is the selected fill plus a 1px border | Navigation/ButtonGroup |
+| Button group | related actions in a spaced row; items hug their labels | Navigation/ButtonGroup |
 | Inline with a field | same height as the field, `default` appearance | Docs/Forms |
 
 ## Alternatives
 
 - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-- For switching between views of the same content, use `SegmentedControl`. For connected action buttons in a toolbar, use `ButtonGroup`.
+- For switching between views of the same content, use `SegmentedControl`. For a spaced row of related action buttons, use `ButtonGroup`.
 
 ## Best practices
 

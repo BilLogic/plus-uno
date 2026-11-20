@@ -93,12 +93,12 @@ ButtonInHeading.play = async ({ canvasElement }) => {
 export const Groups = () => (
     <div style={stack}>
         <ButtonGroup label="Small group">
-            <Button text="Day" spacing="compact" />
-            <Button text="Week" spacing="compact" />
+            <Button text="Edit" spacing="compact" />
+            <Button text="Copy" spacing="compact" />
         </ButtonGroup>
         <ButtonGroup label="Medium group">
-            <Button text="Day" />
-            <Button text="Week" />
+            <Button text="Edit" />
+            <Button text="Copy" />
         </ButtonGroup>
     </div>
 );
