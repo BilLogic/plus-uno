@@ -15,7 +15,7 @@ Four components carry every message. Each component page holds its appearances; 
 - **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.
 - **Banner.** A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.
 - **SectionMessage.** Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.
-- **The Inbox.** Updates that arrived over time, in a 360-wide (`--inbox-width`) Panel beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.
+- **The Inbox.** Updates that arrived over time, in a 360-wide (`--inbox-width`) Panel beside the Sidebar, opened from the bell beside your name, with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.
 
 ## Banner tiers
 
@@ -43,7 +43,7 @@ Notify someone when an action finishes, a condition applies or a decision is nee
 | A condition that holds for everything in a Frame, page or Section | `Banner` at that tier | Top of the tier | When the condition ends |
 | A note beside one thing that most people never need | `InlineMessage` | Beside the field or value | On close |
 | Something that must be answered before going on | `Modal`, Acknowledge or Active | Centered over a Blanket | On the button |
-| What arrived over time | The Inbox, a 360-wide (`--inbox-width`) Panel beside the Sidebar | Start of the page, over content, no Blanket | Escape, outside click, or Close |
+| What arrived over time | The Inbox, a 360-wide (`--inbox-width`) Panel, opened from the bell beside your name | Beside the Sidebar, over the page, no Blanket | Escape, outside click, or Close |
 
 ## Alternatives
 
@@ -153,7 +153,7 @@ A bold fill competes with the page; it is for what must be seen. Routine news st
 
 **Checked:** Review
 
-A Flag is for now; the Inbox is for later. The Inbox opens from the Sidebar at `--inbox-width` over the start of the page with no Blanket, carrying `Mark all as read`, settings and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
+A Flag is for now; the Inbox is for later. The Inbox opens from the bell beside the account name, docked beside the Sidebar at `--inbox-width` over the page with no Blanket, carrying `Mark all as read` and close in the header, `Unread` (with count) and `All` tabs, and `NotificationItem` rows grouped by day. Clearing every unread item shows `"You are all caught up."` in `EmptyState`; pressing `Escape` or clicking outside closes the panel.
 
 ## In code
 

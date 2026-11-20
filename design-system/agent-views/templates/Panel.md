@@ -2,7 +2,7 @@
 
 # Panel
 
-A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
+A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
 Import the Panel and its parts from `@/templates`. This template documents the parts and its layout within the Frame.
 
@@ -12,10 +12,10 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 
 ## Types
 
-Both open on the right with no Blanket: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
+Neither has a Blanket. Details opens on the right, docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths); floating at every width is Planned. Notifications opens at the start, beside the Sidebar.
 
 - **Details.** A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.
-- **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
+- **Notifications.** The Inbox, opened from the bell beside your name. It docks beside the Sidebar, 360 wide, and stays open as you pick one.
 
 ## Anatomy
 
@@ -33,10 +33,11 @@ The picked row stays highlighted on the page while the Panel is open.
 
 Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
 
-1. **Header.** The title, Archive all and Close, with the Show filter (`PopupSelect`: Unread, All, Mentions) in the subheader.
-2. **Items.** Avatar, who did what and where, a one-line excerpt and the time. An unread item ends in a dot, paired with the word "unread" for a screen reader.
+1. **Header.** The title, Mark all as read and Close.
+2. **Tabs.** Unread, with its count, and All.
+3. **Items.** One `NotificationItem` per update, grouped by day. An unread item says "Unread" to a screen reader.
 
-The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
+The bell at the end of the Sidebar's account row, with its unread count, opens the Inbox. The Inbox docks beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
 
 ## Width behavior
 
@@ -65,6 +66,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--panel-width-default` | 400 | The width a Panel opens at. |
+| `--inbox-width` | 360 | The width the Inbox opens at, beside the Sidebar. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
 | `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
 | `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
@@ -74,7 +76,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/templates';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
 The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one, decides whether it docks or floats, and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
@@ -82,17 +84,17 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | Slot | Details | Notifications |
 | --- | --- | --- |
 | `title` | The record's name, with its StatusTag under it | "Inbox" |
-| `actions` | Edit, then Up, Down, More and Close | Archive all and Close (the Show `PopupSelect` sits in the subheader) |
+| `actions` | Edit, then Up, Down, More and Close | Mark all as read and Close |
 | `backAction` · `titleIcon` | Optional, in the header before the title: a back action (`PanelBackAction`) and an icon. Pick the one the task needs. | None |
-| `subheader` (`PanelSubheader`) | The record's StatusTag under the title | The Show `PopupSelect` |
-| `body` | Sections of the record; the form while editing | Items grouped by time |
+| `subheader` (`PanelSubheader`) | The record's StatusTag under the title | None: the Unread and All tabs sit under the header |
+| `body` | Sections of the record; the form while editing | Items grouped by day, in Unread and All tabs |
 | `footer` · `disclaimer` (`PanelFooter`, `PanelDisclaimer`) | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. A `PanelDisclaimer` carries small print beside the actions. | None |
-| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Floating, left, out of the Sidebar. Planned. Today it uses the right-hand area. |
+| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. `PanelOverlay` with `placement="start"`, opened from the Sidebar's bell rather than the Frame's Panel area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that; the Inbox floating out of the Sidebar on the left is  Planned, and today it uses the same right-hand area. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell and docks beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 
@@ -110,6 +112,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+6. **Overlay** (`PanelOverlay`). A Panel that floats over the Page with no Blanket, opened from a trigger. `placement="start"` docks it on the Sidebar's end edge at `--inbox-width`; `"end"` opens at the far edge. Escape and a press outside close it, a press on the trigger is its own toggle, and focus returns to the trigger. It fades on `appearance.fast`, like a menu.
 
 ### States
 
@@ -144,7 +147,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 
 ## Accessibility
 
-- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
+- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or to the bell for the start-side Inbox, on close.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
@@ -167,8 +170,10 @@ Panel reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket. |
 | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
-| floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself. |
+| floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details slides in from its edge over the page. A quick look promoted to its record grows from the Panel itself. |
 | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
+| start-enter | Open and close an overlay | `--ds-motion-appearance-fast` | The Inbox, opened from the Sidebar bell, fades in beside the Sidebar with no travel, like a menu. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
+| start-exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place, the same as the enter. |
 | narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket. |
 | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
 
@@ -187,7 +192,7 @@ Don't: The same Panel with a Blanket dimming the whole page.
 
 **Checked:** Automatic
 
-Another row swaps the content; the Inbox replaces Details. The overlay module keeps a second overlay closed.
+Another row swaps the content; opening the Inbox replaces Details, and opening Details replaces the Inbox. The overlay module keeps a second overlay closed.
 
 Do: One Panel; another row swaps what it shows.
 Don't: Two Panels open at once, the second covering the first.
@@ -224,11 +229,11 @@ Don't: The floating Panel drawn over the AI panel, hiding part of it.
 
 If the person must not look at anything outside it, it is a Modal.
 
-### Grow the Inbox out of the Sidebar. {#grow-the-inbox-out-of-the-sidebar}
+### Dock the Inbox against the Sidebar. {#dock-the-inbox-against-the-sidebar}
 
 **Checked:** Review
 
-Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
+Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right.
 
 ### Give the Panel room to read. {#give-the-panel-room-to-read}
 

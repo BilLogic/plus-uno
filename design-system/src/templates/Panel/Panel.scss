@@ -1,3 +1,5 @@
+@use '../../styles/overlay-motion' as *;
+
 .plus-panel {
     display: flex;
     flex-direction: column;
@@ -60,4 +62,33 @@
     font: var(--body-sm);
     color: var(--ds-text-subtle);
     margin: 0;
+}
+
+// A Panel that floats over the Page with no Blanket, opened from a trigger. The
+// overlay paints the fill, the edge and the elevation; the PanelContainer inside
+// is hosted and paints none. It fades on appearance.fast like a menu.
+.plus-panel-overlay {
+    position: absolute;
+    inset-block: 0;
+    z-index: var(--layer-dialog);
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    background-color: var(--ds-surface);
+    box-shadow: var(--ds-shadow-overlay);
+
+    @include menu-fade;
+}
+
+// Beside the Sidebar: it starts where the docked Sidebar ends and is as wide as the Inbox.
+.plus-panel-overlay--start {
+    inset-inline-start: var(--frame-sidebar-width);
+    width: var(--inbox-width);
+    border-inline-end: var(--border-width-default) solid var(--ds-border);
+}
+
+.plus-panel-overlay--end {
+    inset-inline-end: 0;
+    width: var(--panel-width-default);
+    border-inline-start: var(--border-width-default) solid var(--ds-border);
 }

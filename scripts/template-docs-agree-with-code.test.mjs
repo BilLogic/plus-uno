@@ -76,7 +76,8 @@ test('the Panel page places Details by width, credits Escape to the Frame and li
   assert.doesNotMatch(page, /footer, and Escape to close/);
   assert.match(page, /Docked from 1168; floating under it/);
   assert.match(page, /The Frame closes the Panel on Escape/);
-  assert.match(page, /Inbox floating out of the Sidebar on the left is <PlannedTag \/> Planned/);
+  assert.match(page, /The Inbox opens from the Sidebar's bell and docks beside the Sidebar at the start, 360 wide, over the page/);
+  assert.doesNotMatch(page, /Archive all|Show filter|Mentions/);
   const slots = page.slice(page.indexOf('<tr><th>Slot</th>'), page.indexOf('</DocsTable>', page.indexOf('<tr><th>Slot</th>')));
   for (const part of ['backAction', 'titleIcon', 'PanelSubheader', 'PanelDisclaimer']) assert.ok(slots.includes(part), `the Slots table lists ${part}`);
 });

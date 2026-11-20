@@ -24,6 +24,8 @@ export {
     PanelHostContext,
     PanelMoreAction,
     PanelNewTabAction,
+    PanelOverlay,
+    PANEL_PLACEMENTS,
     PanelProvider,
     PanelSubheader,
     PanelUpAction,

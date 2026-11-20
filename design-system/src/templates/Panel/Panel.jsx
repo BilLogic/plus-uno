@@ -1,6 +1,10 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
+import { Dialog } from '@base-ui/react/dialog';
+import { openOverlayCount } from '@/lib/overlay';
+import { useKeyboardOpen } from '@/lib/overlayMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
 import { Heading, Icon, IconButton } from '@/components';
 import './Panel.scss';
 
@@ -35,6 +39,111 @@ export const usePanelManager = () => {
     const context = useContext(PanelContext);
     if (!context) throw new Error('usePanelManager must be used within a PanelProvider');
     return context;
+};
+
+/** Where a PanelOverlay opens: `start` beside the Sidebar (the Inbox), `end` at the far edge. */
+export const PANEL_PLACEMENTS = ['start', 'end'];
+
+/** The dismiss attempts Base UI reports that a PanelOverlay acts on. */
+const OVERLAY_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
+
+/**
+ * PanelOverlay: a Panel that floats over the Page with no Blanket, opened from
+ * a trigger (the Sidebar's bell opens the Inbox).
+ *
+ * - `placement="start"` docks it on the Sidebar's end edge, 360 wide
+ *   (`--inbox-width`), over the Page and never over the Sidebar; `"end"` opens
+ *   at the far edge at `--panel-width-default`.
+ * - Dismissal and focus are Base UI's: Escape and a press outside close it, a
+ *   press on the trigger is the trigger's own toggle, and closing returns focus
+ *   to the trigger unless the press landed on something else.
+ * - It fades in and out on `appearance.fast`, like a menu: a keyboard open
+ *   shows with no animation, and in-app Reduced mode shows it with none at all.
+ *
+ * Put a `PanelContainer` and its parts inside; the container fills the overlay.
+ * The overlay sits in `container`, the host it is positioned against.
+ */
+export const PanelOverlay = ({
+    isOpen,
+    onOpenChange,
+    placement = 'start',
+    label,
+    container,
+    triggerRef,
+    width,
+    className,
+    children,
+}) => {
+    const reduced = useMotionReduced();
+    const keyboard = useKeyboardOpen(isOpen);
+    const closedBy = useRef(null);
+    // A new open forgets how the last one closed.
+    useEffect(() => { if (isOpen) closedBy.current = null; }, [isOpen]);
+
+    const handleOpenChange = (next, details) => {
+        if (next) {
+            onOpenChange?.(true);
+            return;
+        }
+        const reason = details?.reason;
+        const event = details?.event;
+        const keep = () => {
+            // An attempt this overlay ignores leaves the event alone for whatever else listens.
+            details?.cancel?.();
+            details?.allowPropagation?.();
+        };
+        if (OVERLAY_DISMISS_REASONS.has(reason)) {
+            // An open modal owns Escape and presses; an Escape a control inside already handled stays handled.
+            if (openOverlayCount() > 0) return keep();
+            if (reason === 'escape-key' && event?.defaultPrevented) return keep();
+            // A press on the trigger is its own toggle: closing here would let it reopen.
+            if (reason === 'outside-press' && triggerRef?.current?.contains(event?.target)) return keep();
+        }
+        closedBy.current = reason ?? null;
+        onOpenChange?.(false);
+    };
+
+    return (
+        <Dialog.Root open={isOpen} onOpenChange={handleOpenChange} modal={false}>
+            <Dialog.Portal container={container}>
+                <Dialog.Popup
+                    role="complementary"
+                    aria-label={label}
+                    tabIndex={-1}
+                    className={clsx('plus-panel-overlay', `plus-panel-overlay--${placement}`, className)}
+                    data-reduced={reduced ? 'true' : undefined}
+                    data-instant={keyboard ? 'keyboard' : undefined}
+                    style={width ? { width } : undefined}
+                    // Back to the trigger, unless the person pressed somewhere else on purpose.
+                    finalFocus={() => (closedBy.current === 'outside-press' ? false : (triggerRef?.current ?? true))}
+                >
+                    <PanelHostContext.Provider value>{children}</PanelHostContext.Provider>
+                </Dialog.Popup>
+            </Dialog.Portal>
+        </Dialog.Root>
+    );
+};
+
+PanelOverlay.propTypes = {
+    /** Whether the overlay is open */
+    isOpen: PropTypes.bool.isRequired,
+    /** Called with the next open state: false on Escape, an outside press or a close action */
+    onOpenChange: PropTypes.func,
+    /** `start` beside the Sidebar at `--inbox-width`; `end` at the far edge at `--panel-width-default` */
+    placement: PropTypes.oneOf(PANEL_PLACEMENTS),
+    /** The complementary landmark's name, such as "Inbox" */
+    label: PropTypes.string.isRequired,
+    /** The positioned host the overlay opens in, an element the page owns */
+    container: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any }), PropTypes.object]),
+    /** The control that opened it, as a ref: focus returns to it and a press on it is not an outside press */
+    triggerRef: PropTypes.shape({ current: PropTypes.any }),
+    /** Overrides the placement's width */
+    width: PropTypes.string,
+    className: PropTypes.string,
+    /**
+     * @ds-context Used in: PanelOverlay.children (ds guide panel)
+     */
+    children: PropTypes.node,
 };
 
 /** PanelContainer: the panel's own surface, at a fixed or the provider's width. */
