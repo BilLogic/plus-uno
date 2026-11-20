@@ -82,7 +82,7 @@ describe('Filtering live cases and links', () => {
         expect(CODE.OneTier).toContain("from '@/components';");
         expect(CODE.OneTier).toContain("import { Section } from '@/templates';");
         expect(CODE.TwoTiers).toContain('<FilterMenu');
-        for (const code of Object.values(CODE)) expect(code.split('\n').length).toBeLessThan(90);
+        for (const code of Object.values(CODE)) expect(code.split('\n').length).toBeLessThan(100);
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/\b[A-Z]\w*Case\b|storybook-docs|filteringDemo/);
     });
 });

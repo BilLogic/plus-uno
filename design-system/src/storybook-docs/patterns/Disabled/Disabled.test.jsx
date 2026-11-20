@@ -41,7 +41,8 @@ describe('Disabled live cases and TypeCard links', () => {
         expect(Object.keys(CODE)).toEqual(['ReasonInCaption', 'ReasonInTooltip', 'LeftOutOfMenu', 'DimmedInMenu']);
         expect(CODE.ReasonInCaption).toContain('caption="Choose a school first."');
         expect(CODE.DimmedInMenu).toContain('<ButtonItem isDisabled');
-        expect(CODE.DimmedInMenu).toContain('const MoreMenu');
+        expect(CODE.DimmedInMenu).toContain('const moreTrigger');
+        expect(CODE.DimmedInMenu).not.toContain('isOpen');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 

@@ -15,9 +15,9 @@ import examplesSource from './NavigationExamples.jsx?raw';
 
 export const CODE = showCode(examplesSource, ['BreadcrumbOnRecordPage', 'BreadcrumbOnAreaPage', 'OpenItemsByTimeAndWho', 'OpenItemsCarryEverything', 'OneTabSystem', 'TwoTabSystems']);
 
-const OnRecordPage = ({ children }) => (
+const OnRecordPage = ({ children, level = 5 }) => (
     <CaseSurface border="none" padding="none" surface={false}>
-        <HeadingLevelContext.Provider value={5}>{children}</HeadingLevelContext.Provider>
+        <HeadingLevelContext.Provider value={level}>{children}</HeadingLevelContext.Provider>
     </CaseSurface>
 );
 
@@ -28,7 +28,7 @@ const stayOnPage = (event) => {
 
 export const BreadcrumbCase = ({ record = true }) => (
     <div onClickCapture={stayOnPage}>
-        <OnRecordPage>
+        <OnRecordPage level={4}>
             {record ? <Example.BreadcrumbOnRecordPage /> : <Example.BreadcrumbOnAreaPage />}
         </OnRecordPage>
     </div>
