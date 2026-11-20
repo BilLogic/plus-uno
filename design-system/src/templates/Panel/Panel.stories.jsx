@@ -78,7 +78,6 @@ const expectFloating = async (canvasElement) => {
 
 /** Details: a quick look at a row, floating over the right of the page. */
 export const TypeDetails = {
-    parameters: { fullPage: true },
     name: 'Type: Details',
     render: () => sized(<DetailsFrame />),
     play: async ({ canvasElement }) => {
@@ -99,7 +98,6 @@ export const TypeDetails = {
 
 /** Notifications: the Inbox, a start-side `PanelOverlay` opened from the bell beside the account name: beside the Sidebar, 360 wide, over the page with no Blanket. Escape and an outside press close it and focus returns to the bell. */
 export const TypeNotifications = {
-    parameters: { fullPage: true },
     name: 'Type: Notifications',
     render: () => sized(<InboxFrame />, INBOX_STAGE),
     play: async ({ canvasElement }) => {
@@ -158,7 +156,6 @@ const ANATOMY_DETAILS_PARTS = [
 ];
 
 export const AnatomyDetails = {
-    parameters: { fullPage: true },
     name: 'Anatomy: Details',
     render: () => (
         <LiveAnatomy live scrollable width={FLOAT_STAGE} title="Details with its parts numbered" parts={ANATOMY_DETAILS_PARTS}>
@@ -185,7 +182,6 @@ const ANATOMY_INBOX_PARTS = [
 ];
 
 export const AnatomyNotifications = {
-    parameters: { fullPage: true },
     name: 'Anatomy: Notifications',
     render: () => (
         <LiveAnatomy live scrollable width={INBOX_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
@@ -311,7 +307,6 @@ export const WidthFloating = {
 
 /** Editing: the same Panel with the form open and its 4-track footer; Save returns to reading with no footer. */
 export const KeyEditing = {
-    parameters: { fullPage: true },
     name: 'Key state: Editing',
     render: () => sized(<DetailsFrame editing />),
     play: async ({ canvasElement }) => {
@@ -358,7 +353,6 @@ export const KeyWithForm = {
 
 /** Record gone: the row no longer exists, so the body shows its empty state and a way back. */
 export const KeyRecordGone = {
-    parameters: { fullPage: true },
     name: 'Key state: Record gone',
     render: () => sized(<GoneFrame />),
     play: async ({ canvasElement }) => {
@@ -371,7 +365,6 @@ export const KeyRecordGone = {
 
 /** Under 1024: too narrow to float beside the table, so the Panel is capped at its narrowest, still with no Blanket. */
 export const KeyUnder1024 = {
-    parameters: { fullPage: true },
     name: 'Key state: Under 1024',
     render: () => sized(<PanelFrame label="Session details" panel={<DetailsPanel />} />, FRAME_LAYOUT.dockMin - 124),
     play: async ({ canvasElement }) => {

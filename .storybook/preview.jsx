@@ -9,7 +9,7 @@ import { keepDocsAtTop } from '../design-system/src/storybook-docs/lib/docs-open
 import { DocsOverlayBoundary } from '../design-system/src/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { mountInPageAnchors } from '../design-system/src/storybook-docs/lib/in-page-anchors.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
-import { browserFor } from '../design-system/src/storybook-docs/chrome/browserFor';
+import { browserFor, ownsBrowserWindow } from '../design-system/src/storybook-docs/chrome/browserFor';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
@@ -648,6 +648,14 @@ const preview = {
   // Story animations settle before the a11y scan (afterEach runs in reverse order).
   afterEach: [
     assertContained,
+    // A story that draws its own BrowserWindow is a full page already: the toolbar chrome would make two windows.
+    async ({ canvasElement }) => {
+      if (!canvasElement) return;
+      const chrome = canvasElement.querySelector('.plus-browser-frame');
+      if (chrome && ownsBrowserWindow(canvasElement)) {
+        throw new Error('A story draws its own BrowserWindow and the toolbar browser chrome: set parameters.fullPage to false on it.');
+      }
+    },
     async ({ canvasElement, viewMode, globals, parameters }) => {
       if (viewMode !== 'story' || !canvasElement) return;
       if (

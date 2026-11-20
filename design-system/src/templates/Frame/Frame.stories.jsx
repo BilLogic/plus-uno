@@ -1566,7 +1566,7 @@ const DefaultType = ({ withPanel = false, address = 'app.plus.org/dashboard', ..
 /** Default: Sidebar, Page and the AI panel region, docked at 1440. */
 export const TypeDefault = {
     name: 'Type: Default',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     render: () => (
         <ScrollStage width={1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */}>
             <DefaultType withPanel />
@@ -1593,7 +1593,7 @@ export const TypeDefault = {
 /** Multi-step task: the steps in the inner sidebar, the page footer with Save and exit as a link, Back and Next in tracks 3 and 4. */
 export const LayoutMultiStepTask = {
     name: 'Layout: Multi-step task',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     render: () => <MultiStepTaskType count={5} start={0} scrollable />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1654,7 +1654,7 @@ export const LayoutMultiStepTask = {
 /** Save and exit and the inner sidebar's Back call out, and leave the task as the caller decides. */
 export const LayoutMultiStepTaskLeaves = {
     name: 'Layout: Multi-step task, leaving',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     render: () => {
         const [left, setLeft] = useState('');
         return (
@@ -1692,7 +1692,7 @@ const BareSignIn = () => {
 /** Bare: sign-in, errors and welcome: one centered column, no Sidebar and no header row. */
 export const TypeBare = {
     name: 'Type: Bare',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     render: () => <BareSignIn />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1724,7 +1724,7 @@ const ANATOMY_DEFAULT_PARTS = [
 /** Anatomy: the default type at 1440 with the AI panel docked, a marker on each part. */
 export const AnatomyDefault = {
     name: 'Anatomy: Default',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     render: () => (
         <LiveAnatomy live scrollable width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
             <DefaultType withPanel address="app.plus.org/students/maya-rodriguez" breadcrumbs={RECORD_CRUMBS} />
@@ -2275,7 +2275,7 @@ const goToAreaPlay = (reduced) => async ({ canvasElement }) => {
 
 export const MotionGoToArea = {
     name: 'Navigation motion: Go to another area',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <GoToAreaDemo />,
     play: goToAreaPlay(false),
@@ -2283,7 +2283,7 @@ export const MotionGoToArea = {
 
 export const MotionGoToAreaReduced = {
     name: 'Navigation motion: Go to another area, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <GoToAreaDemo />,
     play: goToAreaPlay(true),
@@ -2473,7 +2473,7 @@ const drillAndClimbPlay = (reduced) => async ({ canvasElement }) => {
 
 export const MotionDrillAndClimb = {
     name: 'Navigation motion: Drill in and climb out',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <DrillDemo />,
     play: drillAndClimbPlay(false),
@@ -2481,7 +2481,7 @@ export const MotionDrillAndClimb = {
 
 export const MotionDrillAndClimbReduced = {
     name: 'Navigation motion: Drill in and climb out, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <DrillDemo />,
     play: drillAndClimbPlay(true),
@@ -2506,7 +2506,7 @@ const drillDeeperPlay = (reduced) => async ({ canvasElement }) => {
 
 export const MotionDrillDeeper = {
     name: 'Navigation motion: Drill deeper',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <DrillDemo initialDepth={1} />,
     play: drillDeeperPlay(false),
@@ -2514,7 +2514,7 @@ export const MotionDrillDeeper = {
 
 export const MotionDrillDeeperReduced = {
     name: 'Navigation motion: Drill deeper, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <DrillDemo initialDepth={1} />,
     play: drillDeeperPlay(true),
@@ -2535,7 +2535,7 @@ const climbTwoLevelsPlay = () => async ({ canvasElement }) => {
 
 export const MotionClimbTwoLevels = {
     name: 'Navigation motion: Climb back two levels',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <DrillDemo initialDepth={2} />,
     play: climbTwoLevelsPlay(),
@@ -2543,7 +2543,7 @@ export const MotionClimbTwoLevels = {
 
 export const MotionClimbTwoLevelsReduced = {
     name: 'Navigation motion: Climb back two levels, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <DrillDemo initialDepth={2} />,
     play: climbTwoLevelsPlay(),
@@ -2723,7 +2723,7 @@ const recordOverlayPlay = (reduced) => async ({ canvasElement }) => {
 
 export const MotionRecordOverlay = {
     name: 'Navigation motion: Record in Panel or Modal',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <RecordOverlayDemo />,
     play: recordOverlayPlay(false),
@@ -2731,7 +2731,7 @@ export const MotionRecordOverlay = {
 
 export const MotionRecordOverlayReduced = {
     name: 'Navigation motion: Record in Panel or Modal, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <RecordOverlayDemo />,
     play: recordOverlayPlay(true),
@@ -2800,7 +2800,7 @@ const stepMotionPlay = ({ reduced }) => async ({ canvasElement }) => {
 
 export const MotionStepDown = {
     name: 'Navigation motion: Step down',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOn],
     render: () => <StepMotionDemo count={4} />,
     play: stepMotionPlay({ reduced: false }),
@@ -2808,7 +2808,7 @@ export const MotionStepDown = {
 
 export const MotionStepDownReduced = {
     name: 'Navigation motion: Step down, reduced',
-    parameters: { layout: 'padded' },
+    parameters: { fullPage: false, layout: 'padded' },
     decorators: [motionOff],
     render: () => <StepMotionDemo count={4} />,
     play: stepMotionPlay({ reduced: true }),

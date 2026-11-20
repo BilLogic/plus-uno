@@ -40,10 +40,24 @@ describe('browserFor: browser chrome frames full pages only', () => {
         }
     });
 
-    it('is set only where the story renders a Frame', () => {
-        for (const file of storyFiles(TEMPLATES)) {
-            const source = readFileSync(file, 'utf8');
-            if (/fullPage/.test(source)) expect(source, file).toMatch(/<Frame\b|PageStage|InAppFrame|PanelStage|FrameStage|Demo/);
+    it('is set on a Page or Panel story only when it renders a bare Frame, and on no Checklist widget', () => {
+        const flagged = {
+            'Page/Page.stories.jsx': ['AnatomyRecord', 'KeyBanner', 'ResponsiveWidth', 'ScenarioArea', 'ScenarioRecordTabs', 'ScenarioSeveralSections', 'ScenarioTwoLevels', 'TypeDefault', 'TypeFullWidth', 'TypeReading'],
+            'Panel/Panel.stories.jsx': ['ResponsiveWidth', 'WidthDocked', 'WidthFloating'],
+            'Page/Checklist.stories.jsx': [],
+        };
+        for (const [file, names] of Object.entries(flagged)) {
+            const blocks = readFileSync(join(TEMPLATES, file), 'utf8').split(/\nexport const /).slice(1);
+            const set = blocks.filter((block) => /fullPage: true/.test(block)).map((block) => block.match(/^(\w+)/)[1]);
+            expect(set.sort(), file).toEqual([...names].sort());
+        }
+    });
+
+    it('is switched off on a Frame story that draws its own BrowserWindow', () => {
+        const source = readFileSync(join(TEMPLATES, 'Frame/Frame.stories.jsx'), 'utf8');
+        for (const name of ['TypeDefault', 'TypeBare', 'MotionGoToArea', 'MotionStepDownReduced']) {
+            const block = source.split(`\nexport const ${name} =`)[1].split(/\nexport const /)[0];
+            expect(block, name).toMatch(/fullPage: false/);
         }
     });
 });

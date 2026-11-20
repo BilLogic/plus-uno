@@ -136,7 +136,6 @@ export const ChecklistCardInPage = {
  * the count, ProgressBar and next step, and opens the full checklist on press.
  */
 export const ChecklistCompactInSidebar = {
-    parameters: { fullPage: true },
     name: 'Checklist: compact in the sidebar',
     render: () => staged(<ChecklistInSidebar />, CHECKLIST_FRAME_STAGE),
     play: async ({ canvas, canvasElement }) => {

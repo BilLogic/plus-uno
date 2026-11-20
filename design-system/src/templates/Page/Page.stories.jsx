@@ -563,7 +563,6 @@ const switchViewsPlay = (reduced) => async ({ canvasElement }) => {
 };
 
 export const MotionSwitchViews = {
-    parameters: { fullPage: true },
     name: 'Navigation motion: Switch views',
     decorators: [motionOn],
     render: () => <SwitchViewsDemo />,
@@ -571,7 +570,6 @@ export const MotionSwitchViews = {
 };
 
 export const MotionSwitchViewsReduced = {
-    parameters: { fullPage: true },
     name: 'Navigation motion: Switch views, reduced',
     decorators: [motionOff],
     render: () => <SwitchViewsDemo />,
@@ -646,7 +644,6 @@ const scrollSpotPlay = (reduced) => async ({ canvasElement }) => {
 };
 
 export const MotionScrollToSpot = {
-    parameters: { fullPage: true },
     name: 'Navigation motion: Scroll to a spot',
     decorators: [motionOn],
     render: () => <ScrollSpotDemo />,
@@ -654,7 +651,6 @@ export const MotionScrollToSpot = {
 };
 
 export const MotionScrollToSpotReduced = {
-    parameters: { fullPage: true },
     name: 'Navigation motion: Scroll to a spot, reduced',
     decorators: [motionOff],
     render: () => <ScrollSpotDemo />,
