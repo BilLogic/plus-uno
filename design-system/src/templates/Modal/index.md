@@ -56,11 +56,7 @@ Modal reads these motion tokens and no literal duration or curve.
 
 **Checked:** Review
 
-A button, a link, an icon. Never on its own.
-
-Do: Open a Modal when a person clicks an action or trigger.
-
-Don't: Open a Modal automatically on page load.
+A button, a link, an icon opens it when a person clicks. Never open a Modal on its own, such as automatically on page load.
 
 ### Size a confirm at the smallest step and step up with a detail line or a field. {#size-a-confirm-at-the-smallest-step-and-step-up-with-a-detail-line-or-a-field}
 

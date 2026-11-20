@@ -1,17 +1,10 @@
-import React from 'react';
-import { Button, FooterActions, StatusTag } from '@/components';
-import {
-    PanelBody,
-    PanelCloseAction,
-    PanelContainer,
-    PanelFooter,
-    PanelHeader,
-    PanelSubheader,
-} from '@/templates';
+import React, { useState } from 'react';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import Blanket from '../Modal/Blanket';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
+import { PanelOverlay } from '@/templates';
 import * as Example from './PanelExamples.jsx';
 import examplesSource from './PanelExamples.jsx?raw';
 
@@ -23,57 +16,36 @@ import examplesSource from './PanelExamples.jsx?raw';
 /** The height of the stage a floating Panel sits in. Docs geometry, px. */
 const FLOAT_STAGE = 440; // docs-literal
 
-const ReadingPanel = ({ footer, inlineSize }) => (
-    <CaseSurface
-        padding="none"
-        style={{
-            maxInlineSize: inlineSize ?? 'var(--panel-width-default)',
-            borderRadius: 'var(--radius-sm)',
-            overflow: 'hidden',
-        }}
-    >
-        <HeadingLevelContext.Provider value={4}>
-            <PanelContainer>
-                <PanelHeader title="Ben Okafor · Thu 5:00 PM" actions={<PanelCloseAction onClick={() => {}} />} />
-                <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
-                <PanelBody>
-                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                        Math · 60 minutes · Room 2. Ben worked through fractions last week.
-                    </p>
-                </PanelBody>
-                {footer ? <PanelFooter>{footer}</PanelFooter> : null}
-            </PanelContainer>
-        </HeadingLevelContext.Provider>
+/** The stand-in screen width a Modal's Blanket is drawn at. Docs geometry, px. */
+const SCREEN = { width: 1024 }; // docs-literal
+
+const ReadingPanel = ({ children }) => (
+    <CaseSurface padding="none" style={{ maxInlineSize: 'var(--panel-width-default)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+        <HeadingLevelContext.Provider value={4}>{children}</HeadingLevelContext.Provider>
     </CaseSurface>
 );
 
 /** Reading: a header and a body, nothing to save. */
-export const ReadingNoFooter = () => <ReadingPanel />;
+export const ReadingNoFooter = () => <ReadingPanel><Example.ReadingNoFooter /></ReadingPanel>;
 
 /** The same Panel squeezed to a third of its default width. */
-export const ReadingNarrow = () => <ReadingPanel inlineSize="calc(var(--panel-width-default) / 3)" />;
+export const ReadingNarrow = () => <ReadingPanel><Example.ReadingNarrow /></ReadingPanel>;
 
 /** A footer of buttons on a Panel that is only read. */
-export const ReadingWithFooter = () => (
-    <ReadingPanel
-        footer={(
-            <FooterActions>
-                <Button text="Done" appearance="primary" onClick={() => {}} />
-            </FooterActions>
-        )}
-    />
-);
+export const ReadingWithFooter = () => <ReadingPanel><Example.ReadingWithFooter /></ReadingPanel>;
 
-/** The Show code for each floating-Panel example, read from `PanelExamples.jsx`. */
-const printed = showCode(examplesSource, [
+/** The Show code for each example, read from `PanelExamples.jsx`. */
+export const CODE = showCode(examplesSource, [
     'FloatsNoBlanket',
+    'DetailsInModal',
+    'OneFloatingPanel',
     'TwoFloatingPanels',
     'BesideAiPanel',
     'CoversAiPanel',
+    'ReadingNoFooter',
+    'ReadingNarrow',
+    'ReadingWithFooter',
 ]);
-
-/** The Blanket is the stage's dimming, so the page-dimmed case prints the same Panel. */
-export const CODE = { ...printed, OneFloatingPanel: printed.FloatsNoBlanket, PanelOnBlanket: printed.FloatsNoBlanket };
 
 /** The stage under floating Panels: a box that clips them, at the docs heading level, with room around the page behind. */
 const FloatStage = ({ children }) => (
@@ -84,22 +56,42 @@ const FloatStage = ({ children }) => (
     </CaseSurface>
 );
 
-/** The Panel floats on its shadow and the page beside it stays undimmed. */
-export const FloatsNoBlanket = () => <FloatStage><Example.FloatsNoBlanket /></FloatStage>;
+/** Puts the stage's host on each PanelOverlay in a printed example: the host is where the overlay opens, so a picture keeps it inside its box. */
+const inHost = (node, host) => React.Children.map(node, (child) => {
+    if (!React.isValidElement(child)) return child;
+    if (child.type === PanelOverlay) return React.cloneElement(child, { container: host });
+    if (child.props?.children) return React.cloneElement(child, undefined, inHost(child.props.children, host));
+    return child;
+});
 
-/** The same Panel with a Blanket dimming the whole page. */
+/** A floating example in its stage: a positioned host the overlay opens in, over the page behind. */
+const Floating = ({ example }) => {
+    const [host, setHost] = useState(null);
+    const element = example();
+    return (
+        <FloatStage>
+            <div ref={setHost} style={{ position: 'relative', blockSize: '100%' }}>{inHost(element, host)}</div>
+        </FloatStage>
+    );
+};
+
+/** The Panel floats on its shadow and the page beside it stays undimmed. */
+export const FloatsNoBlanket = () => <Floating example={Example.FloatsNoBlanket} />;
+
+/** The same details in a Modal: a Blanket dims the whole page. */
 export const PanelOnBlanket = () => (
-    <FloatStage>
-        <Blanket inline show style={{ position: 'absolute', inset: 0 }} />
-        <Example.FloatsNoBlanket />
-    </FloatStage>
+    <FitStage width={SCREEN.width} reflow={false}>
+        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': `${FLOAT_STAGE}px` }}>
+            {inlineModals(Example.DetailsInModal())}
+        </div>
+    </FitStage>
 );
 
 /** One Panel; another row swaps what it shows. */
-export const OneFloatingPanel = FloatsNoBlanket;
+export const OneFloatingPanel = () => <Floating example={Example.OneFloatingPanel} />;
 
 /** Two Panels open at once, the second covering the first. */
-export const TwoFloatingPanels = () => <FloatStage><Example.TwoFloatingPanels /></FloatStage>;
+export const TwoFloatingPanels = () => <Floating example={Example.TwoFloatingPanels} />;
 
 /** The floating Panel sits beside the docked AI panel, both fully visible. */
 export const BesideAiPanel = () => <FloatStage><Example.BesideAiPanel /></FloatStage>;

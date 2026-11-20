@@ -275,11 +275,7 @@ The Blanket is shown while the Modal is open and gone when it closes. `blanket` 
 
 ### Place a modal in the Blanket.
 
-Let the Blanket place the modal. Do not detach it to move things around: the pads are the closest a modal gets to the screen edge.
-
-Do: Center the Dialog on the Blanket with the built-in pads.
-
-Don't: Detach or shift the panel past the Blanket edge pads.
+Let the Blanket place the modal: it centers the Dialog with the built-in pads. Do not detach it or shift it to move things around; the pads are the closest a modal gets to the screen edge.
 
 ### Blanket content guidelines
 
@@ -419,11 +415,7 @@ Use a Modal when the next step has to happen before anything else can: a confirm
 
 <RuleTag kind="review" />
 
-A button, a link, an icon. Never on its own.
-
-Do: Open a Modal when a person clicks an action or trigger.
-
-Don't: Open a Modal automatically on page load.
+A button, a link, an icon opens it when a person clicks. Never open a Modal on its own, such as automatically on page load.
 
 ### Size a confirm at the smallest step and step up with a detail line or a field.
 
@@ -467,8 +459,10 @@ Each width has a maximum height, the screen less `--blanket-pad-y` above and bel
 
 <DoDontPair
     doExample={<FooterPinnedModal />}
+    doCode={CODE.FooterPinned}
     doCaption="Past the cap the body scrolls; the footer stays pinned with its buttons."
     dontExample={<ButtonInBodyModal />}
+    dontCode={CODE.ButtonInBody}
     dontCaption="The button inside the scrolling body: it scrolls out of reach."
 />
 
@@ -480,8 +474,10 @@ Two to five views of one thing opened in any order; one footer saves them all. V
 
 <DoDontPair
     doExample={<StepsFooterModal />}
+    doCode={CODE.StepsWithBackAndNext}
     doCaption="Views in order are Steps: Back and Next split across the footer."
     dontExample={<TabsForStepsModal />}
+    dontCode={CODE.NumberedTabsAsSteps}
     dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
 

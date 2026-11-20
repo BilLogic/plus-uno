@@ -186,7 +186,7 @@ Panel reads these motion tokens and no literal duration or curve.
 The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Blanket. A confirm Modal over a Panel brings its own Blanket.
 
 Do: The Panel floats on its shadow and the page beside it stays undimmed.
-Don't: The same Panel with a Blanket dimming the whole page.
+Don't: The same details in a Modal: a Blanket dims the whole page.
 
 ### Open one floating Panel at a time. {#open-one-floating-panel-at-a-time}
 

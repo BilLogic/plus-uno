@@ -42,13 +42,13 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const pageMdx = readFileSync(join(__dirname, 'Page.mdx'), 'utf8');
 
 describe('Page live cases', () => {
-    it('AddInTitleRow puts Add student once in the title row, while AddTwice duplicates it in PageHeader', () => {
+    it('AddInTitleRow puts Add session once in the title row, while AddTwice duplicates it in PageHeader', () => {
         const r1 = render(<AddInTitleRow />);
-        expect(screen.getAllByRole('button', { name: 'Add student' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Add session' })).toHaveLength(1);
         r1.unmount();
 
         const r2 = render(<AddTwice />);
-        expect(screen.getAllByRole('button', { name: 'Add student' })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: 'Add session' })).toHaveLength(2);
         r2.unmount();
     });
 
@@ -143,7 +143,7 @@ describe('Show code on live pairs', () => {
         render(<DoDontPair doExample={<i />} doCaption="Do" doCode="<a />" dontExample={<i />} dontCaption="Don't" dontCode="<b />" />);
         expect(screen.getAllByText('Show code')).toHaveLength(2);
         const counts = { Page: Object.keys(PAGE_CODE).length, Popup: Object.keys(POPUP_CODE).length, Forms: Object.keys(FORMS_CODE).length, Panel: Object.keys(PANEL_CODE).length };
-        expect(counts).toEqual({ Page: 6, Popup: 8, Forms: 10, Panel: 6 });
+        expect(counts).toEqual({ Page: 10, Popup: 10, Forms: 10, Panel: 9 });
         [PAGE_CODE, POPUP_CODE, FORMS_CODE, PANEL_CODE].forEach((code) => Object.values(code).forEach((src) => expect(src.length).toBeGreaterThan(20)));
     });
 });
