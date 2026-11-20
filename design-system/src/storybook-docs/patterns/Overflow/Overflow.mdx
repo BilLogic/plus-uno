@@ -5,7 +5,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as OverflowStories from './Overflow.stories.jsx';
 import { FOLD_STAGE, NARROW, TABLE_STAGE } from './overflowDemo.jsx';
-import { CODE, ClippedCellNoTextCase, ClippedCellOpensTextCase, ClippedSectionTitleCase, FadedListCase, ShowMoreWithCountCase, WrappedSectionTitleCase } from './OverflowCases.jsx';
+import { CODE, ClippedCellNoTextCase, ClippedCellOpensTextCase, ClippedSectionTitleCase, FadedListCase, GrowingTableCase, PagedTableCase, ShowMoreWithCountCase, WrappedSectionTitleCase } from './OverflowCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -222,6 +222,15 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
     dontExample={<FadedListCase />}
     dontCode={CODE.FadedList}
     dontCaption="A fade over the list, hiding how much is there."
+/>
+
+<DoDontPair
+    doExample={<PagedTableCase />}
+    doCode={CODE.PagedTable}
+    doCaption="A table pages: the pager sits at the end of the Section footer."
+    dontExample={<GrowingTableCase />}
+    dontCode={CODE.GrowingTable}
+    dontCaption="A table that grows under Show more: a table pages, a list grows."
 />
 
 </div>

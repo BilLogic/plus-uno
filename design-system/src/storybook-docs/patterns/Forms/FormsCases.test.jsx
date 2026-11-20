@@ -87,6 +87,8 @@ describe('Forms live cases', () => {
         expect(CODE.EditInModal).not.toMatch(/Dialog|Blanket|100%/);
         expect(CODE.EditInPanel).not.toContain('flex');
         expect(CODE.ErrorOnField).toContain('const LogSessionFooter');
+        for (const key of ['EditInModal', 'ErrorOnField', 'ErrorInSecondDialog']) expect(CODE[key]).not.toContain('Cancel');
+        expect(CODE.ErrorOnField).toContain('text="Discard"');
         expect(CODE.ErrorInSecondDialog).toContain('<Modal');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs|formHosts/);
     });

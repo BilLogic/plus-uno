@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
@@ -9,6 +9,8 @@ import {
     ClippedCellOpensTextCase,
     ClippedSectionTitleCase,
     FadedListCase,
+    GrowingTableCase,
+    PagedTableCase,
     ShowMoreWithCountCase,
     WrappedSectionTitleCase,
 } from './OverflowCases.jsx';
@@ -59,12 +61,13 @@ describe('Overflow live cases and TypeCard links', () => {
         }
     });
 
-    it('ShowMoreWithCountCase expands from 2 to 6 rows on click while FadedListCase offers no expand control', async () => {
+    it('ShowMoreWithCountCase grows a list from 2 to 6 items on click while FadedListCase offers no expand control', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<ShowMoreWithCountCase />);
-        expect(screen.getAllByRole('row')).toHaveLength(3);
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(within(screen.getByRole('list', { name: 'Students' })).getAllByRole('listitem')).toHaveLength(2);
         await user.click(screen.getByRole('button', { name: 'Show 4 more' }));
-        expect(screen.getAllByRole('row')).toHaveLength(7);
+        expect(within(screen.getByRole('list', { name: 'Students' })).getAllByRole('listitem')).toHaveLength(6);
         expect(screen.getByRole('button', { name: 'Show less' })).toBeVisible();
         unmount();
 
@@ -72,10 +75,28 @@ describe('Overflow live cases and TypeCard links', () => {
         expect(screen.queryByRole('button', { name: /Show/ })).toBeNull();
     });
 
+    it('PagedTableCase pages its rows with a Pagination in the footer and never grows; GrowingTableCase grows the table', async () => {
+        const user = userEvent.setup();
+        const { unmount } = render(<PagedTableCase />);
+        expect(screen.getAllByRole('row')).toHaveLength(4);
+        expect(screen.queryByRole('button', { name: /Show/ })).toBeNull();
+        await user.click(screen.getByRole('button', { name: /next/i }));
+        expect(screen.getAllByRole('row')).toHaveLength(4);
+        expect(screen.getByText('Jordan Patel')).toBeVisible();
+        expect(screen.queryByText('Ava Thompson')).toBeNull();
+        unmount();
+
+        render(<GrowingTableCase />);
+        expect(screen.getAllByRole('row')).toHaveLength(4);
+        await user.click(screen.getByRole('button', { name: 'Show 3 more' }));
+        expect(screen.getAllByRole('row')).toHaveLength(7);
+    });
+
     it('prints each example from its own source', () => {
-        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(Object.keys(CODE)).toHaveLength(8);
         expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
-        expect(CODE.ShowMoreWithCount).toContain('const StudentsTable');
+        expect(CODE.ShowMoreWithCount).toContain('const StudentList');
+        expect(CODE.ClippedCellNoText).not.toContain('plus-table-cell-text');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 

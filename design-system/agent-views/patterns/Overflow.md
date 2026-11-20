@@ -166,6 +166,9 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 Do: A button under the list that names how many more it holds, and the list grows in place.
 Don't: A fade over the list, hiding how much is there.
 
+Do: A table pages: the pager sits at the end of the Section footer.
+Don't: A table that grows under Show more: a table pages, a list grows.
+
 ## In code
 
 From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Overflow`.
