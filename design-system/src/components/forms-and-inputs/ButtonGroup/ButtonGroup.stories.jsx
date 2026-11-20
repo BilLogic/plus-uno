@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import { Button, IconButton } from '@/components';
 import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
@@ -110,7 +111,7 @@ export const Spaced = {
             }
         }
         const [first, second] = buttons.map((el) => el.getBoundingClientRect());
-        await expect(Math.round(second.left - first.right), 'gap between buttons').toBe(8);
+        await expect(Math.round(second.left - first.right), 'gap between buttons').toBe(tokenLength(canvasElement, '--inline-md'));
     },
 };
 
