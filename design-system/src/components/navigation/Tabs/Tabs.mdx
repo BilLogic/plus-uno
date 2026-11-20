@@ -64,7 +64,9 @@ export const figmaMeta = {
 
 <ComponentExample of={TabsStories.WithPanels} title="With panels" description={<>Each tab wired to a panel; a disabled tab is still reachable with the arrow keys.</>} />
 
-<ComponentExample of={TabsStories.Overflow} title="Overflow" description="Truncate: a label longer than its cap ends in an ellipsis, and its full text opens in a Tooltip on hover and focus, only while it is clipped. Folding extra tabs into More is Planned." />
+<ComponentExample of={TabsStories.Overflow} title="Overflow" description="Truncate: a label longer than its cap ends in an ellipsis, and its full text opens in a Tooltip on hover and focus, only while it is clipped." />
+
+<ComponentExample of={TabsStories.OverflowMore} title="Overflow: More" description={<>Tabs keep one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds. Its menu lists them by name; picking one selects it and More holds the selection. <code>overflow="wrap"</code> lets extra tabs flow onto more rows instead.</>} />
 
 </div>
 
@@ -260,7 +262,7 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip.
 
-The Tooltip is on only while the label is clipped. More tabs than fit a row wrap; folding the extras into More is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. A `justified` strip shares the row and never folds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 

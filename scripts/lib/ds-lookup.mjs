@@ -259,7 +259,7 @@ const TEMPLATES_SRC = 'design-system/src/templates';
  * (the ds-find bench falls from 41 to 40 hit@1 without it).
  */
 const NAMED_BY_WORD = ['Card'];
-const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal'];
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel', 'Popup'];
 /** The name whose record owns a name's page and rendered text: a template its own, an alias what it aliases. */
 function homeNameOf(a) {
   return a.kind === 'template' ? a.name : a.aliasOf ?? a.name;

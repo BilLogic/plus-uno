@@ -175,7 +175,7 @@ describe('the Harness tab', () => {
   const FIELDSET = 'design-system/src/components/forms-and-inputs/Fieldset.md';
   const PATTERN = 'design-system/src/templates/Modal/index.md';
   const PATTERN_PAGE = 'design-system/agent-views/patterns/Filtering.md';
-  const TEMPLATE_PAGE = 'design-system/agent-views/templates/Popup.md';
+  const TEMPLATE_PAGE = 'design-system/agent-views/templates/TemplatesOverview.md';
   const FOUNDATION_PAGE = 'design-system/agent-views/foundations/Colors.md';
   const modules = rawGlob([DIALOG, FIELDSET, PATTERN, PATTERN_PAGE, TEMPLATE_PAGE, FOUNDATION_PAGE]);
 
@@ -216,11 +216,11 @@ describe('the Harness tab', () => {
 
   it('shows the generated agent file for a docs-only template page and a foundation page', () => {
     const templateEntry = agentViewEntry(modules, {
-      importPath: './design-system/src/templates/Popup/Popup.stories.jsx',
+      importPath: './design-system/src/storybook-docs/templates/TemplatesOverview.stories.jsx',
     });
-    expect(templateEntry).toMatchObject({ path: TEMPLATE_PAGE, name: 'Popup' });
+    expect(templateEntry).toMatchObject({ path: TEMPLATE_PAGE, name: 'TemplatesOverview' });
     expect(templateEntry.value).toBe(read(TEMPLATE_PAGE));
-    expect(repoPathOfGlobKey('../../agent-views/templates/Popup.md')).toBe(TEMPLATE_PAGE);
+    expect(repoPathOfGlobKey('../../agent-views/templates/TemplatesOverview.md')).toBe(TEMPLATE_PAGE);
 
     const foundationEntry = agentViewEntry(modules, {
       importPath: './design-system/src/styles/Colors.stories.jsx',

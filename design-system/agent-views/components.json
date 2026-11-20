@@ -15139,6 +15139,18 @@
           "deprecated": null
         },
         {
+          "name": "overflow",
+          "type": "enum",
+          "required": false,
+          "default": "'collapse'",
+          "values": [
+            "wrap",
+            "collapse"
+          ],
+          "description": "`collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -15201,7 +15213,8 @@
         "Selected",
         "SelectedPill",
         "Disabled",
-        "Overflow"
+        "Overflow",
+        "OverflowMore"
       ],
       "tokens": [
         "--body-default",

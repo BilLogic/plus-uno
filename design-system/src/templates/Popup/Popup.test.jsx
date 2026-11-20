@@ -121,7 +121,7 @@ describe('Popup live cases and docs links', () => {
         const section = popupMdx.split(/^## Key states$/m)[1].split(/^## /m)[0];
         const titles = [...section.matchAll(/<ComponentExample[^\n]*? title="([^"]+)"/g)].map((match) => match[1]);
         expect(titles.length).toBeGreaterThanOrEqual(5);
-        const view = readFileSync(join(__dirname, '../../../agent-views/templates/Popup.md'), 'utf8');
+        const view = readFileSync(join(__dirname, 'index.md'), 'utf8');
         for (const title of titles) expect(view, title).toContain(`**${title}.**`);
     });
 

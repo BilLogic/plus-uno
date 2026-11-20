@@ -12,6 +12,10 @@
  * Each row of the agent-view list, and any hand-typed overview tile, reads as
  * its template page's `purpose`.
  *
+ * A template has exactly one generated agent file, `src/templates/<T>/index.md`,
+ * with its props and its docs page; a second copy under `agent-views/templates/`
+ * is a page the generator did not attach to its stories.
+ *
  * A template is one page in the Storybook sidebar. A visible story titled
  * beneath it (`Templates/Page/Reference screens`) turns it into a folder, so a
  * visible nested title fails too; hidden stories carry `!dev`.
@@ -21,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const TEMPLATES_DIR = 'design-system/src/templates';
+const AGENT_VIEWS = 'design-system/agent-views';
 const BARREL = `${TEMPLATES_DIR}/index.js`;
 const GLOSSARY = 'docs/conventions/design-system-glossary.md';
 const OVERVIEW = 'design-system/src/storybook-docs/templates/TemplatesOverview.mdx';
@@ -83,10 +88,14 @@ export const visibleChildren = (files) =>
 
 /**
  * Every layer held to the roster.
- * @param {{roster: string[], layers: Record<string, string[]>, children: {title: string, file: string}[], purposes?: Record<string, string>, uses?: Record<string, string>, tiles?: Record<string, string>}} model
+ * @param {{agentFiles?: Record<string, string[]>, roster: string[], layers: Record<string, string[]>, children: {title: string, file: string}[], purposes?: Record<string, string>, uses?: Record<string, string>, tiles?: Record<string, string>}} model
  */
-export function checkRoster({ roster, layers, children, purposes = {}, uses = {}, tiles = {} }) {
+export function checkRoster({ roster, layers, children, purposes = {}, uses = {}, tiles = {}, agentFiles = {} }) {
   const problems = [];
+  for (const [name, files] of Object.entries(agentFiles)) {
+    if (files.length !== 1) problems.push(`${name} has ${files.length} generated agent files (${files.join(', ') || 'none'}); a template has exactly one`);
+    else if (files[0] !== `${TEMPLATES_DIR}/${name}/index.md`) problems.push(`${name}'s agent file is ${files[0]}; it belongs at ${TEMPLATES_DIR}/${name}/index.md`);
+  }
   for (const [layer, names] of Object.entries(layers)) {
     for (const name of roster) if (!names.includes(name)) problems.push(`${layer} is missing the ${name} template`);
     for (const name of sorted(names)) if (!roster.includes(name)) problems.push(`${layer} names ${name}, which the @/templates barrel does not export`);
@@ -129,5 +138,8 @@ export function readRoster(root) {
     uses: Object.fromEntries(rows.map((r) => [r.name, r.use])),
     tiles: tileTexts(overview),
     children: visibleChildren(files),
+    agentFiles: Object.fromEntries(
+      roster.map((n) => [n, [`${TEMPLATES_DIR}/${n}/index.md`, `${AGENT_VIEWS}/templates/${n}.md`].filter((f) => fs.existsSync(path.join(root, f)))]),
+    ),
   };
 }

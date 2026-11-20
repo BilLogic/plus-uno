@@ -37,6 +37,21 @@ test('a template whose title has a visible child fails', () => {
   assert.deepEqual(checkRoster(m), ['Templates/Page/Reference screens (p/R.stories.jsx) shows Page as a folder in Storybook; tag the stories !dev']);
 });
 
+test('a template with two agent files, or none, or one in the wrong place fails', () => {
+  const m = agreeing();
+  m.agentFiles = {
+    Panel: ['design-system/src/templates/Panel/index.md', 'design-system/agent-views/templates/Panel.md'],
+    Popup: [],
+    Card: ['design-system/src/templates/Card/index.md'],
+    Table: ['design-system/agent-views/templates/Table.md'],
+  };
+  assert.deepEqual(checkRoster(m), [
+    'Panel has 2 generated agent files (design-system/src/templates/Panel/index.md, design-system/agent-views/templates/Panel.md); a template has exactly one',
+    'Popup has 0 generated agent files (none); a template has exactly one',
+    "Table's agent file is design-system/agent-views/templates/Table.md; it belongs at design-system/src/templates/Table/index.md",
+  ]);
+});
+
 test('a row or a tile that differs from its page purpose fails', () => {
   const m = agreeing();
   m.purposes = { Card: 'A container for one object.', Frame: 'The app frame.' };
