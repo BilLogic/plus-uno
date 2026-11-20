@@ -23,7 +23,9 @@
     transform-origin: top left;
 }
 
-.plus-page-view__full {
+// Full screen: the same layer, fixed over the viewport. The page is at real
+// size and the well scrolls both ways.
+.plus-page-view--full {
     position: fixed;
     inset: 0;
     z-index: var(--layer-modal);
@@ -31,29 +33,45 @@
     flex-direction: column;
     background: var(--ds-surface);
     color: var(--ds-text);
+
+    .plus-page-view__bar {
+        padding: var(--pad-y-sm) var(--pad-x-md);
+        background: var(--ds-surface-sunken);
+        border-bottom: var(--border-width-default) solid var(--ds-border);
+    }
+
+    .plus-page-view__well {
+        flex: 1 1 auto;
+        min-block-size: 0;
+        overflow: auto;
+    }
+
+    .plus-page-view__page {
+        min-inline-size: 100%;
+    }
+
+    // The browser window holds the same well: it fills what the bar leaves.
+    .plus-browser-frame,
+    .plus-browser-frame__page {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-block-size: 0;
+        border-radius: 0;
+    }
 }
 
-.plus-page-view__full-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--pad-y-sm) var(--pad-x-md);
-    background: var(--ds-surface-sunken);
-    border-bottom: var(--border-width-default) solid var(--ds-border);
+.plus-page-view__bar--full {
+    justify-content: flex-start;
 }
 
-.plus-page-view__full-title {
-    margin: 0;
+.plus-page-view__title {
+    font: var(--body-sm);
+    color: var(--ds-text);
+}
+
+.plus-page-view__hint {
+    flex: 1 1 auto;
     font: var(--body-sm);
     color: var(--ds-text-subtle);
-}
-
-.plus-page-view__full-body {
-    flex: 1 1 auto;
-    min-block-size: 0;
-    overflow: auto;
-}
-
-.plus-page-view__full-page {
-    min-inline-size: 100%;
 }

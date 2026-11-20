@@ -11,9 +11,9 @@ describe('FitStage and ScreenStage in TypeCard thumbnails', () => {
             </FitStage>,
         );
         expect(screen.getByText('Content')).toBeInTheDocument();
-        const scrollWrapper = container.firstChild;
-        expect(scrollWrapper.style.overflowX).toBe('auto');
-        expect(scrollWrapper.firstChild.style.inlineSize).toBe('1024px');
+        // The stage is a page view: the page keeps its own width inside a well that scrolls at 100%.
+        expect(container.querySelector('.plus-page-view__well')).not.toBeNull();
+        expect(screen.getByText('Content').closest('[data-fit-stage]').style.inlineSize).toBe('1024px');
     });
 
     it('renders unscrollable Stage inside TypeThumbContext or [data-type-thumb]', () => {

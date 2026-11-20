@@ -6,6 +6,7 @@ import { Tag } from '@/components';
 import { MotionPreferenceContext } from '@/lib/motionPreference.jsx';
 import { useFitScale } from './use-fit-scale.js';
 import { TypeThumbContext } from './fit-stage.jsx';
+import { PageView } from '../chrome/PageView.jsx';
 import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
 
@@ -406,7 +407,7 @@ export const PlannedTag = () => <Tag text="Planned" color="gray" />;
  * fills. The Frame's types sit in one, so the reader sees the app in a window
  * and not a bare rectangle. Chrome only; it paints with `--ds-*` tokens.
  */
-export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, children }) => (
+const BrowserWindowBox = ({ address, height, fill, children }) => (
     <div
         className="not-prose"
         style={{
@@ -434,6 +435,16 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
         <div style={{ blockSize: fill ? undefined : height, flex: fill ? '1 1 0' : undefined, minBlockSize: 0, position: 'relative', overflow: 'hidden' }}>{children}</div>
     </div>
 );
+
+/**
+ * The window as a page view: a window wider than its column gets the view
+ * control; inside a browser frame or another view it renders bare. A `fill`
+ * window sits in a box that sizes it, so it stays unwrapped.
+ */
+export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, children }) => {
+    const box = <BrowserWindowBox address={address} height={height} fill={fill}>{children}</BrowserWindowBox>;
+    return fill ? box : <PageView mode="auto">{box}</PageView>;
+};
 
 BrowserWindow.propTypes = {
     /** The address in the bar. */
