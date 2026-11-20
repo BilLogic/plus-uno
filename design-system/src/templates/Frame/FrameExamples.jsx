@@ -99,6 +99,7 @@ const SignInColumn = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--stack-2xl)', maxInlineSize: 'var(--field-width-xl)', marginInline: 'auto', paddingBlock: 'var(--stack-2xl)' }}>
             <Logo />
+            <PageHeader title="Sign in" />
             <TextField label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
             <Button text="Sign in" appearance="primary" />
         </div>

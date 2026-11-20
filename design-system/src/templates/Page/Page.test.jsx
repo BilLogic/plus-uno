@@ -42,13 +42,13 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const pageMdx = readFileSync(join(__dirname, 'Page.mdx'), 'utf8');
 
 describe('Page live cases', () => {
-    it('AddInTitleRow puts Add student once in the title row, while AddTwice duplicates it in PageHeader', () => {
+    it('AddInTitleRow puts Add session once in the title row, while AddTwice duplicates it in PageHeader', () => {
         const r1 = render(<AddInTitleRow />);
-        expect(screen.getAllByRole('button', { name: 'Add student' })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: 'Add session' })).toHaveLength(1);
         r1.unmount();
 
         const r2 = render(<AddTwice />);
-        expect(screen.getAllByRole('button', { name: 'Add student' })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: 'Add session' })).toHaveLength(2);
         r2.unmount();
     });
 

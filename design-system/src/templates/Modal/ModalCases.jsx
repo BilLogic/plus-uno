@@ -1,5 +1,5 @@
 import React from 'react';
-import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
+import { openModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { SCREEN } from './modalDemo.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
@@ -33,25 +33,25 @@ const OnScreen = ({ children }) => (
 );
 
 /** A confirm at the narrow step: the title, one line and two buttons. */
-export const ConfirmNarrow = () => <OnScreen>{inlineModals(Example.ConfirmNarrow())}</OnScreen>;
+export const ConfirmNarrow = () => <OnScreen>{openModals(Example.ConfirmNarrow())}</OnScreen>;
 
 /** The same confirm at a wide step: empty width around one line. */
-export const ConfirmWide = () => <OnScreen>{inlineModals(Example.ConfirmWide())}</OnScreen>;
+export const ConfirmWide = () => <OnScreen>{openModals(Example.ConfirmWide())}</OnScreen>;
 
 /** One Modal that confirms inside itself, with a message and its own buttons. */
-export const ConfirmsInside = () => <OnScreen>{inlineModals(Example.ConfirmsInside())}</OnScreen>;
+export const ConfirmsInside = () => <OnScreen>{openModals(Example.ConfirmsInside())}</OnScreen>;
 
 /** A Modal opened on another Modal, a second Blanket dimming the first. */
-export const ModalOnModal = () => <OnScreen>{inlineModals(Example.ModalOnModal())}</OnScreen>;
+export const ModalOnModal = () => <OnScreen>{openModals(Example.ModalOnModal())}</OnScreen>;
 
 /** Past the cap the body scrolls while header and footer stay pinned. */
-export const FooterPinnedModal = () => <OnScreen>{inlineModals(Example.FooterPinned())}</OnScreen>;
+export const FooterPinnedModal = () => <OnScreen>{openModals(Example.FooterPinned())}</OnScreen>;
 
 /** The Save button sits inside the scrolling body instead of a pinned footer. */
-export const ButtonInBodyModal = () => <OnScreen>{inlineModals(Example.ButtonInBody())}</OnScreen>;
+export const ButtonInBodyModal = () => <OnScreen>{openModals(Example.ButtonInBody())}</OnScreen>;
 
 /** Sequential steps use ProgressTracker and Back / Next split across the footer. */
-export const StepsFooterModal = () => <OnScreen>{inlineModals(Example.StepsWithBackAndNext())}</OnScreen>;
+export const StepsFooterModal = () => <OnScreen>{openModals(Example.StepsWithBackAndNext())}</OnScreen>;
 
 /** Numbered tabs used as steps with one Save button and no Back. */
-export const TabsForStepsModal = () => <OnScreen>{inlineModals(Example.NumberedTabsAsSteps())}</OnScreen>;
+export const TabsForStepsModal = () => <OnScreen>{openModals(Example.NumberedTabsAsSteps())}</OnScreen>;

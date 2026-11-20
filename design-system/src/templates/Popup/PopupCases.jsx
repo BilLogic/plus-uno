@@ -3,7 +3,7 @@ import { OverlayContainer } from '@/lib/overlay';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { holdMenuOpen } from '@/storybook-docs/lib/hold-menu-open.jsx';
 import { holdPopupOpen } from '@/storybook-docs/lib/hold-popup-open.jsx';
-import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
+import { openModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { PopupStage } from './popupDemo.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './PopupExamples.jsx';
@@ -78,7 +78,7 @@ export const PopupBesidePopup = () => <Held>{open(Example.PopupBesidePopup())}</
 export const FieldsInModalCase = () => (
     <FitStage width={SCREEN_WIDTH} reflow={false}>
         <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN_WIDTH}px`, '--plus-overlay-screen-height': '300px' }}>
-            {inlineModals(Example.FieldsInModal())}
+            {openModals(Example.FieldsInModal())}
         </div>
     </FitStage>
 );

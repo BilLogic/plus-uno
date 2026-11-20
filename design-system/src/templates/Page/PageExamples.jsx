@@ -35,8 +35,8 @@ const StudentViews = () => (
     </Tabs>
 );
 
-const AddStudentAction = () => (
-    <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
+const AddSessionAction = () => (
+    <Button text="Add session" iconBefore="plus" appearance="primary" onClick={() => {}} />
 );
 
 const RecordTabs = ({ active, onSelect }) => (
@@ -129,15 +129,15 @@ export const ParagraphUnderTitle = () => (
 
 export const AddInTitleRow = () => (
     <Page header={<PageHeader title="Students" />}>
-        <Section title="Sessions" views={<StudentViews />} actions={<AddStudentAction />}>
+        <Section title="Sessions" views={<StudentViews />} actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>
 );
 
 export const AddTwice = () => (
-    <Page header={<PageHeader title="Students" actions={<AddStudentAction />} />}>
-        <Section title="Sessions" views={<StudentViews />} actions={<AddStudentAction />}>
+    <Page header={<PageHeader title="Students" actions={<AddSessionAction />} />}>
+        <Section title="Sessions" views={<StudentViews />} actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>

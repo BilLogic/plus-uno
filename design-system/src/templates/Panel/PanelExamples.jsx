@@ -45,14 +45,13 @@ const DEMO_STAGE_SECOND = { ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--inlin
 
 export const FloatsNoBlanket = () => {
     const [open, setOpen] = useState(true);
-    const [host, setHost] = useState(null);
     return (
-        <div ref={setHost} style={{ position: 'relative', blockSize: '100%' }}>
+        <>
             <SessionsBehind />
-            <PanelOverlay isOpen={open} onOpenChange={setOpen} placement="end" label="Session details" container={host}>
+            <PanelOverlay isOpen={open} onOpenChange={setOpen} placement="end" label="Session details">
                 <DetailsPanel onClose={() => setOpen(false)} />
             </PanelOverlay>
-        </div>
+        </>
     );
 };
 
@@ -70,37 +69,35 @@ export const DetailsInModal = () => {
 
 export const OneFloatingPanel = () => {
     const [row, setRow] = useState('Ben Okafor · Thu 5:00 PM');
-    const [host, setHost] = useState(null);
     return (
-        <div ref={setHost} style={{ position: 'relative', blockSize: '100%' }}>
+        <>
             <Section title="Upcoming sessions">
                 <Button text="Ana Ruiz · Thu 4:00 PM" onClick={() => setRow('Ana Ruiz · Thu 4:00 PM')} />
                 <Button text="Ben Okafor · Thu 5:00 PM" onClick={() => setRow('Ben Okafor · Thu 5:00 PM')} />
             </Section>
-            <PanelOverlay isOpen={row !== null} onOpenChange={(next) => next || setRow(null)} placement="end" label="Session details" container={host}>
+            <PanelOverlay isOpen={row !== null} onOpenChange={(next) => next || setRow(null)} placement="end" label="Session details">
                 <DetailsPanel title={row} onClose={() => setRow(null)} />
             </PanelOverlay>
-        </div>
+        </>
     );
 };
 
 export const TwoFloatingPanels = () => {
     const [detailsOpen, setDetailsOpen] = useState(true);
     const [inboxOpen, setInboxOpen] = useState(true);
-    const [host, setHost] = useState(null);
     return (
-        <div ref={setHost} style={{ position: 'relative', blockSize: '100%' }}>
+        <>
             <SessionsBehind />
-            <PanelOverlay isOpen={inboxOpen} onOpenChange={setInboxOpen} placement="start" label="Inbox" container={host}>
+            <PanelOverlay isOpen={inboxOpen} onOpenChange={setInboxOpen} placement="start" label="Inbox">
                 <PanelContainer>
                     <PanelHeader title="Inbox" actions={<PanelCloseAction onClick={() => setInboxOpen(false)} />} />
                     <PanelBody>Ana confirmed Thursday’s session.</PanelBody>
                 </PanelContainer>
             </PanelOverlay>
-            <PanelOverlay isOpen={detailsOpen} onOpenChange={setDetailsOpen} placement="end" label="Session details" container={host}>
+            <PanelOverlay isOpen={detailsOpen} onOpenChange={setDetailsOpen} placement="end" label="Session details">
                 <DetailsPanel onClose={() => setDetailsOpen(false)} />
             </PanelOverlay>
-        </div>
+        </>
     );
 };
 

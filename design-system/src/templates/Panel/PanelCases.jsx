@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { inlineModals } from '@/storybook-docs/lib/inline-modals.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
+import { PanelOverlay } from '@/templates';
 import * as Example from './PanelExamples.jsx';
 import examplesSource from './PanelExamples.jsx?raw';
 
@@ -55,8 +56,27 @@ const FloatStage = ({ children }) => (
     </CaseSurface>
 );
 
+/** Puts the stage's host on each PanelOverlay in a printed example: the host is where the overlay opens, so a picture keeps it inside its box. */
+const inHost = (node, host) => React.Children.map(node, (child) => {
+    if (!React.isValidElement(child)) return child;
+    if (child.type === PanelOverlay) return React.cloneElement(child, { container: host });
+    if (child.props?.children) return React.cloneElement(child, undefined, inHost(child.props.children, host));
+    return child;
+});
+
+/** A floating example in its stage: a positioned host the overlay opens in, over the page behind. */
+const Floating = ({ example }) => {
+    const [host, setHost] = useState(null);
+    const element = example();
+    return (
+        <FloatStage>
+            <div ref={setHost} style={{ position: 'relative', blockSize: '100%' }}>{inHost(element, host)}</div>
+        </FloatStage>
+    );
+};
+
 /** The Panel floats on its shadow and the page beside it stays undimmed. */
-export const FloatsNoBlanket = () => <FloatStage><Example.FloatsNoBlanket /></FloatStage>;
+export const FloatsNoBlanket = () => <Floating example={Example.FloatsNoBlanket} />;
 
 /** The same details in a Modal: a Blanket dims the whole page. */
 export const PanelOnBlanket = () => (
@@ -68,10 +88,10 @@ export const PanelOnBlanket = () => (
 );
 
 /** One Panel; another row swaps what it shows. */
-export const OneFloatingPanel = () => <FloatStage><Example.OneFloatingPanel /></FloatStage>;
+export const OneFloatingPanel = () => <Floating example={Example.OneFloatingPanel} />;
 
 /** Two Panels open at once, the second covering the first. */
-export const TwoFloatingPanels = () => <FloatStage><Example.TwoFloatingPanels /></FloatStage>;
+export const TwoFloatingPanels = () => <Floating example={Example.TwoFloatingPanels} />;
 
 /** The floating Panel sits beside the docked AI panel, both fully visible. */
 export const BesideAiPanel = () => <FloatStage><Example.BesideAiPanel /></FloatStage>;

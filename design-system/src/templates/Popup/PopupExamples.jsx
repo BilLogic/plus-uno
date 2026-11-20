@@ -56,25 +56,28 @@ export const PopupBesidePopup = () => (
 );
 
 export const FieldsInModal = () => {
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     return (
-        <Modal
-            show={open}
-            onClose={() => setOpen(false)}
-            title="Add session"
-            body={(
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
-                    <TextField label="Student" defaultValue="Ana Ruiz" />
-                    <TextField label="Topic" defaultValue="Two-step equations" />
-                </div>
-            )}
-            footer={(
-                <FooterActions>
-                    <Button text="Discard" onClick={() => setOpen(false)} />
-                    <Button text="Save" appearance="primary" onClick={() => setOpen(false)} />
-                </FooterActions>
-            )}
-        />
+        <>
+            <Button text="Add session" onClick={() => setOpen(true)} />
+            <Modal
+                show={open}
+                onClose={() => setOpen(false)}
+                title="Add session"
+                body={(
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
+                        <TextField label="Student" defaultValue="Ana Ruiz" />
+                        <TextField label="Topic" defaultValue="Two-step equations" />
+                    </div>
+                )}
+                footer={(
+                    <FooterActions>
+                        <Button text="Discard" onClick={() => setOpen(false)} />
+                        <Button text="Save" appearance="primary" onClick={() => setOpen(false)} />
+                    </FooterActions>
+                )}
+            />
+        </>
     );
 };
 
