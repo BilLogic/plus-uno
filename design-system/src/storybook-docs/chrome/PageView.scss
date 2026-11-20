@@ -1,0 +1,77 @@
+// The view control of a full-page preview. Semantic and spacing tokens only.
+.plus-page-view__bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-md);
+    padding-block-end: var(--pad-y-sm);
+}
+
+// The page keeps its real width and is scaled from the top left, so its
+// breakpoints never change. At 100% the well scrolls sideways inside itself.
+.plus-page-view__well {
+    min-inline-size: 0;
+    inline-size: 100%;
+    overflow-x: clip;
+}
+
+.plus-page-view__well[data-zoom='100'] {
+    overflow-x: auto;
+}
+
+.plus-page-view__page {
+    transform-origin: top left;
+}
+
+// Full screen: the same layer, fixed over the viewport. The page is at real
+// size and the well scrolls both ways.
+.plus-page-view--full {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-modal);
+    display: flex;
+    flex-direction: column;
+    background: var(--ds-surface);
+    color: var(--ds-text);
+
+    .plus-page-view__bar {
+        padding: var(--pad-y-sm) var(--pad-x-md);
+        background: var(--ds-surface-sunken);
+        border-bottom: var(--border-width-default) solid var(--ds-border);
+    }
+
+    .plus-page-view__well {
+        flex: 1 1 auto;
+        min-block-size: 0;
+        overflow: auto;
+    }
+
+    .plus-page-view__page {
+        min-inline-size: 100%;
+    }
+
+    // The browser window holds the same well: it fills what the bar leaves.
+    .plus-browser-frame,
+    .plus-browser-frame__page {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-block-size: 0;
+        border-radius: 0;
+    }
+}
+
+.plus-page-view__bar--full {
+    justify-content: flex-start;
+}
+
+.plus-page-view__title {
+    font: var(--body-sm);
+    color: var(--ds-text);
+}
+
+.plus-page-view__hint {
+    flex: 1 1 auto;
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}

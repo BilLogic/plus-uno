@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PageView, useInPageView } from '../chrome/PageView.jsx';
 import { STAGE_FLOOR, inTypeThumb, useStageLayout } from './use-fit-scale.js';
 
 /** True when rendered inside a TypeCard thumbnail, keeping the thumbnail stage unscrollable as on main. */
@@ -52,16 +53,21 @@ const Stage = ({ width, allowReflow, scaleOutside, children }) => {
 };
 
 /**
- * A live story at its own `width` inside a horizontally scrollable box: it
- * takes its container's width and scrolls sideways when wider, never scaling.
+ * A live story at its own `width` in a page view: it takes its container's
+ * width and, when wider, gets the view control (Fit by default, 50%, 75%, 100%
+ * scrolling inside its own well, Full screen).
  */
-export const ScrollStage = React.forwardRef(({ width, height, children, ...props }, ref) => (
-    <div ref={ref} style={{ overflowX: 'auto' }}>
+export const ScrollStage = React.forwardRef(({ width, height, children, ...props }, ref) => {
+    const nested = useInPageView();
+    const box = (
         <div style={{ inlineSize: width, blockSize: height }} {...props}>
             {children}
         </div>
-    </div>
-));
+    );
+    // Inside a browser frame the outer view scales the page; here the stage is its own view.
+    if (nested) return <div ref={ref}>{box}</div>;
+    return <PageView ref={ref} mode="auto">{box}</PageView>;
+});
 
 ScrollStage.displayName = 'ScrollStage';
 
@@ -83,9 +89,10 @@ ScrollStage.propTypes = {
  * a whole screen responds to the page and never shrinks to an unreadable
  * picture. A story's own canvas and the test runner keep the fixed stage.
  *
- * With `scrollable` set, the stage never scales and instead scrolls
- * horizontally inside its own box when wider than the docs column (unless
- * inside a `TypeCard` thumbnail, which keeps the unscrollable main stage).
+ * With `scrollable` set, the stage is a page view: when wider than the docs
+ * column it gets the view control (Fit by default; 100% scrolls inside its own
+ * well), unless inside a `TypeCard` thumbnail, which keeps the unscrollable
+ * main stage.
  *
  * @param {object} props
  * @param {number} props.width  the stage width the story lays out at
@@ -137,19 +144,19 @@ ReflowStage.propTypes = {
  * A screen box `width` wide, reflowed on a docs page: `ReflowStage` around one
  * plain box. A `fluid` screen fills its canvas outside the docs, as it did
  * before, and only takes the reflowed width on a docs page. With `scrollable`,
- * the stage never applies a scale transform and scrolls sideways below `STAGE_FLOOR`
+ * the stage is a page view, with the view control below `STAGE_FLOOR`
  * (except inside a `TypeCard` thumbnail, which keeps the unscrollable main stage).
  */
 export const ScreenStage = ({ width, fluid = false, scrollable = false, children }) => {
+    const nested = useInPageView();
     const [probeRef, inThumb] = useInTypeThumb(scrollable);
     if (scrollable && !inThumb) {
-        return (
-            <div ref={probeRef} style={{ overflowX: 'auto' }}>
-                <div style={{ inlineSize: fluid ? '100%' : width, minInlineSize: fluid ? Math.min(width, STAGE_FLOOR) : undefined }}>
-                    {children}
-                </div>
+        const screen = (
+            <div style={{ inlineSize: fluid ? '100%' : width, minInlineSize: fluid ? Math.min(width, STAGE_FLOOR) : undefined }}>
+                {children}
             </div>
         );
+        return nested ? <div ref={probeRef}>{screen}</div> : <PageView ref={probeRef} mode="auto">{screen}</PageView>;
     }
     return (
         <ReflowStage width={width}>
