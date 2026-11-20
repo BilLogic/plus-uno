@@ -243,6 +243,32 @@ export const FoldedLevels = {
         await waitFor(() => expect(body.getByRole('menuitem', { name: 'Lincoln Middle School' })).toBeVisible());
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(menu.isConnected).toBe(false));
+
+        // The same menu opens from the keyboard, with focus on the first hidden level.
+        fold.focus();
+        await userEvent.keyboard('{Enter}');
+        const first = await body.findByRole('menuitem', { name: 'Autumn 2026' });
+        await waitFor(() => expect(first).toHaveFocus());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(first.isConnected).toBe(false));
+        fold.focus();
+        await userEvent.keyboard('{ArrowDown}');
+        const again = await body.findByRole('menuitem', { name: 'Autumn 2026' });
+        await waitFor(() => expect(again).toHaveFocus());
+        await userEvent.keyboard('{Escape}');
+    },
+};
+
+/** Exactly five levels is the threshold: the two between the root and the last two fold. */
+export const FoldedAtFive = {
+    render: () => <Breadcrumb items={DEEP_TRAIL.slice(1)} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show hidden levels' }));
+        const items = await within(canvasElement.ownerDocument.body).findAllByRole('menuitem');
+        await expect(items.map((i) => i.textContent)).toEqual(['Lincoln Middle School', 'Grade 7 math']);
+        await userEvent.keyboard('{Escape}');
     },
 };
 

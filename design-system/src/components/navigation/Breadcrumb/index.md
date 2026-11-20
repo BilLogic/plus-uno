@@ -14,7 +14,7 @@ Also asked as: path, navigation trail.
 
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
-**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused, Overflow, FoldedLevels, NotFolded
+**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused, Overflow, FoldedLevels, FoldedAtFive, NotFolded
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 
