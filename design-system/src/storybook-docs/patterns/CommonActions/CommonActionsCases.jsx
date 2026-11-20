@@ -15,7 +15,7 @@ import examplesSource from './CommonActionsExamples.jsx?raw';
 export const CODE = showCode(examplesSource, ['OnePrimary', 'TwoPrimaries', 'PageButtonsLeft', 'PageButtonsFarRight', 'ModalFooterTracks', 'ModalFooterInset']);
 
 /** The stand-in screen a Modal example is drawn on. Docs geometry, px. */
-const SCREEN = { width: 1024, height: 300 }; // docs-literal
+const SCREEN = { width: 1024, height: 460 }; // docs-literal
 
 const OnSurface = ({ children }) => <CaseSurface>{children}</CaseSurface>;
 
@@ -42,5 +42,5 @@ export const PageButtonsFarRightCase = () => <OnSurface><Example.PageButtonsFarR
 /** Do: two buttons filling the Modal footer's four equal tracks. */
 export const ModalFooterTracksCase = () => <OnScreen><Example.ModalFooterTracks /></OnScreen>;
 
-/** Don't: small buttons inset at the end, with spare footer around them. */
+/** Don't: small buttons in a group, with spare footer around them instead of filling the tracks. */
 export const ModalFooterInsetCase = () => <OnScreen><Example.ModalFooterInset /></OnScreen>;

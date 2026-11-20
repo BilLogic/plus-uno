@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Fieldset, FooterActions, TextField } from '@/components';
+import { Button, ButtonGroup, Fieldset, FooterActions, TextField } from '@/components';
 import { Modal } from '@/templates';
 
 /**
@@ -71,6 +71,7 @@ export const ModalFooterTracks = () => (
         show
         width="4-col"
         title="Log a session"
+        onClose={() => {}}
         footer={(
             <FooterActions>
                 <Button text="Discard" />
@@ -88,20 +89,12 @@ export const ModalFooterInset = () => (
         show
         width="4-col"
         title="Log a session"
+        onClose={() => {}}
         footer={(
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: 'var(--inline-md)',
-                    paddingInline: 'var(--dialog-pad)',
-                    paddingBlock: 'var(--stack-md)',
-                    borderTop: 'var(--border-width-default) solid var(--ds-border)',
-                }}
-            >
-                <Button text="Discard" />
-                <Button text="Save session" appearance="primary" />
-            </div>
+            <ButtonGroup label="Actions">
+                <Button text="Discard" spacing="compact" />
+                <Button text="Save session" appearance="primary" spacing="compact" />
+            </ButtonGroup>
         )}
     >
         <TextField label="Student" defaultValue="Ana Ruiz" />

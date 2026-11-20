@@ -73,6 +73,7 @@ describe('CommonActions live cases and links', () => {
         const user = userEvent.setup();
         const { unmount } = render(<ModalFooterTracksCase />);
         expect(screen.getByRole('heading', { name: 'Log a session' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
         const fullBleedStudent = screen.getByRole('textbox', { name: 'Student' });
         await user.clear(fullBleedStudent);
         await user.type(fullBleedStudent, 'Ava Thompson');
