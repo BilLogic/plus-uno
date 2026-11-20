@@ -15,6 +15,7 @@ import { FormInModal } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import * as Demo from './modalDemo.jsx';
+import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
 
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
@@ -1251,3 +1252,24 @@ const blanketMotionPlay = (reduced = false) => async ({ canvas, canvasElement })
 };
 export const BlanketMotionOpenClose = { render: BlanketMotionOverlay, play: blanketMotionPlay() };
 export const BlanketMotionReduced = { ...BlanketMotionOpenClose, decorators: [withReducedMotion], play: blanketMotionPlay(true) };
+
+/** Wrap: a Modal title longer than the Modal takes more lines and never ends in an ellipsis; the close button keeps its place and the footer is unmoved. */
+export const Overflow = {
+    render: () => (
+        <Demo.ModalStage title={`Move ${LONG_TUTOR}'s session from ${LONG_TOPIC}`} width="4-col" screenHeight={SCREEN.height} footer={footerActions}>
+            {bodyCopy}
+        </Demo.ModalStage>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const [modal] = dialogs(canvas);
+        const heading = within(modal).getByRole('heading', { level: 1 });
+        const one = parseFloat(getComputedStyle(heading).lineHeight);
+        await expect(getComputedStyle(heading).textOverflow, 'a title never ends in an ellipsis').not.toBe('ellipsis');
+        await expect(heading.scrollWidth, 'the whole title is shown').toBeLessThanOrEqual(heading.clientWidth + 1);
+        await expect(heading.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expectInsideWell(heading, modal);
+        await expectInsideWell(within(modal).getByRole('button', { name: 'Close' }), modal);
+        await expectNoSilentClip(modal);
+    },
+};

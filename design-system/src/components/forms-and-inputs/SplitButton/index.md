@@ -6,7 +6,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Import:** `import { SplitButton } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx`
 

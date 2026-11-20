@@ -8,7 +8,7 @@ Also asked as: multi-line, multiline text, long text input, notes field, comment
 
 **Import:** `import { TextArea } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 
@@ -88,7 +88,7 @@ Don't: Disabled fades a value people need to read.
 
 ### Let a `TextArea` note longer than its rows wrap and scroll inside the field. {#let-a-textarea-note-longer-than-its-rows-wrap-and-scroll-inside-the-field}
 
-The field keeps its width, scrolls vertically past `rows` and can be resized from its corner. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The field keeps its width, scrolls vertically past `rows` and can be resized from its corner; it does not autosize. A field that grows to a maximum is the Prompt input. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

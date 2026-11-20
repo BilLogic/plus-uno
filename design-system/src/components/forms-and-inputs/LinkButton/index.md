@@ -6,7 +6,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Import:** `import { LinkButton } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.jsx`
 

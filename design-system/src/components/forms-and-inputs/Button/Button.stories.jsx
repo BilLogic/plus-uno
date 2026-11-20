@@ -8,7 +8,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 import { CountTag, FooterActions, Icon, SectionMessage } from '@/components';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../../_internal/overflowPlays';
 const icons = {
     'none': null,
     'plus': 'plus',

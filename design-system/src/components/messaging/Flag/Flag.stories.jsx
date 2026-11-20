@@ -12,6 +12,7 @@ import { Button } from '@/components';
 import { SoundProvider, useSound } from '@/sound';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { Screen, Section } from '@/storybook-docs/illustrations/primitives.jsx';
+import { LONG_TUTOR, LONG_TOPIC, LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Messaging/Flag',
@@ -733,3 +734,26 @@ export const MotionQueueStackReduced = {
     play: playQueueStack(true),
 };
 
+/** Wrap: a title and a message longer than the flag take more lines and never end in an ellipsis; the dismiss button keeps its place. */
+export const Overflow = () => (
+    <div style={{ width: '360px' /* demo frame */ }}>
+        <FlagGroup containerPosition="static">
+            <Flag title={`${LONG_TUTOR} moved ${LONG_TOPIC}`} timestamp="Just now" autohide={false}>
+                {LONG_SENTENCE}
+            </Flag>
+        </FlagGroup>
+    </div>
+);
+Overflow.play = async ({ canvasElement }) => {
+    const flag = canvasElement.querySelector('.plus-flag');
+    const title = within(flag).getByText(new RegExp(`^${LONG_TUTOR}`));
+    const message = within(flag).getByText(LONG_SENTENCE);
+    for (const text of [title, message]) {
+        const one = parseFloat(getComputedStyle(text).lineHeight);
+        await expect(text.scrollWidth, 'the whole text is shown').toBeLessThanOrEqual(text.clientWidth + 1);
+        await expect(text.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expectInsideWell(text, flag);
+    }
+    await expectInsideWell(within(flag).getByRole('button', { name: 'Dismiss flag' }), flag);
+    await expectNoSilentClip(flag);
+};

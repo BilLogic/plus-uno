@@ -8,7 +8,7 @@ Also asked as: tag list.
 
 **Import:** `import { TagGroup } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/labels/TagGroup/TagGroup.jsx`
 

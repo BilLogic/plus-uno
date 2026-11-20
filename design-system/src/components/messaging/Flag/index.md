@@ -8,11 +8,11 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Import:** `import { Flag } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes, MotionQueueStack, MotionQueueStackReduced
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, UndoTimer, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced, MotionOpenClose, MotionReduced, MotionExitCompletes, MotionQueueStack, MotionQueueStackReduced, Overflow
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -81,6 +81,10 @@ Success for a finished action; error only when something failed.
 
 Do: Success appearance for a saved session.
 Don't: Error appearance on good news.
+
+### Let a long title or message wrap. {#let-a-long-title-or-message-wrap}
+
+A flag takes more lines and never ends in an ellipsis. Keep it short anyway, because a flag leaves on its own. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep routine news on the default flag. {#keep-routine-news-on-the-default-flag}
 

@@ -1,11 +1,12 @@
 import React from 'react';
-import { expect, userEvent } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 const sampleItems = [
     { text: 'Home', href: '/' },
@@ -170,7 +171,7 @@ export const Pressed = {
     },
 };
 
-/** Focused: the 2px ring, 2px off an ancestor link. The current page is not focusable. */
+/** Focused: the 2px ring, 2px off an ancestor link. The current page is focusable only while its text is clipped. */
 export const Focused = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
@@ -178,5 +179,33 @@ export const Focused = {
         await expectFocusRing(canvasElement, ancestor, 'ancestor link');
         await userEvent.tab();
         await expect(current.contains(document.activeElement), 'the current page takes no focus').toBe(false);
+    },
+};
+
+/** Truncate: the trail stays on one line and a level longer than its room ends in an ellipsis; its full text opens in a Tooltip on hover and focus. Folding the middle of five or more levels into "..." is Planned. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '360px' /* demo frame */ }}>
+            <Breadcrumb items={[
+                { text: 'Home', href: '#' },
+                { text: LONG_SCHOOL, href: '#' },
+                { text: LONG_TOPIC },
+            ]} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const link = canvas.getByRole('link', { name: LONG_SCHOOL });
+        await expect(link.scrollWidth).toBeGreaterThan(link.clientWidth);
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.querySelector('.plus-breadcrumb-list'), canvasElement.firstElementChild);
+        const list = canvasElement.querySelector('.plus-breadcrumb-list');
+        await expect(Math.round(list.getBoundingClientRect().height), 'the trail never wraps').toBe(32);
+        await expect(canvas.getByRole('link', { name: 'Home' }).scrollWidth).toBeLessThanOrEqual(canvas.getByRole('link', { name: 'Home' }).clientWidth);
+        await expectFullTextReachable(canvasElement, link, LONG_SCHOOL);
+        const current = canvasElement.querySelector('[aria-current="page"]');
+        await expect(current.scrollWidth).toBeGreaterThan(current.clientWidth);
+        await expect(current, 'a clipped current page is a tab stop').toHaveAttribute('tabindex', '0');
+        await expectFullTextReachable(canvasElement, current, LONG_TOPIC);
     },
 };

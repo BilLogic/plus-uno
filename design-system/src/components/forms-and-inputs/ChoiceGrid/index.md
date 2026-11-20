@@ -8,7 +8,7 @@ Also asked as: matrix question.
 
 **Import:** `import { ChoiceGrid } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx`
 

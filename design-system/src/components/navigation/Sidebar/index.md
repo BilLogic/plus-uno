@@ -10,11 +10,11 @@ Also asked as: left nav, side nav, side navigation.
 
 **Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`)
 
-**Governed by:** Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+**Governed by:** Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
-**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, StudentBreadcrumb, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
+**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, Overflow, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, StudentBreadcrumb, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
 
 **Storybook page:** `design-system/src/components/navigation/Sidebar/Sidebar.mdx`
 

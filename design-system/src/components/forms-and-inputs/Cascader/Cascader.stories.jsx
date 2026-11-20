@@ -4,7 +4,7 @@ import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Cascader from './Cascader';
-import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Select/Cascader',

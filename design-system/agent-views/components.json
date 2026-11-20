@@ -872,7 +872,8 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "Overflow"
       ]
     },
     {
@@ -1034,7 +1035,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -1747,7 +1749,8 @@
         "ForcedColors",
         "LoadingCard",
         "Rows",
-        "PlacementBoundary"
+        "PlacementBoundary",
+        "Overflow"
       ],
       "tokens": [
         "--card-border-default",
@@ -4561,7 +4564,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -5176,7 +5180,8 @@
         "Pressed",
         "Focused",
         "DisabledRow",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ]
     },
     {
@@ -6405,7 +6410,8 @@
         "MotionReduced",
         "MotionExitCompletes",
         "MotionQueueStack",
-        "MotionQueueStackReduced"
+        "MotionQueueStackReduced",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -7736,7 +7742,9 @@
         "ButtonsDoNotMoveThePage",
         "WithAnotherEditView",
         "Placeholder",
-        "Interactive"
+        "Interactive",
+        "Overflow",
+        "OverflowEditing"
       ],
       "tokens": [
         "--body-default",
@@ -8918,7 +8926,8 @@
         "MotionOpenClose",
         "MotionReduced",
         "BlanketMotionOpenClose",
-        "BlanketMotionReduced"
+        "BlanketMotionReduced",
+        "Overflow"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -10723,7 +10732,8 @@
         "ComposingDoesNotSend",
         "Focused",
         "Disabled",
-        "Interactive"
+        "Interactive",
+        "Overflow"
       ],
       "tokens": [
         "--border-width-default",
@@ -12918,7 +12928,8 @@
         "Pressed",
         "Focused",
         "MotionEnterAndExit",
-        "MotionReduced"
+        "MotionReduced",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -13902,7 +13913,7 @@
         "TabsNone",
         "TabsFew",
         "TabsMany",
-        "TabsClipped",
+        "Overflow",
         "TabRest",
         "TabHover",
         "TabFocus",
@@ -14593,7 +14604,9 @@
         "Focused",
         "Disabled",
         "Invalid",
-        "Interactive"
+        "Interactive",
+        "Overflow",
+        "OverflowWrappedHeader"
       ]
     },
     {
@@ -14721,7 +14734,7 @@
         "WithCount",
         "TrailingMetricAppearance",
         "IconBefore",
-        "Truncation",
+        "Overflow",
         "NarrowContainer",
         "NeverAButton",
         "PinnedWeight",
@@ -15145,7 +15158,8 @@
         "Focused",
         "Selected",
         "SelectedPill",
-        "Disabled"
+        "Disabled",
+        "Overflow"
       ],
       "tokens": [
         "--body-default",
@@ -15168,6 +15182,7 @@
         "--ds-text-selected",
         "--ds-text-subtle",
         "--inline-lg",
+        "--label-max-width",
         "--pad-x-lg",
         "--pad-x-md",
         "--radius-control-md",
@@ -15517,7 +15532,7 @@
         "DisabledInField",
         "CountOnSelectable",
         "Saving",
-        "Truncation",
+        "Overflow",
         "OnImages",
         "ColoredMaterial",
         "ElevatedAvatarTypes",
@@ -17442,7 +17457,7 @@
         "PlacementBottom",
         "PlacementLeft",
         "PlacementRight",
-        "Wrapping",
+        "Overflow",
         "MotionOpenClose",
         "MotionReduced",
         "SayWhatControlDoes",

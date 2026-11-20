@@ -8,7 +8,7 @@ Also asked as: date and time, schedule.
 
 **Import:** `import { DateTimePicker } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx`
 

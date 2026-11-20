@@ -6,11 +6,11 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Import:** `import { InlineEdit } from '@/components';`
 
-**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive, Overflow, OverflowEditing
 
 **Storybook page:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx`
 
@@ -69,6 +69,10 @@ in `onConfirm`, or the next edit starts from the old value.
 
 Return the reason from `validate`, in the words a tutor would use. A refused
 value leaves the editor open, so the person can fix it without retyping.
+
+### Let a long read view end in an ellipsis with a Tooltip. {#let-a-long-read-view-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the text is clipped, and the read view keeps its height. The edit view follows the field it holds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Leave the editor open for long text. {#leave-the-editor-open-for-long-text}
 

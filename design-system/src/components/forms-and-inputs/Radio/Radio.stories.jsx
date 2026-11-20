@@ -8,7 +8,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import { Illustration } from '@/components';
 import Radio from './Radio';
-import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio',

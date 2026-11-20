@@ -8,9 +8,11 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Import:** `import { PromptInput } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/ai/PromptInput/PromptInput.jsx`
 
-**Stories:** `design-system/src/components/ai/PromptInput/PromptInput.stories.jsx` — Default, ButtonInside, ButtonStaysBottom, RingFollowsField, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
+**Stories:** `design-system/src/components/ai/PromptInput/PromptInput.stories.jsx` — Default, ButtonInside, ButtonStaysBottom, RingFollowsField, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/ai/PromptInput/PromptInput.mdx`
 
@@ -33,6 +35,10 @@ PromptInput reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | Send becomes Stop at once while the AI writes. |
 
 ## Best practices
+
+### Let a long prompt grow to five lines, then scroll. {#let-a-long-prompt-grow-to-five-lines-then-scroll}
+
+The field never grows past its maximum height and never scrolls sideways; the send button stays at the bottom. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep the field visible while generating. {#keep-the-field-visible-while-generating}
 

@@ -10,7 +10,7 @@ Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions
 
 **Used in:** Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
@@ -94,7 +94,7 @@ The Menu family has no submenu-trigger row. Flatten the choices or use sections.
 
 ### Let a `DropdownMenu` item longer than the menu end in an ellipsis with a Tooltip. {#let-a-dropdownmenu-item-longer-than-the-menu-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped, and the item keeps its row height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped, and the item keeps its row height; a `CustomItem` row follows the same rule. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

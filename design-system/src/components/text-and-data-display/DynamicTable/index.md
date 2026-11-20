@@ -10,11 +10,11 @@ Also asked as: data table, interactive table.
 
 **Used in:** Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx`
 
@@ -54,6 +54,10 @@ Don't: No key, so the formatted strings sort alphabetically instead.
 
 Do: A message that says what is missing and what happens next.
 Don't: No data, with no hint of why.
+
+### Page a long list, and truncate each cell. {#page-a-long-list-and-truncate-each-cell}
+
+The table shows one page and never grows with the list. A cell longer than its column ends in an ellipsis with a Tooltip while it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Page on the server when the list is long. {#page-on-the-server-when-the-list-is-long}
 

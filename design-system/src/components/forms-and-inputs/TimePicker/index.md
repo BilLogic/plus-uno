@@ -8,7 +8,7 @@ Also asked as: time input, clock, time field, time selector.
 
 **Import:** `import { TimePicker } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx`
 

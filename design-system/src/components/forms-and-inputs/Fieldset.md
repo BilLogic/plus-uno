@@ -8,7 +8,7 @@ Also asked as: field group.
 
 **Import:** `import { Fieldset } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Fieldset.jsx`
 

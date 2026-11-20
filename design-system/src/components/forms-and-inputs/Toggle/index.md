@@ -10,7 +10,7 @@ Also asked as: enable disable, on/off setting.
 
 **Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`)
 
-**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 

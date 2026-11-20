@@ -6,7 +6,7 @@ import FileItem, {
     FILE_ITEM_REMOVALS,
     FILE_ITEM_STATUSES,
 } from './FileItem';
-import { expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 const wrap = { maxWidth: '640px' /* demo frame */ };
 const narrowWrap = { maxWidth: '320px' /* demo frame */ };

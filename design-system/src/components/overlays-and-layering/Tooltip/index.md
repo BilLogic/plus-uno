@@ -10,11 +10,11 @@ Also asked as: hover hint, hover text.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); +1 more
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced, SayWhatControlDoes, KeepToOneLine, InteractiveContentInPopup
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Overflow, MotionOpenClose, MotionReduced, SayWhatControlDoes, KeepToOneLine, InteractiveContentInPopup
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
@@ -56,6 +56,10 @@ Tooltip reads these motion tokens and no literal duration or curve.
 // transient confirmation.
 <Tooltip text="Save this draft"><Button appearance="primary" text="Save" /></Tooltip>
 ```
+
+### Let a long tooltip wrap at its maximum width. {#let-a-long-tooltip-wrap-at-its-maximum-width}
+
+The text wraps and stays whole; a Tooltip never truncates. Keep it short. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Say what the control does. {#say-what-the-control-does}
 

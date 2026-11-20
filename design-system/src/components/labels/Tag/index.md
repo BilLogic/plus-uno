@@ -8,11 +8,11 @@ Also asked as: label, keyword.
 
 **Import:** `import { Tag } from '@/components';`
 
-**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, LeadingSwatchAndIcon, SwatchRefusesRawColor, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ColoredMaterial, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerTags, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, LeadingSwatchAndIcon, SwatchRefusesRawColor, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Overflow, OnImages, ColoredMaterial, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerTags, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/Tag/Tag.mdx`
 
@@ -127,6 +127,10 @@ and every tag inside follows:
 ```
 
 `useTagContext()` reads the same value from inside a custom tag.
+
+### Let a label longer than 180 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-180-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the label is clipped, and a clipped tag is the one tab stop that reaches it. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Let the group own the gaps. {#let-the-group-own-the-gaps}
 

@@ -6,7 +6,7 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Import:** `import { TagInput } from '@/components';`
 
-**Governed by:** Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx`
 

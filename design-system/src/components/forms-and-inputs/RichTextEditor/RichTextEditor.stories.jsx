@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import RichTextEditor from './RichTextEditor';
-import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Rich text editor',

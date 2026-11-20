@@ -10,7 +10,7 @@ Also asked as: page section, section header, block, region.
 
 **Used in:** Card (`ds guide card`); Frame (`ds guide frame`); Page (`ds guide page`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); +6 more
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); +8 more
 
 **Source:** `design-system/src/templates/Section/Section.jsx`
 

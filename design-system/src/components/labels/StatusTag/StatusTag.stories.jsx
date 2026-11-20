@@ -6,6 +6,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './StatusTag';
+import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
@@ -270,11 +271,11 @@ IconBefore.play = async ({ canvasElement }) => {
 };
 
 /**
- * Past `maxWidth` (200) the label ends in an ellipsis, and the full text is a
+ * Truncate: past `maxWidth` (200) the label ends in an ellipsis, and the full text is a
  * tooltip reachable by pointer and by keyboard. A Status that fits is not a tab
  * stop.
  */
-export const Truncation = () => (
+export const Overflow = () => (
     <div style={row}>
         <Button>Before</Button>
         <StatusTag appearance="info" data-testid="short">In progress</StatusTag>
@@ -283,8 +284,10 @@ export const Truncation = () => (
         </StatusTag>
     </div>
 );
-Truncation.play = async ({ canvasElement }) => {
+Overflow.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await expectNoSilentClip(canvasElement);
+    await expectInsideWell(canvas.getByTestId('long'), canvasElement.firstElementChild);
     const full = 'Waiting on the district data export before the next session';
     const long = canvas.getByTestId('long');
     const label = within(long).getByText(full);

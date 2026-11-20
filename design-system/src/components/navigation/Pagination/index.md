@@ -10,7 +10,7 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Used in:** Table (`ds guide table`)
 
-**Governed by:** Overflow (`ds guide overflow`)
+**Governed by:** Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
 

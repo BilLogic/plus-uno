@@ -77,6 +77,20 @@
     "componentName": null
   },
   {
+    "file": "design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx",
+    "title": "Patterns/States/Overflow",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/storybook-docs/patterns/Overflow/Overflow.mdx",
+    "title": "Patterns/States/Overflow",
+    "categoryRoot": "Patterns",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
     "file": "design-system/src/storybook-docs/patterns/PatternsOverview.mdx",
     "title": "Patterns/Overview",
     "categoryRoot": "Patterns",

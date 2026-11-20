@@ -8,11 +8,11 @@ Also asked as: callout, inline alert, warning box.
 
 **Import:** `import { SectionMessage } from '@/components';`
 
-**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
+**Governed by:** Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused, MotionEnterAndExit, MotionReduced
+**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused, MotionEnterAndExit, MotionReduced, Overflow
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 
@@ -73,6 +73,10 @@ A short body speaks for itself.
 
 Do: A short body, no title.
 Don't: A title that repeats the body.
+
+### Let a long title or message wrap. {#let-a-long-title-or-message-wrap}
+
+A section message takes more lines and never ends in an ellipsis. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Dismiss only what is optional. {#dismiss-only-what-is-optional}
 
