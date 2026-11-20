@@ -10,11 +10,11 @@ Also asked as: summary card, object card.
 
 **Used in:** Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/templates/Card/Card.jsx`
 
-**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
+**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary, Overflow
 
 **Storybook page:** `design-system/src/templates/Card/Card.mdx`
 
@@ -72,6 +72,10 @@ Visible empty space inside the card means a narrower minimum width. A clipped or
 
 Do: One number fits the 224 minimum; the card is only as wide as it needs, so a row of them stays tidy.
 Don't: The same number at 480 leaves most of the card empty; narrow it instead of filling the space.
+
+### Let a title longer than the card wrap. {#let-a-title-longer-than-the-card-wrap}
+
+A title takes more lines and never ends in an ellipsis; the actions stay at the end of the row. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Never put a card inside a card. {#never-put-a-card-inside-a-card}
 

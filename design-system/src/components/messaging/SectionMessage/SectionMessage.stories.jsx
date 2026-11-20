@@ -10,6 +10,7 @@ import { Button } from '@/components';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { LONG_TUTOR, LONG_TOPIC, LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 const ICON_TOKEN = {
     primary: '--ds-icon-brand',
@@ -566,4 +567,26 @@ export const MotionReduced = {
         fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
         await waitFor(() => expect(alert.isConnected).toBe(false));
     },
+};
+
+/** Wrap: a title and a message longer than the section message take more lines and never end in an ellipsis; the dismiss button keeps its place. */
+export const Overflow = () => (
+    <div style={{ width: '360px' /* demo frame */ }}>
+        <SectionMessage appearance="warning" title={`${LONG_TUTOR} moved ${LONG_TOPIC}`}>
+            {LONG_SENTENCE}
+        </SectionMessage>
+    </div>
+);
+Overflow.play = async ({ canvasElement }) => {
+    const alert = within(canvasElement).getByRole('alert');
+    const title = within(alert).getByText(new RegExp(`^${LONG_TUTOR}`));
+    const message = within(alert).getByText(LONG_SENTENCE);
+    for (const text of [title, message]) {
+        const one = parseFloat(getComputedStyle(text).lineHeight);
+        await expect(text.scrollWidth, 'the whole text is shown').toBeLessThanOrEqual(text.clientWidth + 1);
+        await expect(text.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expectInsideWell(text, alert);
+    }
+    await expectInsideWell(within(alert).getByRole('button', { name: /dismiss|close/i }), alert);
+    await expectNoSilentClip(alert);
 };

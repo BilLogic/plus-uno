@@ -4,7 +4,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Time picker',

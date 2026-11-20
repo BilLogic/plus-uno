@@ -5,6 +5,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { Avatar, AVATAR_SIZES } from '@/components';
 import AvatarGroup from './AvatarGroup';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 /**
  * `AvatarGroup`: a row of avatars that overlap, with the rest behind a `+n`.
@@ -210,5 +211,34 @@ export const Disabled = {
     play: async ({ canvasElement }) => {
         // Nothing to fold, so no `+n` control exists; the group is only pictures.
         await expect(within(canvasElement).queryByRole('button')).toBeNull();
+    },
+};
+
+/** Collapse: past `max` the rest fold into a `+n`, so the row never outgrows its well, and the hidden people stay reachable by name, a long name ending in an ellipsis with its full text in a Tooltip. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '200px' /* demo frame */, paddingBottom: '200px' /* demo frame: room for the menu */ }}>
+            <AvatarGroup label="Session attendees" max={4}>
+                {[...PEOPLE.slice(0, 4), LONG_TUTOR, ...PEOPLE.slice(4)].map((name) => <Avatar key={name} name={name} />)}
+            </AvatarGroup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const group = canvas.getByRole('group', { name: 'Session attendees' });
+        await expect(within(group).getAllByRole('img')).toHaveLength(3);
+        await expectInsideWell(group, canvasElement.firstElementChild);
+        const more = canvas.getByRole('button', { name: '+5, 5 more people' });
+        await userEvent.click(more);
+        const body = within(canvasElement.ownerDocument.body);
+        const long = await body.findByRole('menuitem', { name: LONG_TUTOR });
+        for (const name of ['Sam Ortiz', 'Priya Nair', 'Tom Hale', 'Wei Chen']) {
+            await waitFor(async () => expect(await body.findByText(name)).toBeVisible());
+        }
+        const menu = long.closest('[role="menu"]');
+        await waitFor(() => expect(long.querySelector('.plus-menu-item-label').scrollWidth).toBeGreaterThan(long.querySelector('.plus-menu-item-label').clientWidth));
+        await expectNoSilentClip(menu);
+        await expectFullTextReachable(canvasElement, long, LONG_TUTOR);
+        await userEvent.keyboard('{Escape}');
     },
 };

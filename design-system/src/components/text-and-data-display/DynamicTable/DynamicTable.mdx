@@ -111,6 +111,8 @@ A table people sort, page or act on. `DynamicTable` sits on the table shell, wit
 
 <ComponentExample of={DynamicTableStories.Widths} description={<>Under 720 the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content.</>} />
 
+<ComponentExample of={DynamicTableStories.Overflow} title="Overflow" description={<>A table pages instead of growing: the footer states the range under a pager. A cell too long for its column ends in an ellipsis with a Tooltip while it is clipped; a header set to <code>shouldTruncate: false</code> wraps.</>} />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -255,6 +257,10 @@ A date needs a key that sorts, such as `20261024`, and its readable text as `con
     dontExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No data" />}
     dontCaption="No data, with no hint of why."
 />
+
+### Page a long list, and truncate each cell.
+
+The table shows one page and never grows with the list. A cell longer than its column ends in an ellipsis with a Tooltip while it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Page on the server when the list is long.
 

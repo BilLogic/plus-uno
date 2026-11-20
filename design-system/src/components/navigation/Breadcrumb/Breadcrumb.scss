@@ -14,16 +14,33 @@
         display: flex;
         align-items: center;
         gap: var(--stack-md);
-        flex-wrap: wrap;
+        // One line, always: a level too long ends in an ellipsis (Patterns, States, Overflow).
+        flex-wrap: nowrap;
     }
 
     .plus-breadcrumb-item {
         display: flex;
         align-items: center;
+        min-width: 0;
+
+        // The root keeps its room; the levels after it give way first.
+        &:first-child {
+            flex: none;
+            max-width: 40%;
+        }
+
+        .plus-breadcrumb-text {
+            display: block;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
         // Separator Style
         & + .plus-breadcrumb-item {
             &::before {
+                flex: none;
                 padding-right: var(--stack-md);
                 color: var(--ds-text-subtlest);
                 content: var(--plus-breadcrumb-divider, '/');
@@ -46,6 +63,11 @@
         // Current page item
         &.plus-breadcrumb-current {
             color: var(--ds-text-subtlest);
+            // Block, so the text can end in an ellipsis; the divider stays in front.
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }

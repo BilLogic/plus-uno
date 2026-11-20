@@ -5,6 +5,7 @@ import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.j
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { StaticTable, HeadCell } from '@/components';
 import { iconClass } from '../../../lib/icon';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Text and data display/Static table',
@@ -378,4 +379,50 @@ export const Invalid = {
 /** The playground: the overview story's args, with every control live. */
 export const Interactive = {
     args: { ...Overview.args }
+};
+
+/** Truncate: a cell longer than its column keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped, and the table keeps its width. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '480px' /* demo frame */ }}>
+            <StaticTable
+                headers={[{ text: 'Student', width: '40%' }, { text: 'Note' }]}
+                rows={[
+                    [{ content: 'Maya Rodriguez', emphasis: 'title' }, { content: LONG_SENTENCE }],
+                    [{ content: 'Marcus Lee', emphasis: 'title' }, { content: 'Fractions' }],
+                ]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const note = canvas.getByText(LONG_SENTENCE);
+        await waitFor(() => expect(note.scrollWidth).toBeGreaterThan(note.clientWidth));
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.querySelector('.plus-table-wrapper'), canvasElement.firstElementChild);
+        const rows = canvas.getAllByRole('row').slice(1);
+        await expect(Math.round(rows[0].getBoundingClientRect().height), 'the clipped row keeps its height').toBe(Math.round(rows[1].getBoundingClientRect().height));
+        await expect(canvas.getByText('Fractions'), 'a cell that fits is not a tab stop').not.toHaveAttribute('tabindex');
+        await expectFullTextReachable(canvasElement, note, LONG_SENTENCE);
+    },
+};
+
+/** Wrap: a header that must be read whole takes more lines instead of ending in an ellipsis (`shouldTruncate={false}`), and the cells under it still truncate. */
+export const OverflowWrappedHeader = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <HeadRow>
+                <HeadCell label="Tutor reflection and supervisor feedback, as submitted after the session" width={'120px' /* demo frame */} shouldTruncate={false} />
+                <HeadCell label="Sessions" align="number" width={'120px' /* demo frame */} />
+            </HeadRow>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const head = within(canvasElement).getByRole('columnheader', { name: /Tutor reflection/ });
+        const label = head.querySelector('.plus-table-head-cell-label');
+        await expect(getComputedStyle(label).textOverflow).not.toBe('ellipsis');
+        await expect(label.scrollWidth, 'the whole header is shown').toBeLessThanOrEqual(label.clientWidth + 1);
+        await expect(label.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(24);
+        await expectNoSilentClip(canvasElement);
+    },
 };

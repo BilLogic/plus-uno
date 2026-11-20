@@ -8,7 +8,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
 import { CheckboxGroup as CheckboxGroupComponent, Illustration } from '@/components';
-import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 export default {
     title: 'Components/Forms and inputs/Checkbox/Checkbox',
     component: Checkbox,

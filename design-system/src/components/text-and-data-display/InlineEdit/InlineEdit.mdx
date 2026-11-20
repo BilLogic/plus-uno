@@ -55,6 +55,10 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description={<><code>spacing="compact"</code> draws both views 32 high.</>} />
 
+<ComponentExample of={InlineEditStories.Overflow} title="Overflow: read view" description="Truncate: the read view keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped." />
+
+<ComponentExample of={InlineEditStories.OverflowEditing} title="Overflow: edit view" description="The edit view is the Text field: one line, no Tooltip, and focus reaches the whole value." />
+
 The `compact` boolean is now `spacing="compact"` (`default` or `compact`). Callers that passed `compact` change to `spacing="compact"`; the `compact` prop is no longer read.
 
 <ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
@@ -231,6 +235,10 @@ in `onConfirm`, or the next edit starts from the old value.
 
 Return the reason from `validate`, in the words a tutor would use. A refused
 value leaves the editor open, so the person can fix it without retyping.
+
+### Let a long read view end in an ellipsis with a Tooltip.
+
+The Tooltip is on only while the text is clipped, and the read view keeps its height. The edit view follows the field it holds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Leave the editor open for long text.
 

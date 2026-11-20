@@ -10,11 +10,11 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Used in:** Card (`ds guide card`); Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/templates/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterLeadingAction, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyWithForm, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
+**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterLeadingAction, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyWithForm, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced, Overflow
 
 **Storybook page:** `design-system/src/templates/Modal/Modal.mdx`
 
@@ -70,6 +70,12 @@ A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps 
 
 Do: A confirm at the narrow step: the title, one line and two buttons.
 Don't: The same confirm at a wide step: empty width around one line, picked to make it look a certain way.
+
+### Let a title longer than the Modal wrap. {#let-a-title-longer-than-the-modal-wrap}
+
+**Checked:** Review
+
+A title takes more lines and never ends in an ellipsis; the close button keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Confirm inside the Modal, and never open a Modal on another Modal. {#confirm-inside-the-modal-and-never-open-a-modal-on-another-modal}
 

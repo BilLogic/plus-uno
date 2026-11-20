@@ -139,6 +139,8 @@
     text-decoration: none;
     // One line, always: a tab label never wraps into a two-line tab.
     white-space: nowrap;
+    // A label past the cap ends in an ellipsis (Patterns, States, Overflow).
+    max-width: min(100%, var(--label-max-width));
     cursor: pointer;
     transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
@@ -159,6 +161,13 @@
     &.pseudo-focus:not([data-disabled]) {
         @include plus-ring;
     }
+}
+
+.plus-tab-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 // Sizing

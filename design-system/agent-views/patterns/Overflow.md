@@ -19,9 +19,9 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 ## Key cases
 
-The two cases below are Planned : no component carries them yet.
+Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle.** Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. The Breadcrumb never wraps.
+- **The breadcrumb middle** is Planned . Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. Today each level truncates and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
@@ -32,16 +32,20 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 
 | Element | Answer | Full text |
 | --- | --- | --- |
-| Page title, Section title | Wrap | Always visible |
-| Field error, Section message, Flag, Banner | Wrap | Always visible |
-| Column header | Planned: wrap | Always visible |
+| Page title, Section title, Card title, Modal title | Wrap | Always visible |
+| Field error, Section message, Flag, Banner, Tooltip | Wrap | Always visible |
+| Column header | Wrap with `shouldTruncate` false; wrap by default is Planned | Always visible |
 | Table cell | Truncate at the end, one line | Tooltip on hover and focus when clipped |
 | Tag (180), Status tag (200) | Truncate at the end | Tooltip when clipped; the tag becomes focusable |
 | Tags in a group | Fold into +n | The +n menu lists the hidden tags |
 | A table | Page | The range and the pager in the footer |
-| Breadcrumb with five or more levels | Planned: fold the middle into "…" | The "…" opens a menu of the hidden levels |
-| Open item in the Sidebar | Planned: truncate at the end | Tooltip with the school |
-| Menu item and Popup row | Truncate at the end | Tooltip on hover and focus when clipped |
+| Tab label | Truncate at the end; folding extra tabs into More is Planned | Tooltip when clipped |
+| Breadcrumb level | Truncate at the end; with five or more levels, fold the middle into "…" | Tooltip when clipped; the "…" opens a menu of the hidden levels |
+| Open item in the Sidebar | Truncate at the end | Tooltip with the school |
+| People in an Avatar group | Fold into +n | The +n menu lists the hidden people by name |
+| Inline edit, read view | Truncate at the end, one line | Tooltip when clipped; the edit view follows the Text field |
+| Prompt input | Grow to five lines, then scroll inside | Always reachable by scrolling |
+| Menu item, custom row and Popup row | Truncate at the end | Tooltip on hover and focus when clipped |
 | Button label | Truncate at the end, no Tooltip | Shorten the label; the full label stays in the accessible name |
 | File name | Truncate mid-line, keeping the extension | Tooltip on hover and focus when clipped |
 | Id | Planned: truncate mid-line | Tooltip when clipped |
@@ -71,7 +75,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 | Do | Don't |
 | --- | --- |
 | "Show 4 more" and "Show less" (Planned). | "Load more", "See all", "…". |
-| Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). | The whole title in the Sidebar. |
+| Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip. | The whole title in the Sidebar. |
 | Breadcrumb levels by the page's own title: "Lincoln Middle School". | "Back", "Up one level". |
 | File name mid-line: "reflection_…_week12.pdf". | "reflection_maya_rodrig…". |
 

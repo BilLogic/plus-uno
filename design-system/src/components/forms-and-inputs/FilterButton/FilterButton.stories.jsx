@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import FilterButton, { FILTER_BUTTON_APPEARANCES } from './FilterButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 

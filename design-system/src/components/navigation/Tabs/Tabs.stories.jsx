@@ -90,8 +90,8 @@ Overview.parameters = {
  */
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const selected = canvas.getByText('Home');
-    const other = canvas.getByText('Profile');
+    const selected = canvas.getByRole('tab', { name: 'Home' });
+    const other = canvas.getByRole('tab', { name: 'Profile' });
     for (const tab of [selected, other]) tab.style.transition = 'none';
 
     await inEveryColorMode(async () => {

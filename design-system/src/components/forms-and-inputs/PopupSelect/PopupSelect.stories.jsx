@@ -5,7 +5,7 @@ import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FilterButton } from '../FilterButton/FilterButton';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import PopupSelect, { POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from './PopupSelect';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 const STATUSES = ['Upcoming', 'Completed', 'Canceled'];
 

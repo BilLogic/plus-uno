@@ -7,7 +7,7 @@ import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid
 import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import Select from './Select';
 import { Button } from '@/components';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable, expectReachableByFocus } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable, expectReachableByFocus } from '../../_internal/overflowPlays';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`

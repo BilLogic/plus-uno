@@ -14,7 +14,7 @@ Also asked as: lozenge, pill, state label.
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — ColoredMaterial, Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — ColoredMaterial, Styles, WithCount, TrailingMetricAppearance, IconBefore, Overflow, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 
@@ -62,6 +62,10 @@ A status is read at a glance; a sentence belongs in the row text.
 
 Do: On track.
 Don't: A sentence in the tag.
+
+### Let a label longer than 200 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-200-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the label is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Show one status per object. {#show-one-status-per-object}
 

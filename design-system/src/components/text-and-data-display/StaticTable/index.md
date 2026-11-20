@@ -12,7 +12,7 @@ Also asked as: basic table.
 
 **Source:** `design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/StaticTable/StaticTable.stories.jsx` — Overview, Striped, Bordered, Sizes, FramedAndLines, Cells, RowStates, Summary, Static, HeadCells, Rest, Hovered, Pressed, Focused, Disabled, Invalid, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/StaticTable/StaticTable.stories.jsx` — Overview, Striped, Bordered, Sizes, FramedAndLines, Cells, RowStates, Summary, Static, HeadCells, Rest, Hovered, Pressed, Focused, Disabled, Invalid, Interactive, Overflow, OverflowWrappedHeader
 
 **Storybook page:** `design-system/src/components/text-and-data-display/StaticTable/StaticTable.mdx`
 
@@ -36,6 +36,10 @@ Don't: Left-aligned numbers do not line up.
 
 Do: `titleColumn` marks the one column that names the row.
 Don't: Emphasis on every cell, so nothing stands out.
+
+### Let a cell longer than its column end in an ellipsis with a Tooltip. {#let-a-cell-longer-than-its-column-end-in-an-ellipsis-with-a-tooltip}
+
+The Tooltip is on only while the cell is clipped, and the row keeps its height. A header that must be read whole wraps with `shouldTruncate={false}`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep a cell to one line. {#keep-a-cell-to-one-line}
 

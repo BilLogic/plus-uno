@@ -78,6 +78,8 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 
 <ComponentExample of={DropdownMenuStories.Overflow} title="Truncate" description="An item longer than the menu keeps one line and ends in an ellipsis; its full text opens in a Tooltip on focus." />
 
+<ComponentExample of={MenuItemStories.Overflow} title="Truncate: custom row" description="A custom row follows the same rule as a button or link row: one line, an ellipsis, and a Tooltip while it is clipped. A row that is not a control takes a tab stop only while it is clipped." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -246,7 +248,7 @@ The Menu family has no submenu-trigger row. Flatten the choices or use sections.
 
 ### Let a `DropdownMenu` item longer than the menu end in an ellipsis with a Tooltip.
 
-The Tooltip is on only while the label is clipped, and the item keeps its row height. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped, and the item keeps its row height; a `CustomItem` row follows the same rule. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

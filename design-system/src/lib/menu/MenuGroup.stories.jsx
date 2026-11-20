@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/lib/menu';
 import { Checkbox } from '@/components';
 import { iconClass } from '../icon';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '@/components/_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Menu items',
@@ -203,5 +204,29 @@ export const Disabled = {
         await userEvent.keyboard('{ArrowDown}');
         await expect(itemOf(canvasElement, 'link'), 'disabled button and link rows are skipped').toHaveFocus();
         await expect(itemOf(canvasElement, 'disabled-link')).toHaveAttribute('aria-disabled', 'true');
+    },
+};
+
+/** Truncate: a custom row longer than its menu keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '240px' /* demo frame */ }}>
+            <MenuGroup>
+                <CustomItem>{LONG_SCHOOL}</CustomItem>
+                <CustomItem>Lincoln Middle</CustomItem>
+            </MenuGroup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const long = canvas.getByRole('menuitem', { name: LONG_SCHOOL });
+        const short = canvas.getByRole('menuitem', { name: 'Lincoln Middle' });
+        const label = long.querySelector('.plus-menu-item-label');
+        await waitFor(() => expect(label.scrollWidth).toBeGreaterThan(label.clientWidth));
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(canvasElement.querySelector('.plus-menu-group'), canvasElement.firstElementChild);
+        await expect(Math.round(long.getBoundingClientRect().height)).toBe(Math.round(short.getBoundingClientRect().height));
+        await expect(short, 'a row that fits takes no tab stop').not.toHaveAttribute('tabindex');
+        await expectFullTextReachable(canvasElement, long, LONG_SCHOOL);
     },
 };

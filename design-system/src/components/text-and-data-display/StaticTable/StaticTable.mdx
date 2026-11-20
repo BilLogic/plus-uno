@@ -97,6 +97,10 @@ A fixed grid people read. Cells accept any node, so a row can carry Status tags,
 
 <ComponentExample of={StaticTableStories.HeadCells} description={<>The head cell holds a label and an optional type icon. It aligns as text, number or icon, and a label too long for its width ends in an ellipsis.</>} />
 
+<ComponentExample of={StaticTableStories.Overflow} title="Overflow: cells truncate" description="A cell longer than its column keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped." />
+
+<ComponentExample of={StaticTableStories.OverflowWrappedHeader} title="Overflow: header wraps" description={<>A header read whole sets <code>shouldTruncate</code> to false and takes more lines. Wrapping every header by default is Planned.</>} />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -240,6 +244,10 @@ card.
     dontExample={<StaticTable headers={rosterHeaders} rows={[[{ content: 'Jul 3', emphasis: 'title' }, { content: 'Priya Nair', emphasis: 'title' }, { content: '$32.00', align: 'number', emphasis: 'title' }]]} />}
     dontCaption="Emphasis on every cell, so nothing stands out."
 />
+
+### Let a cell longer than its column end in an ellipsis with a Tooltip.
+
+The Tooltip is on only while the cell is clipped, and the row keeps its height. A header that must be read whole wraps with `shouldTruncate={false}`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep a cell to one line.
 

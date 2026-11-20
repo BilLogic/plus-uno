@@ -72,6 +72,8 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={CardStories.ImageRatioGrid} title="Height follows the width" description="Each ratio at three card widths: the image height is the width times the ratio, rounded to a multiple of 4."  />
 
+<ComponentExample of={CardStories.Overflow} title="Overflow" description="Wrap: a title longer than the card takes more lines and never ends in an ellipsis; the actions keep their place at the end of the row." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -293,6 +295,10 @@ Visible empty space inside the card means a narrower minimum width. A clipped or
     dontExample={<MetricAtMin480 />}
     dontCaption="The same number at 480 leaves most of the card empty; narrow it instead of filling the space."
 />
+
+### Let a title longer than the card wrap.
+
+A title takes more lines and never ends in an ellipsis; the actions stay at the end of the row. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Never put a card inside a card.
 
