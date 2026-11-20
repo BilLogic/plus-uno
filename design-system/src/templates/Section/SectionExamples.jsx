@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, StatusTag, Tabs, TextField } from '@/components';
+import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, Sidebar, StatusTag, Tabs, TextField } from '@/components';
 import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section } from '@/templates';
 
 /**
@@ -545,6 +545,8 @@ export const ListType = () => {
     );
 };
 
+const accountRow = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
+
 export const queueStudents = roster.slice(0, 4);
 
 export const ReflectionQueue = () => {
@@ -585,7 +587,7 @@ export const ReflectionQueue = () => {
         </PanelContainer>
     );
     return (
-        <Frame panel={panel} panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
+        <Frame sidebar={<Sidebar user="tutor" activeTabId="home" account={accountRow} />} panel={panel} panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
             <Section
                 title="Reflections to review"
                 views={(
