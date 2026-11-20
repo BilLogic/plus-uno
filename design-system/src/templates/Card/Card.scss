@@ -49,6 +49,18 @@
     cursor: pointer;
 }
 
+// Keyboard focus draws the one focus ring, outside the card edge. Only
+// :focus-visible, so a pointer click leaves the card as it was.
+.plus-template-card--clickable:focus-visible {
+    @include plus-ring;
+}
+
+@media (forced-colors: active) {
+    .plus-template-card--clickable:focus-visible {
+        @include plus-ring(var(--focus-ring-width), Highlight);
+    }
+}
+
 // A clickable sunken or default card lifts to Raised on hover in place;
 // pressed settles to the raised shadow.
 @include plus-state(

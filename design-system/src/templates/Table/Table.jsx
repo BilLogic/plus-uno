@@ -102,6 +102,29 @@ Table.propTypes = {
     actions: PropTypes.node,
     /** Inline styles on the Section; passed to the Section */
     style: PropTypes.object,
+    /** The views row of the Section header, usually Tabs in the pill appearance; passed to the Section
+     * @ds-context Used in: Table.views (ds guide table)
+     */
+    views: PropTypes.node,
+    /** The Search field in the Section header, at compact spacing; passed to the Section
+     * @ds-context Used in: Table.search (ds guide table)
+     * @ds-context Governed by: Search (ds guide search)
+     */
+    search: PropTypes.node,
+    /** The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does */
+    filters: PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.string,
+        label: PropTypes.string,
+        text: PropTypes.string.isRequired,
+        isSelected: PropTypes.bool,
+        onClick: PropTypes.func,
+        menu: PropTypes.func,
+    })),
+    /** How many rows match, such as "3 of 12", once a filter is applied; passed to the Section
+     * @ds-context Used in: Table.count (ds guide table)
+     * @ds-context Governed by: Filtering (ds guide filtering)
+     */
+    count: PropTypes.node,
 };
 
 export default Table;
