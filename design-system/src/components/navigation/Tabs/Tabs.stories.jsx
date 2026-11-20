@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
@@ -455,4 +455,49 @@ export const Overflow = {
         await userEvent.unhover(short);
         await expectFullTextReachable(canvasElement, long, LONG_TOPIC);
     },
+};
+
+const TOPICS = ['Overview', 'Sessions', 'Progress', 'Reflections', 'Feedback', 'Schedule', 'Students', 'Resources'];
+
+export const OverflowMore = {
+    render: () => (
+        <div style={{ width: '440px' /* demo frame */ }}>
+            <Tabs overflow="collapse" defaultActiveKey="Overview">
+                {TOPICS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
+                {TOPICS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} view</Tabs.Panel>)}
+            </Tabs>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        const more = await canvas.findByRole('tab', { name: /^More/ });
+        const visible = canvas.getAllByRole('tab').filter((tab) => tab !== more);
+        const hiddenCount = TOPICS.length - visible.length;
+        await expect(hiddenCount, 'some tabs fold into More').toBeGreaterThan(0);
+        await expect(more.getAttribute('aria-label')).toBe(`More, ${hiddenCount} more ${hiddenCount === 1 ? 'tab' : 'tabs'}`);
+        await expect(more.textContent).toContain(String(hiddenCount));
+        // Nothing wraps: every tab and More share one row, and the row stays in its well.
+        const tops = [...visible, more].map((tab) => Math.round(tab.getBoundingClientRect().top));
+        await expect(new Set(tops).size, 'tabs wrapped onto a second row').toBe(1);
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(more, canvasElement.firstElementChild);
+        // Every hidden tab is reachable by name in the menu.
+        await userEvent.click(more);
+        const rows = await body.findAllByRole('menuitemradio');
+        await expect(rows.map((row) => row.textContent)).toEqual(TOPICS.slice(visible.length));
+        // Choosing one selects it and More holds the selection.
+        await userEvent.click(rows[rows.length - 1]);
+        await waitFor(() => expect(more.getAttribute('aria-selected')).toBe('true'));
+        await expect(canvas.getByText(`${TOPICS[TOPICS.length - 1]} view`)).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: TOPICS[0] }));
+        await waitFor(() => expect(more.getAttribute('aria-selected')).toBe('false'));
+    },
+};
+OverflowMore.parameters = {
+    docs: {
+        description: {
+            story: 'With `overflow="collapse"` the strip keeps one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
+        }
+    }
 };

@@ -15097,6 +15097,18 @@
           "deprecated": null
         },
         {
+          "name": "overflow",
+          "type": "enum",
+          "required": false,
+          "default": "'wrap'",
+          "values": [
+            "wrap",
+            "collapse"
+          ],
+          "description": "`wrap` (default) lets tabs that do not fit flow onto more rows; `collapse` keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -15159,7 +15171,8 @@
         "Selected",
         "SelectedPill",
         "Disabled",
-        "Overflow"
+        "Overflow",
+        "OverflowMore"
       ],
       "tokens": [
         "--body-default",

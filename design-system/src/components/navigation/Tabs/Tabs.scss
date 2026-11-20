@@ -80,6 +80,37 @@
     }
 }
 
+// A collapsing strip takes the row's width, so the count that fits follows the
+// container; its tabs stay on one line and the rest fold into More.
+.plus-tabs--collapse {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+
+    .plus-tabs-list {
+        flex-wrap: nowrap;
+        width: fit-content;
+        max-width: 100%;
+    }
+
+    .plus-tab {
+        flex: 0 0 auto;
+    }
+}
+
+// Hidden copies of the whole row, read for widths only.
+.plus-tabs-ghosts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: max-content;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 // Justified tabs share the full row: the root takes the row's width rather
 // than shrinking to its tabs, so the list's 100% is the row.
 .plus-tabs--justified {

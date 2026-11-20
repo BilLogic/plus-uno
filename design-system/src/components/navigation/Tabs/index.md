@@ -14,7 +14,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled, Overflow
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled, Overflow, OverflowMore
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
@@ -105,7 +105,7 @@ Don't: Counts and status in the label.
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip. {#let-a-tab-label-longer-than-its-cap-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped. More tabs than fit a row wrap; folding the extras into More is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. With `overflow="collapse"` the tabs that do not fit fold into a More tab that opens a menu of them; by default they wrap onto more rows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
@@ -188,6 +188,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | `alignment` | enum | `'left'` | Horizontal alignment of the tab strip |
 | `appearance` | enum | `'default'` | Underline indicator (default), or a pill-shaped selected fill. |
 | `spacing` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
+| `overflow` | enum | `'wrap'` | `wrap` (default) lets tabs that do not fit flow onto more rows; `collapse` keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name. |
 | `className` | string | `''` | Extra class on the tabs root, beside `plus-tabs`. |
 | `id` | string | — | Id set on the tabs root. |
 | `defaultActiveKey` | string or number | — | The `eventKey` of the tab selected at first, for uncontrolled use. |
@@ -201,6 +202,8 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 **`appearance`** — `default` · `pill`
 
 **`spacing`** — `default` · `compact`
+
+**`overflow`** — `wrap` · `collapse`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
