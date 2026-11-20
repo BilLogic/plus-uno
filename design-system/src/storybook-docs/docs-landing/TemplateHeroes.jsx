@@ -31,7 +31,7 @@ import { TURN, turnTransform } from '../lib/iso-turn.js';
  * These stay kit illustrations, not live examples with Show code: each is an
  * abstract exploded figure with no readable text, which a live Section cannot draw.
  *
- * Alignment, from `src/templates/Section/Section.mdx`: a view bar's controls
+ * Alignment, from `src/templates/Section/Section.mdx`: a Section header's controls
  * share the content's left and right edges, so a Section's heading starts at
  * the rows' left edge and its last control ends at the content's right edge. A
  * Popup opens bottom-end: its end edge meets its trigger's end edge and it sits
@@ -198,19 +198,19 @@ export const SectionHero = () => {
     return (
         <HeroDrawing>
             <PageFill {...s} ring />
-            {/* The header: heading at the content's left edge. */}
-            <SkeletonBar x={left} y={s.y + 12} w={44} h={5} accent heading />
-            <SkeletonBar x={left + 52} y={s.y + 13} w={40} />
+            {/* The title row: the heading at the content's left edge, its description under it. */}
+            <SkeletonBar x={left} y={s.y + 10} w={44} h={5} accent heading />
+            <SkeletonBar x={left} y={s.y + 19} w={60} />
+            {/* The actions end the title row at the content's right edge: More, then the labeled Primary last. */}
+            <Rect x={right - 40 - 4 - 10} y={s.y + 8} w={10} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={right - 40} y={s.y + 8} w={40} h={8} fill={PAINT.buttonPrimary} corner="button" />
             {/* Row 2: the views as pills at the start. */}
-            <Rect x={left} y={s.y + 24} w={30} h={8} fill={PAINT.tabSelected} corner="button" />
-            <Rect x={left + 34} y={s.y + 24} w={26} h={8} fill={PAINT.buttonDefault} corner="button" />
-            {/* The actions end the title row, at the content's right edge. */}
-            <Rect x={right - 10 - 4 - 40} y={s.y + 10} w={40} h={8} fill={PAINT.buttonDefault} corner="button" />
-            <Rect x={right - 10} y={s.y + 10} w={10} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={left} y={s.y + 28} w={30} h={8} fill={PAINT.tabSelected} corner="button" />
+            <Rect x={left + 34} y={s.y + 28} w={26} h={8} fill={PAINT.buttonDefault} corner="button" />
             {/* Row 3: Search, then the Field: value triggers. */}
-            <Rect x={left} y={s.y + 38} w={44} h={8} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="button" />
-            <Rect x={left + 48} y={s.y + 38} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
-            <Rect x={left + 86} y={s.y + 38} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={left} y={s.y + 40} w={44} h={8} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="button" />
+            <Rect x={left + 48} y={s.y + 40} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={left + 86} y={s.y + 40} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
             {/* The body, and the side beside it. */}
             <Rows x={left} w={side.x - 14 - left} y={s.y + 58} n={5} pitch={14} />
             <CardBox {...side} />

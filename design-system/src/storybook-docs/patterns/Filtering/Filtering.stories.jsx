@@ -13,7 +13,7 @@ import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
 
 /**
  * Filtering: the pattern page's examples, run in the Storybook tests. Each
- * composes the real Section, its view bar and the real menus (FilterButton,
+ * composes the real Section, its header rows and the real menus (FilterButton,
  * Popup select, FilterMenu), and each asserts the ruling it shows: one tier
  * per bar at the bar's end, what is on shown on the control that holds it,
  * Clear in a menu and "Reset filters" everywhere else.

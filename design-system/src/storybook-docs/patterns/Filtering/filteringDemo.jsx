@@ -11,7 +11,7 @@ import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-he
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
- * The Filtering pattern's examples: a real Section with its view bar, the
+ * The Filtering pattern's examples: a real Section with its header rows, the
  * filters at the bar's end in one tier, and the real menus. A held-open menu
  * mounts inside its picture (`container`), so it scales and clips with it.
  *

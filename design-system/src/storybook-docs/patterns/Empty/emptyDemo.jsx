@@ -261,7 +261,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
             <Section
                 title="Students"
                 description="Lincoln Middle"
-                actions={<Button text="Add students" appearance="primary" spacing="compact" onClick={() => setResolved(true)} />}
+                actions={<Button text="Add students" appearance="primary" onClick={() => setResolved(true)} />}
                 views={<ViewPills views={['All students']} />}
             >
                 <StudentsTable

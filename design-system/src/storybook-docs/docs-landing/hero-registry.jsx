@@ -273,7 +273,7 @@ export const HEROES = {
   'patterns-filtering': {
     Hero: FilteringHero,
     description:
-      'A view bar with two filter buttons; Grade has picks and is open, its menu below it with two options checked.',
+      'A Section header with Search, then two filter buttons under the title; Grade has picks and is open, its menu below it with two options checked.',
   },
   'patterns-navigation': {
     Hero: NavigationHero,
@@ -343,7 +343,7 @@ export const HEROES = {
   'templates-section': {
     Hero: SectionHero,
     description:
-      'Header, view bar, body and side, ringed.',
+      'The header rows, body and side, ringed.',
   },
   'templates-card': {
     Hero: CardHero,

@@ -67,7 +67,7 @@ authored half, counted rather than assumed.
   - For a standalone attachment row without a picker, use `FileItem`.
   - For text the user types rather than a file they hold, use `TextField` or `TextArea`.
   - For a message composer that mixes typed text with inline attachments, use `PromptInput`.
-- **[FilterButton](FilterButton/index.md)** — Use `FilterButton` for a control in a view bar that opens a filter's options or toggles a filter on and off.
+- **[FilterButton](FilterButton/index.md)** — Use `FilterButton` for a filter trigger in a Section header that opens a filter's options or toggles a filter on and off.
   - For a single-list filter menu that applies on pick, use `PopupSelect`.
   - For several filter categories staged and applied together from one trigger, use `FilterMenu`.
   - For showing a chosen filter value that can be removed directly, use `Tag`.
@@ -119,7 +119,7 @@ authored half, counted rather than assumed.
   - For a threaded discussion entry with an author and timestamp, use `Comment`.
 - **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
   - For picking a value from a known option list, use `Select`.
-  - For narrowing a list by a category in a view bar, use `FilterButton`, `PopupSelect` or `FilterMenu`.
+  - For narrowing a list by a category in a Section header, use `FilterButton`, `PopupSelect` or `FilterMenu`.
   - For general single-line text entry in a form, use `TextField`.
 - **[SegmentedControl](SegmentedControl/index.md)** — Use `SegmentedControl` to change how the same content is shown: Table or Cards, Day, Week or Month, Form or Code. The choice applies at once and there is no apply step. Exactly one segment is selected.
   - For switching between sections of a page, each with its own content, use `Tabs`.

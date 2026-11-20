@@ -22,7 +22,7 @@ export const POPUP_SELECT_SPACINGS = ['default', 'compact'];
  * - **Two triggers.** With `label` and no `trigger`, the labeled trigger
  *   reads "Status: Upcoming" with a chevron, as the view switch under page
  *   tabs. Pass `trigger` for anything else, such as a filter button in a
- *   section's view bar; a function gets `{ isOpen, option }`.
+ *   Section header; a function gets `{ isOpen, option }`.
  * - **Placement follows the trigger's side.** A trigger at the start of a bar
  *   opens `bottom-start` (the default); one at the end opens `bottom-end`.
  * - **Width** is Popup's `auto`: at least the trigger, 160 to 320.

@@ -189,10 +189,10 @@ const FilteredMembersTable = () => {
                         spacing="compact"
                         icon="magnifying-glass"
                         header="No members match this filter"
-                        description="Nothing matches Role: Admin. Clear the filter to see every member."
+                        description="Nothing matches Role: Admin. Reset filters to see every member."
                         primaryAction={(
                             <Button
-                                text="Clear filter"
+                                text="Reset filters"
                                 appearance="default"
                                 spacing="compact"
                                 onClick={() => setFiltered(false)}
@@ -221,7 +221,7 @@ export const EmptyHiddenByFilter = {
         await expect(getComputedStyle(box).backgroundColor, 'empty box uses sunken surface')
             .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(canvas.getByRole('button', { name: 'Role: Admin' }), 'filter stays above').toBeVisible();
-        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        const clear = within(box).getByRole('button', { name: 'Reset filters' });
         await expect(clear.className, 'clear button is default').not.toContain('primary');
         await userEvent.click(clear);
         await expect(canvas.getByRole('table'), 'clearing the filter shows rows').toBeVisible();

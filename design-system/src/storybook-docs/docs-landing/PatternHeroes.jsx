@@ -27,7 +27,7 @@ import { Glyph } from './glyphs.jsx';
  * kit units (1 = 2px) from the stage's corner; a drawing bleeds past the stage
  * where the picture is a crop.
  *
- * A view bar's controls align to the content edges of the screen they sit in:
+ * A Section header's controls align to the content edges of the screen they sit in:
  * the heading starts at the content's left edge and the last control ends at
  * its right edge, the same edges the rows run between. `VIEW` holds those edges
  * for the screens below, so a bar never floats off its content.
@@ -50,7 +50,7 @@ const Rows = ({ x = VIEW.x0, w = VIEW.x1 - VIEW.x0, y, n, pitch = 14 }) => (
 );
 
 /**
- * Real moments, sized by scope: Filtering big and ringed (a view bar with its
+ * Real moments, sized by scope: Filtering big and ringed (a Section header with its
  * filter buttons over rows), a Flag wide, a Spinner and a bell with its count
  * countTag small. The bento runs the frame's width, past the stage.
  */
@@ -158,25 +158,29 @@ const FilterButton = ({ x, y, w, h = 20, label, count = false }) => (
 );
 
 /**
- * A view bar with two real FilterButtons at its end. Grade has picks and is
- * open: its menu hangs bottom-start, 4 under it, two options checked, ringed.
+ * A Section header with Search, then two real FilterButtons, in the row under
+ * its title. Grade has picks and is open: its menu hangs bottom-start, 4 under
+ * it, two options checked, ringed.
  */
 export const FilteringHero = () => {
-    const bar = { y: 18, h: 20 };
-    const status = { x: 214, w: 62 };
-    const grade = { x: status.x - 6 - 84, w: 84 };
+    const bar = { y: 32, h: 20 };
+    const search = { x: VIEW.x0, w: 72 };
+    const grade = { x: search.x + search.w + 6, w: 84 };
+    const status = { x: grade.x + grade.w + 6, w: 62 };
     const menu = { x: grade.x, y: bar.y + bar.h + 4, w: 120, h: 112 };
     return (
         <HeroDrawing>
             <PageSheet x={-40} y={0} w={380} h={190} />
-            <SkeletonBar x={VIEW.x0} y={bar.y + 7} w={70} h={6} heading />
+            <SkeletonBar x={VIEW.x0} y={12} w={70} h={6} heading />
             {[0, 1, 2, 3, 4, 5].map((i) => (
                 <React.Fragment key={i}>
-                    <Rule x1={VIEW.x0} x2={VIEW.x1} y1={52 + i * 22} y2={52 + i * 22} stroke={PAINT.rowDivider} />
-                    <SkeletonBar x={VIEW.x0} y={61 + i * 22} w={60} />
-                    <SkeletonBar x={VIEW.x0 + 80} y={61 + i * 22} w={30} />
+                    <Rule x1={VIEW.x0} x2={VIEW.x1} y1={66 + i * 22} y2={66 + i * 22} stroke={PAINT.rowDivider} />
+                    <SkeletonBar x={VIEW.x0} y={75 + i * 22} w={60} />
+                    <SkeletonBar x={VIEW.x0 + 80} y={75 + i * 22} w={30} />
                 </React.Fragment>
             ))}
+            <Rect x={search.x} y={bar.y} w={search.w} h={bar.h} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="field" />
+            <SkeletonBar x={search.x + 10} y={bar.y + bar.h / 2 - 2} w={36} />
             <FilterButton x={grade.x} y={bar.y} w={grade.w} label={30} count />
             <FilterButton x={status.x} y={bar.y} w={status.w} label={26} />
             {/* The menu's rows replace the kit Popup's placeholder lines. */}

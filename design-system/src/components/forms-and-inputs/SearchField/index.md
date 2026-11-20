@@ -44,7 +44,7 @@ SearchField reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For picking a value from a known option list, use `Select`.
-- For narrowing a list by a category in a view bar, use `FilterButton`, `PopupSelect` or `FilterMenu`.
+- For narrowing a list by a category in a Section header, use `FilterButton`, `PopupSelect` or `FilterMenu`.
 - For general single-line text entry in a form, use `TextField`.
 
 ## Best practices
@@ -56,7 +56,7 @@ Don't: A bare verb leaves the scope unsaid, and the label is hidden.
 
 ### Pass compact in a bar. {#pass-compact-in-a-bar}
 
-A view bar holds 32-high controls, so pass `spacing="compact"`.
+A Section header holds 32-high controls, so pass `spacing="compact"`.
 
 ### Collapse only where the bar is tight. {#collapse-only-where-the-bar-is-tight}
 

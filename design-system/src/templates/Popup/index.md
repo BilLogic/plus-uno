@@ -121,7 +121,7 @@ When a list applies, and the words Clear and Reset filters: Filtering.
 
 ## Related
 
-- Section: use when placing the Filter icon, the view picker or More in the view bar.
+- Section: use when a Popup opens from a Section header: a filter trigger's list, the Filter menu or More.
 - Modal: use when the content must be finished before going on.
 - Panel: use when the content is wider than 4-col or outlives a click.
 - Patterns: use when you need the rules around a Popup: Filtering, Overflow, Loading, Disabled.

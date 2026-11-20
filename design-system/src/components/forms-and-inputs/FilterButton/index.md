@@ -22,7 +22,7 @@ Also asked as: filter chip, filter control.
 
 ## Usage
 
-Use `FilterButton` for a control in a view bar that opens a filter's options or toggles a filter on and off.
+Use `FilterButton` for a filter trigger in a Section header that opens a filter's options or toggles a filter on and off.
 
 ## Motion
 

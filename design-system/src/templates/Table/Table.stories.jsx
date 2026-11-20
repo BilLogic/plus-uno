@@ -64,7 +64,7 @@ const treeProps = {
 
 const KIND_PROPS = { static: staticProps, dynamic: dynamicProps, tree: treeProps };
 
-const addMember = <Button text="Add member" appearance="primary" spacing="compact" onClick={() => {}} />;
+const addMember = <Button text="Add member" appearance="primary" onClick={() => {}} />;
 
 const rangeFooter = (
     <span className="body-sm" style={{ color: 'var(--ds-text-subtle)' }}>1–3 of 3 members</span>
@@ -251,8 +251,8 @@ const FilteredMembers = () => {
                     spacing="compact"
                     icon="magnifying-glass"
                     header="No members match this filter"
-                    description="Nothing matches Role: Admin. Clear the filter to see every member."
-                    primaryAction={<Button text="Clear filter" appearance="default" spacing="compact" onClick={() => setFiltered(false)} />}
+                    description="Nothing matches Role: Admin. Reset filters to see every member."
+                    primaryAction={<Button text="Reset filters" appearance="default" spacing="compact" onClick={() => setFiltered(false)} />}
                 />
             )}
         >
@@ -272,7 +272,7 @@ export const EmptyHiddenByFilter = {
         await expect(getComputedStyle(box).backgroundColor, 'empty box uses the sunken surface')
             .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(canvas.getByRole('button', { name: 'Role: Admin' }), 'the filter stays above').toBeVisible();
-        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        const clear = within(box).getByRole('button', { name: 'Reset filters' });
         await expect(clear.className, 'the box action is default, not primary').not.toContain('primary');
         await userEvent.click(clear);
         await expect(canvas.getByRole('table'), 'clearing the filter shows the rows').toBeVisible();
