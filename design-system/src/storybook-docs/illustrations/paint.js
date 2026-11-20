@@ -30,96 +30,96 @@
  *   same; floating, Frame's overlay fill and shadow, and no edge line.
  */
 
-/** role: [token, source SCSS relative to design-system/src] */
+/** role: [token, the component stylesheet's file name, found by name across the library] */
 const ROLES = {
   // Frame and Page
-  pageSurface: ['--ds-surface', 'templates/Frame/Frame.scss'],
-  pageEdge: ['--ds-border-surface', 'styles/_surface-edge.scss'],
-  frameSunken: ['--ds-surface-sunken', 'templates/Frame/Frame.scss'],
-  frameDivider: ['--ds-border', 'templates/Frame/Frame.scss'],
+  pageSurface: ['--ds-surface', 'Frame.scss'],
+  pageEdge: ['--ds-border-surface', '_surface-edge.scss'],
+  frameSunken: ['--ds-surface-sunken', 'Frame.scss'],
+  frameDivider: ['--ds-border', 'Frame.scss'],
   // Sidebar
-  sidebarOverlaySurface: ['--ds-surface-material-overlay', 'templates/Frame/Frame.scss'],
-  sidebarOverlayShadow: ['--ds-shadow-overlay', 'templates/Frame/Frame.scss'],
-  sidebarSelected: ['--ds-background-selected', 'components/navigation/Sidebar/Sidebar.scss'],
-  sidebarIcon: ['--ds-icon-subtle', 'components/navigation/Sidebar/Sidebar.scss'],
+  sidebarOverlaySurface: ['--ds-surface-material-overlay', 'Frame.scss'],
+  sidebarOverlayShadow: ['--ds-shadow-overlay', 'Frame.scss'],
+  sidebarSelected: ['--ds-background-selected', 'Sidebar.scss'],
+  sidebarIcon: ['--ds-icon-subtle', 'Sidebar.scss'],
   // Section and Card
   // A Section draws no surface; a sunken box inside one is a sunken Card.
-  sectionSubtleSurface: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
-  cardSurface: ['--ds-surface-raised', 'tokens/ladder/_templates.scss'],
-  cardSunken: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
-  cardShadow: ['--ds-shadow-raised', 'tokens/ladder/_templates.scss'],
+  sectionSubtleSurface: ['--ds-surface-sunken', '_templates.scss'],
+  cardSurface: ['--ds-surface-raised', '_templates.scss'],
+  cardSunken: ['--ds-surface-sunken', '_templates.scss'],
+  cardShadow: ['--ds-shadow-raised', '_templates.scss'],
   // Overlays
-  popupSurface: ['--ds-surface-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
-  popupShadow: ['--ds-shadow-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
+  popupSurface: ['--ds-surface-overlay', 'Popup.scss'],
+  popupShadow: ['--ds-shadow-overlay', 'Popup.scss'],
   // Tooltip: a flat label, no shadow, the fill and text flip with the mode
-  tooltipSurface: ['--ds-background-neutral-bold', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  tooltipText: ['--ds-text-inverse', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  panelSurface: ['--ds-surface', 'templates/Panel/Panel.scss'],
-  panelEdge: ['--ds-border', 'templates/Panel/Panel.scss'],
+  tooltipSurface: ['--ds-background-neutral-bold', 'Tooltip.scss'],
+  tooltipText: ['--ds-text-inverse', 'Tooltip.scss'],
+  panelSurface: ['--ds-surface', 'Panel.scss'],
+  panelEdge: ['--ds-border', 'Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
-  panelFloatingShadow: ['--ds-shadow-overlay', 'templates/Frame/Frame.scss'],
-  modalSurface: ['--ds-surface-material-overlay', 'components/messaging/Dialog/Dialog.scss'],
-  modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
-  modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
-  blanket: ['--ds-blanket', 'templates/Modal/Modal.scss'],
+  panelFloatingShadow: ['--ds-shadow-overlay', 'Frame.scss'],
+  modalSurface: ['--ds-surface-material-overlay', 'Dialog.scss'],
+  modalShadow: ['--ds-shadow-blocking', '_templates.scss'],
+  modalDivider: ['--ds-border', 'Dialog.scss'],
+  blanket: ['--ds-blanket', 'Modal.scss'],
   // Material: the overlay fill is `modalSurface`/`sidebarOverlaySurface`; media and control have no
   // component yet, so they are drawn from the token alone.
   materialMedia: ['--ds-surface-material-media', null],
   materialControl: ['--ds-surface-material-control', null],
-  materialOverlay: ['--ds-surface-material-overlay', 'components/messaging/Dialog/Dialog.scss'],
-  materialEdge: ['--ds-border-material', 'components/messaging/Dialog/Dialog.scss'],
+  materialOverlay: ['--ds-surface-material-overlay', 'Dialog.scss'],
+  materialEdge: ['--ds-border-material', 'Dialog.scss'],
   // Placeholder text: the Skeleton component's own bar
-  placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
-  placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
+  placeholderText: ['--ds-skeleton', 'Skeleton.scss'],
+  placeholderHeading: ['--ds-skeleton', 'Skeleton.scss'],
   // Table row
-  rowDivider: ['--ds-border', 'components/text-and-data-display/Table/Table.scss'],
+  rowDivider: ['--ds-border', 'components/**/Table.scss'],
   // Overflow: a part that stays put while content scrolls under it, such as a sticky table header
-  overflowShadow: ['--ds-shadow-overflow', 'components/text-and-data-display/Table/TableShell.scss'],
-  rowSelected: ['--ds-background-selected', 'components/text-and-data-display/Table/Table.scss'],
+  overflowShadow: ['--ds-shadow-overflow', 'TableShell.scss'],
+  rowSelected: ['--ds-background-selected', 'components/**/Table.scss'],
   // Field
-  fieldSurface: ['--ds-background-input', 'lib/field/FieldBox.scss'],
-  fieldBorder: ['--ds-border-input', 'lib/field/FieldBox.scss'],
-  fieldBorderInvalid: ['--ds-border-danger', 'lib/field/FieldBox.scss'],
+  fieldSurface: ['--ds-background-input', 'FieldBox.scss'],
+  fieldBorder: ['--ds-border-input', 'FieldBox.scss'],
+  fieldBorderInvalid: ['--ds-border-danger', 'FieldBox.scss'],
   // A danger message block: the Banner's danger surface, edged by the invalid field's border.
-  dangerSurface: ['--ds-background-danger', 'components/messaging/Banner/Banner.scss'],
-  fieldMessageDanger: ['--ds-text-danger', 'lib/field/FieldFrame.scss'],
+  dangerSurface: ['--ds-background-danger', 'Banner.scss'],
+  fieldMessageDanger: ['--ds-text-danger', 'FieldFrame.scss'],
   // Button
-  buttonPrimary: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonPrimaryText: ['--ds-text-inverse', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonDefault: ['--ds-background-neutral', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonDefaultText: ['--ds-text', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonSelectedBorder: ['--ds-border-selected', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonPrimary: ['--ds-background-brand-bold', 'Button.scss'],
+  buttonPrimaryText: ['--ds-text-inverse', 'Button.scss'],
+  buttonDefault: ['--ds-background-neutral', 'Button.scss'],
+  buttonDefaultText: ['--ds-text', 'Button.scss'],
+  buttonSelectedBorder: ['--ds-border-selected', 'Button.scss'],
   // Tabs
-  tabsDivider: ['--ds-border', 'components/navigation/Tabs/Tabs.scss'],
-  tabSelected: ['--ds-border-selected', 'components/navigation/Tabs/Tabs.scss'],
+  tabsDivider: ['--ds-border', 'Tabs.scss'],
+  tabSelected: ['--ds-border-selected', 'Tabs.scss'],
   // Breadcrumb
-  breadcrumbSeparator: ['--ds-text-subtlest', 'components/navigation/Breadcrumb/Breadcrumb.scss'],
+  breadcrumbSeparator: ['--ds-text-subtlest', 'Breadcrumb.scss'],
   // ProgressTracker
-  trackerConnector: ['--ds-border', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  trackerDot: ['--ds-icon-subtle', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  trackerVisited: ['--ds-icon-success', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  trackerCurrent: ['--ds-background-selected', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  trackerCurrentDot: ['--ds-background-brand-bold', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  trackerCurrentRing: ['--ds-border-brand', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
+  trackerConnector: ['--ds-border', 'ProgressTracker.scss'],
+  trackerDot: ['--ds-icon-subtle', 'ProgressTracker.scss'],
+  trackerVisited: ['--ds-icon-success', 'ProgressTracker.scss'],
+  trackerCurrent: ['--ds-background-selected', 'ProgressTracker.scss'],
+  trackerCurrentDot: ['--ds-background-brand-bold', 'ProgressTracker.scss'],
+  trackerCurrentRing: ['--ds-border-brand', 'ProgressTracker.scss'],
   // Flag
-  flagSurface: ['--ds-surface-overlay', 'components/messaging/Flag/Flag.scss'],
-  flagShadow: ['--ds-shadow-overlay', 'components/messaging/Flag/Flag.scss'],
-  flagIconNeutral: ['--ds-icon-subtle', 'components/messaging/Flag/Flag.scss'],
-  flagIconSuccess: ['--ds-icon-success', 'components/messaging/Flag/Flag.scss'],
-  flagIconWarning: ['--ds-icon-warning', 'components/messaging/Flag/Flag.scss'],
-  flagIconDanger: ['--ds-icon-danger', 'components/messaging/Flag/Flag.scss'],
-  flagIconInfo: ['--ds-icon-information', 'components/messaging/Flag/Flag.scss'],
+  flagSurface: ['--ds-surface-overlay', 'Flag.scss'],
+  flagShadow: ['--ds-shadow-overlay', 'Flag.scss'],
+  flagIconNeutral: ['--ds-icon-subtle', 'Flag.scss'],
+  flagIconSuccess: ['--ds-icon-success', 'Flag.scss'],
+  flagIconWarning: ['--ds-icon-warning', 'Flag.scss'],
+  flagIconDanger: ['--ds-icon-danger', 'Flag.scss'],
+  flagIconInfo: ['--ds-icon-information', 'Flag.scss'],
   // CountTag
-  countSurface: ['--ds-background-neutral', 'components/labels/CountTag/CountTag.scss'],
-  countText: ['--ds-text', 'components/labels/CountTag/CountTag.scss'],
+  countSurface: ['--ds-background-neutral', 'CountTag.scss'],
+  countText: ['--ds-text', 'CountTag.scss'],
   // The one accent: it marks the drawing's subject in the brand color.
-  accent: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
+  accent: ['--ds-background-brand-bold', 'Button.scss'],
   // Motion drawings. A chart's axis and gridlines, and its reference line such as the
   // target, take the tokens the charts theme gives them (chartTheme.css neutral-20, neutral-40).
-  axis: ['--ds-border', 'dataviz/chartTheme.css'],
-  target: ['--ds-border-bold', 'dataviz/chartTheme.css'],
+  axis: ['--ds-border', 'chartTheme.css'],
+  target: ['--ds-border-bold', 'chartTheme.css'],
   // A press: the ring the pressed and focused states draw (plus-ring in _state.scss).
-  tapRing: ['--ds-border-focused', 'styles/_state.scss'],
+  tapRing: ['--ds-border-focused', '_state.scss'],
   // Drawing devices, no component behind them
   // A plotted series that is not the subject: the data-viz neutral series.
   curve: ['--chart-neutral', null],
@@ -140,7 +140,7 @@ const ROLES = {
   // The one drawn letterform: the Typography specimen's glyphs, in the text ink.
   glyph: ['--ds-text', null],
   // An icon drawn as an icon (the Iconography set): the Icon component's default subtle ink.
-  iconGlyph: ['--ds-icon-subtle', 'components/images-and-icons/Icon/Icon.scss'],
+  iconGlyph: ['--ds-icon-subtle', 'Icon.scss'],
   // The palette shown as itself (the Foundations overview's color cell): the darkest brand
   // step closing the ramp (the lighter steps are the accent at reduced opacity), and the
   // neutrals from the ground to the text ink.
@@ -160,41 +160,41 @@ const ROLES = {
 };
 
 /**
- * height role: [height token, source SCSS]. The kit draws it at half (one unit
+ * height role: [height token, source stylesheet name]. The kit draws it at half (one unit
  * is 2px), and the paint test resolves each token to px and holds the drawn
  * height to it. Only roles whose real component sets a height token are here.
  */
 export const HEIGHTS = {
-  field: ['--control-lg', 'lib/field/FieldBox.scss', 20],
-  button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
-  tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
-  count: ['--label-height-sm', 'styles/_label-heights.scss', 8],
-  tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
-  sidebarRow: ['--control-md', 'components/navigation/Sidebar/Sidebar.scss', 16],
+  field: ['--control-lg', 'FieldBox.scss', 20],
+  button: ['--control-md', 'Button.scss', 16],
+  tab: ['--control-md', 'Tabs.scss', 16],
+  count: ['--label-height-sm', '_label-heights.scss', 8],
+  tracker: ['--control-md', 'ProgressTracker.scss', 16],
+  sidebarRow: ['--control-md', 'Sidebar.scss', 16],
 };
 
 /** corner role: [radius token, source SCSS]. Drawn at the kit's half scale. */
 const CORNERS = {
   window: ['--radius-control-sm', null],
-  button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
-  card: ['--card-radius', 'templates/Card/Card.scss'],
-  section: ['--card-radius', 'templates/Card/Card.scss'],
-  popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
-  flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
-  tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  modal: ['--modal-radius', 'templates/Modal/Modal.scss'],
-  field: ['--radius-control-lg', 'lib/field/FieldBox.scss'],
-  sidebarRow: ['--frame-sidebar-row-radius', 'components/navigation/Sidebar/Sidebar.scss'],
-  tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
-  count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
-  tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
+  button: ['--button-radius-default', 'Button.scss'],
+  buttonCompact: ['--button-radius-compact', 'Button.scss'],
+  buttonSpacious: ['--button-radius-spacious', 'Button.scss'],
+  card: ['--card-radius', 'Card.scss'],
+  section: ['--card-radius', 'Card.scss'],
+  popup: ['--popup-radius', 'Popup.scss'],
+  flag: ['--popup-radius', 'Flag.scss'],
+  tooltip: ['--radius-control-sm', 'Tooltip.scss'],
+  modal: ['--modal-radius', 'Modal.scss'],
+  field: ['--radius-control-lg', 'FieldBox.scss'],
+  sidebarRow: ['--frame-sidebar-row-radius', 'Sidebar.scss'],
+  tab: ['--radius-control-md', 'Tabs.scss'],
+  count: ['--radius-md', 'CountTag.scss'],
+  tag: ['--radius-md', 'Tag.scss'],
   icon: ['--radius-sm', null],
-  tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  cardImage: ['--card-radius', 'templates/Card/Card.scss'],
+  tracker: ['--radius-control-md', 'ProgressTracker.scss'],
+  cardImage: ['--card-radius', 'Card.scss'],
   shape: ['--radius-control-sm', null],
-  full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
+  full: ['--radius-full', 'ProgressTracker.scss'],
 };
 
 export const ROLE_SOURCES = Object.fromEntries(
