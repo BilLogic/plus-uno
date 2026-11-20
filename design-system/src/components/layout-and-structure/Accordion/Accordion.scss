@@ -4,9 +4,13 @@
  * Accordion Component Styles
  * Built on Base UI's Accordion (ADR-037); styled on `--ds-*` role tokens.
  *
+ * Appearances:
+ * - separated (default): each item is its own container on the card surface, stacked with a gap
+ * - grouped: one bordered box with dividers between items; flush drops the box
+ *
  * States:
  * - Default: surface bg, border
- * - Expanded ([data-panel-open] on the trigger): selected bg
+ * - Expanded ([data-panel-open] on the trigger): selected bg in grouped; separated stays plain
  * - Focus: 2px ring via the state mixin
  * - Pressed: neutral-subtle-pressed bg
  * - Disabled: 38% opacity (78% for flush)
@@ -16,8 +20,9 @@
     width: 100%;
     border-radius: var(--card-radius);
 
-    // --- ACCORDION ITEM ---
-    .plus-accordion-item {
+    // --- ACCORDION ITEM (grouped: one shared box) ---
+    &--grouped .plus-accordion-item,
+    &--flush .plus-accordion-item {
         background-color: var(--ds-surface);
         border: var(--border-width-default) solid var(--ds-border);
 
@@ -69,6 +74,7 @@
         align-items: center;
         justify-content: space-between;
         flex-direction: row;
+        gap: var(--inline-md);
         cursor: pointer;
 
         // --- ICON STYLING ---
@@ -114,6 +120,74 @@
         font: var(--body-lg);
         border-top: var(--border-width-default) solid var(--ds-border);
         text-align: left;
+    }
+
+    // --- TRIGGER PARTS ---
+    // The leading slot holds one avatar or icon in a fixed-width column so the
+    // open body can indent to the title's start.
+    .plus-accordion-elem {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        inline-size: var(--image-sm);
+    }
+
+    .plus-accordion-text {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-inline-size: 0;
+    }
+
+    // One line only; a longer summary is cut with an ellipsis.
+    .plus-accordion-summary {
+        color: var(--ds-text-subtle);
+        font: var(--body-sm);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // --- SEPARATED (default) ---
+    // Each item is its own container on the card surface, with a gap between.
+    &--separated {
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-sm);
+
+        .plus-accordion-item {
+            background-color: var(--ds-surface);
+            border: var(--border-width-default) solid var(--ds-border);
+            border-radius: var(--card-radius);
+        }
+
+        .plus-accordion-trigger {
+            // inside the item's border, so the corner is one hairline tighter
+            border-radius: calc(var(--card-radius) - var(--border-width-default));
+            color: var(--ds-text);
+
+            // The open header stays plain: no selected fill.
+            &[data-panel-open] {
+                background-color: var(--ds-surface);
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+
+                @include plus-state((
+                    hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+                ), $ring: false);
+            }
+        }
+
+        .plus-accordion-body {
+            border-top: 0;
+            padding-block-start: 0;
+        }
+
+        // The body starts where the title starts.
+        .plus-accordion-item--has-elem .plus-accordion-body {
+            padding-inline-start: calc(var(--card-pad) + var(--image-sm) + var(--inline-md));
+        }
     }
 
     // --- FLUSH MODE ---

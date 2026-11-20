@@ -10,7 +10,7 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled, MotionOpenClose, MotionReduced
+**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, ExpandedGrouped, Disabled, MotionOpenClose, MotionReduced, WithSummary, OpenCloseByClickAndKeyboard, Overflow
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
@@ -25,8 +25,11 @@ shape and the headers stay a readable index of what is there.
 
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
-lets more than one item stay open at once, and `flush` removes the outer border
-and rounded corners when the accordion sits inside a card or panel. Use an accordion for several long, independent sections where only one matters at a time.
+lets more than one item stay open at once. Each item is its own container by
+default (`appearance="separated"`); use `appearance="grouped"` for one bordered box with
+dividers, and `flush` to drop that box when the accordion sits inside a card or panel.
+An item takes `elemBefore` (an avatar or icon) and `summary` (one line of subtle text
+under the title) for a list of people or records. Use an accordion for several long, independent sections where only one matters at a time.
 
 ## Motion
 
@@ -56,12 +59,19 @@ The title is the only thing visible when closed, so it has to name the content a
 Do: A short noun title.
 Don't: A title that runs on and wraps.
 
-### Stack the items in one accordion. {#stack-the-items-in-one-accordion}
+### Keep the items in one accordion. {#keep-the-items-in-one-accordion}
 
-Items share borders so the group reads as one control.
+One accordion spaces its items evenly and keeps one open at a time; separate accordions each open on their own.
 
-Do: Items touch, borders shared.
-Don't: Items spaced apart like separate cards.
+Do: One accordion, items spaced by the gap.
+Don't: One accordion per item, spaced by hand.
+
+### Use separated on a page, grouped inside a card. {#use-separated-on-a-page-grouped-inside-a-card}
+
+Separated reads as a list of records on the bare page. Inside a card or panel a container within a container is noisy, so use grouped.
+
+Do: Separated on the page, for a list of people.
+Don't: Grouped on the bare page, where a list of people reads as one block.
 
 ### Author items with either `items` or `children`; `children` wins. {#author-items-with-either-items-or-children-children-wins}
 
@@ -85,11 +95,11 @@ Don't: Items spaced apart like separate cards.
 <Accordion alwaysOpen defaultActiveKey={['0']} items={sections} />
 ```
 
-### Use `flush` inside another bordered surface. {#use-flush-inside-another-bordered-surface}
+### Use `appearance="grouped"` or `flush` inside another bordered surface. {#use-appearance-grouped-or-flush-inside-another-bordered-surface}
 
-`flush` removes the outer border and corner radius so the item rows sit flat
-against a bordered container such as a card. On the bare page, keep the default
-border.
+`grouped` keeps one box with dividers, and `flush` also removes the outer
+border and corner radius so the rows sit flat against a bordered container such
+as a card. On the bare page, keep the default separated look.
 
 ## Accessibility
 
@@ -118,10 +128,11 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Parts
 
-1. **Trigger.** The full-width button: the section title on the left, the chevron on the right.
-2. **Chevron.** Turns up when the section is open, so the state reads without the body.
-3. **Body.** The content, shown under an open trigger.
-4. **Edge.** One border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+1. **Container.** Separated: each item has its own surface, one border and the card corner radius, with a gap between items. Grouped: one border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+2. **Leading slot.** Optional avatar or icon before the title.
+3. **Trigger.** The full-width button: the title, an optional summary line under it, and the chevron on the right.
+4. **Chevron.** Turns up when the section is open, so the state reads without the body.
+5. **Body.** The content under an open trigger, indented to the title's start when there is a leading slot.
 
 ### States
 
@@ -131,7 +142,7 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 | Hovered | `--ds-background-neutral-subtle-hovered`. |
 | Pressed | `--ds-background-neutral-subtle-pressed`. |
 | Focused | Shows the focus ring with no fill change; see Border. |
-| Expanded | `--ds-background-selected`, and `--ds-background-selected-hovered` under the pointer. The chevron turns up. |
+| Expanded | Separated: the header stays on the surface. Grouped: `--ds-background-selected`, and `--ds-background-selected-hovered` under the pointer. The chevron turns up. |
 | Disabled | The item is dimmed to `--ds-opacity-disabled`. The trigger is announced as disabled, leaves the tab order, and a press never opens it. |
 
 ### Tokens
@@ -139,9 +150,10 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 | Part | Token |
 | --- | --- |
 | Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open, `--ds-background-selected` and `--ds-background-selected-hovered`. |
-| Trigger and chevron | `--ds-text-subtle`; title in `--heading-sm`; chevron at `--icon-sm`. |
+| Trigger and chevron | Title in `--heading-sm`, `--ds-text` when separated and `--ds-text-subtle` when grouped; chevron at `--icon-sm` in `--ds-text-subtle`; `--inline-md` between the parts. |
+| Leading slot and summary | Slot column `--image-sm` wide; summary in `--body-sm` and `--ds-text-subtle`. |
 | Body | `--body-lg` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it. |
-| Edge | `--ds-border` at `--stroke-1`, corners `--card-radius`. |
+| Edge | `--ds-border` at `--border-width-default`, corners `--card-radius`; separated items sit `--stack-sm` apart. |
 | Padding | `--card-pad` on every side. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
 | Disabled | `--ds-opacity-disabled`. |
@@ -152,6 +164,7 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 | --- | --- |
 | Name the section with a short noun phrase: "Session notes". | Write a sentence or a question as the header. |
 | Lead the body with the answer or the content itself. | Repeat the header as the first line of the body. |
+| Say the state in the summary: "Engaged · 2 tags". | Put a paragraph in the summary; it is cut to one line. |
 | Keep sibling headers parallel: all nouns, all the same case. | Mix "Goals", "How do I set goals?" and "SETTINGS". |
 
 ## Props
@@ -162,11 +175,18 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 | `children` | node | — | Child AccordionItem components (alternative to items array) |
 | `defaultActiveKey` | string or array | — | Initially expanded item(s) - single key or array for alwaysOpen |
 | `activeKey` | string or array | — | Controlled active key(s) |
-| `flush` | bool | `false` | Remove borders for seamless/flush appearance |
+| `appearance` | enum | `'separated'` | Separated gives each item its own container; grouped is one bordered box with dividers |
+| `flush` | bool | `false` | Grouped look without the outer border, for an accordion inside a card or panel |
 | `alwaysOpen` | bool | `false` | Allow multiple items to be open simultaneously |
 | `onSelect` | func | — | Callback when active item changes |
 | `className` | string | `''` | Additional CSS classes |
 | `id` | string | — | HTML ID attribute |
+
+## Variants
+
+**`appearance`** — `separated` · `grouped`
+
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Sub-components
 
@@ -178,13 +198,15 @@ Implemented as `AccordionItem`.
 |------|------|---------|-------------|
 | `eventKey` | string (required) | — | Unique key for this accordion item |
 | `header` | node (required) | — | Header content (title text or node) |
+| `summary` | node | — | One line of subtle text under the title, such as a status or a count. A longer line is cut with an ellipsis. |
+| `elemBefore` | node | — | An avatar or an icon before the title. The open body indents to the title's start. |
 | `children` | node | — | Body content when expanded |
 | `disabled` | bool | — | Disable this item |
 | `className` | string | — | Additional CSS classes |
 
 ## Tokens touched
 
-`--body-lg` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-sm` · `--icon-sm`
+`--body-lg` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-subtle` · `--heading-sm` · `--icon-sm` · `--image-sm` · `--inline-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 
