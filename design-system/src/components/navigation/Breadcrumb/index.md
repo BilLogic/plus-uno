@@ -28,9 +28,9 @@ answers two questions at once: where am I, and what is one level up. When the
 hierarchy is one level deep, a single "Back to X" `Link` says the same thing
 with less furniture.
 
-It takes a single `items` array, ordered root first. Each item is `{ text, href,
-onClick }`. The last item is the current page and is rendered as plain text; every
-item before it is a link.
+It takes a single `items` array of parents, ordered root first. Each item is
+`{ text, href, onClick }` and renders as a link. The current record is not an
+item: the `PageHeader` title names it.
 
 ## Motion
 
@@ -49,21 +49,19 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### End the trail on the current page. {#end-the-trail-on-the-current-page}
+### List parents only. {#list-parents-only}
 
 ```jsx
-// Incorrect — the href is dropped. The last item is rendered active
-// unconditionally, and an active item is plain text with aria-current="page",
-// never an anchor.
-<Breadcrumb items={[
-    { text: 'Cohorts', href: '/cohorts' },
-    { text: 'Autumn 2026', href: '/cohorts/a26' },
-]} />
-
-// Correct — the trail ends at where you are.
+// Incorrect — the last item is the current record. The page title already
+// names it, so the trail repeats it.
 <Breadcrumb items={[
     { text: 'Cohorts', href: '/cohorts' },
     { text: 'Autumn 2026' },
+]} />
+
+// Correct — every item is a parent the person can climb to.
+<Breadcrumb items={[
+    { text: 'Cohorts', href: '/cohorts' },
 ]} />
 ```
 
@@ -75,14 +73,14 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 // unreachable by keyboard.
 <Breadcrumb items={[
     { text: 'Cohorts', onClick: goToCohorts },
-    { text: 'Autumn 2026' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
 ]} />
 
 // Correct — the href makes it a real, focusable link; onClick intercepts it
 // for the router. The component calls preventDefault for you.
 <Breadcrumb items={[
     { text: 'Cohorts', href: '/cohorts', onClick: goToCohorts },
-    { text: 'Autumn 2026' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
 ]} />
 ```
 
@@ -98,9 +96,9 @@ Don't: A React element is stringified by CSS and disappears.
 
 ### Show the whole path, root first. {#show-the-whole-path-root-first}
 
-A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let a level too long end in an ellipsis rather than dropping it.
+A trail that starts mid-hierarchy leaves people unsure where they are. List every parent from the top down to the page's own parent, and let a level too long end in an ellipsis rather than dropping it.
 
-Do: Every level from the root to the current page.
+Do: Every parent from the root down.
 Don't: The trail starts mid-hierarchy, so the top is missing.
 
 ### Keep the trail on one line and truncate each level. {#keep-the-trail-on-one-line-and-truncate-each-level}
@@ -120,8 +118,9 @@ Don't: Names that mean nothing out of context.
 
 ## Accessibility
 
-- **The landmark and the current page are handled.** It renders a `nav` around
-  an `ol`, and the last item carries `aria-current="page"`.
+- **The landmark is handled.** It renders a `nav` around an `ol`, one link per
+  parent. The current record is the page's heading, not a crumb, so no item
+  carries `aria-current`.
 - **Every breadcrumb is named "breadcrumb" unless you say otherwise.** Pass
   `label` to name the landmark when more than one breadcrumb appears on a page.
 - **Keep `text` short and literal.** It is the whole accessible name of the
@@ -142,26 +141,25 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 ## Parts
 
 1. **Landmark and list.** A `nav` named by `label` around an ordered list, one item per level, root first.
-2. **Ancestor link.** Every item before the last, in the link color; an `onClick` intercepts it for a router.
+2. **Parent link.** Every item, in the link color; an `onClick` intercepts it for a router.
 3. **Separator.** A slash drawn between items; `separator` swaps the character.
-4. **Current page.** The last item, plain text in the subtlest ink, marked `aria-current="page"`.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | Ancestors in the link color with no underline; the current page in subtlest ink. |
+| Rest | Parents in the link color with no underline. |
 | Hovered | Underline on an ancestor link; the ink stays the link color. |
 | Pressed | No change of its own. |
 | Focused | Shows the focus ring on the link for keyboard focus; see Border. |
-| Disabled | Not a state. A level the person cannot open is the current page or is left out, never a dimmed link. |
+| Disabled | Not a state. A level the person cannot open is left out, never a dimmed link. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Ancestor link | `--ds-link` |
-| Separator and current page | `--ds-text-subtlest` |
+| Parent link | `--ds-link` |
+| Separator | `--ds-text-subtlest` |
 | Row | `--control-md`, `--body-default` |
 | Gap and separator space | `--stack-md` |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` |
@@ -172,15 +170,15 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 | --- | --- |
 | Name each level as the page is titled, in sentence case. | Abbreviate or invent a shorter name that appears nowhere else. |
 | Keep each name to a few words so the trail fits on one line. | Repeat the full page title when it runs long. |
-| End the trail on the current page. | Add a trailing link, arrow or the word “current”. |
+| List parents only; the page title names the current record. | Add the current record, a trailing arrow or the word “current”. |
 | Use real nouns: “Autumn 2026”, “Lessons”. | Use “here”, “back” or “click”. |
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | arrayOf (required) | `[]` | The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". |
-| `id` | string | — | The `id` attribute of the last (current) item. |
+| `items` | arrayOf (required) | `[]` | The parents, root first, as `{ text, href, onClick }`. List parents only: the current record is not a crumb, the page title names it. An item without `href` is plain text, not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". |
+| `id` | string | — | The `id` attribute of the last item. |
 | `separator` | node | `'/'` | What is drawn between items. A string is used as is; the default is `/`. |
 | `label` | string | `'breadcrumb'` | Accessible label for the nav region that wraps the breadcrumbs. |
 | `className` | string | `''` | Extra class names added to the `nav` element beside the component's own. |

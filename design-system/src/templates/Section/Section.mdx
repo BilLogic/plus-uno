@@ -103,11 +103,11 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 A header has up to three rows, all on one 32 line. Row 1 is the title with its actions: usually one Primary standing alone, with a `…` Icon button or a secondary button beside it. Row 2 is the views at the start and the format switch at the end. Row 3 is Search, then the filter triggers, each reading "Field: value". A Section with no views drops row 2 and the format switch moves to the end of row 3; one with nothing to search or filter drops row 3.
 
-Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Clear all. Three triggers show and the rest go in More filters with a count. Under 768 Search takes the row and, with more than one trigger, the triggers fold into one Filter button with a count (a lone trigger stays as it is); the count and Clear all stay at the end of the Search row. When the triggers no longer fit beside Search they wrap to their own row, end-aligned. A trigger can open a list: give its `filters` entry a `menu` that hands the trigger to a Popup select or a Filter menu.
+Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Reset filters. Three triggers show and the rest go in More filters with a count. Under 768 Search takes the row and, with more than one trigger, the triggers fold into one Filter button with a count (a lone trigger stays as it is); the count and Reset filters stay at the end of the Search row. When the triggers no longer fit beside Search they wrap to their own row, end-aligned. A trigger can open a list: give its `filters` entry a `menu` that hands the trigger to a Popup select or a Filter menu.
 
 <TypeGrid>
 <TypeCard of={SectionStories.Full} to="#full" title="Full">Title and actions, views and the format switch, then Search and three triggers.</TypeCard>
-<TypeCard of={SectionStories.FiltersApplied} to="#filters-applied" title="Filters applied">Applied triggers take the selected state; the row ends with the count and Clear all.</TypeCard>
+<TypeCard of={SectionStories.FiltersApplied} to="#filters-applied" title="Filters applied">Applied triggers take the selected state; the row ends with the count and Reset filters.</TypeCard>
 <TypeCard of={SectionStories.NoViews} to="#no-views" title="No views">Row 2 goes; the format switch joins the end of row 3.</TypeCard>
 <TypeCard of={SectionStories.ViewsOnly} to="#views-only" title="Views only">Nothing to search or filter, so row 3 goes.</TypeCard>
 <TypeCard of={SectionStories.ManyFilters} to="#many-filters" title="Many filters">Three triggers show; the rest sit in More filters with a count.</TypeCard>
@@ -119,7 +119,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 <ComponentExample of={SectionStories.Full} title="Full" description="Title and actions, views and the format switch, then Search and three triggers." />
 
-<ComponentExample of={SectionStories.FiltersApplied} title="Filters applied" description="Applied triggers take the selected state; the row ends with the count and Clear all." />
+<ComponentExample of={SectionStories.FiltersApplied} title="Filters applied" description="Applied triggers take the selected state; the row ends with the count and Reset filters." />
 
 <ComponentExample of={SectionStories.NoViews} title="No views" description="Row 2 goes; the format switch joins the end of row 3." />
 
@@ -147,6 +147,8 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 <ComponentExample of={SectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The tiers are the Filtering pattern.'} />
 
+<PlannedTag /> The Section does not place a side at its start yet, so this example composes it.
+
 <ComponentExample of={SectionStories.Detail} title="Detail" description="An inline expand: the disclosure row opens in place inside the Section and pushes the content below it down. Queue pages dock a Panel instead." />
 
 </div>
@@ -155,7 +157,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 ## Width behavior
 
-Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
+Drag the width through 960 and 768. <PlannedTag /> From 960 the filter side sits at the start; the Section does not build that placement or the takeover below yet, so the example composes them. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
 
 <DocsInteractivePlayground of={SectionStories.ResponsiveWidth} description="The width control sets the Section's own width." />
 
@@ -223,7 +225,8 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>isLoading</code></td><td>Swaps the header for skeleton bars while the Section loads.</td></tr>
 <tr><td><code>level</code></td><td><code>page</code> makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it.</td></tr>
 <tr><td><code>named</code></td><td>Makes the Section a region named by its title, for one that stands apart as a landmark.</td></tr>
-<tr><td><code>onClearAll</code> · <code>onMoreFilters</code> · <code>onOpenFilters</code></td><td>Clear all, More filters, and the Filter button of a narrow Section.</td></tr>
+<tr><td><code>hasNoMatches</code></td><td>True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains.</td></tr>
+<tr><td><code>onClearAll</code> · <code>onMoreFilters</code> · <code>onOpenFilters</code></td><td>Reset filters, More filters, and the Filter button of a narrow Section.</td></tr>
 <tr><td><code>id</code> · <code>className</code> · <code>style</code></td><td>Passed to the Section's root.</td></tr>
 <tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
@@ -347,7 +350,7 @@ The part-ticked select-all, the count of selected rows, then the actions, all at
 
 <RuleTag kind="review" />
 
-Each control has one home. The Filter button returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
+Each control has one home. The Filter button returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`. <PlannedTag /> The Section does not build this takeover yet.
 
 ### Use a Section detail as an inline expand, never on a queue page.
 

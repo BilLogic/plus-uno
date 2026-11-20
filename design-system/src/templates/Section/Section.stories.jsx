@@ -258,7 +258,7 @@ export const Levels = () => (
 /**
  * The header's Search: the icon grows left into the field. Esc clears, a
  * second Esc closes; it stays open while it holds text. The count is a polite
- * live region, and Clear all clears the search with the filters.
+ * live region, and Reset filters clears the search with the filters.
  */
 export const SearchInHeader = {
     name: 'Search',
@@ -309,12 +309,12 @@ export const SearchInHeader = {
             await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
         });
 
-        await step('Clear all clears the search too', async () => {
+        await step('Reset filters clears the search too', async () => {
             await userEvent.click(icon());
             await userEvent.type(field(), 'sam');
             await userEvent.click(canvas.getByRole('button', { name: 'Status: All' }));
             expect(canvas.getByRole('status')).toHaveTextContent('1 of 6 students');
-            await userEvent.click(canvas.getByRole('button', { name: 'Clear all' }));
+            await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
             await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
             expect(canvas.getByRole('status')).toHaveTextContent('6 students');
         });
@@ -732,7 +732,7 @@ export const Full = {
     },
 };
 
-/** Filters applied: the applied triggers take the selected state; the row ends with the count and Clear all. */
+/** Filters applied: the applied triggers take the selected state; the row ends with the count and Reset filters. */
 export const FiltersApplied = {
     name: 'Filters applied',
     render: () => <Example.FiltersApplied />,
@@ -743,8 +743,8 @@ export const FiltersApplied = {
         await expect(canvas.getByText('3 of 12')).toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toHaveAttribute('aria-pressed', 'true');
         await expect(canvas.getByRole('button', { name: 'Group: Whitaker' })).toHaveAttribute('aria-pressed', 'true');
-        await userEvent.click(canvas.getByRole('button', { name: 'Clear all' }));
-        await waitFor(() => expect(canvas.queryByRole('button', { name: 'Clear all' })).toBeNull());
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitFor(() => expect(canvas.queryByRole('button', { name: 'Reset filters' })).toBeNull());
     },
 };
 
@@ -853,9 +853,9 @@ export const Narrow = {
         const filter = await canvas.findByRole('button', { name: /^Filter/ });
         await expect(filter).toHaveTextContent('1');
         await expect(canvas.getAllByRole('button', { name: /^Filter/ }), 'one Filter button').toHaveLength(1);
-        const clear = canvas.getByRole('button', { name: 'Clear all' });
+        const clear = canvas.getByRole('button', { name: 'Reset filters' });
         await expect(canvas.getByText('3 of 12'), 'the count stays under 768').toBeInTheDocument();
-        await expect(clear.getBoundingClientRect().right, 'Clear all ends the Search row').toBeCloseTo(canvasElement.querySelector('.plus-section-row--filters').getBoundingClientRect().right, 0);
+        await expect(clear.getBoundingClientRect().right, 'Reset filters ends the Search row').toBeCloseTo(canvasElement.querySelector('.plus-section-row--filters').getBoundingClientRect().right, 0);
         await expect(clear.getBoundingClientRect().top, 'on the Search line').toBeLessThan(canvasElement.querySelector('.plus-section-row__search').getBoundingClientRect().bottom);
         await expect(canvas.queryByRole('button', { name: 'Status: Upcoming' }), 'the triggers are folded').toBeNull();
         const search = canvasElement.querySelector('.plus-section-row__search');

@@ -64,6 +64,7 @@ export const ReplacedTable = () => {
                 { key: 'subject', label: 'Subject', text: 'Math', isSelected: true, onClick: () => {} },
             ] : []}
             onClearAll={() => setIsFiltered(false)}
+            hasNoMatches={rows.length === 0}
         >
             <DynamicTable
                 head={HEAD}

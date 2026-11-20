@@ -22,8 +22,7 @@ export default {
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         text: { control: 'text', description: 'Text content of the item' },
-        href: { control: 'text', description: 'URL for the link (if not current)' },
-        isCurrent: { control: 'boolean', description: 'Whether this is the current active page' },
+        href: { control: 'text', description: 'URL the link goes to' },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -45,24 +44,18 @@ export default {
 
 /**
  * Page Item
- * Represents a single item in the breadcrumb trail.
- * Can be a parent link (Link Item) or the current page (Current Page Item).
+ * Represents a single item in the breadcrumb trail: a link to a parent. The current record is not an item; the page title names it.
  */
-export const PageItem = ({ text, href, isCurrent }) => (
+export const PageItem = ({ text, href }) => (
     <nav aria-label="breadcrumb" className="plus-breadcrumb">
         <ol className="plus-breadcrumb-list">
-            {isCurrent ? (
-                <li aria-current="page" className="plus-breadcrumb-item plus-breadcrumb-current">{text}</li>
-            ) : (
-                <li className="plus-breadcrumb-item plus-breadcrumb-link"><a href={href}>{text}</a></li>
-            )}
+            <li className="plus-breadcrumb-item plus-breadcrumb-link"><a href={href}>{text}</a></li>
         </ol>
     </nav>
 );
 PageItem.args = {
     text: 'Lesson plans',
     href: '#',
-    isCurrent: false,
 };
 
 /**
@@ -76,13 +69,13 @@ export const Divider = {
             items={[
                 { text: 'Home', href: '#home' },
                 { text: 'Tutoring', href: '#tutoring' },
-                { text: 'Algebra B' },
+                { text: 'Algebra B', href: '#algebra-b' },
             ]}
         />
     ),
     play: async ({ canvas }) => {
         await expect(canvas.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument();
         await expect(canvas.getByRole('link', { name: 'Home' })).toBeInTheDocument();
-        await expect(canvas.getByText('Algebra B')).toHaveAttribute('aria-current', 'page');
+        await expect(canvas.getByRole('link', { name: 'Algebra B' })).toBeInTheDocument();
     },
 };

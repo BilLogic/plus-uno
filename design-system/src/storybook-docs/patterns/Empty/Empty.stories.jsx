@@ -170,6 +170,7 @@ export const KeyNoMatchesInTable = {
         await expect(canvas.queryAllByRole('columnheader'), 'no column headers').toHaveLength(0);
         await expect(canvas.queryByRole('navigation'), 'no pagination').toBeNull();
         await expect(canvas.getByRole('heading', { name: 'No students match these filters' })).toBeVisible();
+        await expect(canvas.getAllByRole('button', { name: 'Reset filters' }), 'one Reset filters: the header hides its own').toHaveLength(1);
         const reset = canvas.getByRole('button', { name: 'Reset filters' });
         await expect(reset).toBeVisible();
         await fitsCanvas(canvasElement);

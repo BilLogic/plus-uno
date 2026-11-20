@@ -25,8 +25,8 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 Pick the mode by where the answer lands:
 
 - `active` (default): filters rows as you type through `onValueChange`.
-- `basic`: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
-- `focused`: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
+- `basic` : runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
+- `focused` : opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
 
 `name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
 

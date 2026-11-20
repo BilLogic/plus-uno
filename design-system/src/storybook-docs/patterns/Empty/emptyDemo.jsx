@@ -162,6 +162,7 @@ export const InTable = ({ kind = 'first' }) => {
                 search={kind === 'matches' ? <HeaderSearch /> : undefined}
                 filters={kind === 'matches' ? categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter) : undefined}
                 onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
+                hasNoMatches={!showingRows}
             >
                 <StudentsTable
                     count={showingRows ? 4 : 0}
@@ -223,6 +224,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
                     views={<ViewPills views={['All students']} />}
                     filters={categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter)}
                     onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
+                    hasNoMatches={!resolved}
                 >
                     <StudentsTable
                         count={resolved ? 4 : 0}

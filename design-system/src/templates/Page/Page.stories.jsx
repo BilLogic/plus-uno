@@ -184,7 +184,7 @@ export const Interactive = {
 
 /* The template's types, anatomy, key scenarios and states: live stories of the real header, Sections and Frame. */
 
-const DEEP_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez', href: '#' }, { text: 'Session on Oct 14' }];
+const DEEP_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez', href: '#' }];
 
 /** The page's content box: the Frame's content element, which carries the cap. */
 const contentBox = (root) => root.querySelector('.plus-frame__content');
@@ -492,7 +492,7 @@ const SwitchViewsDemo = () => {
                     <Page
                         header={(
                             <DemoPageHeader
-                                breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Maya Rodriguez' }]}
+                                breadcrumb={[{ text: 'Students', href: '#students' }]}
                                 title="Maya Rodriguez"
                                 description="Grade 8 · Math"
                                 actions={<PageActions />}
@@ -573,7 +573,7 @@ const ScrollSpotDemo = () => (
             <Frame>
                 <Page>
                     <DemoPageHeader
-                        breadcrumb={[{ text: 'Sessions', href: '#sessions' }, { text: 'Oct 14 · Maya Rodriguez' }]}
+                        breadcrumb={[{ text: 'Sessions', href: '#sessions' }]}
                         title="Oct 14 · Maya Rodriguez"
                         description="Grade 8 · Math · 60 minutes"
                     />

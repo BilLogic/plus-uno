@@ -10,7 +10,7 @@ Also asked as: title, headline.
 
 **Used in:** Card (`ds guide card`); Page (`ds guide page`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+**Governed by:** Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`)
 
 **Source:** `design-system/src/components/text-and-data-display/Heading/Heading.jsx`
 

@@ -144,7 +144,8 @@ export const TierDrill = {
         const nav = canvas.getByRole('navigation', { name: 'Breadcrumb' });
         const parentLink = within(nav).getByRole('link', { name: 'Students' });
         await expect(within(nav).getAllByRole('link').map((a) => a.textContent), 'parents only, each a link').toEqual(['Students']);
-        await expect(nav.querySelector('[aria-current="page"]'), 'the record is plain text, the current page').toHaveTextContent('Maya Rodriguez');
+        await expect(nav.querySelector('[aria-current]'), 'the record is not a crumb').toBeNull();
+        await expect(canvas.getByRole('heading', { name: 'Maya Rodriguez' }), 'the page title names the record').toBeInTheDocument();
         await userEvent.tab();
         await expect(parentLink).toHaveFocus();
         await userEvent.tab();

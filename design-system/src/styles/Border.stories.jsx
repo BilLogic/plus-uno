@@ -158,7 +158,7 @@ export const SidebarEdges = {
                 <InAppFrame
                     height="320px" /* demo frame */
                     panelStorageKey={null}
-                    breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
+                    breadcrumbs={[{ text: 'Home', href: '#home' }]}
                 >
                     <Page>
                         <Section title="Upcoming sessions" />
@@ -265,7 +265,7 @@ const ALineUnderDontFigure = () => (
                         paddingBlockEnd: 'var(--stack-sm)',
                     }}
                 >
-                    <Breadcrumb items={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]} label="Example breadcrumb" />
+                    <Breadcrumb items={[{ text: 'Home', href: '#home' }]} label="Example breadcrumb" />
                 </div>
             )}
         >

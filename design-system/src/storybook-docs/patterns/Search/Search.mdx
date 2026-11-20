@@ -6,7 +6,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 import * as SearchStories from './Search.stories.jsx';
 import { SCOPE, STAGE } from './searchDemo.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
-import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <Meta title="Patterns/Search" tags={['manifest']} />
@@ -15,7 +15,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="patterns-search"
     eyebrow="Pattern"
     title="Search"
-    purpose={<>How a person finds a record by typing, with a <a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a> in one of three modes: active, focused or basic.</>}
+    purpose={<>How a person finds a record by typing, with a <a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a> that narrows the rows of a Section. One kind ships: active.</>}
     links={{
         label: 'Uses',
         items: [
@@ -39,12 +39,12 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 ## Choosing a type
 
-Three modes share one field. Choose by the amount of data and the cost of searching it.
+One kind ships: Active, narrowing the rows of the Section it sits in. There is no global search. Focused and Basic are Planned, so build neither yet.
 
 <TypeGrid>
 <TypeCard of={SearchStories.TypeActive} to="#narrowing" title="Active" stage={STAGE} thumbRatio="2 / 1">Small or on-screen data. The rows narrow in place as the person types.</TypeCard>
-<TypeCard of={SearchStories.TypeFocused} to="#focused-search" title="Focused" stage={STAGE} thumbRatio="2 / 1">A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".</TypeCard>
-<TypeCard of={SearchStories.TypeBasic} to="#basic-search" title="Basic" stage={STAGE} thumbRatio="2 / 1">Large or costly data. Nothing runs while typing; Enter takes the person to a results page.</TypeCard>
+<TypeCard of={SearchStories.TypeFocused} to="#focused-search" title="Focused" stage={STAGE} thumbRatio="2 / 1">A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results". <PlannedTag /></TypeCard>
+<TypeCard of={SearchStories.TypeBasic} to="#basic-search" title="Basic" stage={STAGE} thumbRatio="2 / 1">Large or costly data. Nothing runs while typing; Enter takes the person to a results page. <PlannedTag /></TypeCard>
 </TypeGrid>
 
 </div>
@@ -67,7 +67,7 @@ The field starts the Section header's third row, compact, and collapses to an ic
 
 <div className="sb-ds-doc-section">
 
-## Focused search
+## Focused search <PlannedTag />
 
 Focus in the field opens the panel. With no text it lists recent searches; while typing it lists matches grouped by type, then a last "See all results" row that runs a basic search. An optional action row, such as "Add student", closes the panel.
 
@@ -77,7 +77,7 @@ Focus in the field opens the panel. With no text it lists recent searches; while
 
 <div className="sb-ds-doc-section">
 
-## Basic search
+## Basic search <PlannedTag />
 
 The field alone. Typing runs nothing; Enter runs the search and a results page takes over. That page is its own template, outside this pattern.
 
@@ -115,7 +115,7 @@ The field alone. Typing runs nothing; Enter runs the search and a results page t
 
 ## Usage
 
-Use Search when a person knows what a record is called. Search finds by name; <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a> narrows by attribute, so the two keep separate controls and separate counts.
+Use Search when a person knows what a record is called, to narrow the Section they are in. There is no global search. Search finds by name; <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a> narrows by attribute, so the two keep separate controls and separate counts.
 
 <DocsTable>
 <thead>
@@ -123,8 +123,8 @@ Use Search when a person knows what a record is called. Search finds by name; <a
 </thead>
 <tbody>
 <tr><td>Active</td><td>The data is small or already on screen.</td><td>The rows in place, as you type.</td></tr>
-<tr><td>Focused</td><td>A person finds their own work from the page they are on.</td><td>A panel under the field; "See all results" widens it.</td></tr>
-<tr><td>Basic</td><td>The data is large or costly to search.</td><td>A results page, after Enter.</td></tr>
+<tr><td>Focused <PlannedTag /></td><td>A person finds their own work from the page they are on.</td><td>A panel under the field; "See all results" widens it.</td></tr>
+<tr><td>Basic <PlannedTag /></td><td>The data is large or costly to search.</td><td>A results page, after Enter.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -161,11 +161,11 @@ Use Search when a person knows what a record is called. Search finds by name; <a
 
 ## Best practices
 
-### Pick the mode by where the answer lands.
+### Narrow inside a Section with Active search.
 
 <RuleTag kind="review" />
 
-Active when the rows are in hand and few, focused when the person jumps to a record from the page they are on, basic when the search is heavy enough to wait for Enter. One mode per field.
+Active is the one kind that ships: the rows are in hand and narrow as the person types. Search stays inside its Section; there is no global search. Focused, for jumping to a record from the page, and Basic, for a search heavy enough to wait for Enter, are Planned <PlannedTag />. One mode per field.
 
 ### Name the scope in the placeholder.
 
@@ -259,8 +259,8 @@ The Section header holds controls of one height, 32, so the field takes `spacing
 <tr><th>Part</th><th>Component</th><th>Notes</th></tr>
 </thead>
 <tbody>
-<tr><td>Field</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a></td><td>Mode <code>active</code>, <code>focused</code> or <code>basic</code>; compact in a bar, default in a page body.</td></tr>
-<tr><td>Panel</td><td><a target="_top" href="./?path=/docs/templates-popup--docs">Popup</a></td><td>Focused only: recent searches, grouped matches, "See all results" and an optional action row.</td></tr>
+<tr><td>Field</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a></td><td>Mode <code>active</code>; compact in a bar, default in a page body. <PlannedTag /> <code>focused</code> and <code>basic</code> are Planned.</td></tr>
+<tr><td>Panel</td><td><a target="_top" href="./?path=/docs/templates-popup--docs">Popup</a></td><td><PlannedTag /> Focused only: recent searches, grouped matches, "See all results" and an optional action row.</td></tr>
 <tr><td>Rows</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>Narrows as the text changes.</td></tr>
 <tr><td>No matches</td><td><a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a></td><td>Fills the results body; offers "Reset filters".</td></tr>
 <tr><td>Loading</td><td><a target="_top" href="./?path=/docs/components-loading-skeleton--docs">Skeleton</a></td><td>Takes the results body; a Spinner takes the search icon.</td></tr>

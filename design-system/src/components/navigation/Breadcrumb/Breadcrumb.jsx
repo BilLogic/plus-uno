@@ -67,24 +67,23 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
                     );
                 }
                 const isLast = index === items.length - 1;
-                // Active if there's no href, or it's the last item.
-                const isCurrent = !item.href || isLast;
-                return isCurrent ? (
+                // A level lists a parent, so it is a link. One given no href is plain text, never marked as the current page.
+                const isPlain = !item.href;
+                return isPlain ? (
                     <ClippedTooltip key={index} text={item.text}>
                         {({ measureRef, truncated }) => (
                             <li
                                 ref={measureRef}
                                 tabIndex={truncated ? 0 : undefined}
                                 id={isLast && id ? id : undefined}
-                                aria-current={isLast ? 'page' : undefined}
-                                className="plus-breadcrumb-item plus-breadcrumb-current"
+                                className="plus-breadcrumb-item plus-breadcrumb-plain"
                             >
                                 {item.text}
                             </li>
                         )}
                     </ClippedTooltip>
                 ) : (
-                    <li key={index} className="plus-breadcrumb-item plus-breadcrumb-link">
+                    <li key={index} id={isLast && id ? id : undefined} className="plus-breadcrumb-item plus-breadcrumb-link">
                         <ClippedTooltip text={item.text}>
                             {({ measureRef }) => (
                                 <a
@@ -111,7 +110,7 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
 };
 
 Breadcrumb.propTypes = {
-    /** The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". */
+    /** The parents, root first, as `{ text, href, onClick }`. List parents only: the current record is not a crumb, the page title names it. An item without `href` is plain text, not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". */
     items: PropTypes.arrayOf(
         PropTypes.shape({
             text: PropTypes.string.isRequired,
@@ -119,7 +118,7 @@ Breadcrumb.propTypes = {
             onClick: PropTypes.func,
         })
     ).isRequired,
-    /** The `id` attribute of the last (current) item. */
+    /** The `id` attribute of the last item. */
     id: PropTypes.string,
     /** What is drawn between items. A string is used as is; the default is `/`. */
     separator: PropTypes.node,

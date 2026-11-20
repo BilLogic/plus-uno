@@ -4,7 +4,7 @@
 
 Text that assistive technology reads and nobody sees: a one-pixel, clipped span taken out of the flow. It is the `.visually-hidden` class `main.scss` defines, which the rest of the system already uses by class name, given a component so the caller never types the class. It paints nothing, so it takes no tokens.
 
-Also asked as: screen reader only, sr-only, assistive text, screen reader text.
+Also asked as: screen reader only, sr-only, assistive text, screen reader text, text for screen readers.
 
 **Import:** `import { VisuallyHidden } from '@/components';`
 

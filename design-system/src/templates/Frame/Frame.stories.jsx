@@ -2189,7 +2189,7 @@ const DOCKED_BROWSER_STAGE = 1100; // docs-literal: keeps Frame >= 1024 inside B
 const AREA_PAGES = {
     sessions: {
         address: 'app.plus.org/sessions/this-week',
-        crumbs: [{ text: 'Sessions', href: '#sessions' }, { text: 'This week' }],
+        crumbs: [{ text: 'Sessions', href: '#sessions' }],
         title: 'This week',
         section: 'Upcoming sessions',
         cards: [
@@ -2315,12 +2315,10 @@ const DrillDemo = ({ initialDepth = 0 }) => {
         ? [
             { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climbTo(0); } },
             { text: current.student.name, href: `#${current.student.id}`, onClick: (e) => { e.preventDefault(); controller.climbTo(1); } },
-            { text: current.session[0] },
         ]
         : current.key === 'student'
             ? [
                 { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climb(); } },
-                { text: current.student.name },
             ]
             : null;
 
@@ -2571,7 +2569,6 @@ const RecordOverlayDemo = () => {
     const crumbs = controller.current.key === 'student'
         ? [
             { text: 'Students', href: '#students', onClick: (e) => { e.preventDefault(); controller.climb(); } },
-            { text: controller.current.student.name },
         ]
         : null;
 

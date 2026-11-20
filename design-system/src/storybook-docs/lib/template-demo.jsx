@@ -42,7 +42,7 @@ export const slotContent = (label) => (
     </div>
 );
 
-export const RECORD_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
+export const RECORD_CRUMBS = [{ text: 'Students', href: '#' }];
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 /**

@@ -978,7 +978,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a \"…\" menu named \"Show hidden levels\".",
+          "description": "The parents, root first, as `{ text, href, onClick }`. List parents only: the current record is not a crumb, the page title names it. An item without `href` is plain text, not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a \"…\" menu named \"Show hidden levels\".",
           "deprecated": null
         },
         {
@@ -987,7 +987,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The `id` attribute of the last (current) item.",
+          "description": "The `id` attribute of the last item.",
           "deprecated": null
         },
         {
@@ -12545,7 +12545,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
+          "description": "Runs when \"Reset filters\" is pressed. The button shows once a filter is applied.",
+          "deprecated": null
+        },
+        {
+          "name": "hasNoMatches",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "True while the content is a No matches empty state, which offers its own \"Reset filters\": the header hides its button so one control remains.",
           "deprecated": null
         },
         {

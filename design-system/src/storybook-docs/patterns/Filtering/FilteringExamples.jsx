@@ -66,12 +66,9 @@ const filterMenuEntry = (ids, value, onApply) => {
     return {
         key: 'filters',
         text: 'Filters',
-        iconBefore: 'filter',
-        hasChevronDown: false,
-        trailingMetric: count > 0 ? count : undefined,
         isSelected: count > 0,
-        menu: (trigger) => (
-            <FilterMenu categories={categories(ids)} value={value} onApply={onApply} layout="side-by-side" trigger={trigger} />
+        menu: () => (
+            <FilterMenu categories={categories(ids)} value={value} onApply={onApply} layout="side-by-side" />
         ),
     };
 };

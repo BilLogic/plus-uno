@@ -66,6 +66,7 @@ export const ListWithFilters = {
                         }]}
                         count={`${rows.length} of ${sessions.length}`}
                         onClearAll={reset}
+                        hasNoMatches={!rows.length}
                         empty={!rows.length}
                         label="Sessions"
                         emptyState={

@@ -173,11 +173,9 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                     ? [
                         { text: 'Students', onClick: NOOP },
                         { text: 'Maya Lin', onClick: NOOP },
-                        { text: 'Session 12' },
                     ]
                     : [
                         { text: 'Students', onClick: NOOP },
-                        { text: 'Maya Lin' },
                     ]
             }
         />

@@ -24,7 +24,7 @@ export const figmaMeta = {
 <Meta of={BreadcrumbStories} />
 
 <Title />
-Use breadcrumbs to show navigational context on pages that are many levels deep in a site's hierarchy.
+Use breadcrumbs to show the parents of the page a person is on, in a site's hierarchy. The page title names the current record, so the trail never does.
 
 <DocsTabs of={BreadcrumbStories}>
 
@@ -41,9 +41,9 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 ## Appearance
 
-<ComponentExample of={BreadcrumbStories.Standard} title="Full trail" description={<>Linked ancestors, then the current page as plain text.</>} />
+<ComponentExample of={BreadcrumbStories.Standard} title="Full trail" description={<>Every level is a link to a parent; the current record is the page title.</>} />
 
-<ComponentExample of={BreadcrumbStories.Short} title="Two levels" description={<>The shortest trail: one ancestor and the current page.</>} />
+<ComponentExample of={BreadcrumbStories.Short} title="Two levels" description={<>The shortest trail: two parents.</>} />
 
 </div>
 
@@ -51,7 +51,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 ## Behavior
 
-<ComponentExample of={BreadcrumbSubStories.PageItem} title="Page item" description="A linked ancestor and the current-page item." />
+<ComponentExample of={BreadcrumbSubStories.PageItem} title="Page item" description="A link to a parent." />
 
 <ComponentExample of={BreadcrumbSubStories.Divider} title="Separator" description={<>A slash between items by default; <code>separator</code> swaps the character.</>} />
 
@@ -65,13 +65,13 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 ## State
 
-<ComponentExample of={BreadcrumbStories.Rest} title="Rest" description={<>Linked ancestors in the link color; the current page is plain, subtlest text with <code>aria-current="page"</code>.</>} />
+<ComponentExample of={BreadcrumbStories.Rest} title="Rest" description="Every level is a parent link in the link color." />
 
 <ComponentExample of={BreadcrumbStories.Hovered} title="Hovered" description="An ancestor link is underlined and keeps the link color." />
 
 <ComponentExample of={BreadcrumbStories.Pressed} title="Pressed" description="A link takes no pressed step of its own; the trail does not change under the pointer." />
 
-<ComponentExample of={BreadcrumbStories.Focused} title="Focused" description="Shows the focus ring on an ancestor link. The current page is focusable only while its text is clipped." />
+<ComponentExample of={BreadcrumbStories.Focused} title="Focused" description="Shows the focus ring on an ancestor link." />
 
 </div>
 
@@ -112,9 +112,9 @@ answers two questions at once: where am I, and what is one level up. When the
 hierarchy is one level deep, a single "Back to X" `Link` says the same thing
 with less furniture.
 
-It takes a single `items` array, ordered root first. Each item is `{ text, href,
-onClick }`. The last item is the current page and is rendered as plain text; every
-item before it is a link.
+It takes a single `items` array of parents, ordered root first. Each item is
+`{ text, href, onClick }` and renders as a link. The current record is not an
+item: the `PageHeader` title names it.
 
 </div>
 
@@ -133,9 +133,8 @@ item before it is a link.
 ## Parts
 
 1. **Landmark and list.** A `nav` named by `label` around an ordered list, one item per level, root first.
-2. **Ancestor link.** Every item before the last, in the link color; an `onClick` intercepts it for a router.
+2. **Parent link.** Every item, in the link color; an `onClick` intercepts it for a router.
 3. **Separator.** A slash drawn between items; `separator` swaps the character.
-4. **Current page.** The last item, plain text in the subtlest ink, marked `aria-current="page"`.
 
 ### States
 
@@ -144,11 +143,11 @@ item before it is a link.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>Ancestors in the link color with no underline; the current page in subtlest ink.</td></tr>
+<tr><td>Rest</td><td>Parents in the link color with no underline.</td></tr>
 <tr><td>Hovered</td><td>Underline on an ancestor link; the ink stays the link color.</td></tr>
 <tr><td>Pressed</td><td>No change of its own.</td></tr>
 <tr><td>Focused</td><td>Shows the focus ring on the link for keyboard focus; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
-<tr><td>Disabled</td><td>Not a state. A level the person cannot open is the current page or is left out, never a dimmed link.</td></tr>
+<tr><td>Disabled</td><td>Not a state. A level the person cannot open is left out, never a dimmed link.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -159,8 +158,8 @@ item before it is a link.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Ancestor link</td><td><code>--ds-link</code></td></tr>
-<tr><td>Separator and current page</td><td><code>--ds-text-subtlest</code></td></tr>
+<tr><td>Parent link</td><td><code>--ds-link</code></td></tr>
+<tr><td>Separator</td><td><code>--ds-text-subtlest</code></td></tr>
 <tr><td>Row</td><td><code>--control-md</code>, <code>--body-default</code></td></tr>
 <tr><td>Gap and separator space</td><td><code>--stack-md</code></td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
@@ -173,21 +172,19 @@ item before it is a link.
 
 ## Best practices
 
-### End the trail on the current page.
+### List parents only.
 
 ```jsx
-// Incorrect — the href is dropped. The last item is rendered active
-// unconditionally, and an active item is plain text with aria-current="page",
-// never an anchor.
-<Breadcrumb items={[
-    { text: 'Cohorts', href: '/cohorts' },
-    { text: 'Autumn 2026', href: '/cohorts/a26' },
-]} />
-
-// Correct — the trail ends at where you are.
+// Incorrect — the last item is the current record. The page title already
+// names it, so the trail repeats it.
 <Breadcrumb items={[
     { text: 'Cohorts', href: '/cohorts' },
     { text: 'Autumn 2026' },
+]} />
+
+// Correct — every item is a parent the person can climb to.
+<Breadcrumb items={[
+    { text: 'Cohorts', href: '/cohorts' },
 ]} />
 ```
 
@@ -199,14 +196,14 @@ item before it is a link.
 // unreachable by keyboard.
 <Breadcrumb items={[
     { text: 'Cohorts', onClick: goToCohorts },
-    { text: 'Autumn 2026' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
 ]} />
 
 // Correct — the href makes it a real, focusable link; onClick intercepts it
 // for the router. The component calls preventDefault for you.
 <Breadcrumb items={[
     { text: 'Cohorts', href: '/cohorts', onClick: goToCohorts },
-    { text: 'Autumn 2026' },
+    { text: 'Autumn 2026', href: '/cohorts/a26' },
 ]} />
 ```
 
@@ -218,20 +215,20 @@ for you and works; a React element is stringified by CSS and disappears. Pass
 `'/'`, `'›'`, `'—'`.
 
 <DoDontPair
-    doExample={<Breadcrumb separator="›" items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    doExample={<Breadcrumb separator="›" items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }]} />}
     doCaption="A string separator is quoted for you."
-    dontExample={<Breadcrumb separator={<span>›</span>} items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    dontExample={<Breadcrumb separator={<span>›</span>} items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }]} />}
     dontCaption="A React element is stringified by CSS and disappears."
 />
 
 ### Show the whole path, root first.
 
-A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let a level too long end in an ellipsis rather than dropping it.
+A trail that starts mid-hierarchy leaves people unsure where they are. List every parent from the top down to the page's own parent, and let a level too long end in an ellipsis rather than dropping it.
 
 <DoDontPair
-    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
-    doCaption="Every level from the root to the current page."
-    dontExample={<Breadcrumb items={[{ text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
+    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }, { text: 'Lincoln Middle School', href: '#' }]} />}
+    doCaption="Every parent from the root down."
+    dontExample={<Breadcrumb items={[{ text: 'Autumn 2026', href: '#' }, { text: 'Lincoln Middle School', href: '#' }]} />}
     dontCaption="The trail starts mid-hierarchy, so the top is missing."
 />
 
@@ -248,9 +245,9 @@ A breadcrumb shows where a page sits in the hierarchy, never the pages the perso
 Use the page's own title, not a direction or a pointer.
 
 <DoDontPair
-    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }]} />}
     doCaption="Short, literal names that match the page titles."
-    dontExample={<Breadcrumb items={[{ text: 'Back', href: '#' }, { text: 'here' }]} />}
+    dontExample={<Breadcrumb items={[{ text: 'Back', href: '#' }, { text: 'here', href: '#' }]} />}
     dontCaption="Names that mean nothing out of context."
 />
 
@@ -267,7 +264,7 @@ Use the page's own title, not a direction or a pointer.
 <tbody>
 <tr><td>Name each level as the page is titled, in sentence case.</td><td>Abbreviate or invent a shorter name that appears nowhere else.</td></tr>
 <tr><td>Keep each name to a few words so the trail fits on one line.</td><td>Repeat the full page title when it runs long.</td></tr>
-<tr><td>End the trail on the current page.</td><td>Add a trailing link, arrow or the word “current”.</td></tr>
+<tr><td>List parents only; the page title names the current record.</td><td>Add the current record, a trailing arrow or the word “current”.</td></tr>
 <tr><td>Use real nouns: “Autumn 2026”, “Lessons”.</td><td>Use “here”, “back” or “click”.</td></tr>
 </tbody>
 </DocsTable>
@@ -278,8 +275,9 @@ Use the page's own title, not a direction or a pointer.
 
 ## Accessibility
 
-- **The landmark and the current page are handled.** It renders a `nav` around
-  an `ol`, and the last item carries `aria-current="page"`.
+- **The landmark is handled.** It renders a `nav` around an `ol`, one link per
+  parent. The current record is the page's heading, not a crumb, so no item
+  carries `aria-current`.
 - **Every breadcrumb is named "breadcrumb" unless you say otherwise.** Pass
   `label` to name the landmark when more than one breadcrumb appears on a page.
 - **Keep `text` short and literal.** It is the whole accessible name of the

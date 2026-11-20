@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag } from '@/storybook-docs/lib/template-page.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={SearchFieldStories} />
@@ -45,6 +46,8 @@ what is searched.
 <div className="sb-ds-doc-section">
 
 ## Mode
+
+<PlannedTag /> Basic and Focused are Planned: Active is the one kind that ships. Search narrows inside a Section; there is no global search.
 
 <ComponentExample of={SearchFieldStories.Basic} title="Basic" description="Nothing runs per keystroke. Enter runs onSearch with the text." />
 
@@ -120,8 +123,8 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 Pick the mode by where the answer lands:
 
 - `active` (default): filters rows as you type through `onValueChange`.
-- `basic`: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
-- `focused`: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
+- `basic` <PlannedTag />: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
+- `focused` <PlannedTag />: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
 
 `name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
 

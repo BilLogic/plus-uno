@@ -2,7 +2,7 @@
 
 # Search
 
-How a person finds a record by typing, with a Search field in one of three modes: active, focused or basic.
+How a person finds a record by typing, with a Search field that narrows the rows of a Section. One kind ships: active.
 
 **Kind:** Pattern
 
@@ -10,7 +10,7 @@ How a person finds a record by typing, with a Search field in one of three modes
 
 ## Choosing a type
 
-Three modes share one field. Choose by the amount of data and the cost of searching it.
+One kind ships: Active, narrowing the rows of the Section it sits in. There is no global search. Focused and Basic are Planned, so build neither yet.
 
 - **Active.** Small or on-screen data. The rows narrow in place as the person types.
 - **Focused.** A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".
@@ -32,7 +32,7 @@ The field alone. Typing runs nothing; Enter runs the search and a results page t
 
 ## Usage
 
-Use Search when a person knows what a record is called. Search finds by name; Filtering narrows by attribute, so the two keep separate controls and separate counts.
+Use Search when a person knows what a record is called, to narrow the Section they are in. There is no global search. Search finds by name; Filtering narrows by attribute, so the two keep separate controls and separate counts.
 
 | Mode | Use when | Where the answer lands |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ Use Search when a person knows what a record is called. Search finds by name; Fi
 
 | Part | Component | Notes |
 | --- | --- | --- |
-| Field | Search field | Mode `active`, `focused` or `basic`; compact in a bar, default in a page body. |
+| Field | Search field | Mode `active`; compact in a bar, default in a page body. `focused` and `basic` are Planned. |
 | Panel | Popup | Focused only: recent searches, grouped matches, "See all results" and an optional action row. |
 | Rows | Dynamic table | Narrows as the text changes. |
 | No matches | Empty state | Fills the results body; offers "Reset filters". |
@@ -108,11 +108,11 @@ Search reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Pick the mode by where the answer lands. {#pick-the-mode-by-where-the-answer-lands}
+### Narrow inside a Section with Active search. {#narrow-inside-a-section-with-active-search}
 
 **Checked:** Review
 
-Active when the rows are in hand and few, focused when the person jumps to a record from the page they are on, basic when the search is heavy enough to wait for Enter. One mode per field.
+Active is the one kind that ships: the rows are in hand and narrow as the person types. Search stays inside its Section; there is no global search. Focused, for jumping to a record from the page, and Basic, for a search heavy enough to wait for Enter, are Planned . One mode per field.
 
 ### Name the scope in the placeholder. {#name-the-scope-in-the-placeholder}
 

@@ -725,7 +725,7 @@ const InFrame = ({ width, sidebarDocked }) => {
             <div style={{ width, height: 760 }}>
                 <Frame
                     sidebarDocked={sidebarDocked}
-                    header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
+                    header={<Breadcrumb items={[{ text: 'Toolkit', href: '#toolkit' }]} />}
                     sidebar={<Sidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
@@ -1001,7 +1001,7 @@ export const StudentBreadcrumb = {
                 />
             </Box>
             <div data-page="student" style={{ padding: 'var(--page-pad)' }}>
-                <Breadcrumb items={[{ text: 'Students', href: '#students' }, { text: 'Maya R.' }]} />
+                <Breadcrumb items={[{ text: 'Students', href: '#students' }]} />
             </div>
         </div>
     ),
@@ -1012,7 +1012,7 @@ export const StudentBreadcrumb = {
         await expect(selectedRows(canvasElement)[0].textContent).toMatch(/Maya R\./);
         const crumbs = within(canvasElement).getByRole('navigation', { name: 'breadcrumb' });
         await expect(within(crumbs).getByRole('link', { name: 'Students' })).toHaveAttribute('href', '#students');
-        await expect(within(crumbs).getByText('Maya R.'), 'the last crumb names the student').toBeVisible();
+        await expect(within(crumbs).queryByText('Maya R.'), 'the trail lists parents only: the student is the page, not a crumb').toBeNull();
     },
 };
 
