@@ -152,7 +152,7 @@ Don't: The buttons at the far end of the page, away from the fields, with the Pr
 FooterActions divides the footer into four equal tracks: filled buttons 48 high, Primary in the last track. One button takes the right half. A side action leads as a link and takes no track. A Panel's editing footer and a multi-step task's footer use the same component.
 
 Do: Two buttons filling the footer's four tracks.
-Don't: Small buttons inset at the end, hand-built, with spare footer around them.
+Don't: Small buttons in a group, with spare footer around them instead of filling the tracks.
 
 ### Keep the footer where it is. {#keep-the-footer-where-it-is}
 

@@ -4,6 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FilteringStories from './Filtering.stories.jsx';
 import {
+    CODE,
     CountOnIconCase,
     FiltersAmongViewsCase,
     FiltersAtEndCase,
@@ -157,8 +158,10 @@ Quick filters and a filter menu never share a bar: some filters outside and some
 
 <DoDontPair
     doExample={<OneTierCase />}
+    doCode={CODE.OneTier}
     doCaption="One tier: three quick filters, all in the bar."
     dontExample={<TwoTiersCase />}
+    dontCode={CODE.TwoTiers}
     dontCaption="Two quick filters plus a Filter button: two systems in one bar."
 />
 
@@ -170,8 +173,10 @@ The first two rows are for the title with its actions and for the views. The fil
 
 <DoDontPair
     doExample={<FiltersAtEndCase />}
+    doCode={CODE.FiltersAtEnd}
     doCaption="Views in the second row; Search, then the filters, in the third."
     dontExample={<FiltersAmongViewsCase />}
+    dontCode={CODE.FiltersAmongViews}
     dontCaption="The filters squeezed in beside the views."
 />
 
@@ -183,8 +188,10 @@ A FilterButton's count, the Filter button's count on the selected fill, or a cou
 
 <DoDontPair
     doExample={<CountOnIconCase />}
+    doCode={CODE.CountOnIcon}
     doCaption="The count on the Filter button, on the selected fill."
     dontExample={<TagRowCase />}
+    dontCode={CODE.TagRow}
     dontCaption="A row of tags under the bar, repeating what is on."
 />
 
