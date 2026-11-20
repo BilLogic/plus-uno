@@ -294,6 +294,7 @@ const preview = {
               "Range",
               "Rating",
               "Rich text editor",
+              "Segmented control",
               "Select",
               [
                 "Select",

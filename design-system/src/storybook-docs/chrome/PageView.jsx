@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, IconButton } from '@/components';
+import { IconButton, SegmentedControl } from '@/components';
 import { inDocsPage } from '../lib/use-fit-scale.js';
 import './PageView.scss';
 
@@ -149,7 +149,7 @@ export const usePageViewIds = () => {
     return { title: `${id}-title`, hint: `${id}-hint` };
 };
 
-/** The control bar: the zoom steps as one group and Full screen as an icon button; in full screen, the way out. */
+/** The control bar: the zoom steps as one segmented control and Full screen as an icon button; in full screen, the way out. */
 export const PageViewBar = ({ view, ids }) => {
     if (view.fullScreen) {
         return (
@@ -168,17 +168,13 @@ export const PageViewBar = ({ view, ids }) => {
     }
     return (
         <div className="plus-page-view__bar">
-            <ButtonGroup label="Page zoom">
-                {ZOOMS.map(({ key, label }) => (
-                    <Button
-                        key={key}
-                        text={label}
-                        spacing="compact"
-                        isSelected={view.zoom === key}
-                        onClick={() => view.setZoom(key)}
-                    />
-                ))}
-            </ButtonGroup>
+            <SegmentedControl
+                label="Page zoom"
+                spacing="compact"
+                options={ZOOMS.map(({ key, label }) => ({ value: key, label }))}
+                value={view.zoom}
+                onChange={view.setZoom}
+            />
             <IconButton
                 icon="expand"
                 label="Full screen"

@@ -1326,7 +1326,7 @@
       "import": "import { ButtonGroup } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx",
-      "summary": "Button group: a visually connected row of related actions. A plain container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology.",
+      "summary": "Button group: a plain row of spaced buttons for related actions. A container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology. To switch between views of the same content, use `SegmentedControl`.",
       "props": [
         {
           "name": "children",
@@ -1376,11 +1376,10 @@
       ],
       "stories": [
         "Overview",
-        "Seams",
         "Appearances",
         "Spacing",
         "IconOnly",
-        "Selected",
+        "Spaced",
         "HoveredState",
         "PressedState",
         "KeyboardFocus",
@@ -1388,8 +1387,7 @@
         "Overflow"
       ],
       "tokens": [
-        "--border-width-default",
-        "--button-radius-default"
+        "--inline-md"
       ]
     },
     {

@@ -2,7 +2,7 @@
 
 # ButtonGroup
 
-Button group: a visually connected row of related actions. A plain container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology.
+Button group: a plain row of spaced buttons for related actions. A container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology. To switch between views of the same content, use `SegmentedControl`.
 
 **Import:** `import { ButtonGroup } from '@/components';`
 
@@ -10,16 +10,17 @@ Button group: a visually connected row of related actions. A plain container for
 
 **Source:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Seams, Appearances, Spacing, IconOnly, Selected, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
+**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Appearances, Spacing, IconOnly, Spaced, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx`
 
 ## Usage
 
-Use `ButtonGroup` for a short row of related actions or view toggles that read as one unit.
+Use `ButtonGroup` for a short row of related actions that work on the same object. It spaces the buttons and names the row for assistive technology; it does not join them or track a selection.
 
 ## Alternatives
 
+- For switching how the same content is shown (Day / Week / Month, Table / Cards), use `SegmentedControl`.
 - For a single standalone action, use `Button`.
 - For one primary action joined to a menu of variations, use `SplitButton`.
 - For mutually exclusive form answers, use `RadioGroup`.
@@ -29,39 +30,39 @@ Use `ButtonGroup` for a short row of related actions or view toggles that read a
 
 ### Group related actions only. {#group-related-actions-only}
 
-A group reads as one control. Every button in it works on the same object.
+A group is one set of actions. Every button in it works on the same object.
 
-Do: Day, Week and Month all change the same calendar.
+Do: Edit, Duplicate and Archive all act on the same draft.
 Don't: Save, Delete and Help act on different things.
 
 ### Give the group an accessible name. {#give-the-group-an-accessible-name}
 
 `ButtonGroup` has no visible title of its own. `label` names the whole group
-for assistive technology, such as "Calendar view".
+for assistive technology, such as "Draft actions".
 
 ```jsx
-<ButtonGroup label="Calendar view">
-    <Button text="Day" isSelected={view === 'day'} onClick={() => setView('day')} />
-    <Button text="Week" isSelected={view === 'week'} onClick={() => setView('week')} />
+<ButtonGroup label="Draft actions">
+    <Button text="Edit" onClick={edit} />
+    <Button text="Duplicate" onClick={duplicate} />
 </ButtonGroup>
 ```
 
 ### Keep every button one size. {#keep-every-button-one-size}
 
-Buttons in a group share one spacing so the outline stays continuous.
+Buttons in a group share one spacing so the row keeps one height.
 
 Do: Every button uses default spacing.
-Don't: A compact button beside default ones breaks the outline.
+Don't: A compact button beside default ones makes the row uneven.
 
 ### Make the labels parallel. {#make-the-labels-parallel}
 
-Do: Every label is a noun of the same kind.
-Don't: A noun, a phrase and a verb in one group.
+Do: Every label is a verb of the same kind.
+Don't: A verb, a phrase and a noun in one group.
 
-### Selection state lives on each `Button`, not on the group. {#selection-state-lives-on-each-button-not-on-the-group}
+### Use `SegmentedControl` to switch views, not `ButtonGroup`. {#use-segmentedcontrol-to-switch-views-not-buttongroup}
 
-`ButtonGroup` renders children as given — set `isSelected` on the `Button`
-that should read as current, and manage which one that is yourself.
+A group runs actions and holds no selection. When one choice stays on and the
+view changes at once, such as Day, Week and Month, use `SegmentedControl`.
 
 ### Let `ButtonGroup` buttons that do not fit shrink and end their labels in an ellipsis. {#let-buttongroup-buttons-that-do-not-fit-shrink-and-end-their-labels-in-an-ellipsis}
 
@@ -76,6 +77,7 @@ The group keeps one row inside its slot. A clipped label has no Tooltip, so keep
 
 ## Related
 
+- `SegmentedControl`: use to switch how the same content is shown.
 - `Button`: use when an action stands alone or sits in a spaced row.
 - `SplitButton`: use when one primary action pairs with a chevron menu.
 - `ChoiceGrid`: use when offering illustrated choices (or `RadioGroup` / `CheckboxGroup` with `appearance="tile"`).
@@ -85,33 +87,23 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 ## Parts
 
 1. **Container.** Groups its children with `role="group"` and the `label` as its name. It paints nothing of its own.
-2. **Buttons.** Button or Icon button children that hug their labels. Each keeps its own appearance, spacing and state.
-3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control and a selected item's 1px border stays unbroken.
-
-### States
-
-| State | What changes |
-| --- | --- |
-| Hovered | The hovered button rises above its neighbors so its fill is not covered. |
-| Focused | The focused button rises above its neighbors so its ring is not covered. |
-| Selected | Set on each button with `isSelected`, which sets `aria-pressed`, draws `--ds-background-selected`, `--ds-text-selected` and a 1px `--ds-border-selected` border, and rises above its neighbors. The group has no selection logic. |
+2. **Buttons.** Button or Icon button children that hug their labels. Each keeps its own appearance, spacing, corners and state.
+3. **Gap.** The buttons sit one inline step apart.
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Outer corners | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
-| Seam overlap | 1: `--border-width-default`. |
-| Selected border | 1px `--ds-border-selected` over `--ds-background-selected`. |
+| Gap between buttons | 8: `--inline-md`. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Give the group a label that names the choice: "Date range". | A generic label such as "Buttons" or "Group". |
-| Keep each button label to one or two words in sentence case: "Week", "Month". | Long or sentence-length labels that make the group wrap. |
-| Make the labels parallel: all nouns or all verbs. | A mix such as "Week", "Show all" and "Choose". |
-| Order the buttons the way people read the choice, such as smallest to largest. | An arbitrary order. |
+| Give the group a label that names the set: "Draft actions". | A generic label such as "Buttons" or "Group". |
+| Keep each button label to one or two words in sentence case: "Edit", "Duplicate". | Long or sentence-length labels that make the group wrap. |
+| Make the labels parallel: all verbs. | A mix such as "Edit", "More options" and "Draft". |
+| Order the buttons by how often people use them. | An arbitrary order. |
 
 ## Props
 
@@ -125,7 +117,7 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 
 ## Tokens touched
 
-`--border-width-default` · `--button-radius-default`
+`--inline-md`
 
 From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss`. Override these through the token layer, never with a literal.
 

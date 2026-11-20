@@ -12,7 +12,8 @@ authored half, counted rather than assumed.
   - For an action shown as an icon with no visible label, use `IconButton`.
   - For a primary action joined to a menu of related variations, use `SplitButton`.
   - For a menu of actions behind one trigger, use `DropdownMenu`.
-- **[ButtonGroup](ButtonGroup/index.md)** — Use `ButtonGroup` for a short row of related actions or view toggles that read as one unit.
+- **[ButtonGroup](ButtonGroup/index.md)** — Use `ButtonGroup` for a short row of related actions that work on the same object. It spaces the buttons and names the row for assistive technology; it does not join them or track a selection.
+  - For switching how the same content is shown (Day / Week / Month, Table / Cards), use `SegmentedControl`.
   - For a single standalone action, use `Button`.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
@@ -76,7 +77,7 @@ authored half, counted rather than assumed.
   - For one to three quick filter triggers in a bar, use `FilterButton`.
 - **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
   - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-  - For switching between views of the same content, use `SegmentedControl`. For connected action buttons in a toolbar, use `ButtonGroup`.
+  - For switching between views of the same content, use `SegmentedControl`. For a spaced row of related action buttons, use `ButtonGroup`.
 - **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
   - For an action where space allows a text label, use `Button`.
   - For an icon that navigates to another page or site, use `LinkIconButton`.
@@ -137,7 +138,7 @@ authored half, counted rather than assumed.
   - For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.
   - For one value on a record page read far more often than edited, use `InlineEdit`.
 - **[SplitButton](SplitButton/index.md)** — Use `SplitButton` when one action is clearly primary and a few related variations belong in an attached menu, such as "Send" with "Send and close" or "Save as draft".
-  - For a connected row of actions with no single primary, use `ButtonGroup`.
+  - For a spaced row of actions with no single primary, use `ButtonGroup`.
   - For a single trigger that opens a menu of actions without a separate primary button, use `DropdownMenu`.
   - For a single action with no menu, use `Button`.
 - **[TagInput](TagInput/index.md)** — Use `TagInput` when a field's value is a set of short labels the person picks from a list and may create, rename, recolor or reorder in place, such as the topics a session covered. The field holds the picked values as `Tag`s in a `TagGroup`, with a text entry after them, and focusing it opens the option list under it.

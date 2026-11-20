@@ -95,10 +95,10 @@ export const webAppSourceSnippets = {
         '/>'
     ]),
     buttonGroup: snippet([
-        '<ButtonGroup label="Alignment">',
-        '  <Button text="Left" />',
-        '  <Button text="Center" />',
-        '  <Button text="Right" />',
+        '<ButtonGroup label="Draft actions">',
+        '  <Button text="Edit" />',
+        '  <Button text="Duplicate" />',
+        '  <Button text="Archive" />',
         '</ButtonGroup>'
     ]),
     card: snippet([

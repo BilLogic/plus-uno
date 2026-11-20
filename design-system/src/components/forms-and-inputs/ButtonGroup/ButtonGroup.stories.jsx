@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
-import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
 import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
@@ -40,31 +39,6 @@ export const Overview = {
         const group = within(canvasElement).getByRole('group', { name: 'Date range' });
         await expect(group).toHaveClass('plus-button-group');
         await expect(within(group).getAllByRole('button')).toHaveLength(2);
-    },
-};
-
-/** Joined: outer corners keep the button radius, inner seams are square. */
-export const Seams = {
-    render: () => (
-        <ButtonGroup label="Seams">
-            <Button text="Day" />
-            <Button text="Week" />
-            <Button text="Month" />
-        </ButtonGroup>
-    ),
-    play: async ({ canvasElement }) => {
-        const [a, b, c] = within(canvasElement).getAllByRole('button').map((el) => getComputedStyle(el));
-        await expect(a.borderTopLeftRadius).toBe('6px');
-        await expect(a.borderBottomLeftRadius).toBe('6px');
-        await expect(a.borderTopRightRadius).toBe('0px');
-        await expect(a.borderBottomRightRadius).toBe('0px');
-        for (const side of ['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight']) {
-            await expect(b[`border${side}Radius`], `middle ${side}`).toBe('0px');
-        }
-        await expect(c.borderTopLeftRadius).toBe('0px');
-        await expect(c.borderBottomLeftRadius).toBe('0px');
-        await expect(c.borderTopRightRadius).toBe('6px');
-        await expect(c.borderBottomRightRadius).toBe('6px');
     },
 };
 
@@ -104,71 +78,44 @@ export const Spacing = {
 };
 
 export const IconOnly = {
-    render: () => {
-        const [view, setView] = useState('grid');
-        return (
-            <ButtonGroup label="View mode">
-                <IconButton icon="grip" label="Grid view" isSelected={view === 'grid'} onClick={() => setView('grid')} />
-                <IconButton icon="list" label="List view" isSelected={view === 'list'} onClick={() => setView('list')} />
-            </ButtonGroup>
-        );
-    },
+    render: () => (
+        <ButtonGroup label="Item actions">
+            <IconButton icon="pen" label="Edit" />
+            <IconButton icon="copy" label="Duplicate" />
+            <IconButton icon="trash" label="Delete" />
+        </ButtonGroup>
+    ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Grid view' })).toHaveAttribute('aria-pressed', 'true');
+        for (const name of ['Edit', 'Duplicate', 'Delete']) {
+            await expect(canvas.getByRole('button', { name })).not.toHaveAttribute('aria-pressed');
+        }
     },
 };
 
-export const Selected = {
-    render: () => {
-        const [range, setRange] = useState('week');
-        const [format, setFormat] = useState('table');
-        return (
-            <div style={row}>
-                <ButtonGroup label="Date range">
-                    <Button text="Day" isSelected={range === 'day'} onClick={() => setRange('day')} />
-                    <Button text="Week" isSelected={range === 'week'} onClick={() => setRange('week')} />
-                    <Button text="Month" isSelected={range === 'month'} onClick={() => setRange('month')} />
-                </ButtonGroup>
-                <ButtonGroup label="Schedule format">
-                    <Button appearance="subtle" text="Table" isSelected={format === 'table'} onClick={() => setFormat('table')} />
-                    <Button appearance="subtle" text="Calendar" isSelected={format === 'calendar'} onClick={() => setFormat('calendar')} />
-                </ButtonGroup>
-            </div>
-        );
-    },
+/** A plain row: each button keeps its own radius and the gap is the inline step. */
+export const Spaced = {
+    render: () => (
+        <ButtonGroup label="Spaced">
+            <Button text="Day" />
+            <Button text="Week" />
+            <Button text="Month" />
+        </ButtonGroup>
+    ),
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const week = canvas.getByRole('button', { name: 'Week' });
-        const month = canvas.getByRole('button', { name: 'Month' });
-        const assigned = canvas.getByRole('button', { name: 'Table' });
-        week.style.transition = 'none';
-        month.style.transition = 'none';
-        assigned.style.transition = 'none';
-        await expect(week).toHaveAttribute('aria-pressed', 'true');
-        await expect(month).toHaveAttribute('aria-pressed', 'false');
-        const weekStyle = getComputedStyle(week);
-        await expect(weekStyle.backgroundColor, 'selected fill').toBe(tokenColor(canvasElement, '--ds-background-selected'));
-        await expect(weekStyle.color, 'selected text').toBe(tokenColor(canvasElement, '--ds-text-selected'));
-        await expect(weekStyle.borderTopWidth, 'selected 1px border width').toBe('1px');
-        await expect(weekStyle.borderRightWidth, 'selected right seam border width').toBe('1px');
-        await expect(weekStyle.borderLeftWidth, 'selected left seam border width').toBe('1px');
-        await expect(weekStyle.borderTopColor, 'selected border').toBe(tokenColor(canvasElement, '--ds-border-selected'));
-        await expect(weekStyle.zIndex, 'selected button rises above both neighbors').toBe('1');
-        await expect(week).not.toHaveClass('plus-btn--fit-container');
-
-        const assignedStyle = getComputedStyle(assigned);
-        await expect(assignedStyle.borderTopWidth, 'subtle selected 1px border width').toBe('1px');
-        await expect(assignedStyle.borderTopColor, 'subtle selected border').toBe(tokenColor(canvasElement, '--ds-border-selected'));
-
-        const monthStyle = getComputedStyle(month);
-        await expect(monthStyle.backgroundColor, 'default fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
-        await expect(monthStyle.color, 'default text').toBe(tokenColor(canvasElement, '--ds-text'));
-        await expect(monthStyle.borderTopColor, 'default border').toBe('rgba(0, 0, 0, 0)');
+        const buttons = within(canvasElement).getAllByRole('button');
+        for (const el of buttons) {
+            const style = getComputedStyle(el);
+            for (const corner of ['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight']) {
+                await expect(style[`border${corner}Radius`], corner).toBe('6px');
+            }
+        }
+        const [first, second] = buttons.map((el) => el.getBoundingClientRect());
+        await expect(Math.round(second.left - first.right), 'gap between buttons').toBe(tokenLength(canvasElement, '--inline-md'));
     },
 };
 
-/** A hovered member takes the default hovered step and rises above its neighbor. */
+/** A hovered member takes the default hovered step. */
 export const HoveredState = {
     parameters: { docs: { disable: true } },
     render: () => (
@@ -182,8 +129,6 @@ export const HoveredState = {
         for (const name of ['Week hover', 'Month hover']) {
             const member = canvas.getByRole('button', { name });
             await expectHovered(canvasElement, member, 'default', name);
-            const raised = withForcedPseudo(member, ':hover', () => getComputedStyle(member).zIndex);
-            await expect(raised, `${name} rises above its neighbor`).toBe('1');
         }
     },
 };
@@ -205,7 +150,7 @@ export const PressedState = {
     },
 };
 
-/** Tabbing onto a member draws the 2px ring, raised above its neighbor. */
+/** Tabbing onto a member draws the 2px ring. */
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => (
@@ -216,12 +161,8 @@ export const KeyboardFocus = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const month = canvas.getByRole('button', { name: 'Month focus' });
         await expectFocusRing(canvasElement, canvas.getByRole('button', { name: 'Week focus' }), 'first member');
-        await expectFocusRing(canvasElement, month, 'last member');
-        month.focus({ focusVisible: true });
-        await expect(getComputedStyle(month).zIndex, 'ring sits above the neighbor').toBe('1');
-        month.blur();
+        await expectFocusRing(canvasElement, canvas.getByRole('button', { name: 'Month focus' }), 'last member');
     },
 };
 
