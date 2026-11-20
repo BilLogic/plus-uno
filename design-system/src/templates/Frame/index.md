@@ -135,6 +135,18 @@ The default type at 1440 with the AI panel docked.
 3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width, no cap at full width).
 4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It docks from 1168 with a 400 panel, from 1408 beside an open Sidebar; under that it floats over the Page.
 
+## Width behavior
+
+The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel floats over the Page with no Blanket. Under 768 the panel is full width. The Sidebar docks from 1024 (in Figma, the `Sidebar docked` variable); in code the Frame measures its own width through the layout resolver and has no token for it.
+
+## Key states
+
+- **Panel collapses the Sidebar, 1200.** The Sidebar, a 400 panel and 720 of content cannot all fit, so the Sidebar collapses and the toggle moves to the Page's top left. It comes back when the panel closes.
+
+- **Under 1024.** The Sidebar never docks: opened by hand it floats over the Page. The panel floats over the Page with no Blanket, and one layer is open at a time.
+
+A system banner, when one is needed, spans the whole width above the Sidebar and the Page: Notifications.
+
 ## Slots
 
 | Slot or prop | Holds |

@@ -137,6 +137,16 @@ A record page one level down shows every header slot, with markers in the gutter
 6. **Banner** (optional). Under the header, one at a time.
 7. **Content.** Sections on the grid, under the header.
 
+## Width behavior
+
+Drag the width control. Above the content cap, content centers at the cap; below it, content fills the available width. The header keeps one h1 at every width.
+
+## Key states
+
+- **Page banner.** A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview.
+
+- **Header and banner slots.** Page owns the spacing from its header to the banner and content, including when the banner is removed.
+
 ## Slots
 
 | Slot or prop | Holds |

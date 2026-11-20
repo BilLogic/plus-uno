@@ -32,8 +32,9 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 
 export default {
     decorators: [settledLayout],
-    // A test harness and the page's figures: `!dev` keeps it out of the sidebar. The page is Templates/Panel (Panel.mdx).
-    title: 'Templates/Panel/Examples',
+    // The page's figures and tests: `!dev` keeps them out of the sidebar. Panel.mdx attaches to this meta, so the page is Templates/Panel.
+    title: 'Templates/Panel',
+    component: PanelContainer,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'padded' },
 };

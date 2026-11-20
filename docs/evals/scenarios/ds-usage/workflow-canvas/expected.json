@@ -15,7 +15,7 @@
       "pages": [
         "design-system/src/templates/Frame/index.md",
         "design-system/src/templates/Page/index.md",
-        "design-system/agent-views/templates/Panel.md"
+        "design-system/src/templates/Panel/index.md"
       ],
       "guides": ["frame", "page", "panel", "templates"],
       "scoring": "checker",
@@ -82,7 +82,7 @@
     {
       "id": "node-details-in-panel",
       "placement": "Selected node details in Panel",
-      "page": "design-system/agent-views/templates/Panel.md",
+      "page": "design-system/src/templates/Panel/index.md",
       "section": "Details",
       "scoring": "judge",
       "expectation": "Node inspection and rename controls render in a non-blocking Panel beside the canvas."

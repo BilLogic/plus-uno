@@ -20,9 +20,11 @@ export function componentContext(root, records, { source = false } = {}) {
       const record = records.find((r) => r.source === p.componentSource || r.name === p.componentName);
       const source = record?.source;
       const dir = source && path.posix.dirname(source);
-      const doc = source
+      // A template page in its own folder owns that folder's index.md, whether or not a component of its name is the source (Popup's is a component).
+      const ownFolder = p.categoryRoot === 'Templates' && p.file.startsWith('design-system/src/templates/') ? `${path.posix.dirname(p.file)}/index.md` : null;
+      const doc = ownFolder ?? (source
         ? `${dir}/${path.posix.basename(dir) === path.posix.basename(source, '.jsx') ? 'index' : record.name}.md`
-        : agentFilePath(p.file, p.categoryRoot);
+        : agentFilePath(p.file, p.categoryRoot));
       const text = pageText(page);
       const slots = sectionText(page, 'Slots') ?? '';
       const references = (body) => names.filter((name) => {

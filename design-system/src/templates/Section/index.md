@@ -172,6 +172,16 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
+## Width behavior
+
+Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
+
+## Key states
+
+- **Empty, in a table.** The empty state replaces the whole table, column headers and footer too, and offers "Reset filters". The rule is the Empty pattern's.
+
+Loading, errors and the search field follow their patterns and components: Loading, Errors and Search, listed in Patterns.
+
 ## Slots
 
 | Slot or prop | Holds |

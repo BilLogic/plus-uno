@@ -617,6 +617,21 @@ for (const [name, entry] of parsedByName) {
   const [record] = buildComponentsManifest({ exports: [name], components: [entry], version }).components;
   renderOne({ ...componentFacts({ components: [...manifest.components, record] }, name, aliasRows), import: null });
 }
+/**
+ * A template whose source is a component of its own (Popup) has no file in its
+ * folder to parse. Its page still owns that folder's index.md: the component's
+ * props with the template page's text, so every template has one agent file.
+ */
+for (const template of context.pages.filter((p) => p.kind === 'template' && p.doc.startsWith('design-system/src/templates/') && !p.component)) {
+  const record = manifest.components.find((r) => r.name === template.name && r.kind !== 'template' && r.source);
+  const pageFile = template.doc.replace(/index\.md$/, `${template.name}.mdx`);
+  if (!record || !fs.existsSync(path.join(REPO_ROOT, pageFile))) continue;
+  const storiesFile = pageFile.replace(/\.mdx$/, '.stories.jsx');
+  const stories = readIf(path.join(REPO_ROOT, storiesFile));
+  const facts = { ...componentFacts(manifest, record.name, aliasRows), storiesFile, ...(stories ? { stories: storyExports(stories) } : {}) };
+  const page = readDocsPage(fs.readFileSync(path.join(REPO_ROOT, pageFile), 'utf8'), { root: REPO_ROOT, file: pageFile });
+  written.push([path.join(REPO_ROOT, template.doc), renderComponent(facts, { path: pageFile, page }, context.edges[record.name])]);
+}
 for (const group of groups) written.push([path.join(group.dir, 'index.md'), groupIndex(group, Object.fromEntries(rendered))]);
 
 /**

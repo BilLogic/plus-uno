@@ -139,6 +139,31 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 20 on ev
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
 4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
 
+## Width behavior
+
+Drag the screen's width. The Modal grows with it and never shrinks.
+
+| Width | 768 | 1024 | 1440 | Made of |
+| --- | --- | --- | --- | --- |
+| 4-col | 269 | 355 | 440 | 4 screen-grid columns + 2 × 20 |
+| 6-col | 392 | 520 | 648 | 6 columns + 2 × 20 |
+| 8-col | 515 | 685 | 856 | 8 columns + 2 × 20 |
+| 10-col | 637 | 851 | 1064 | 10 columns + 2 × 20 |
+
+## Widths
+
+A width is a step of the screen grid plus 20 on each side: 4, 6, 8 and 10 columns, here at 1024. It grows with the window and never shrinks; the Sidebar never changes it.
+
+## Key states
+
+- **Long content.** Each width has a maximum height. Past it the body scrolls between the pinned header and footer; the footer never moves.
+
+- **Loading.** No skeleton on the Modal itself; the body shows its content's own loading state: Loading.
+
+- **With a form.** The fields in the body and the Modal's own footer. A blocked submit keeps the Modal open and marks the field: Forms.
+
+A Modal that confirms inside itself is under Stacking.
+
 ## Slots
 
 ```jsx
