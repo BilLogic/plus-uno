@@ -11,7 +11,6 @@
 import React from 'react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { libraryStyleFiles, resolveStyleSource } from '../../scripts/lib/style-sources.mjs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { CORNER_TOKEN, HEIGHTS, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
@@ -19,6 +18,7 @@ import { Illustration } from '../src/storybook-docs/illustrations/Illustration.j
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
 import * as construction from '../src/storybook-docs/illustrations/construction.jsx';
+import { libraryStyleFiles, resolveStyleSource } from '../../scripts/lib/style-sources.mjs';
 
 const SRC = resolve(__dirname, '../src');
 const STYLES = libraryStyleFiles(resolve(__dirname, '../..'));

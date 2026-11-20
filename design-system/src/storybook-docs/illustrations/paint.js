@@ -30,7 +30,7 @@
  *   same; floating, Frame's overlay fill and shadow, and no edge line.
  */
 
-/** role: [token, the component stylesheet's file name, found by name across the library] */
+/** role: [token, stylesheet file name, found across the library] */
 const ROLES = {
   // Frame and Page
   pageSurface: ['--ds-surface', 'Frame.scss'],
@@ -160,7 +160,7 @@ const ROLES = {
 };
 
 /**
- * height role: [height token, source stylesheet name]. The kit draws it at half (one unit
+ * height role: [height token, stylesheet file name found across the library, drawn height]. The kit draws it at half (one unit
  * is 2px), and the paint test resolves each token to px and holds the drawn
  * height to it. Only roles whose real component sets a height token are here.
  */
@@ -173,7 +173,7 @@ export const HEIGHTS = {
   sidebarRow: ['--control-md', 'Sidebar.scss', 16],
 };
 
-/** corner role: [radius token, source SCSS]. Drawn at the kit's half scale. */
+/** corner role: [radius token, stylesheet file name, found across the library]. Drawn at the kit's half scale. */
 const CORNERS = {
   window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'Button.scss'],

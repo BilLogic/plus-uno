@@ -36,7 +36,7 @@ export function resolveStyleSource(files, source) {
   if (matches.length === 1) return matches[0];
   throw new Error(
     matches.length === 0
-      ? `No style file matches "${source}"`
+      ? `No style file matches "${source}": update the source in illustrations/paint.js`
       : `"${source}" matches ${matches.length} style files (${matches.join(', ')}): name the folder too`,
   );
 }
