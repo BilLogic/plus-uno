@@ -5,7 +5,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { FileItem } from '@/components';
 import FileUpload from './FileUpload';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { LONG_FILE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_FILE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 

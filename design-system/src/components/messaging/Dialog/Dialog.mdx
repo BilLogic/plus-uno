@@ -71,6 +71,8 @@ The width examples are drawn at the 1024 screen.
 
 <ComponentExample of={DialogStories.Content} title="Content" description="Short and long bodies, with and without footer actions." />
 
+<ComponentExample of={DialogStories.Overflow} title="Overflow" description="Wrap: a title longer than the dialog takes more lines and never ends in an ellipsis; the close button keeps its place." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -257,6 +259,10 @@ objects and the component renders the `FooterActions` pair.
 Do: Pass `primaryButton` or `footer` when the dialog asks for a decision.
 
 Don't: Leave a confirm dialog with no footer action.
+
+### Let a title longer than the Dialog wrap.
+
+A title takes more lines and never ends in an ellipsis; the close button keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use `Modal` from `@/templates` when a task needs a Blanket and focus trap.
 

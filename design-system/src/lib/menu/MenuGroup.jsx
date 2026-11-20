@@ -119,7 +119,7 @@ ItemRow.propTypes = {
  */
 const ItemTooltip = ({ label, children }) => (
     <ClippedTooltip text={typeof label === 'string' ? label : ''} placement="right">
-        {({ measureRef }) => children(measureRef)}
+        {({ measureRef, truncated }) => children(measureRef, truncated)}
     </ClippedTooltip>
 );
 
@@ -229,9 +229,6 @@ LinkItem.propTypes = {
 export const CustomItem = ({ component: Component = 'div', elemBefore, elemAfter, description, isSelected, isDisabled, testId, className, children, ...props }) => {
     const roving = useRoving();
     const onKeyDown = useRovingHandlers(roving);
-    const row = (
-        <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
-    );
     const rowClassName = clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className);
 
     // `menuitem` is only a valid role on elements HTML-AAM allows it on (e.g. `div`); a
@@ -241,37 +238,50 @@ export const CustomItem = ({ component: Component = 'div', elemBefore, elemAfter
     // look (background, padding, selected/disabled state) goes on `Component` itself: it is
     // the visible, clickable box, and a native control like `button` paints its own opaque
     // background over the wrapper's otherwise.
-    if (Component !== 'div') {
-        return (
-            <div role="menuitem">
-                <Component
-                    ref={(node) => roving?.register(node)}
-                    aria-disabled={isDisabled || undefined}
-                    aria-current={isSelected || undefined}
-                    onKeyDown={onKeyDown}
-                    data-testid={testId}
-                    className={rowClassName}
-                    {...props}
-                >
-                    {row}
-                </Component>
-            </div>
-        );
-    }
-
+    //
+    // A label that does not fit ends in an ellipsis with its full text in a Tooltip on
+    // the row, like the other rows. A plain `div` row is not a control, so it takes a tab
+    // stop only while it is clipped, to make the Tooltip reachable by keyboard.
     return (
-        <Component
-            ref={(node) => roving?.register(node)}
-            role="menuitem"
-            aria-disabled={isDisabled || undefined}
-            aria-current={isSelected || undefined}
-            onKeyDown={onKeyDown}
-            data-testid={testId}
-            className={rowClassName}
-            {...props}
-        >
-            {row}
-        </Component>
+        <ItemTooltip label={children}>
+            {(labelRef, truncated) => {
+                const row = (
+                    <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description} labelRef={labelRef}>{children}</ItemRow>
+                );
+                if (Component !== 'div') {
+                    return (
+                        <div role="menuitem">
+                            <Component
+                                ref={(node) => roving?.register(node)}
+                                aria-disabled={isDisabled || undefined}
+                                aria-current={isSelected || undefined}
+                                onKeyDown={onKeyDown}
+                                data-testid={testId}
+                                className={rowClassName}
+                                {...props}
+                            >
+                                {row}
+                            </Component>
+                        </div>
+                    );
+                }
+                return (
+                    <Component
+                        ref={(node) => roving?.register(node)}
+                        role="menuitem"
+                        tabIndex={truncated && !isDisabled ? 0 : undefined}
+                        aria-disabled={isDisabled || undefined}
+                        aria-current={isSelected || undefined}
+                        onKeyDown={onKeyDown}
+                        data-testid={testId}
+                        className={rowClassName}
+                        {...props}
+                    >
+                        {row}
+                    </Component>
+                );
+            }}
+        </ItemTooltip>
     );
 };
 

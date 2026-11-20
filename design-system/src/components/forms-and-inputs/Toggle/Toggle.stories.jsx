@@ -7,7 +7,7 @@ import { px, probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Toggle from './Toggle';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export const Motion = {
     render: () => <Toggle label="Session reminders" />,

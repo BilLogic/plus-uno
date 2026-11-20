@@ -14,7 +14,7 @@ Also asked as: path, navigation trail.
 
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
-**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused, Overflow
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 
@@ -98,10 +98,14 @@ Don't: A React element is stringified by CSS and disappears.
 
 ### Show the whole path, root first. {#show-the-whole-path-root-first}
 
-A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let the row wrap rather than dropping a level.
+A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let a level too long end in an ellipsis rather than dropping it.
 
 Do: Every level from the root to the current page.
 Don't: The trail starts mid-hierarchy, so the top is missing.
+
+### Keep the trail on one line and truncate each level. {#keep-the-trail-on-one-line-and-truncate-each-level}
+
+A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Folding the middle of five or more levels is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use it for position, not for history. {#use-it-for-position-not-for-history}
 

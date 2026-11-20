@@ -11,6 +11,7 @@ import Sidebar, {
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 /**
  * `Sidebar` — the app's navigation.
@@ -512,11 +513,11 @@ export const TabsMany = {
 };
 
 /**
- * A tab whose label is clipped shows the full text in a tooltip, on hover and
+ * Truncate: a tab whose label is clipped shows the full text in a tooltip, on hover and
  * on focus. The row is already a button, so it takes no second tab stop, and a
  * tab that fits has no tooltip of its own (here, none). No `title` is used.
  */
-export const TabsClipped = {
+export const Overflow = {
     args: { tabSet: 'clipped', activeId: 'home' },
     play: async ({ canvasElement }) => {
         const body = within(canvasElement.ownerDocument.body);
@@ -524,6 +525,8 @@ export const TabsClipped = {
         const clipped = tabNamed(canvasElement, /Wed 4:30 PM/);
         const fullText = 'Wed 4:30 PM · Mr. Alexander-Montgomery';
         const label = clipped.querySelector('.plus-template-sidebar__label');
+        await expectNoSilentClip(nav(canvasElement));
+        await expectInsideWell(clipped, nav(canvasElement));
 
         await waitFor(() => expect(label.scrollWidth, 'the label is clipped').toBeGreaterThan(label.clientWidth));
         await expect(clipped, 'no title attribute').not.toHaveAttribute('title');

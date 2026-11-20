@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TreeSelect from './TreeSelect';
-import { LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Select/Tree select',

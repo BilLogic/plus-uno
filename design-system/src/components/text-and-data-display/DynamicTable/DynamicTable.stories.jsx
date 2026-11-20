@@ -6,6 +6,7 @@ import { Button, DynamicTable, EmptyState, HeadCell, StaticTable } from '@/compo
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { Section } from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { LONG_TUTOR, LONG_SENTENCE, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
 
 /**
  * The Dynamic table: a table people sort, page or act on. `DynamicTable` is
@@ -638,4 +639,39 @@ export const DisabledRow = {
 /** The playground: the default story's args, with every control live. */
 export const Interactive = {
     args: { ...Default.args }
+};
+
+/** Page: a table with more rows than a page shows one page and a pager in its footer, never growing past it. A cell longer than its column truncates with a Tooltip; a header that must be read whole wraps. */
+export const Overflow = {
+    args: {
+        head: {
+            cells: [
+                { key: 'student', content: 'Student', isSortable: true },
+                { key: 'note', content: 'Tutor reflection and supervisor feedback, as submitted after the session', shouldTruncate: false, width: '200px' /* demo frame */ },
+            ],
+        },
+        rows: [
+            { key: 'a', cells: [{ key: 'a', content: LONG_TUTOR }, { key: 'a2', content: LONG_SENTENCE }] },
+            ...['Marcus Lee', 'Sofia Ramirez', 'Jordan Patel', 'Emily Chen', 'Noah Williams'].map((name) => ({ key: name, cells: [{ key: name, content: name }, { key: `${name}-note`, content: 'Fractions' }] })),
+        ],
+        label: 'Students',
+        rowsPerPage: 3,
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(bodyRows(canvas), 'one page, not every row').toHaveLength(3);
+        await expect(canvas.getByText('1–3 of 6')).toBeVisible();
+        await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+        await expect(canvas.getByText('4–6 of 6')).toBeVisible();
+        await userEvent.click(canvas.getByRole('button', { name: 'Previous' }));
+        const head = canvas.getByRole('columnheader', { name: /Tutor reflection/ });
+        const label = head.querySelector('.plus-table-head-cell-label');
+        await expect(label.scrollWidth, 'the header is shown whole').toBeLessThanOrEqual(label.clientWidth + 1);
+        await waitFor(() => expect(canvas.getAllByText(LONG_SENTENCE), 'the page has settled').toHaveLength(1));
+        const note = within(bodyRows(canvas)[0]).getAllByRole('cell')[1].querySelector('.plus-table-cell-text');
+        await waitFor(() => expect(note.scrollWidth).toBeGreaterThan(note.clientWidth));
+        await expectNoSilentClip(canvasElement.querySelector('tbody'));
+        await expectInsideWell(canvasElement.querySelector('.plus-table-shell-scroll'), canvasElement.firstElementChild);
+        await expectFullTextReachable(canvasElement, note, LONG_SENTENCE);
+    },
 };

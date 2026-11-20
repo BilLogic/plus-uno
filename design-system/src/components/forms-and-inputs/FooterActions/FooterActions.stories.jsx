@@ -10,7 +10,7 @@ import {
 } from '@/templates';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 const stageStyle = {
     inlineSize: '560px',

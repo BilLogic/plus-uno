@@ -5,7 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextArea from './TextArea';
-import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Text area',

@@ -7,7 +7,7 @@ import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';
-import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../_internal/overflowPlays';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Text field',

@@ -8,7 +8,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
-import { expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../_internal/overflowPlays';
+import { expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date picker',

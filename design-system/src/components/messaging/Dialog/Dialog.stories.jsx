@@ -6,6 +6,7 @@ import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { FigureScreen } from '@/storybook-docs/ds-docs-layout.jsx';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
+import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 export default {
     title: 'Components/Messaging/Dialog',
@@ -568,5 +569,32 @@ export const Focused = {
     render: () => <StateDialog />,
     play: async ({ canvasElement }) => {
         await expectFocusRing(canvasElement, await closeOf(canvasElement), 'dialog close');
+    },
+};
+
+/** Wrap: a title longer than the dialog takes more lines and never ends in an ellipsis; the close button keeps its place. */
+export const Overflow = {
+    render: () => (
+        <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, width: '100%' }}>
+            <Dialog
+                width="4-col"
+                title={`Move ${LONG_TUTOR}'s session from ${LONG_TOPIC}`}
+                body="The tutor and the family get an email with the new time."
+                primaryButton={{ text: 'Move session' }}
+                onClose={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const panel = canvasElement.querySelector('.plus-dialog');
+        const heading = canvas.getByRole('heading', { level: 1 });
+        const one = parseFloat(getComputedStyle(heading).lineHeight);
+        await expect(getComputedStyle(heading).textOverflow, 'a title never ends in an ellipsis').not.toBe('ellipsis');
+        await expect(heading.scrollWidth, 'the whole title is shown').toBeLessThanOrEqual(heading.clientWidth + 1);
+        await expect(heading.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expectInsideWell(heading, panel);
+        await expectInsideWell(canvas.getByRole('button', { name: 'Close' }), panel);
+        await expectNoSilentClip(panel);
     },
 };

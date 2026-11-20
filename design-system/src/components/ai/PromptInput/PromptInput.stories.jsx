@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import PromptInput from './PromptInput';
 import { iconClass } from '../../../lib/icon';
+import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 
 /**
  * `PromptInput` — where a person writes to the AI.
@@ -261,3 +263,25 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = { label: 'Message to AI chat', placeholder: 'Ask anything', isDisabled: false, isLoading: false };
+
+/** Grow, then scroll: a prompt longer than five lines grows to its maximum height and scrolls inside itself; the send button stays at the bottom and nothing leaves the field. */
+export const Overflow = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to AI chat" defaultValue={Array.from({ length: 10 }, (_, i) => `${i + 1}. ${LONG_TOPIC}`).join('\n')} onSubmit={fn()} />
+    </div>
+);
+
+Overflow.play = async ({ canvasElement }) => {
+    const box = canvasElement.querySelector('.plus-field');
+    const area = within(canvasElement).getByRole('textbox', { name: 'Message to AI chat' });
+    const send = within(canvasElement).getByRole('button', { name: 'Send' });
+    const max = tokenLength(canvasElement, '--type-line-height-125') * 5 + tokenLength(canvasElement, '--pad-y-md') * 2;
+    await expect(Math.round(area.getBoundingClientRect().height), 'it stops at five lines').toBe(Math.round(max));
+    await expect(area.scrollHeight, 'the rest scrolls inside').toBeGreaterThan(area.clientHeight);
+    await expect(getComputedStyle(area).overflowY).toBe('auto');
+    await expect(insets(send, box).bottom, 'send stays at the bottom').toBe(4);
+    await expectNoSilentClip(canvasElement);
+    await expectInsideWell(box, canvasElement.firstElementChild);
+    area.scrollTop = area.scrollHeight;
+    await expect(area.scrollTop + area.clientHeight, 'the last line is reachable').toBeGreaterThanOrEqual(area.scrollHeight - 1);
+};

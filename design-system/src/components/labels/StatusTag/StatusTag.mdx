@@ -57,7 +57,7 @@ system calculated it or a person set it.
 
 ## Behavior
 
-<ComponentExample of={StatusTagStories.Truncation} title="Truncation" description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus.</>} />
+<ComponentExample of={StatusTagStories.Overflow} title="Overflow" description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus.</>} />
 
 <ComponentExample of={StatusTagStories.NeverAButton} title="Never a button" description={<>An <code>onClick</code> passed to a Status tag is dropped with a development warning.</>} />
 
@@ -206,6 +206,10 @@ A status is read at a glance; a sentence belongs in the row text.
     dontExample={<StatusTag appearance="success">Student is on track for the next session</StatusTag>}
     dontCaption="A sentence in the tag."
 />
+
+### Let a label longer than 200 end in an ellipsis with a Tooltip.
+
+The Tooltip is on only while the label is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Show one status per object.
 

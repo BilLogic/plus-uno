@@ -6,9 +6,11 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 **Import:** `import { AvatarGroup } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.stories.jsx` — Group, GroupFits, Sizes, GroupSizeAndShape, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.stories.jsx` — Group, GroupFits, Sizes, GroupSizeAndShape, Interactive, Rest, Hovered, Pressed, Focused, Disabled, Overflow
 
 **Storybook page:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.mdx`
 
@@ -40,6 +42,10 @@ slot — `max` is the most slots the row ever shows, the `+n` included.
 
 Do: Three people fit in the cap with no +n.
 Don't: A fourth person shows two avatars and +n, because the +n takes a slot.
+
+### Fold the rest into `+n`, never past the row. {#fold-the-rest-into-n-never-past-the-row}
+
+The group never outgrows its row: people past `max` go behind `+n`, listed by name, and a name longer than the menu ends in an ellipsis with a Tooltip. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep the group short. {#keep-the-group-short}
 

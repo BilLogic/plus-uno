@@ -10,6 +10,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing as expectRing } from '@/storybook-docs/lib/button-states.js';
 import { iconClass } from '../../../lib/icon';
+import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 /**
  * `Tag` — a category, outlined: color on the border, neutral text, one size
@@ -1111,12 +1112,12 @@ export const Saving = {
 /* -------------------------------------------------------------- truncation */
 
 /**
- * Every tag caps at 180 wide. A clipped label ellipsizes and its full text is a
+ * Truncate: every tag caps at 180 wide. A clipped label ellipsizes and its full text is a
  * tooltip a keyboard can reach: on a span tag the label takes focus while it is
  * clipped; on a control, the control carries the tooltip. A label that fits
  * gets no tooltip and no extra tab stop.
  */
-export const Truncation = () => (
+export const Overflow = () => (
     <div style={row}>
         <Tag color="blue">Social-Emotional Learning and Advocacy for Every Student</Tag>
         <Tag isSelected={false} color="blue">Mastering Content Across Every Grade Band</Tag>
@@ -1124,8 +1125,10 @@ export const Truncation = () => (
     </div>
 );
 
-Truncation.play = async ({ canvasElement }) => {
+Overflow.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await expectNoSilentClip(canvasElement);
+    await expectInsideWell(canvas.getByText('Social-Emotional Learning and Advocacy for Every Student').parentElement, canvasElement.firstElementChild);
     const page = within(canvasElement.ownerDocument.body);
     const long = canvas.getByText('Social-Emotional Learning and Advocacy for Every Student');
 

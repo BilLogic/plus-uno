@@ -4,7 +4,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { expectNoSilentClip } from '../../_internal/overflowPlays';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Tooltip, Button, Popup, Link } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
@@ -225,8 +226,8 @@ export const PlacementBottom = { render: () => <PlacedTooltip placement="bottom"
 export const PlacementLeft = { render: () => <PlacedTooltip placement="left" /> };
 export const PlacementRight = { render: () => <PlacedTooltip placement="right" /> };
 
-/** A long line wraps past the maximum width. */
-export const Wrapping = {
+/** Wrap: a long line wraps at the maximum width, never ends in an ellipsis, and stays whole. */
+export const Overflow = {
     render: () => (
         <div style={tooltipPlaygroundPadding}>
             <Tooltip text="Opens the session notes, with the goals, the topics covered and what to practice before the next lesson" show>
@@ -234,6 +235,14 @@ export const Wrapping = {
             </Tooltip>
         </div>
     ),
+    play: async ({ canvasElement }) => {
+        const tooltip = await within(canvasElement.ownerDocument.body).findByRole('tooltip');
+        const one = parseFloat(getComputedStyle(tooltip).lineHeight);
+        await expect(tooltip.getBoundingClientRect().width, 'it stops at its maximum width').toBeLessThanOrEqual(tokenLength(canvasElement, '--tooltip-max-width') + 1);
+        await expect(tooltip.getBoundingClientRect().height, 'it took more than one line').toBeGreaterThan(one * 1.5);
+        await expect(tooltip.scrollWidth, 'the whole text is shown').toBeLessThanOrEqual(tooltip.clientWidth + 1);
+        await expectNoSilentClip(tooltip);
+    },
 };
 
 // Open and close at the component seam, including retained exit and OS reduction.

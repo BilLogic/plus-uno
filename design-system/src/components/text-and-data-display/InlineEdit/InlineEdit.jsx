@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { FieldLabel, SAVE_FAILED } from '@/lib/field';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import './InlineEdit.scss';
 
 /** What the edit view's control is, to put the caret in it when the view opens. */
@@ -159,6 +160,7 @@ const InlineEdit = ({
     ].filter(Boolean).join(' ');
 
     const buttonSpacing = spacing === 'compact' ? 'compact' : 'default';
+    const readContent = editing ? null : readView();
 
     return (
         <div
@@ -208,16 +210,24 @@ const InlineEdit = ({
                 </>
             ) : (
                 <>
-                    <button
-                        type="button"
-                        ref={readRef}
-                        className={`plus-inline-edit__read${readViewFitContainerWidth ? ' plus-inline-edit__read--fill' : ''}`}
-                        aria-labelledby={label ? `${labelId} ${textId}` : textId}
-                        aria-describedby={hintId}
-                        onClick={open}
-                    >
-                        <span id={textId} className="plus-inline-edit__text">{readView()}</span>
-                    </button>
+                    {/* A read view longer than its room ends in an ellipsis and opens its
+                        full text in a Tooltip while it is clipped. The button already takes
+                        focus, so the Tooltip adds no tab stop. Only plain text can be shown
+                        that way; a placeholder or other markup has no Tooltip. */}
+                    <ClippedTooltip text={typeof readContent === 'string' ? readContent : ''}>
+                        {({ measureRef }) => (
+                            <button
+                                type="button"
+                                ref={readRef}
+                                className={`plus-inline-edit__read${readViewFitContainerWidth ? ' plus-inline-edit__read--fill' : ''}`}
+                                aria-labelledby={label ? `${labelId} ${textId}` : textId}
+                                aria-describedby={hintId}
+                                onClick={open}
+                            >
+                                <span id={textId} ref={measureRef} className="plus-inline-edit__text">{readContent}</span>
+                            </button>
+                        )}
+                    </ClippedTooltip>
                     <span id={hintId} className="plus-inline-edit__hint">{editLabel}</span>
                 </>
             )}

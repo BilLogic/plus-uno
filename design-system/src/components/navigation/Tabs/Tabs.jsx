@@ -16,12 +16,16 @@ import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { animate } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from '@/lib/motionPreference';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import './Tabs.scss';
 
 const alignmentClass = (alignment) =>
     alignment === 'center' ? 'plus-tabs-list--center' :
         alignment === 'right' ? 'plus-tabs-list--right' :
             alignment === 'justified' ? 'plus-tabs-list--justified' : '';
+
+// The words of a tab's label, which can be clipped; a count or icon beside them never is.
+const labelText = (children) => React.Children.toArray(children).filter((child) => typeof child === 'string').join('');
 
 const Tab = ({
     eventKey,
@@ -30,14 +34,25 @@ const Tab = ({
     className = '',
     ...props
 }) => (
-    <BaseTabs.Tab
-        value={eventKey}
-        disabled={isDisabled}
-        className={`plus-tab ${className}`}
-        {...props}
-    >
-        {children}
-    </BaseTabs.Tab>
+    // A label longer than the tab's cap ends in an ellipsis; its full text is a
+    // Tooltip on hover and focus, only while it is clipped. The tab is already
+    // a tab stop, so the Tooltip adds none.
+    <ClippedTooltip text={labelText(children)}>
+        {({ measureRef }) => (
+            <BaseTabs.Tab
+                value={eventKey}
+                disabled={isDisabled}
+                className={`plus-tab ${className}`}
+                {...props}
+            >
+                {React.Children.map(children, (child) => (
+                    typeof child === 'string'
+                        ? <span ref={measureRef} className="plus-tab-label">{child}</span>
+                        : child
+                ))}
+            </BaseTabs.Tab>
+        )}
+    </ClippedTooltip>
 );
 
 Tab.propTypes = {

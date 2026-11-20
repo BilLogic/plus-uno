@@ -55,6 +55,8 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <ComponentExample of={BreadcrumbSubStories.Divider} title="Separator" description={<>A slash between items by default; <code>separator</code> swaps the character.</>} />
 
+<ComponentExample of={BreadcrumbStories.Overflow} title="Overflow" description="Truncate: the trail stays on one line and a level too long ends in an ellipsis; its full text opens in a Tooltip. Folding the middle of five or more levels into a menu is Planned." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -67,7 +69,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <ComponentExample of={BreadcrumbStories.Pressed} title="Pressed" description="A link takes no pressed step of its own; the trail does not change under the pointer." />
 
-<ComponentExample of={BreadcrumbStories.Focused} title="Focused" description="Shows the focus ring on an ancestor link. The current page is not focusable." />
+<ComponentExample of={BreadcrumbStories.Focused} title="Focused" description="Shows the focus ring on an ancestor link. The current page is focusable only while its text is clipped." />
 
 </div>
 
@@ -222,7 +224,7 @@ for you and works; a React element is stringified by CSS and disappears. Pass
 
 ### Show the whole path, root first.
 
-A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let the row wrap rather than dropping a level.
+A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let a level too long end in an ellipsis rather than dropping it.
 
 <DoDontPair
     doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
@@ -230,6 +232,10 @@ A trail that starts mid-hierarchy leaves people unsure where they are. List ever
     dontExample={<Breadcrumb items={[{ text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
     dontCaption="The trail starts mid-hierarchy, so the top is missing."
 />
+
+### Keep the trail on one line and truncate each level.
+
+A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Folding the middle of five or more levels is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use it for position, not for history.
 

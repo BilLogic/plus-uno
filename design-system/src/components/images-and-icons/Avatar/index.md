@@ -8,6 +8,8 @@ Also asked as: user photo, initials, profile image, user picture, tutor photo, s
 
 **Import:** `import { Avatar } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/images-and-icons/Avatar/Avatar.jsx`
 
 **Stories:** `design-system/src/components/images-and-icons/Avatar/Avatar.stories.jsx` — Initials, Sizes, DefaultSize, Shapes, Fallbacks, Colors, Status, Naming, Interactive, Rest, Hovered, Pressed, Focused, Disabled

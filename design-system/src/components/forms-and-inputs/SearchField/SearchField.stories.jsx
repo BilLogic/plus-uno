@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import SearchField, { SearchFieldAction } from './SearchField';
 import { Button } from '@/components';
-import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../_internal/overflowPlays';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../../_internal/overflowPlays';
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' };
 const SCOPES = [
     { value: 'students', label: 'Students', count: 42 },
