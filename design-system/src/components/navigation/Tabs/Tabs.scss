@@ -80,6 +80,43 @@
     }
 }
 
+// A collapsing strip is as wide as its tabs and no wider than its container,
+// so the count that fits follows the container; its tabs stay on one line and
+// the rest fold into More. The hidden copy below keeps the strip's natural
+// width whole, so folding never shrinks the strip and cannot re-measure into
+// a different count.
+.plus-tabs--collapse {
+    max-width: 100%;
+    min-width: 0;
+
+    .plus-tabs-list {
+        flex-wrap: nowrap;
+        max-width: 100%;
+    }
+
+    .plus-tab,
+    .plus-tab-ghost {
+        flex: 0 0 auto;
+    }
+}
+
+// A hidden copy of a tab is drawn as a tab (`@extend`) but is not a `.plus-tab`,
+// so nothing that counts or measures real tabs sees it.
+.plus-tab-ghost {
+    @extend .plus-tab;
+}
+
+// Hidden copies of the whole row, read for widths only. In flow, so the
+// strip's natural width counts them; no height, so nothing else does.
+.plus-tabs-ghosts {
+    display: flex;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+}
+
 // Justified tabs share the full row: the root takes the row's width rather
 // than shrinking to its tabs, so the list's 100% is the row.
 .plus-tabs--justified {

@@ -39,7 +39,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | Tag (180), Status tag (200) | Truncate at the end | Tooltip when clipped; the tag becomes focusable |
 | Tags in a group | Fold into +n | The +n menu lists the hidden tags |
 | A table | Page | The range and the pager in the footer |
-| Tab label | Truncate at the end; folding extra tabs into More is Planned | Tooltip when clipped |
+| Tab label | Truncate at the end; with more tabs than fit, fold the rest into More | Tooltip when clipped; the More menu lists the hidden tabs by name |
 | Breadcrumb level | Truncate at the end; with five or more levels, fold the middle into "…" | Tooltip when clipped; the "…" opens a menu of the hidden levels |
 | Open item in the Sidebar | Truncate at the end | Tooltip with the school |
 | People in an Avatar group | Fold into +n | The +n menu lists the hidden people by name |
