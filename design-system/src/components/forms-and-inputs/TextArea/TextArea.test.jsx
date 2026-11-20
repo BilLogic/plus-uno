@@ -128,6 +128,56 @@ describe('TextArea, validation', () => {
         expect(screen.queryByRole('alert')).toBeNull();
     });
 
+    it('keeps a described-by the page passes, beside its own message', () => {
+        render(
+            <>
+                <TextArea label="Session notes" isInvalid errorMessage="Add more detail." aria-describedby="page-note" />
+                <p id="page-note">Visible to your supervisor</p>
+            </>,
+        );
+        expect(field()).toHaveAccessibleDescription(expect.stringContaining('Visible to your supervisor'));
+        expect(field()).toHaveAccessibleDescription(expect.stringContaining('Add more detail.'));
+    });
+
+    it('lets an error win over a warning and a success, and a warning over a success', () => {
+        const { rerender } = render(
+            <TextArea label="Session notes" isInvalid errorMessage="Bad." warningMessage="Hmm." successMessage="Good." />,
+        );
+        expect(field()).toHaveAccessibleDescription('Bad.');
+        rerender(<TextArea label="Session notes" warningMessage="Hmm." successMessage="Good." />);
+        expect(field()).toHaveAccessibleDescription('Hmm.');
+        rerender(<TextArea label="Session notes" successMessage="Good." />);
+        expect(field()).toHaveAccessibleDescription('Good.');
+    });
+
+    it('validates on blur when the page does: the error shows after leaving and goes once fixed', async () => {
+        const user = userEvent.setup();
+        const Page = () => {
+            const [value, setValue] = useState('');
+            const [touched, setTouched] = useState(false);
+            return (
+                <TextArea
+                    label="Session notes"
+                    value={value}
+                    onChange={(event) => setValue(event.target.value)}
+                    onBlur={() => setTouched(true)}
+                    isInvalid={touched && value.length < 10}
+                    errorMessage="Add more detail."
+                />
+            );
+        };
+        render(<Page />);
+        await user.type(field(), 'short');
+        expect(field()).not.toHaveAttribute('aria-invalid');
+        await user.tab();
+        expect(field()).toHaveAttribute('aria-invalid', 'true');
+        expect(screen.getByRole('alert')).toHaveTextContent('Add more detail.');
+        await user.click(field());
+        await user.type(field(), ' and more');
+        expect(field()).not.toHaveAttribute('aria-invalid');
+        expect(screen.queryByRole('alert')).toBeNull();
+    });
+
     it('currently only announces isRequired: an empty required field still submits', async () => {
         // Design question: isRequired sets aria-required and never `required`, so the
         // browser does not block submit. Pages must validate themselves.
@@ -193,6 +243,20 @@ describe('TextArea, in a form', () => {
         await user.click(screen.getByRole('button', { name: 'Send' }));
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(submitted(screen.getByTestId('form'))).toEqual([['notes', 'Slope.\nIntercepts.']]);
+    });
+});
+
+describe('TextArea, maxLength in a form', () => {
+    it('submits no more than maxLength, and counts it', async () => {
+        const user = userEvent.setup();
+        render(
+            <form data-testid="form">
+                <TextArea label="Session notes" name="notes" maxLength={8} />
+            </form>,
+        );
+        await user.type(field(), 'Slope and intercepts');
+        expect(submitted(screen.getByTestId('form'))).toEqual([['notes', 'Slope an']]);
+        expect(screen.getByText('8 / 8')).toBeInTheDocument();
     });
 });
 

@@ -239,6 +239,20 @@ describe('Toggle, in a form', () => {
         expect(submitted(screen.getByTestId('form'))).toEqual([]);
     });
 
+    it('is disabled by a fieldset around it: not switchable, and left out of the form', async () => {
+        const user = userEvent.setup();
+        render(
+            <form data-testid="form">
+                <fieldset disabled>
+                    <Toggle label="Session reminders" name="reminders" defaultChecked />
+                </fieldset>
+            </form>,
+        );
+        await user.click(toggle());
+        expect(toggle()).toHaveAttribute('aria-checked', 'true');
+        expect(submitted(screen.getByTestId('form'))).toEqual([]);
+    });
+
     it('does not submit the form by itself when switched', async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn((event) => event.preventDefault());

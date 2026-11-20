@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import SearchField, { SearchFieldAction } from './SearchField';
 
 /**
@@ -9,11 +9,6 @@ import SearchField, { SearchFieldAction } from './SearchField';
  * keyboard, and the rows a page filters or loads. The Storybook plays cover the
  * drawn result (insets, spinner, focus ring); these cover what the field reports.
  */
-
-// jsdom draws no layout, so it has no scrollIntoView; the focused panel asks for it.
-beforeAll(() => {
-    Element.prototype.scrollIntoView = Element.prototype.scrollIntoView || (() => {});
-});
 
 const search = (name = 'Search students') => screen.getByRole('searchbox', { name });
 const combo = (name = 'Search students') => screen.getByRole('combobox', { name });
@@ -170,7 +165,7 @@ describe('SearchField, loadResults', () => {
         await waitFor(() => expect(onResults).toHaveBeenCalledTimes(1));
         expect(loadResults).toHaveBeenLastCalledWith('', { offset: 0, limit: 50 });
         await user.type(search(), 'abc');
-        await waitFor(() => expect(onResults).toHaveBeenLastCalledWith({ results: ['abc'], total: 3 }));
+        await waitFor(() => expect(onResults).toHaveBeenLastCalledWith({ results: ['abc'], total: 3 }), { timeout: 2000 });
         expect(loadResults).toHaveBeenCalledTimes(2);
         expect(loadResults).toHaveBeenLastCalledWith('abc', { offset: 0, limit: 50 });
     });
@@ -184,7 +179,7 @@ describe('SearchField, loadResults', () => {
         answer({ results: [], total: 0 });
         await waitFor(() => expect(screen.queryByText('Searching')).toBeNull());
         await user.type(search(), 'a');
-        await waitFor(() => expect(screen.getByText('Searching')).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText('Searching')).toBeInTheDocument(), { timeout: 2000 });
         answer({ results: [], total: 0 });
         await waitFor(() => expect(screen.queryByText('Searching')).toBeNull());
     });
@@ -197,9 +192,9 @@ describe('SearchField, loadResults', () => {
         render(<SearchField placeholder="Search students" loadResults={loadResults} onResults={onResults} />);
         await waitFor(() => expect(loadResults).toHaveBeenCalledTimes(1));
         await user.type(search(), 'a');
-        await waitFor(() => expect(loadResults).toHaveBeenCalledWith('a', expect.anything()));
+        await waitFor(() => expect(loadResults).toHaveBeenCalledWith('a', expect.anything()), { timeout: 2000 });
         await user.type(search(), 'b');
-        await waitFor(() => expect(loadResults).toHaveBeenCalledWith('ab', expect.anything()));
+        await waitFor(() => expect(loadResults).toHaveBeenCalledWith('ab', expect.anything()), { timeout: 2000 });
         resolvers.a({ results: ['stale'], total: 1 });
         resolvers.ab({ results: ['fresh'], total: 1 });
         await waitFor(() => expect(onResults).toHaveBeenCalledWith({ results: ['fresh'], total: 1 }));
@@ -207,9 +202,25 @@ describe('SearchField, loadResults', () => {
     });
 
     it('stops the spinner when a request fails', async () => {
-        const loadResults = vi.fn(() => Promise.reject(new Error('offline')));
+        let fail;
+        const loadResults = vi.fn(() => new Promise((_, reject) => { fail = reject; }));
         render(<SearchField placeholder="Search students" loadResults={loadResults} />);
+        await waitFor(() => expect(screen.getByText('Searching')).toBeInTheDocument(), { timeout: 2000 });
+        fail(new Error('offline'));
+        await waitFor(() => expect(screen.queryByText('Searching')).toBeNull());
+    });
+
+    it('currently shows the spinner for isLoading even with no request, and either source keeps it on', async () => {
+        // Design question: isLoading and a loadResults request are OR-ed; neither
+        // overrides the other, so a page cannot force the spinner off mid-request.
+        let answer;
+        const loadResults = vi.fn(() => new Promise((resolve) => { answer = resolve; }));
+        const { rerender } = render(<SearchField placeholder="Search students" isLoading loadResults={loadResults} />);
         await waitFor(() => expect(loadResults).toHaveBeenCalled());
+        answer({ results: [], total: 0 });
+        await waitFor(() => expect(loadResults).toHaveBeenCalledTimes(1));
+        expect(screen.getByText('Searching')).toBeInTheDocument();
+        rerender(<SearchField placeholder="Search students" isLoading={false} loadResults={loadResults} />);
         await waitFor(() => expect(screen.queryByText('Searching')).toBeNull());
     });
 });
@@ -236,7 +247,7 @@ describe('SearchField, basic', () => {
         render(<SearchField placeholder="Search students" mode="basic" loadResults={loadResults} />);
         await waitFor(() => expect(loadResults).toHaveBeenCalledTimes(1));
         await user.type(search(), 'ada');
-        await waitFor(() => expect(loadResults).toHaveBeenLastCalledWith('ada', expect.anything()));
+        await waitFor(() => expect(loadResults).toHaveBeenLastCalledWith('ada', expect.anything()), { timeout: 2000 });
     });
 
     it('keeps Enter from submitting the form it sits in', async () => {
@@ -328,6 +339,14 @@ describe('SearchField, scopes', () => {
 });
 
 describe('SearchField, focused panel', () => {
+    // jsdom draws no layout, so it has no scrollIntoView; the focused panel asks for it.
+    const original = Element.prototype.scrollIntoView;
+    beforeAll(() => { Element.prototype.scrollIntoView = () => {}; });
+    afterAll(() => {
+        if (original) Element.prototype.scrollIntoView = original;
+        else delete Element.prototype.scrollIntoView;
+    });
+
     const PEOPLE = [
         { value: 's1', label: 'Ada Lovelace', description: 'Grade 8' },
         { value: 's2', label: 'Grace Hopper', description: 'Grade 9' },

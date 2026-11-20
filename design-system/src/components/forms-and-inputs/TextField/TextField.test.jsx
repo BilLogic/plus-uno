@@ -317,6 +317,42 @@ describe('TextField, number', () => {
         expect(input()).toHaveValue('0.3');
     });
 
+    it('submits the number as text under its name, after typing and after a stepper press', async () => {
+        const user = userEvent.setup();
+        render(
+            <form data-testid="form">
+                <TextField label="Grade" type="number" name="grade" defaultValue={5} />
+            </form>,
+        );
+        expect(submitted(screen.getByTestId('form'))).toEqual([['grade', '5']]);
+        await user.click(screen.getByRole('button', { name: 'Increase Grade' }));
+        expect(submitted(screen.getByTestId('form'))).toEqual([['grade', '6']]);
+        await user.clear(input());
+        await user.type(input(), '11');
+        expect(submitted(screen.getByTestId('form'))).toEqual([['grade', '11']]);
+    });
+
+    it('submits an empty number as an empty string, never 0', () => {
+        render(
+            <form data-testid="form">
+                <TextField label="Grade" type="number" name="grade" />
+            </form>,
+        );
+        expect(submitted(screen.getByTestId('form'))).toEqual([['grade', '']]);
+    });
+
+    it('does not submit the form when a stepper is pressed', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn((event) => event.preventDefault());
+        render(
+            <form onSubmit={onSubmit}>
+                <TextField label="Grade" type="number" name="grade" />
+            </form>,
+        );
+        await user.click(screen.getByRole('button', { name: 'Increase Grade' }));
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it('hides the steppers when read-only and disables them when disabled', () => {
         const { unmount } = number({ defaultValue: 4, isReadOnly: true });
         expect(screen.queryByRole('button')).toBeNull();
