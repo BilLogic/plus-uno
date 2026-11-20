@@ -75,9 +75,9 @@ const Popup = ({
     const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultShow);
     const isOpen = show !== undefined ? Boolean(show) : uncontrolledOpen;
 
-    const handleOpenChange = (next) => {
+    const handleOpenChange = (next, details) => {
         if (show === undefined) setUncontrolledOpen(next);
-        onToggle?.(next);
+        onToggle?.(next, details);
     };
 
     const isTextTrigger = trigger !== undefined && !React.isValidElement(trigger);
@@ -171,6 +171,7 @@ Popup.propTypes = {
     ]),
     defaultShow: PropTypes.bool,
     show: PropTypes.bool,
+    /** Called with the next open state and Base UI's change details (`reason`, `event`, `cancel()`). Calling `cancel()` keeps the popup as it is. */
     onToggle: PropTypes.func,
     /** Where the popup portals to. Defaults to the page, or the modal the trigger sits in. */
     container: PropTypes.object,
