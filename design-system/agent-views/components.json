@@ -13351,7 +13351,8 @@
         "OpenListEdge",
         "MotionOpenClose",
         "MotionReduced",
-        "MotionKeyboardOpen"
+        "MotionKeyboardOpen",
+        "RequiredBlocksSubmit"
       ],
       "tokens": [
         "--body-default",

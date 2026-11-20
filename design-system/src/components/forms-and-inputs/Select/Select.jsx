@@ -110,6 +110,7 @@ const Select = ({
     const [focused, setFocused] = useState(false);
     // Set when the form blocked a submit because this required field was empty.
     const [missing, setMissing] = useState(false);
+    const standInRef = useRef(null);
 
     useEffect(() => { setQuery(defaultSearchTerm || null); }, [defaultSearchTerm]);
 
@@ -517,11 +518,16 @@ const Select = ({
                     tabIndex={-1}
                     aria-hidden="true"
                     required
+                    ref={standInRef}
                     value={isEmpty(committedList) ? '' : 'picked'}
                     onChange={() => {}}
                     onInvalid={() => {
                         setMissing(true);
-                        queueMicrotask(() => controlRef.current?.focus());
+                        // The browser focuses the first invalid control after this event, which
+                        // can be the stand-in: once it has, hand focus on to the combobox.
+                        requestAnimationFrame(() => {
+                            if (document.activeElement === standInRef.current) controlRef.current?.focus();
+                        });
                     }}
                 />
             )}

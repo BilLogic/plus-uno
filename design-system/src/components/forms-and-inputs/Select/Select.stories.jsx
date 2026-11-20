@@ -770,3 +770,24 @@ export const MotionKeyboardOpen = {
         await waitFor(() => expect(surface.isConnected).toBe(false));
     },
 };
+
+/** A required Select left empty: the browser blocks the form and focus ends on the combobox, not the hidden stand-in. */
+export const RequiredBlocksSubmit = {
+    render: () => (
+        <form onSubmit={(event) => event.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 320 }}>
+            <Select label="School" name="school" isRequired options={[{ value: 'north', label: 'North High' }, { value: 'south', label: 'South High' }]} />
+            <button type="submit">Send</button>
+        </form>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const combobox = canvas.getByRole('combobox', { name: 'School' });
+        await expect(combobox).not.toHaveAttribute('aria-invalid', 'true');
+        await userEvent.click(canvas.getByRole('button', { name: 'Send' }));
+        await waitFor(() => expect(combobox).toHaveAttribute('aria-invalid', 'true'));
+        await waitFor(() => expect(combobox).toHaveFocus());
+        await userEvent.click(combobox);
+        await userEvent.click(await within(document.body).findByRole('option', { name: 'North High' }));
+        await waitFor(() => expect(combobox).not.toHaveAttribute('aria-invalid', 'true'));
+    },
+};

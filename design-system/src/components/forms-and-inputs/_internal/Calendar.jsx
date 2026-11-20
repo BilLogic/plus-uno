@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { SlideViews } from '@/lib/navigationMotion';
 import Icon from '../../images-and-icons/Icon';
@@ -19,6 +19,9 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  *   between; `aria-current="date"` marks today.
  * - **Bounds:** days before `minDate` or after `maxDate` are disabled.
  * - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
+ * - **Roles:** a `grid` named by the month, a `row` of `columnheader`s, then six
+ *   `row`s of `gridcell`s. `aria-selected` marks the picked day (or range ends) and
+ *   `aria-disabled` a day outside `minDate`/`maxDate`.
  * - **Keyboard:** one day is in the tab order (the picked day, else today, else
  *   the first enabled day) and the arrows move from it, the way a date grid
  *   does: Left and Right by a day, Up and Down by a week, Home and End to the
@@ -113,8 +116,16 @@ const Calendar = ({
     };
 
     const cells = [];
+    // A day sits in a gridcell; its column (0-6) is what the range ends are drawn from.
+    const cell = (key, node, props = {}) => (
+        <div key={key} role="gridcell" className="plus-calendar-cell" {...props}>{node}</div>
+    );
     for (let i = firstWeekday - 1; i >= 0; i -= 1) {
-        cells.push(<div key={`prev-${i}`} className="plus-calendar-day plus-calendar-day--outside">{lastOfPrevious - i}</div>);
+        cells.push(cell(
+            `prev-${i}`,
+            <span data-column={cells.length % 7} className="plus-calendar-day plus-calendar-day--outside">{lastOfPrevious - i}</span>,
+            { 'aria-disabled': true },
+        ));
     }
     for (let day = 1; day <= daysInMonth; day += 1) {
         const date = new Date(year, month, day);
@@ -126,10 +137,11 @@ const Calendar = ({
         const isSelected = sameDay(date, picked) || isEnd;
         const inRange = Boolean(start && end) && date > start && date < end;
         const isToday = sameDay(date, today);
-        cells.push(
+        cells.push(cell(
+            `day-${day}`,
             <button
-                key={`day-${day}`}
                 type="button"
+                data-column={cells.length % 7}
                 disabled={disabled}
                 aria-label={date.toLocaleDateString(undefined, {
                     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -156,12 +168,21 @@ const Calendar = ({
             >
                 {day}
             </button>,
-        );
+            { 'aria-selected': isSelected, 'aria-disabled': disabled || undefined },
+        ));
     }
     for (let day = 1; cells.length < 42; day += 1) {
-        cells.push(<div key={`next-${day}`} className="plus-calendar-day plus-calendar-day--outside">{day}</div>);
+        cells.push(cell(
+            `next-${day}`,
+            <span data-column={cells.length % 7} className="plus-calendar-day plus-calendar-day--outside">{day}</span>,
+            { 'aria-disabled': true },
+        ));
     }
+    const weeks = Array.from({ length: 6 }, (_, week) => (
+        <div key={week} role="row" className="plus-calendar-week">{cells.slice(week * 7, week * 7 + 7)}</div>
+    ));
 
+    const monthId = useId();
     const turn = (step) => onViewDateChange(new Date(year, month + step, 1));
 
     return (
@@ -173,15 +194,17 @@ const Calendar = ({
         >
             <div className="plus-calendar-header">
                 <IconButton icon={<Icon name="chevron-left" size={12} />} label="Previous month" appearance="subtle" spacing="compact" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
-                <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
+                <div id={monthId} className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
                 <IconButton icon={<Icon name="chevron-right" size={12} />} label="Next month" appearance="subtle" spacing="compact" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
             </div>
-            <div className="plus-calendar-weekdays" aria-hidden="true">
-                {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}
+            <div role="grid" aria-labelledby={monthId} className="plus-calendar-grid">
+                <div role="row" className="plus-calendar-weekdays">
+                    {WEEKDAYS.map((day) => <div key={day} role="columnheader" className="plus-calendar-weekday">{day}</div>)}
+                </div>
+                <SlideViews activeKey={monthKey} keys={slideKeys} size="panel">
+                    <div className="plus-calendar-days">{weeks}</div>
+                </SlideViews>
             </div>
-            <SlideViews activeKey={monthKey} keys={slideKeys} size="panel">
-                <div className="plus-calendar-days">{cells}</div>
-            </SlideViews>
         </div>
     );
 };

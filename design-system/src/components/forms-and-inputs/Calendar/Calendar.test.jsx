@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import Calendar from './Calendar';
@@ -110,5 +110,34 @@ describe('Calendar keyboard', () => {
         await focusDay(user, 'October 21, 2026');
         await user.keyboard('{ArrowRight}{Enter}');
         expect(onPick).toHaveBeenCalledWith(new Date(2026, 9, 22));
+    });
+});
+
+describe('Calendar roles', () => {
+    it('is a grid named by the month, with seven column headers and six rows of seven cells', () => {
+        render(<Held />);
+        const grid = screen.getByRole('grid', { name: 'October 2026' });
+        expect(within(grid).getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+        const rows = within(grid).getAllByRole('row');
+        expect(rows).toHaveLength(7);
+        rows.slice(1).forEach((row) => expect(within(row).getAllByRole('gridcell')).toHaveLength(7));
+    });
+
+    it('marks the picked day aria-selected, and the others not', () => {
+        render(<Held />);
+        const cellOf = (text) => day(text).closest('[role="gridcell"]');
+        expect(cellOf('October 21, 2026')).toHaveAttribute('aria-selected', 'true');
+        expect(cellOf('October 22, 2026')).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('marks days outside minDate and maxDate, and the other months, aria-disabled', () => {
+        render(<Held minDate="2026-10-10" maxDate="2026-10-25" />);
+        const cellOf = (text) => day(text).closest('[role="gridcell"]');
+        expect(cellOf('October 9, 2026')).toHaveAttribute('aria-disabled', 'true');
+        expect(cellOf('October 26, 2026')).toHaveAttribute('aria-disabled', 'true');
+        expect(cellOf('October 15, 2026')).not.toHaveAttribute('aria-disabled');
+        const cells = screen.getAllByRole('gridcell');
+        expect(cells).toHaveLength(42);
+        expect(cells.filter((c) => !c.querySelector('button')).every((c) => c.getAttribute('aria-disabled') === 'true')).toBe(true);
     });
 });

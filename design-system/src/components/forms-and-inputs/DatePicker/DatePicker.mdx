@@ -196,7 +196,7 @@ The first click sets the first day, the second sets the last day, and `onChange`
 
 ### Name the field.
 
-There is no `label` prop. Pass `aria-label` or `aria-labelledby`; both go straight to the input.
+`label` does not name a plain field: it is the filter trigger's text and turns `DatePicker` into the filter popup. Name a plain field with `aria-label` or `aria-labelledby` (both go straight to the input), or a visible label tied to its `id` with `htmlFor`.
 
 ### Show the date format as a hint.
 
