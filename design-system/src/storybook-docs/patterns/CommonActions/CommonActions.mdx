@@ -5,15 +5,15 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as CommonActionsStories from './CommonActions.stories.jsx';
 import {
+    CODE,
     ModalFooterTracksCase,
     ModalFooterInsetCase,
     OnePrimaryCase,
-    PAGE_WIDTH,
     PageButtonsFarRightCase,
     PageButtonsLeftCase,
-    STAGE,
     TwoPrimariesCase,
-} from './commonActionsDemo.jsx';
+} from './CommonActionsCases.jsx';
+import { PAGE_WIDTH, STAGE } from './commonActionsDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -221,8 +221,10 @@ The Primary is the main call to action or a form's submit. A second main action 
 
 <DoDontPair
     doExample={<OnePrimaryCase />}
+    doCode={CODE.OnePrimary}
     doCaption="One Primary, with the other action Default beside it."
     dontExample={<TwoPrimariesCase />}
+    dontCode={CODE.TwoPrimaries}
     dontCaption="Two Primary buttons in one row: neither reads as the next step."
 />
 
@@ -234,8 +236,10 @@ On a page the Primary comes first, read in the same direction as the fields. In 
 
 <DoDontPair
     doExample={<PageButtonsLeftCase />}
+    doCode={CODE.PageButtonsLeft}
     doCaption="Primary first, then Cancel, left-aligned under the fields."
     dontExample={<PageButtonsFarRightCase />}
+    dontCode={CODE.PageButtonsFarRight}
     dontCaption="The buttons at the far end of the page, away from the fields, with the Primary last."
 />
 
@@ -247,8 +251,10 @@ FooterActions divides the footer into four equal tracks: filled buttons 48 high,
 
 <DoDontPair
     doExample={<ModalFooterTracksCase />}
+    doCode={CODE.ModalFooterTracks}
     doCaption="Two buttons filling the footer's four tracks."
     dontExample={<ModalFooterInsetCase />}
+    dontCode={CODE.ModalFooterInset}
     dontCaption="Small buttons inset at the end, hand-built, with spare footer around them."
 />
 

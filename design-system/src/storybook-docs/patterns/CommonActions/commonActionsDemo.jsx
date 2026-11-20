@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, LinkButton, TextField, Tooltip } from '@/components';
+import { Button, ButtonItem, DropdownMenu, IconButton, InlineEdit, LinkButton, TextField, Tooltip } from '@/components';
 import { Card, Section } from '@/templates';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
-import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../Forms/formHosts.jsx';
@@ -216,114 +215,3 @@ export const Sending = ({ sending: started = false }) => {
         </ModalStage>
     );
 };
-
-/* ----------------------------------------------------- live do/don't pairs */
-
-const buttonRow = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 'var(--stack-md)',
-    marginBlockStart: 'var(--stack-lg)',
-};
-
-/** Do: one Primary, with the second action Default beside it. */
-export const OnePrimaryCase = () => (
-    <CaseSurface>
-        <Fieldset legend="Session">
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-        </Fieldset>
-        <div style={buttonRow}>
-            <Button appearance="primary" text="Save session" onClick={() => {}} />
-            <Button appearance="default" text="Save draft" onClick={() => {}} />
-        </div>
-    </CaseSurface>
-);
-
-/** Don't: two Primary buttons in one row; neither reads as the next step. */
-export const TwoPrimariesCase = () => (
-    <CaseSurface>
-        <Fieldset legend="Session">
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-        </Fieldset>
-        <div style={buttonRow}>
-            <Button appearance="primary" text="Save session" onClick={() => {}} />
-            <Button appearance="primary" text="Save draft" onClick={() => {}} />
-        </div>
-    </CaseSurface>
-);
-
-/** Do: Primary first, then Cancel, left-aligned under the fields. */
-export const PageButtonsLeftCase = () => (
-    <CaseSurface>
-        <Fieldset legend="Session">
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-            <TextField label="Site" defaultValue="Lincoln Middle" />
-        </Fieldset>
-        <div style={{ ...buttonRow, justifyContent: 'flex-start' }}>
-            <Button appearance="primary" text="Save session" onClick={() => {}} />
-            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
-        </div>
-    </CaseSurface>
-);
-
-/** Don't: buttons pushed to the far end of the page, away from the fields, with Primary last. */
-export const PageButtonsFarRightCase = () => (
-    <CaseSurface>
-        <Fieldset legend="Session">
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-            <TextField label="Site" defaultValue="Lincoln Middle" />
-        </Fieldset>
-        <div style={{ ...buttonRow, justifyContent: 'flex-end' }}>
-            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
-            <Button appearance="primary" text="Save session" onClick={() => {}} />
-        </div>
-    </CaseSurface>
-);
-
-/** Do: two buttons filling the Modal footer's four equal tracks. */
-export const ModalFooterTracksCase = () => (
-    <CaseBlanket height={280}>
-        <Dialog
-            width="4-col"
-            title="Log a session"
-            onClose={() => {}}
-            footer={(
-                <FooterActions>
-                    <Button text="Discard" onClick={() => {}} />
-                    <Button text="Save session" appearance="primary" onClick={() => {}} />
-                </FooterActions>
-            )}
-        >
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-        </Dialog>
-    </CaseBlanket>
-);
-
-/** Don't: small buttons inset at the end, with spare footer around them. */
-// Deliberately draws a hand-built inset footer as the Don't example.
-export const ModalFooterInsetCase = () => (
-    <CaseBlanket height={280}>
-        <Dialog
-            width="4-col"
-            title="Log a session"
-            onClose={() => {}}
-            footer={(
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: 'var(--inline-md)',
-                        paddingInline: 'var(--dialog-pad)',
-                        paddingBlock: 'var(--stack-md)',
-                        borderTop: 'var(--border-width-default) solid var(--ds-border)',
-                    }}
-                >
-                    <Button text="Discard" onClick={() => {}} />
-                    <Button text="Save session" appearance="primary" onClick={() => {}} />
-                </div>
-            )}
-        >
-            <TextField label="Student" defaultValue="Ana Ruiz" />
-        </Dialog>
-    </CaseBlanket>
-);

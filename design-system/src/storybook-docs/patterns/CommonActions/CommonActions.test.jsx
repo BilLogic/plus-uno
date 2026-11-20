@@ -4,13 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
+    CODE,
     ModalFooterTracksCase,
     ModalFooterInsetCase,
     OnePrimaryCase,
     PageButtonsFarRightCase,
     PageButtonsLeftCase,
     TwoPrimariesCase,
-} from './commonActionsDemo.jsx';
+} from './CommonActionsCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -90,6 +91,14 @@ describe('CommonActions live cases and links', () => {
         const discard = screen.getByRole('button', { name: 'Discard' });
         discard.focus();
         expect(discard).toHaveFocus();
+    });
+
+    it('prints each pair\'s own source, as a consumer writes it', () => {
+        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(CODE.OnePrimary).toContain("import { Button, Fieldset, TextField } from '@/components';");
+        expect(CODE.ModalFooterTracks).toContain("import { Modal } from '@/templates';");
+        expect(CODE.ModalFooterTracks).toContain('<FooterActions>');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Case|storybook-docs|Dialog\b/);
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in CommonActions.mdx', () => {

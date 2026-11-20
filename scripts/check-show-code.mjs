@@ -52,13 +52,10 @@ const LITERAL = /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\b(?!100%)\d+(?:\.\d+)?
 const PAIR = /<DoDontPair\b[\s\S]*?(?:\n\/>|\/>\n)/g;
 
 /**
- * Pages whose pairs do not print yet, each with the reason it waits. An entry
- * leaves this list the day its pairs print; the list never grows.
+ * Pages whose pairs do not print yet, each with the reason it waits. It is
+ * empty today: an entry leaves the day its pairs print, and the list never grows.
  */
-export const DEFERRED_PAGES = {
-  'design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx': 'the footers rewrite in flight renames and reworks these cases; their examples move once it lands',
-  'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx': 'FilterMenu and the filtering wording are being reworked in the same change; their examples move once it lands',
-};
+export const DEFERRED_PAGES = {};
 
 const CODE_PROP = /\b(doCode|dontCode)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
 const CODE_REFERENCE = /^\{CODE\.[A-Za-z_$][\w$]*\}$/;
