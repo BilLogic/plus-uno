@@ -72,7 +72,8 @@ const LINES_KEY = '$lines';
  * page) is written as one array element per line instead of one `\n`-escaped line, so two
  * branches that change different paragraphs change different lines and git merges them without
  * a conflict. Keys keep the order `buildDsIndex` builds them in, which is already sorted.
- * `loadDsIndex` reads it back, so the in-memory index is the same either way.
+ * `loadDsIndex` reads it back, so the in-memory index is the same either way. The indent is a
+ * tab: a space-indented file would push the packaged CLI over its size budget.
  */
 export function serializeDsIndex(index) {
   const spread = (value) => {
@@ -81,7 +82,7 @@ export function serializeDsIndex(index) {
     if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, spread(v)]));
     return value;
   };
-  return JSON.stringify(spread(index), null, 2) + '\n';
+  return JSON.stringify(spread(index), null, '\t') + '\n';
 }
 
 /** The inverse of `serializeDsIndex`: rejoin each `$lines` wrapper into the string it came from. */
