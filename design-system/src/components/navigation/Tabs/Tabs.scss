@@ -94,9 +94,16 @@
         max-width: 100%;
     }
 
-    .plus-tab {
+    .plus-tab,
+    .plus-tab-ghost {
         flex: 0 0 auto;
     }
+}
+
+// A hidden copy of a tab is drawn as a tab (`@extend`) but is not a `.plus-tab`,
+// so nothing that counts or measures real tabs sees it.
+.plus-tab-ghost {
+    @extend .plus-tab;
 }
 
 // Hidden copies of the whole row, read for widths only. In flow, so the

@@ -426,13 +426,13 @@ const Tabs = ({
                 // strip draws just the tabs that fit.
                 <div className="plus-tabs-ghosts" aria-hidden="true">
                     {tabs.map((tab) => (
-                        <span key={tab.props.eventKey} className="plus-tab" data-tab-ghost="">
+                        <span key={tab.props.eventKey} className="plus-tab-ghost" data-tab-ghost="">
                             {React.Children.map(tab.props.children, (child) => (
                                 typeof child === 'string' ? <span className="plus-tab-label">{child}</span> : child
                             ))}
                         </span>
                     ))}
-                    <span className="plus-tab" data-tab-more-ghost="">
+                    <span className="plus-tab-ghost" data-tab-more-ghost="">
                         <span className="plus-tab-label">More</span>
                         <CountTag value={Number('8'.repeat(moreDigits))} />
                     </span>
