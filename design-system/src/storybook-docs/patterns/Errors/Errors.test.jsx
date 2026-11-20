@@ -4,23 +4,37 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import { BorderAndTooltipCase, CODE, FailureInModal, FailureInSlot, MessageOnFieldCase } from './ErrorsCases.jsx';
+import { MessageOnField } from './ErrorsExamples.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('Errors live cases and TypeCard links', () => {
-    it('MessageOnFieldCase shows visible error text that clears once valid, while BorderAndTooltipCase puts the message in a tooltip', async () => {
+    it('MessageOnField stays quiet on render, shows its message after blur with a bad value, and clears once fixed', async () => {
         const user = userEvent.setup();
-        const { container, unmount } = render(<MessageOnFieldCase />);
-        expect(container.querySelector('[inert]')).toBeNull();
+        render(<MessageOnField />);
+        const message = 'Enter a full email, like name@school.org';
         const field = screen.getByLabelText(/School email/);
+        expect(field).not.toHaveAttribute('aria-invalid', 'true');
+        expect(screen.queryByText(message)).toBeNull();
+
+        await user.click(field);
+        expect(screen.queryByText(message)).toBeNull();
+        await user.tab();
         expect(field).toHaveAttribute('aria-invalid', 'true');
-        expect(screen.getByText('Enter a full email, like name@school.org')).toBeInTheDocument();
-        expect(screen.queryByRole('tooltip')).toBeNull();
+        expect(screen.getByText(message)).toBeInTheDocument();
 
         await user.clear(field);
         await user.type(field, 'ana@school.org');
         expect(field).not.toHaveAttribute('aria-invalid', 'true');
-        expect(screen.queryByText('Enter a full email, like name@school.org')).toBeNull();
+        expect(screen.queryByText(message)).toBeNull();
+    });
+
+    it('MessageOnFieldCase is drawn after a blur, with the message in words; BorderAndTooltipCase puts it in a tooltip', () => {
+        const { container, unmount } = render(<MessageOnFieldCase />);
+        expect(container.querySelector('[inert]')).toBeNull();
+        expect(screen.getByLabelText(/School email/)).toHaveAttribute('aria-invalid', 'true');
+        expect(screen.getByText('Enter a full email, like name@school.org')).toBeInTheDocument();
+        expect(screen.queryByRole('tooltip')).toBeNull();
         unmount();
 
         render(<BorderAndTooltipCase />);
