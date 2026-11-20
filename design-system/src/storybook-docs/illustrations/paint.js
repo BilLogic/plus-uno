@@ -44,7 +44,6 @@ const ROLES = {
   sidebarIcon: ['--ds-icon-subtle', 'Sidebar.scss'],
   // Section and Card
   // A Section draws no surface; a sunken box inside one is a sunken Card.
-  sectionSubtleSurface: ['--ds-surface-sunken', '_templates.scss'],
   cardSurface: ['--ds-surface-raised', '_templates.scss'],
   cardSunken: ['--ds-surface-sunken', '_templates.scss'],
   cardShadow: ['--ds-shadow-raised', '_templates.scss'],

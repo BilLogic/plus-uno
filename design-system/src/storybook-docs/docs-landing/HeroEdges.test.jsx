@@ -64,7 +64,7 @@ describe('the hero edge role', () => {
  * The fills that need an edge on the ground: a layer or a page. Gray fills
  * (`countSurface`, `shape`) also mark things inside a layer, so the generic check
  * cannot tell them apart; the Indicators hero's tags on the ground are held by
- * name below. The sunken fills (`frameSunken`, `sectionSubtleSurface`) are the ground
+ * name below. The sunken fills (`frameSunken`, `cardSunken`) are the ground
  * itself, so they have no edge to show, and the Logo mark's tile is a gray that
  * already clears the ground. A new surface role goes in this list.
  */

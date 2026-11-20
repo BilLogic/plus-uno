@@ -88,8 +88,8 @@ export const Templates = {
         await expect(root.querySelector('[data-legend="page"] [data-value]')).toHaveTextContent('0');
         await expectLegendValue(root, 'card', '--card-radius', canvasElement);
         // The drawing is at half scale: one unit is 2px.
-        const section = root.querySelector('[data-part="section-box"]');
-        await expect(cornerOf(section)).toBeCloseTo(radiusOf(canvasElement, '--card-radius') / 2, 1);
+        const sunken = root.querySelector('[data-part="sunken-card"]');
+        await expect(cornerOf(sunken)).toBeCloseTo(radiusOf(canvasElement, '--card-radius') / 2, 1);
         const nested = root.querySelector('[data-part="card-nested"]');
         await expect(cornerOf(nested)).toBeCloseTo(radiusOf(canvasElement, '--card-radius'), 1);
     },

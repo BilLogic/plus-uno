@@ -66,7 +66,7 @@ export const OpeningARecord = ({
               {[0, 1, 2, 3, 4].map((k) => (
                 <SkeletonBar key={k} x={x + 6} y={y + 12 + k * 12} w={w * 0.26} />
               ))}
-              <Rect x={x + 6 + w * 0.36} y={y + 8} w={w * 0.64 - 12} h={h - 16} fill={PAINT.sectionSubtleSurface} stroke={PAINT.accent} />
+              <Rect x={x + 6 + w * 0.36} y={y + 8} w={w * 0.64 - 12} h={h - 16} fill={PAINT.cardSunken} stroke={PAINT.accent} />
               <SkeletonBar x={x + 12 + w * 0.36} y={y + 16} w={w * 0.3} h={5} accent heading />
               {[0, 1, 2].map((k) => (
                 <SkeletonBar key={k} x={x + 12 + w * 0.36} y={y + 30 + k * 9} w={w * 0.32} />
@@ -143,7 +143,7 @@ export const ReflowScreen = ({ width = 1280, layout = width, neutral = false, re
   return (
     <Screen {...box} sidebar={sidebar} accentSidebar={!neutral && sidebar === 'overlay'}>
       <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={!neutral && sidebar !== 'overlay'} />
-      {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} subtle />}
+      {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} />}
     </Screen>
   );
 };

@@ -73,14 +73,11 @@ The footer is fixed along the bottom, one row high, with its buttons on one line
 Do: Save and exit as a link at the left edge; Back and the primary Next in the right half, on one line.
 Don't: Cancel repeated in the footer beside Save and exit: two ways out of one task.
 
-### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
+### Dock the AI panel where there is room, and float it beside narrow layouts. {#dock-the-ai-panel-where-there-is-room-and-float-it-beside-narrow-layouts}
 
 **Checked:** Review
 
-The AI panel is a region of the Frame, not a floating Panel, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it floats over the Page, with no Blanket.
-
-Do: The panel docked at the right edge, the Page narrowing beside it.
-Don't: The panel floating over the Page, hiding the rows beneath it.
+The AI panel is a region of the Frame, not a floating Panel, so it stays put as a person moves between pages. The Page makes room for it while the Frame is wide enough to keep the Page above its floor. Where the Frame is not, the panel floats over the Page and the Sidebar, with no Blanket. The widths are under Width behavior.
 
 ### Keep a bare Frame to one column. {#keep-a-bare-frame-to-one-column}
 

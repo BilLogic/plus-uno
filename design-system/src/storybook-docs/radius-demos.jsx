@@ -217,7 +217,7 @@ export const TemplateMap = () => (
     >
         <Screen x={0} y={0} w={MAP.w} h={MAP.h}>
             <Card x={56} y={46} w={100} h={120} />
-            <TokenRect x={170} y={46} w={138} h={120} token="--card-radius" scale="kit" fill={PAINT.sectionSubtleSurface} data-part="section-box" />
+            <TokenRect x={170} y={46} w={138} h={120} token="--card-radius" scale="kit" fill={PAINT.cardSunken} data-part="sunken-card" />
             <SkeletonBar x={180} y={56} w={44} h={5} heading />
             <RaisedBox x={180} y={72} w={118} h={84} token="--card-radius" data-part="card-nested" />
             <SkeletonBar x={190} y={84} w={60} heading />
@@ -351,7 +351,7 @@ export const WindowEdge = () => {
                 <TokenRect x={160} y={10} w={136} h={108} token="--modal-radius" scale="kit" fill={PAINT.modalSurface} stroke={PAINT.modalDivider} data-part="modal" />
                 <SkeletonBar x={172} y={22} w={50} h={6} heading />
                 {[0, 1].map((i) => <SkeletonBar key={i} x={172} y={38 + i * 10} w={96 - i * 24} />)}
-                <TokenRect x={160} y={92} w={136} h={26} fill={PAINT.sectionSubtleSurface} clipPath={`url(#${clip})`} data-part="footer-seam" />
+                <TokenRect x={160} y={92} w={136} h={26} fill={PAINT.cardSunken} clipPath={`url(#${clip})`} data-part="footer-seam" />
                 <Rule x1={160} y1={92} x2={296} y2={92} stroke={PAINT.modalDivider} />
                 <ButtonShape x={226} y={101} w={28} />
                 <ButtonShape x={258} y={101} w={28} appearance="primary" />

@@ -252,17 +252,26 @@ export const PageHeader = ({ x, y, w, accent = false }) => (
 );
 
 /**
- * A Section. By default it has no fill, no pad and no box: the real
- * Section draws only its parts, so the drawing is a heading and rows on
- * whatever surface it sits on. `subtle` is the one variant with a box
- * (the sunken surface, padded and rounded), for a section beside a list.
+ * A Section: no fill, no pad and no box. The real Section draws only its
+ * parts, so the drawing is a heading and rows on whatever surface it sits on.
+ * A box with a fill is a Card: see `SunkenCard`.
  */
-export const Section = ({ x, y, w, h, accent = false, rows = 3, subtle = false }) => {
-  const pad = subtle ? 8 : 0;
+export const Section = ({ x, y, w, accent = false, rows = 3 }) => (
+  <g data-part="section">
+    <SkeletonBar x={x} y={y} w={w * 0.3} h={5} accent={accent} heading />
+    {Array.from({ length: rows }, (_, i) => (
+      <SkeletonBar key={i} x={x} y={y + 14 + i * 9} w={w * (0.8 - i * 0.15)} />
+    ))}
+  </g>
+);
+
+/** A sunken Card: the sunken surface, padded and rounded, holding a heading and rows. It is how a filled block beside a list is drawn. */
+export const SunkenCard = ({ x, y, w, h, accent = false, rows = 3 }) => {
+  const pad = 8;
   return (
-    <g data-part="section">
-      {subtle && <Rect x={x} y={y} w={w} h={h} fill={PAINT.sectionSubtleSurface} corner="section" />}
-      {subtle && accent && <AccentRing x={x} y={y} w={w} h={h} corner="section" />}
+    <g data-part="card">
+      <Rect x={x} y={y} w={w} h={h} fill={PAINT.cardSunken} corner="card" />
+      {accent && <AccentRing x={x} y={y} w={w} h={h} corner="card" />}
       <SkeletonBar x={x + pad} y={y + pad} w={w * 0.3} h={5} accent={accent} heading />
       {Array.from({ length: rows }, (_, i) => (
         <SkeletonBar key={i} x={x + pad} y={y + pad + 14 + i * 9} w={Math.min(w * (0.8 - i * 0.15), w - 2 * pad)} />
