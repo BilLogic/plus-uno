@@ -451,7 +451,7 @@ Overview.play = async ({ canvasElement }) => {
     });
 };
 
-/** Wrap: a row label longer than its column takes more lines, and the grid stays inside its well instead of scrolling the page sideways. */
+/** Wrap: a row label longer than its column takes more lines; columns that cannot fit scroll inside the grid, never the page. */
 export const Overflow = {
     render: () => (
         <div style={{ width: '360px' /* demo frame */ }}>
@@ -466,9 +466,9 @@ export const Overflow = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const table = canvasElement.querySelector('table');
+        const wrapper = canvasElement.querySelector('.plus-choice-grid-wrapper');
         await expectNoSilentClip(canvasElement);
-        await expectInsideWell(table, canvasElement.firstElementChild);
+        await expectInsideWell(wrapper, canvasElement.firstElementChild);
         const label = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes(LONG_TOPIC));
         await expect(label).toBeTruthy();
         const short = [...canvasElement.querySelectorAll('.plus-choice-grid-row-label')].find((el) => el.textContent.includes('Monday'));

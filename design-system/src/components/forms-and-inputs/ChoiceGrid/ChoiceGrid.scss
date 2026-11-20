@@ -6,6 +6,9 @@
 .plus-choice-grid-wrapper {
     display: block;
     width: 100%;
+    // Columns that cannot fit scroll inside the grid's own well, as a table
+    // does, so the page never scrolls sideways.
+    overflow-x: auto;
 
     // `size`: option-label font and the control width that goes with it.
     // Unset keeps the default rendering (the control's own size, body-default text).
