@@ -451,8 +451,9 @@ const FIGURE_WIDTHS = { narrow: 'var(--field-width-md)', medium: 'var(--field-wi
  * @param {'none' | 'sm' | 'md' | 'lg'} [gap] - `none` draws parts touching, for a figure about spacing
  * @param {'center' | 'start' | 'end' | 'stretch'} [align]
  * @param {'between' | 'end'} [justify]
+ * @param {boolean} [isRoomy] - leave room under the row for a character drawing: its limbs reach past the Illustration's own box, which a figure row cannot size, so the row holds the room
  */
-export function FigureRow({ gap = 'md', align = 'center', justify, children }) {
+export function FigureRow({ gap = 'md', align = 'center', justify, isRoomy, children }) {
     return (
         <div
             className="sb-ds-figure-row"
@@ -462,6 +463,7 @@ export function FigureRow({ gap = 'md', align = 'center', justify, children }) {
                 alignItems: align === 'start' || align === 'end' ? `flex-${align}` : align,
                 justifyContent: justify === 'between' ? 'space-between' : justify === 'end' ? 'flex-end' : undefined,
                 gap: FIGURE_GAPS[gap],
+                paddingBlockEnd: isRoomy ? 'var(--stack-lg)' : undefined,
             }}
         >
             {children}

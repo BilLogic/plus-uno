@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Dialog, FooterActions, Popup, TextField } from '@/components';
 import { OverlayContainer } from '@/lib/overlay';
-import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
 import { PopupStage } from './popupDemo.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './PopupExamples.jsx';
@@ -14,6 +14,9 @@ import examplesSource from './PopupExamples.jsx?raw';
 
 /** The height of the stage a held-open menu has room in. Docs geometry, px. */
 const MENU_STAGE = 230; // docs-literal
+
+/** The height of the stage a form in a Popup has room in. Docs geometry, px. */
+const FORM_STAGE = 300; // docs-literal: the form's popup is about 190 px tall; the stage leaves room below it
 
 /** The height of the stage a long read has room in. Docs geometry, px. */
 const LONG_READ_STAGE = 330; // docs-literal
@@ -46,36 +49,32 @@ export const FieldsInModalCase = () => {
 
 /** A form placed inside a Popup closes on an outside click and loses edits. */
 export const FormInPopupCase = () => {
-    const [mount, setMount] = useState(null);
     const [student, setStudent] = useState('Ana Ruiz');
     return (
-        <CaseSurface
-            ref={setMount}
-            style={{
-                position: 'relative',
-                boxSizing: 'border-box',
-                minBlockSize: 280,
-            }}
-        >
-            {mount ? (
-                <Popup
-                    show
-                    triggerType="manual"
-                    container={mount}
-                    placement="bottom-start"
-                    title="Add session"
-                    trigger={<Button text="Add session" spacing="compact" onClick={() => {}} />}
-                >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}>
-                            <Button text="Cancel" appearance="subtle" spacing="compact" onClick={() => {}} />
-                            <Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} />
-                        </div>
-                    </div>
-                </Popup>
-            ) : null}
-        </CaseSurface>
+        // The stage fills the well: in the example's centered column it would shrink to the trigger and clip the popup.
+        <div style={{ inlineSize: '100%' }}>
+            <PopupStage height={FORM_STAGE}>
+                {(mount) => (
+                    <OverlayContainer container={mount} boundary={null}>
+                        <Popup
+                            show
+                            triggerType="manual"
+                            placement="bottom-start"
+                            title="Add session"
+                            trigger={<Button text="Add session" spacing="compact" onClick={() => {}} />}
+                        >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                                <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}>
+                                    <Button text="Cancel" appearance="subtle" spacing="compact" onClick={() => {}} />
+                                    <Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} />
+                                </div>
+                            </div>
+                        </Popup>
+                    </OverlayContainer>
+                )}
+            </PopupStage>
+        </div>
     );
 };
 

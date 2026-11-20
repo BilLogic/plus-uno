@@ -11,6 +11,8 @@ import { ThemeProvider, ensure, themes } from "storybook/theming";
 
 import { Button, Dialog, DynamicTable, ProgressTracker, PromptStarters } from "@/components";
 import { Section } from "@/templates";
+// A deep import on purpose: the Popup cases are docs staging, not part of a public barrel.
+import { FormInPopupCase } from "@/templates/Popup/PopupCases.jsx";
 import { AGENT_VIEW_MARKDOWN } from "./docs-tabs.jsx";
 import { DoDontPair, FigureScreen } from "./ds-docs-layout.jsx";
 
@@ -335,6 +337,51 @@ export const SectionActionsWrap = {
       actions.getBoundingClientRect().right,
       "the actions stay at the end of the row",
     ).toBeCloseTo(column.getBoundingClientRect().right, -1);
+    await expectColumnHolds(column);
+  },
+};
+
+/** An open layer a Do or Don't example shows stays inside its own well, under the card above it. */
+export const OpenLayerStaysInItsWell = {
+  render: () => (
+    <div data-testid="column" style={{ inlineSize: NARROW }}>
+      {/* A page's examples sit far down it: the viewport has no room under the trigger, which flips a layer measured against the page. */}
+      <div style={{ blockSize: "100vh" }} />
+      <DoDontPair
+        doExample={<span>Do</span>}
+        doCaption="A caption."
+        dontExample={<FormInPopupCase />}
+        dontCaption="A caption."
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const column = canvasElement.querySelector('[data-testid="column"]');
+    const popup = await waitFor(() => {
+      const found = canvasElement.querySelector(".plus-popup");
+      expect(found, "the popup is open").not.toBeNull();
+      return found;
+    });
+    const [, well] = canvasElement.querySelectorAll(".sb-ds-dodont-card__well");
+    // Opening moves focus into the layer and scrolls it into view; a reader is at the top of the page, with the example below the fold.
+    window.scrollTo(0, 0);
+    // The layer places itself again after that scroll: wait until its position is the same on two looks in a row.
+    let last = "";
+    await waitFor(() => {
+      const r = popup.getBoundingClientRect();
+      const now = `${r.top}/${r.left}`;
+      const settled = now === last;
+      last = now;
+      expect(settled, "the layer has settled").toBe(true);
+    });
+    const layer = popup.getBoundingClientRect();
+    const box = well.getBoundingClientRect();
+    await expect(layer.top, "the layer starts inside its well").toBeGreaterThanOrEqual(box.top - 1);
+    await expect(layer.bottom, "the layer ends inside its well").toBeLessThanOrEqual(box.bottom + 1);
+    await expect(layer.left, "the layer stays inside its well at the start").toBeGreaterThanOrEqual(box.left - 1);
+    await expect(layer.right, "the layer stays inside its well at the end").toBeLessThanOrEqual(box.right + 1);
+    const stage = popup.closest("[data-popup-stage]").getBoundingClientRect();
+    await expect(layer.right, "the stage is wide enough that it does not cut the layer").toBeLessThanOrEqual(stage.right + 1);
     await expectColumnHolds(column);
   },
 };

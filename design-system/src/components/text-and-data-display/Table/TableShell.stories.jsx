@@ -5,9 +5,9 @@ import { alpha, computedShadow, tokenColor, tokenLength, px } from '@/storybook-
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
-import { TableShell } from './TableParts';
+import { TableFooter, TableShell } from './TableParts';
 import { Section } from '@/templates';
-import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
+import { Checkbox, Button, EmptyState as PlusEmptyState, Pagination } from '@/components';
 
 const sampleRows = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -690,3 +690,28 @@ export const MotionReorderRowsReduced = {
     play: playReorderRows(true),
 };
 
+
+/** At phone width the footer wraps: nothing runs past it, and the pager stays at its end. */
+export const FooterWrapsAtPhoneWidth = {
+    render: () => (
+        <div data-testid="column" style={{ inlineSize: 'calc(var(--card-min-width-md) * 1.2)' }}>
+            <TableShell footer={(
+                <TableFooter range="1–10 of 340 students">
+                    <Pagination currentPage={1} totalPages={34} onPageChange={() => {}} />
+                </TableFooter>
+            )}
+            >
+                {tableContent}
+            </TableShell>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const footer = canvasElement.querySelector('.plus-table-footer');
+        const pager = canvasElement.querySelector('.plus-pagination');
+        const column = canvasElement.querySelector('[data-testid="column"]');
+        await expect(footer.scrollWidth, 'nothing runs past the footer').toBeLessThanOrEqual(footer.clientWidth + 1);
+        await expect(column.scrollWidth, 'nothing pushes the column wide').toBeLessThanOrEqual(column.clientWidth + 1);
+        const end = footer.getBoundingClientRect().right - parseFloat(getComputedStyle(footer).paddingInlineEnd);
+        await expect(pager.getBoundingClientRect().right, "the pager's right edge is the footer's end").toBeCloseTo(end, 0);
+    },
+};
