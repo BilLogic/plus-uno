@@ -37,7 +37,7 @@ describe('Empty live cases and TypeCard links', () => {
         expect(screen.queryByRole('navigation')).toBeNull();
         expect(screen.getByRole('heading', { name: 'No students match these filters' })).toBeInTheDocument();
 
-        await user.click(screen.getAllByRole('button', { name: 'Reset filters' })[0]);
+        await user.click(screen.getByRole('button', { name: 'Reset filters' }));
         expect(screen.getByRole('table')).toBeInTheDocument();
         unmount();
 
@@ -67,7 +67,7 @@ describe('Empty live cases and TypeCard links', () => {
 
         rerender(<EmptyTableBoxCase variant="hiddenByFilter" />);
         expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
-        await user.click(screen.getAllByRole('button', { name: 'Reset filters' })[0]);
+        await user.click(screen.getByRole('button', { name: 'Reset filters' }));
         expect(screen.getByRole('table')).toBeInTheDocument();
 
         rerender(<EmptyTableBoxCase variant="nothingToCreate" />);

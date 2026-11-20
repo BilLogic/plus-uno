@@ -331,6 +331,13 @@ describe('Section header rows', () => {
         expect(onClearAll).toHaveBeenCalled();
     });
 
+    it('hides its Reset filters while a No matches state offers one', () => {
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i < 2 }));
+        render(<Section title="Sessions" search={<div />} filters={applied} count="0 of 12" onClearAll={() => {}} hasNoMatches>Body</Section>);
+        expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
+        expect(screen.getByText('0 of 12')).toBeInTheDocument();
+    });
+
     it('shows no count or Reset filters while nothing is applied', () => {
         render(<Section title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</Section>);
         expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();

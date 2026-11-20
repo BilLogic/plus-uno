@@ -65,8 +65,8 @@
             ), $ring: true);
         }
 
-        // Current page item
-        &.plus-breadcrumb-current {
+        // Plain-text item: a level given no href
+        &.plus-breadcrumb-plain {
             color: var(--ds-text-subtlest);
             // Block, so the text can end in an ellipsis; the divider stays in front.
             display: block;

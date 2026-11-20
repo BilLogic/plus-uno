@@ -76,7 +76,7 @@ export const SECTION_VISIBLE_FILTERS = 3;
  * the filter triggers. Every control sits on the one 32 line, so Search is the
  * compact field and the buttons keep their default spacing.
  */
-const SectionHeaderRows = ({ views, format, search, filters = [], count, onClearAll, onMoreFilters, onOpenFilters, narrow }) => {
+const SectionHeaderRows = ({ views, format, search, filters = [], count, onClearAll, hasNoMatches, onMoreFilters, onOpenFilters, narrow }) => {
     const hasFilters = filters.length > 0;
     const hasRow3 = Boolean(search) || hasFilters || (!views && Boolean(format));
     const applied = filters.filter((filter) => filter.isSelected).length;
@@ -154,7 +154,7 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
                     {hasFilters && applied > 0 && (
                         <div className="plus-section-row__applied">
                             {count && <span className="plus-section-row__count" role="status">{count}</span>}
-                            {onClearAll && <Button text="Reset filters" appearance="subtle" onClick={onClearAll} />}
+                            {onClearAll && !hasNoMatches && <Button text="Reset filters" appearance="subtle" onClick={onClearAll} />}
                         </div>
                     )}
                     {formatInRow3 && <div className="plus-section-row__end">{format}</div>}
@@ -171,6 +171,7 @@ SectionHeaderRows.propTypes = {
     filters: PropTypes.arrayOf(PropTypes.object),
     count: PropTypes.node,
     onClearAll: PropTypes.func,
+    hasNoMatches: PropTypes.bool,
     onMoreFilters: PropTypes.func,
     onOpenFilters: PropTypes.func,
     narrow: PropTypes.bool,
@@ -218,6 +219,7 @@ const Section = ({
     filters,
     count,
     onClearAll,
+    hasNoMatches = false,
     onMoreFilters,
     onOpenFilters,
     isLoading = false,
@@ -299,6 +301,7 @@ const Section = ({
                         filters={filters}
                         count={count}
                         onClearAll={onClearAll}
+                        hasNoMatches={hasNoMatches}
                         onMoreFilters={onMoreFilters}
                         onOpenFilters={onOpenFilters}
                         narrow={narrow}
@@ -473,6 +476,8 @@ Section.propTypes = {
     count: PropTypes.node,
     /** Runs when "Reset filters" is pressed. The button shows once a filter is applied. */
     onClearAll: PropTypes.func,
+    /** True while the content is a No matches empty state, which offers its own "Reset filters": the header hides its button so one control remains. */
+    hasNoMatches: PropTypes.bool,
     /** Runs when "More filters" is pressed. */
     onMoreFilters: PropTypes.func,
     /** Runs when the Filter button of a narrow Section is pressed. */

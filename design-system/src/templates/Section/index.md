@@ -194,6 +194,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `isLoading` | Swaps the header for skeleton bars while the Section loads. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
+| `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |
 | `onClearAll` · `onMoreFilters` · `onOpenFilters` | Reset filters, More filters, and the Filter button of a narrow Section. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
@@ -242,6 +243,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `filters` | arrayOf | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
 | `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |
 | `onClearAll` | func | — | Runs when "Reset filters" is pressed. The button shows once a filter is applied. |
+| `hasNoMatches` | bool | `false` | True while the content is a No matches empty state, which offers its own "Reset filters": the header hides its button so one control remains. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
 | `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
 | `isLoading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |

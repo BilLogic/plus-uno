@@ -76,14 +76,14 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
                                 ref={measureRef}
                                 tabIndex={truncated ? 0 : undefined}
                                 id={isLast && id ? id : undefined}
-                                className="plus-breadcrumb-item plus-breadcrumb-current"
+                                className="plus-breadcrumb-item plus-breadcrumb-plain"
                             >
                                 {item.text}
                             </li>
                         )}
                     </ClippedTooltip>
                 ) : (
-                    <li key={index} className="plus-breadcrumb-item plus-breadcrumb-link">
+                    <li key={index} id={isLast && id ? id : undefined} className="plus-breadcrumb-item plus-breadcrumb-link">
                         <ClippedTooltip text={item.text}>
                             {({ measureRef }) => (
                                 <a

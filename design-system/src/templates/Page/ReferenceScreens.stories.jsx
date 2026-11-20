@@ -66,6 +66,7 @@ export const ListWithFilters = {
                         }]}
                         count={`${rows.length} of ${sessions.length}`}
                         onClearAll={reset}
+                        hasNoMatches={!rows.length}
                         empty={!rows.length}
                         label="Sessions"
                         emptyState={
@@ -104,8 +105,7 @@ export const ListWithFilters = {
         await expect(canvas.getByText('No matching sessions')).toBeVisible();
         await expect(canvas.queryByRole('table')).toBeNull();
         await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
-        // The header row and the empty state both offer it; either one resets.
-        await userEvent.click(canvas.getAllByRole('button', { name: 'Reset filters' })[0]);
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
         await expect(canvas.getAllByRole('row')).toHaveLength(4);
     },
 };

@@ -12548,6 +12548,15 @@
           "deprecated": null
         },
         {
+          "name": "hasNoMatches",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "True while the content is a No matches empty state, which offers its own \"Reset filters\": the header hides its button so one control remains.",
+          "deprecated": null
+        },
+        {
           "name": "onMoreFilters",
           "type": "func",
           "required": false,

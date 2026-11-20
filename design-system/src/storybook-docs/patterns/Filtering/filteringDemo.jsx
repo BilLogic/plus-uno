@@ -279,6 +279,7 @@ export const FilteredStudents = ({
                                 : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
                             filters={filters}
                             onClearAll={reset}
+                            hasNoMatches={rows.length === 0}
                             onOpenFilters={() => setShowSide(true)}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>

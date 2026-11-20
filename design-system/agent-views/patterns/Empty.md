@@ -101,7 +101,7 @@ The picture above, then the heading, one line and the action, all on one left ed
 
 **Checked:** Review
 
-No column headers and no footer while the table is empty; the Section's header rows above stay, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
+No column headers and no footer while the table is empty; the Section's header rows above stay, so the person can change the view, search or reset. A "No matches" state offers "Reset filters", and the Section header hides its own button while it shows, so one control remains.
 
 Do: The whole table replaced; the header rows stay.
 Don't: Column headers and a footer over nothing, with a centered paragraph.

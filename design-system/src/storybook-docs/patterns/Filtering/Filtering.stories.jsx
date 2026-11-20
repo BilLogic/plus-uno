@@ -312,8 +312,8 @@ export const NoMatches = {
         await expect(p.canvas.queryByRole('table'), 'the empty state replaces the whole table').toBeNull();
         await expect(p.canvas.getByText(/Grade 6 and Math/), 'it names the filters that are on').toBeInTheDocument();
         await expectFilterCount(p.filterIcon(), 2);
-        // The Section's header row and the empty state both offer it; either one resets.
-        await userEvent.click(p.canvas.getAllByRole('button', { name: 'Reset filters' })[0]);
+        await expect(p.canvas.getAllByRole('button', { name: 'Reset filters' }), 'one Reset filters: the empty state offers it, the header hides its own').toHaveLength(1);
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Reset filters' }));
         await waitFor(() => expect(p.canvas.getByRole('table')).toBeInTheDocument());
         await expectFilterCount(p.filterIcon(), 0);
         await expect(p.status()).toHaveTextContent('8 students');

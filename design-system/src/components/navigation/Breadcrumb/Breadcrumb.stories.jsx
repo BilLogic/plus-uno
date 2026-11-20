@@ -23,7 +23,7 @@ export default {
         layout: 'padded',
         docs: {
             description: {
-                component: 'Universal element component for navigation hierarchy. indicates the current page\'s location within a navigational hierarchy that automatically adds separators via CSS.',
+                component: 'Universal element component for navigation hierarchy. shows the parent pages of the page a person is on, with separators added by CSS.',
             },
         },
     },
