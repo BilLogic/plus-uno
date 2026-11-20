@@ -123,17 +123,16 @@ describe('SearchField, active', () => {
         expect(onSubmit).toHaveBeenCalledTimes(1);
     });
 
-    it('currently leaves the search out of a submitted form: the input has no name to submit under', async () => {
-        // Design question: SearchField has no `name` prop (extra attributes go to the
-        // wrapper, not the input), so a plain form post never carries the text.
+    it('submits the search text under its name, and sets the name on the input', async () => {
         const user = userEvent.setup();
         render(
             <form data-testid="form">
                 <SearchField placeholder="Search students" name="q" />
             </form>,
         );
+        expect(search()).toHaveAttribute('name', 'q');
         await user.type(search(), 'ada');
-        expect([...new FormData(screen.getByTestId('form')).entries()]).toEqual([]);
+        expect([...new FormData(screen.getByTestId('form')).entries()]).toEqual([['q', 'ada']]);
     });
 });
 
@@ -237,17 +236,14 @@ describe('SearchField, basic', () => {
         expect(onSearch).toHaveBeenCalledWith('ada');
     });
 
-    it('currently still calls loadResults on mount and after typing pauses', async () => {
-        // Design question: the docs say basic mode "does no work per keystroke", but
-        // loadResults is not gated on mode, so a page that passes one gets a request
-        // per typing pause. The Basic story asserts "never called" right after typing,
-        // before the 250ms pause has elapsed, so it cannot see this.
+    it('never calls loadResults, on mount or after typing pauses', async () => {
         const user = userEvent.setup();
         const loadResults = vi.fn(async () => ({ results: [], total: 0 }));
         render(<SearchField placeholder="Search students" mode="basic" loadResults={loadResults} />);
-        await waitFor(() => expect(loadResults).toHaveBeenCalledTimes(1));
         await user.type(search(), 'ada');
-        await waitFor(() => expect(loadResults).toHaveBeenLastCalledWith('ada', expect.anything()), { timeout: 2000 });
+        await new Promise((resolve) => { setTimeout(resolve, 600); });
+        expect(loadResults).not.toHaveBeenCalled();
+        expect(screen.queryByText('Searching')).toBeNull();
     });
 
     it('keeps Enter from submitting the form it sits in', async () => {

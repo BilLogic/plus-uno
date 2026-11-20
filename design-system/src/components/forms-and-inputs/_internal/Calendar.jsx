@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { SlideViews } from '@/lib/navigationMotion';
 import Icon from '../../images-and-icons/Icon';
-import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
+import { formatMonthYear, outOfBounds, parseDate, sameDay, formatIso } from './dates';
 import { IconButton } from '../IconButton/IconButton';
 import './Calendar.scss';
 
@@ -19,6 +19,13 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  *   between; `aria-current="date"` marks today.
  * - **Bounds:** days before `minDate` or after `maxDate` are disabled.
  * - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
+ * - **Keyboard:** one day is in the tab order (the picked day, else today, else
+ *   the first enabled day) and the arrows move from it, the way a date grid
+ *   does: Left and Right by a day, Up and Down by a week, Home and End to the
+ *   start and end of the week, Page Up and Page Down by a month (Shift for a
+ *   year). Moving past the month on show turns to that month; `minDate` and
+ *   `maxDate` stop the move. Base UI has no date grid, so this is the one
+ *   hand-rolled roving focus, on the WAI-ARIA date grid keys.
  *
  * @param {object} props
  * @returns {JSX.Element}
@@ -51,9 +58,59 @@ const Calendar = ({
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const lastOfPrevious = new Date(year, month, 0).getDate();
     const today = new Date();
+    const [focusDate, setFocusDate] = useState(null);
+    const pendingFocus = useRef(false);
+    const gridRef = useRef(null);
     const start = parseDate(rangeStart);
     const end = parseDate(rangeEnd);
     const picked = parseDate(selected);
+
+    const inView = (date) => date && date.getFullYear() === year && date.getMonth() === month;
+    const isEnabled = (date) => !outOfBounds(date, minDate, maxDate);
+    const firstEnabled = Array.from({ length: daysInMonth }, (_, i) => new Date(year, month, i + 1)).find(isEnabled);
+    const tabDay = [focusDate, picked, start, today, firstEnabled]
+        .find((date) => inView(date) && isEnabled(date));
+
+    useEffect(() => {
+        if (!pendingFocus.current || !focusDate) return;
+        const target = gridRef.current?.querySelector(`[data-date="${formatIso(focusDate)}"]`);
+        if (target) {
+            pendingFocus.current = false;
+            target.focus();
+        }
+    }, [focusDate, monthKey]);
+
+    const moveFocus = (from, event) => {
+        const { shiftKey } = event;
+        let next;
+        switch (event.key) {
+            case 'ArrowLeft': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() - 1); break;
+            case 'ArrowRight': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1); break;
+            case 'ArrowUp': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() - 7); break;
+            case 'ArrowDown': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 7); break;
+            case 'Home': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() - from.getDay()); break;
+            case 'End': next = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 6 - from.getDay()); break;
+            case 'PageUp': case 'PageDown': {
+                const step = (event.key === 'PageUp' ? -1 : 1) * (shiftKey ? 12 : 1);
+                const target = new Date(from.getFullYear(), from.getMonth() + step, 1);
+                const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+                next = new Date(target.getFullYear(), target.getMonth(), Math.min(from.getDate(), last));
+                break;
+            }
+            default: return;
+        }
+        event.preventDefault();
+        const min = parseDate(minDate);
+        const max = parseDate(maxDate);
+        if (min && next < min) next = min;
+        if (max && next > max) next = max;
+        if (sameDay(next, from)) return;
+        pendingFocus.current = true;
+        setFocusDate(next);
+        if (next.getFullYear() !== year || next.getMonth() !== month) {
+            onViewDateChange(new Date(next.getFullYear(), next.getMonth(), 1));
+        }
+    };
 
     const cells = [];
     for (let i = firstWeekday - 1; i >= 0; i -= 1) {
@@ -77,6 +134,9 @@ const Calendar = ({
                 aria-label={date.toLocaleDateString(undefined, {
                     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
                 })}
+                data-date={formatIso(date)}
+                tabIndex={tabDay && sameDay(date, tabDay) ? 0 : -1}
+                onKeyDown={(event) => moveFocus(date, event)}
                 aria-pressed={isSelected}
                 aria-current={isToday ? 'date' : undefined}
                 data-in-range={inRange || undefined}
@@ -108,6 +168,7 @@ const Calendar = ({
         <div
             className={['plus-calendar', className].filter(Boolean).join(' ')}
             data-size={size}
+            ref={gridRef}
             {...props}
         >
             <div className="plus-calendar-header">

@@ -1493,6 +1493,7 @@
         "Size32",
         "Size40",
         "PickADay",
+        "ArrowKeys",
         "TurnMonths",
         "TurnMonthsReduced",
         "Default",
@@ -3575,7 +3576,7 @@
       "import": "import { DatePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-      "summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on. `label` does not name the plain field: it is the filter trigger's text and turns DatePicker into the filter popup. Name a plain field with `aria-label`, or a visible label tied to it with `htmlFor` and the field's `id`.",
       "props": [
         {
           "name": "id",
@@ -12013,7 +12014,7 @@
       "import": "import { SearchField } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx",
-      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected. `mode=\"basic\"` runs `onSearch(text)` on Enter and does no work per keystroke. `mode=\"focused\"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last \"See all\" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.",
+      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected. `mode=\"basic\"` runs `onSearch(text)` on Enter and does no work per keystroke: it never calls `loadResults`. `name` is the input's form key, so a plain form submits the text under it. `mode=\"focused\"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last \"See all\" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.",
       "props": [
         {
           "name": "placeholder",
@@ -12031,6 +12032,15 @@
           "default": null,
           "values": null,
           "description": "The accessible name, when it should differ from the placeholder.",
+          "deprecated": null
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Form key of the input: a plain form submits the search text under it.",
           "deprecated": null
         },
         {
@@ -13119,7 +13129,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Sets `aria-required` on the combobox. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
+          "description": "Sets `aria-required` on the combobox and makes an empty field fail the form's own check: submit is blocked and the field draws itself invalid. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -16064,7 +16074,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Sets `aria-required` on the textarea. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
+          "description": "Marks the textarea `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -16358,7 +16368,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Sets `aria-required` on the input. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
+          "description": "Marks the input `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {

@@ -69,6 +69,24 @@ PickADay.play = async ({ canvasElement }) => {
     await expect(day).toHaveAttribute('aria-pressed', 'true');
 };
 
+export const ArrowKeys = () => {
+    const [viewDate, setViewDate] = useState(new Date(2026, 9, 1));
+    return <Calendar viewDate={viewDate} onViewDateChange={setViewDate} selected="2026-10-21" onPick={() => {}} />;
+};
+ArrowKeys.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const day = (name) => canvas.getByRole('button', { name: new RegExp(name) });
+    // One day is in the tab order; the arrows move from it.
+    day('October 21, 2026').focus();
+    await userEvent.keyboard('{ArrowRight}{ArrowDown}');
+    await expect(day('October 29, 2026')).toHaveFocus();
+    await userEvent.keyboard('{Home}');
+    await expect(day('October 25, 2026')).toHaveFocus();
+    await userEvent.keyboard('{PageDown}');
+    await settleAnimations(canvasElement);
+    await waitFor(() => expect(day('November 25, 2026')).toHaveFocus());
+};
+
 export const TurnMonths = () => {
     const [viewDate, setViewDate] = useState(new Date(2026, 9, 1));
     return <Calendar viewDate={viewDate} onViewDateChange={setViewDate} onPick={() => {}} />;

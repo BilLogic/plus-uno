@@ -107,8 +107,10 @@ const fromValue = (value, range) => {
  *   is no room below.
  *
  * Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`,
- * `data-*`) go to the input, which is the control a screen reader lands on:
- * DatePicker has no `label` prop, so that is how a caller names it.
+ * `data-*`) go to the input, which is the control a screen reader lands on.
+ * `label` does not name the plain field: it is the filter trigger's text and
+ * turns DatePicker into the filter popup. Name a plain field with `aria-label`,
+ * or a visible label tied to it with `htmlFor` and the field's `id`.
  *
  * @param {object} props
  * @returns {JSX.Element}
@@ -620,7 +622,7 @@ DatePicker.propTypes = {
             range: PropTypes.func,
         })),
     ]),
-    /** Filter trigger label (such as `"Created"`). When set, opens the preset range popup from a `FilterButton`. */
+    /** Filter trigger label (such as `"Created"`). When set, opens the preset range popup from a `FilterButton`. It does not name a plain field: use `aria-label`, or a visible label with `htmlFor`. */
     label: PropTypes.string,
     /** Custom trigger element or `({ isOpen, value, summary }) => node` for the filter popup. */
     trigger: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),

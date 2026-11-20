@@ -50,7 +50,10 @@ SearchFieldAction.propTypes = {
  *
  * `scopes` puts a scope filter before the field, with "All" first and selected.
  *
- * `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke.
+ * `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke:
+ * it never calls `loadResults`.
+ *
+ * `name` is the input's form key, so a plain form submits the text under it.
  *
  * `mode="focused"` opens a panel (a Popup) under the field. On focus with no
  * text it lists `recent` searches; while typing it lists matches grouped by
@@ -61,6 +64,7 @@ SearchFieldAction.propTypes = {
 const SearchField = ({
     placeholder,
     label,
+    name: fieldName,
     mode = 'active',
     value: valueProp,
     defaultValue = '',
@@ -275,7 +279,8 @@ const SearchField = ({
     loadRef.current = loadResults;
     const resultsRef = useRef(onResults);
     resultsRef.current = onResults;
-    const hasLoader = Boolean(loadResults);
+    // Basic mode does no work as you type, so a loader is never asked.
+    const hasLoader = Boolean(loadResults) && mode !== 'basic';
     const first = useRef(true);
     useEffect(() => {
         if (!hasLoader) return undefined;
@@ -370,6 +375,7 @@ const SearchField = ({
         <TextField
             label={name}
             isLabelHidden
+            name={fieldName}
             placeholder={placeholder}
             type="search"
             spacing={spacing}
@@ -493,6 +499,8 @@ SearchField.propTypes = {
     placeholder: PropTypes.string.isRequired,
     /** The accessible name, when it should differ from the placeholder. */
     label: PropTypes.string,
+    /** Form key of the input: a plain form submits the search text under it. */
+    name: PropTypes.string,
     /** `active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel. */
     mode: PropTypes.oneOf(SEARCH_FIELD_MODES),
     /** The search text, when the caller holds it. Pair with `onValueChange`. */
