@@ -353,10 +353,12 @@ export const KeyFlipped = {
     render: () => <Demo.PopupStage height={320} side="end" align="end">{(mount) => <Demo.Menu mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvas, canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
-        const trigger = rect(canvas.getByRole('button', { name: 'More' }));
+        const more = canvas.getByRole('button', { name: 'More' });
         const stage = canvasElement.querySelector('[data-popup-stage]');
-        const scale = rect(stage).width / stage.offsetWidth;
+        /* Read the trigger, the stage and its scale inside the retry: the picture is scaled after it opens, so a box read once goes stale. */
         await waitFor(() => {
+            const trigger = rect(more);
+            const scale = rect(stage).width / stage.offsetWidth;
             expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
             expect((rect(stage).bottom - rect(layer).bottom) / scale, 'and stays clear of the edge').toBeGreaterThanOrEqual(0);
         });
