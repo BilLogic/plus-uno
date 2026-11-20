@@ -1,7 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
+import DropdownMenu, { ButtonItem, LinkItem } from '../../forms-and-inputs/DropdownMenu';
+import IconButton from '../../forms-and-inputs/IconButton';
 import './Breadcrumb.scss';
+
+/** From this many levels the middle folds behind a "…" menu. */
+const FOLD_AT = 5;
 
 /**
  * Breadcrumb component for PLUS design system.
@@ -18,14 +23,49 @@ import './Breadcrumb.scss';
  * `separator` is what first rendered a Breadcrumb with no items, and the crash
  * had been reachable by any caller all along.
  */
-const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', className = '', style }) => (
+const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', className = '', style }) => {
+    // Five or more levels keep the root and the last two; the rest fold behind "…".
+    const folds = items.length >= FOLD_AT;
+    const hidden = folds ? items.slice(1, -2) : [];
+    const rows = folds
+        ? [
+            { item: items[0], index: 0 },
+            { fold: true },
+            ...items.slice(-2).map((item, i) => ({ item, index: items.length - 2 + i })),
+        ]
+        : items.map((item, index) => ({ item, index }));
+    return (
     <nav
         aria-label={label}
         className={`plus-breadcrumb ${className}`}
         style={{ ...style, '--plus-breadcrumb-divider': typeof separator === 'string' ? `'${separator}'` : separator }}
     >
         <ol className="plus-breadcrumb-list">
-            {items.map((item, index) => {
+            {rows.map(({ item, index, fold }) => {
+                if (fold) {
+                    return (
+                        <li key="fold" className="plus-breadcrumb-item plus-breadcrumb-fold">
+                            <DropdownMenu
+                                trigger={<IconButton icon="ellipsis" label="Show hidden levels" appearance="subtle" spacing="compact" />}
+                                spacing="compact"
+                            >
+                                {hidden.map((level, i) => (
+                                    level.href ? (
+                                        <LinkItem
+                                            key={i}
+                                            href={level.href}
+                                            onClick={level.onClick ? (e) => { e.preventDefault(); level.onClick(e); } : undefined}
+                                        >
+                                            {level.text}
+                                        </LinkItem>
+                                    ) : (
+                                        <ButtonItem key={i} onClick={level.onClick}>{level.text}</ButtonItem>
+                                    )
+                                ))}
+                            </DropdownMenu>
+                        </li>
+                    );
+                }
                 const isLast = index === items.length - 1;
                 // Active if there's no href, or it's the last item.
                 const isCurrent = !item.href || isLast;
@@ -67,10 +107,11 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
             })}
         </ol>
     </nav>
-);
+    );
+};
 
 Breadcrumb.propTypes = {
-    /** The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. */
+    /** The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". */
     items: PropTypes.arrayOf(
         PropTypes.shape({
             text: PropTypes.string.isRequired,

@@ -10,7 +10,7 @@ Also asked as: cta, submit.
 
 **Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Panel (`ds guide panel`); Section (`ds guide section`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`); +1 more
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +2 more
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 

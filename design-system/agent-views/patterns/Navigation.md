@@ -95,7 +95,7 @@ Navigation reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-Never on an area page or a multi-step task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned .
+Never on an area page or a multi-step task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Five or more items fold the middle into a "…" button that opens the hidden levels as links.
 
 Do: A breadcrumb on the record page, parents only.
 Don't: A breadcrumb on an area page: there is nothing to climb out of.

@@ -978,7 +978,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler.",
+          "description": "The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a \"…\" menu named \"Show hidden levels\".",
           "deprecated": null
         },
         {
@@ -1036,7 +1036,10 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "Overflow"
+        "Overflow",
+        "FoldedLevels",
+        "FoldedAtFive",
+        "NotFolded"
       ],
       "tokens": [
         "--body-default",
