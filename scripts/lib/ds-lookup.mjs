@@ -63,6 +63,36 @@ import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, governedByO
 import { retiredRenames } from './tokens/plan.mjs';
 
 export const DS_INDEX = 'design-system/agent-views/ds-index.json';
+
+/** The wrapper key a multi-line string is written under in the committed index. */
+const LINES_KEY = '$lines';
+
+/**
+ * The committed index's text. Every multi-line string (a component's generated doc, a guide's
+ * page) is written as one array element per line instead of one `\n`-escaped line, so two
+ * branches that change different paragraphs change different lines and git merges them without
+ * a conflict. Keys keep the order `buildDsIndex` builds them in, which is already sorted.
+ * `loadDsIndex` reads it back, so the in-memory index is the same either way. The indent is a
+ * tab: a space-indented file would push the packaged CLI over its size budget.
+ */
+export function serializeDsIndex(index) {
+  const spread = (value) => {
+    if (typeof value === 'string') return value.includes('\n') ? { [LINES_KEY]: value.split(/(?<=\n)/) } : value;
+    if (Array.isArray(value)) return value.map(spread);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, spread(v)]));
+    return value;
+  };
+  return JSON.stringify(spread(index), null, '\t') + '\n';
+}
+
+/** The inverse of `serializeDsIndex`: rejoin each `$lines` wrapper into the string it came from. */
+export function parseDsIndex(text) {
+  return JSON.parse(text, (_key, value) =>
+    value && typeof value === 'object' && !Array.isArray(value) && Array.isArray(value[LINES_KEY]) && Object.keys(value).length === 1
+      ? value[LINES_KEY].join('')
+      : value,
+  );
+}
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
 export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
@@ -529,7 +559,7 @@ function loadDsIndex(root, { buildIndex = false } = {}) {
   if (buildIndex) return buildDsIndex(root);
   for (const rel of [DS_INDEX, 'agent-views/ds-index.json']) {
     const file = path.join(root, rel);
-    if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (fs.existsSync(file)) return parseDsIndex(fs.readFileSync(file, 'utf8'));
   }
   throw new Error('design-system/agent-views/ds-index.json is missing. Run `node scripts/generate-ds-index.mjs`.');
 }

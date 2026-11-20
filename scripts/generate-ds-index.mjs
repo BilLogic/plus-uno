@@ -13,12 +13,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { DS_INDEX, buildDsIndex } from './lib/ds-lookup.mjs';
+import { DS_INDEX, buildDsIndex, serializeDsIndex } from './lib/ds-lookup.mjs';
 import { byRoot, isEntry, main } from './lib/findings.mjs';
 
 const artifacts = byRoot((repoRoot) => {
   const index = buildDsIndex(repoRoot);
-  const content = JSON.stringify(index, null, 2) + '\n';
+  const content = serializeDsIndex(index);
   return [{ file: DS_INDEX, content, counts: { entries: index.entries.length, guides: Object.keys(index.guides).length } }];
 });
 

@@ -91,7 +91,17 @@ describe("the baked DS facts", () => {
 
   it("holds the facts built into the Worker under their byte budget", () => {
     const committed = readFileSync(new URL("../src/generated/ds-facts.ts", import.meta.url), "utf8");
-    assert.equal(budgetOverrun(committed), null);
+    const literal = committed.slice(committed.indexOf("= {") + 2, committed.lastIndexOf("};") + 1);
+    assert.equal(budgetOverrun(JSON.stringify(JSON.parse(literal))), null);
+  });
+
+  it("measures the payload, so line breaks in the source file do not count", () => {
+    const baked = { components: Array.from({ length: 50 }, (_, i) => ({ name: `C${i}` })) };
+    const payload = JSON.stringify(baked);
+    const laidOut = renderDsFacts(baked);
+    assert.ok(Buffer.byteLength(laidOut) > Buffer.byteLength(payload) + 50);
+    assert.equal(budgetOverrun(payload, Buffer.byteLength(payload)), null);
+    assert.match(budgetOverrun(laidOut, Buffer.byteLength(payload)) ?? "", /over DS_FACTS_BYTE_BUDGET/);
   });
 
   it("names the overrun in bytes, counting multi-byte characters as bytes", () => {
