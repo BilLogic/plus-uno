@@ -28,7 +28,7 @@
 .plus-logo--outlined-reversed .plus-logo__ring { stroke: var(--ds-logo-mark-reversed); }
 .plus-logo--outlined-reversed .plus-logo__plus rect { fill: var(--ds-logo-mark-reversed); }
 
-/* Wordmark. */
+/* Wordmark. The dark-ground hairline below is 0.7% of the cap: 5.012 in the wordmark's own units (cap 716). */
 .plus-logo__wordmark path { fill: var(--ds-logo-wordmark); }
 .plus-logo--colored .plus-logo__wordmark path { fill: var(--ds-text); }
 .plus-logo--colored-dark .plus-logo__wordmark path,
@@ -40,7 +40,7 @@
 .plus-logo--dark .plus-logo__wordmark path,
 .plus-logo--outlined-reversed .plus-logo__wordmark path {
     stroke: var(--ds-logo-wordmark-stroke);
-    stroke-width: 0.55;
+    stroke-width: 5.012;
     stroke-linejoin: round;
 }
 
@@ -65,7 +65,7 @@
     .plus-logo__glows--dark { display: inline; }
     .plus-logo__wordmark path {
         stroke: var(--ds-logo-wordmark-stroke);
-        stroke-width: 0.55;
+        stroke-width: 5.012;
         stroke-linejoin: round;
     }
 }
@@ -74,7 +74,7 @@
     :is([data-color-mode="auto"]) .plus-logo--colored {
         .plus-logo__wordmark path {
             stroke: var(--ds-logo-wordmark-stroke);
-            stroke-width: 0.55;
+            stroke-width: 5.012;
             stroke-linejoin: round;
         }
         .plus-logo__glows--light { display: none; }
