@@ -2,7 +2,7 @@
 
 # SegmentedControl
 
-Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment and glides to the new one on a spatial spring; under reduced motion it does not glide.
+Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it jumps. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.
 
 **Import:** `import { SegmentedControl } from '@/components';`
 
@@ -10,7 +10,7 @@ Segmented control: switches how the same content is shown (Table / Cards, Day / 
 
 **Source:** `design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.stories.jsx` — Overview, SelectByClick, KeyboardArrows, WithIcons, IconOnly, Spacing, FitContainer, Disabled, SelectedLook, Motion, Overflow, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.stories.jsx` — Overview, SelectByClick, KeyboardArrows, WithIcons, IconOnly, Spacing, FitContainer, Disabled, SelectedLook, Motion, IndicatorFollowsResize, IndicatorFollowsOptions, Overflow, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.mdx`
 
@@ -54,11 +54,11 @@ SegmentedControl reads these motion tokens and no literal duration or curve.
 Every segment shows the same content a different way.
 
 Do: Table and Cards show the same students.
-Don't: Students and Sessions are different content. Use Tabs.
+Don't: Students and Sessions are different content, so use Tabs.
 
 ### Keep it to two to five segments. {#keep-it-to-two-to-five-segments}
 
-A longer list is a menu. Six is the limit when every segment is icon-only.
+A longer list is a menu. Six is the limit only when every segment is icon-only; one text segment makes the limit five.
 
 ### Name the group and every icon-only segment. {#name-the-group-and-every-icon-only-segment}
 
@@ -79,7 +79,7 @@ The segments share the width equally instead of hugging their labels. Labels tha
 - **Keyboard.** Tab enters the control on the selected segment. Arrow keys move focus between segments and wrap at the ends. Space or Enter selects the focused segment.
 - **One always selected.** Pressing the selected segment keeps it selected.
 - **Icon-only.** The `label` is the accessible name, and the Tooltip shows on hover and on keyboard focus.
-- **Reduced motion.** The indicator does not slide; the selected segment takes its fill at once.
+- **Reduced motion.** The indicator jumps to the new segment with no slide.
 
 ## Related
 
@@ -91,16 +91,16 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Track.** A neutral fill that holds the segments, inset by 2.
+1. **Track.** A neutral fill that holds the segments, inset by 2. It reads on the sunken page and on white.
 2. **Segments.** Text, an icon with text, or an icon alone. Each is a toggle button.
-3. **Indicator.** One raised surface under the selected segment. It slides to the new segment when the choice changes.
+3. **Indicator.** One raised surface with a 1px neutral edge, under the selected segment at rest. It is measured, so it follows the segments when the container resizes, the fonts load or the options change, and it slides to the new segment when the choice changes.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Selected | The segment takes the raised surface, the raised shadow and the default ink, and sets `aria-pressed="true"`. |
-| Hovered, pressed | An unselected segment takes the neutral hovered and pressed fills. The selected one takes the raised hovered and pressed fills. |
+| Selected | The indicator sits under the segment, and the segment takes the default ink and sets `aria-pressed="true"`. The edge is 3:1 or better against the track in dark and in both increased-contrast themes, so selection never rests on the fill alone. |
+| Hovered, pressed | An unselected segment takes the neutral hovered and pressed fills. The selected segment keeps its indicator unchanged. |
 | Focused | A 2px ring on the segment, inside the track, for keyboard focus only. |
 | Disabled | The disabled ink, and the segment leaves the tab order. |
 
@@ -111,7 +111,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Height | 32: `--control-md`. Compact 24: `--control-sm`. |
 | Track | `--ds-background-neutral`, corners `--radius-control-md` (compact `--radius-control-sm`), inset `--pad-y-sm`. |
 | Segment | Padding `--pad-x-md` (compact `--pad-x-sm`), icon gap `--inline-sm`. |
-| Indicator | `--ds-surface-raised` with `--ds-shadow-raised`. |
+| Indicator | `--ds-surface-raised` with `--ds-shadow-raised` and a 1px neutral edge: `--ds-border`, and `--ds-border-bold` in dark. |
 
 ## Content guidelines
 
@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 |------|------|---------|-------------|
 | `label` | string (required) | — | The group's accessible name. |
 | `options` | arrayOf (required) | `[]` | The segments: `{ value, label, icon, isIconOnly, isDisabled }`. |
-| `value` | string | — | The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored. |
+| `value` | string | — | The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored. Keep it set, or leave it out, for the life of the control. |
 | `defaultValue` | string | — | Starting value of an uncontrolled control. Defaults to the first enabled segment. |
 | `onChange` | func | — | Called with the chosen segment's value when the person picks a different segment. |
 | `spacing` | enum | `'default'` | `default` is 32 high; `compact` is 24. |
@@ -144,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-icon` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-raised` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-sm` · `--radius-control-md` · `--radius-control-sm` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-icon` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-raised` · `--ds-surface-raised` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-sm` · `--radius-control-md` · `--radius-control-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.scss`. Override these through the token layer, never with a literal.
 

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
@@ -25,14 +25,15 @@ const MAX_ICON_ONLY_SEGMENTS = 6;
  * Built on Base UI's ToggleGroup, single and required: a group of toggle
  * buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move
  * between segments; Space or Enter selects. One raised indicator sits under
- * the selected segment and glides to the new one on a spatial spring; under
- * reduced motion it does not glide.
+ * the selected segment at rest and glides to the new one on a spatial spring;
+ * under reduced motion it jumps. It is measured, so it follows the track and
+ * the segments when the container resizes, the fonts load or the options change.
  *
  * @param {object} props
  * @param {string} props.label - The group's accessible name ("Format").
- * @param {{value: string, label: string, icon?: string|React.ReactNode, isIconOnly?: boolean, isDisabled?: boolean}[]} props.options
- * @param {string} [props.value] - Controlled selected value.
- * @param {string} [props.defaultValue] - Starting value of an uncontrolled control; the first option when omitted.
+ * @param {{value: string, label: string, icon?: string|React.ReactNode, isIconOnly?: boolean, isDisabled?: boolean}[]} props.options - Two to five segments; six when every segment is icon-only.
+ * @param {string} [props.value] - Controlled selected value. Keep it set, or leave it out, for the life of the control.
+ * @param {string} [props.defaultValue] - Starting value of an uncontrolled control; the first enabled option when omitted.
  * @param {(value: string) => void} [props.onChange]
  * @param {'default'|'compact'} [props.spacing='default']
  * @param {boolean} [props.shouldFitContainer=false]
@@ -52,7 +53,16 @@ const SegmentedControl = ({
     ...props
 }) => {
     const isControlled = value !== undefined;
-    const [own, setOwn] = useState(defaultValue ?? options.find((o) => !o.isDisabled)?.value);
+    const [own, setOwn] = useState(value ?? defaultValue ?? options.find((o) => !o.isDisabled)?.value);
+    // A controlled value is mirrored into `own`, so a control that stops being controlled keeps the last choice rather than jumping back.
+    if (isControlled && own !== value) setOwn(value);
+    const wasControlled = useRef(isControlled);
+    useEffect(() => {
+        if (wasControlled.current !== isControlled) {
+            warn('`value` switched between set and unset; keep it set (controlled) or unset (uncontrolled) for the life of the control.');
+            wasControlled.current = isControlled;
+        }
+    }, [isControlled]);
     const selected = isControlled ? value : own;
 
     const iconOnlyCount = options.filter((o) => o.isIconOnly).length;
@@ -64,10 +74,12 @@ const SegmentedControl = ({
 
     const rootRef = useRef(null);
     const indicatorRef = useRef(null);
-    const mountedRef = useRef(false);
-    const lastRef = useRef(null);
+    const shownRef = useRef(null);
     const animRef = useRef(null);
     const reduced = useMotionReduced();
+    const reducedRef = useRef(reduced);
+    reducedRef.current = reduced;
+    const lastActiveRef = useRef(null);
 
     // Required selection: pressing the selected segment would empty the group, so that change is dropped.
     const handleValueChange = (next) => {
@@ -77,57 +89,87 @@ const SegmentedControl = ({
         onChange?.(picked);
     };
 
-    useLayoutEffect(() => {
+    const paint = useCallback((box) => {
+        const el = indicatorRef.current;
+        if (!el) return;
+        el.style.transform = `translate(${box.x}px, ${box.y}px)`;
+        el.style.width = `${box.width}px`;
+        el.style.height = `${box.height}px`;
+        el.dataset.ready = 'true';
+        shownRef.current = box;
+    }, []);
+
+    /*
+     * Put the indicator under the selected segment. Everything that can move a
+     * segment (a selection, a resize, a font, new options) comes through here.
+     * `glide` is true only for a change of selection; a measurement alone jumps.
+     * A change that arrives mid-glide starts the next glide from where the
+     * indicator is drawn now, so it re-targets instead of snapping.
+     */
+    const place = useCallback((glide) => {
         const rootEl = rootRef.current;
-        const indicatorEl = indicatorRef.current;
-        if (!rootEl || !indicatorEl) return undefined;
+        if (!rootEl || !indicatorRef.current) return;
         const activeEl = rootEl.querySelector('[aria-pressed="true"]');
         if (!activeEl) {
-            lastRef.current = null;
-            return undefined;
+            delete indicatorRef.current.dataset.ready;
+            shownRef.current = null;
+            return;
         }
-        const readBox = (el) => ({ el, x: el.offsetLeft, y: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight });
-        const next = readBox(activeEl);
-        if (!mountedRef.current) {
-            mountedRef.current = true;
-            lastRef.current = next;
-            return undefined;
-        }
-        const prev = lastRef.current;
-        if (!prev || prev.el === activeEl) {
-            if (!rootEl.dataset.gliding) lastRef.current = next;
-            return undefined;
+        const target = { x: activeEl.offsetLeft, y: activeEl.offsetTop, width: activeEl.offsetWidth, height: activeEl.offsetHeight };
+        const from = shownRef.current;
+        const moving = animRef.current !== null;
+        if (!from || reducedRef.current || (!glide && !moving)) {
+            animRef.current?.stop?.();
+            animRef.current = null;
+            paint(target);
+            return;
         }
         animRef.current?.stop?.();
-        if (reduced) {
-            delete rootEl.dataset.gliding;
-            lastRef.current = next;
-            return undefined;
-        }
-        rootEl.dataset.gliding = 'true';
-        const from = { ...prev };
-        const apply = (p) => {
-            const lerp = (a, b) => a + (b - a) * p;
-            const x = lerp(from.x, next.x);
-            const w = Math.max(0, lerp(from.width, next.width));
-            indicatorEl.style.transform = `translate(${x}px, ${next.y}px)`;
-            indicatorEl.style.width = `${w}px`;
-            indicatorEl.style.height = `${next.height}px`;
-            lastRef.current = { el: activeEl, x, y: next.y, width: w, height: next.height };
-        };
-        apply(0);
-        const anim = animate(0, 1, { ...SPRINGS['spatial.fast'].productive, onUpdate: apply });
+        const start = { ...from };
+        const anim = animate(0, 1, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: (p) => {
+                const lerp = (a, b) => a + (b - a) * p;
+                paint({ x: lerp(start.x, target.x), y: lerp(start.y, target.y), width: Math.max(0, lerp(start.width, target.width)), height: Math.max(0, lerp(start.height, target.height)) });
+            },
+        });
         animRef.current = anim;
         Promise.resolve(anim.finished).then(() => {
             if (animRef.current !== anim) return;
             animRef.current = null;
-            delete rootEl.dataset.gliding;
-            lastRef.current = readBox(activeEl);
+            paint(target);
         });
-        return undefined;
-    });
+    }, [paint]);
 
-    useLayoutEffect(() => () => { animRef.current?.stop?.(); }, []);
+    const optionsKey = options.map((o) => `${o.value}|${o.label}|${o.icon && typeof o.icon === 'string' ? o.icon : ''}|${o.isIconOnly ? 1 : 0}`).join(',');
+
+    // After every render that can change what is selected or how wide a segment is.
+    useLayoutEffect(() => {
+        const changed = lastActiveRef.current !== null && lastActiveRef.current !== selected;
+        lastActiveRef.current = selected;
+        place(changed);
+    }, [selected, optionsKey, spacing, shouldFitContainer, place]);
+
+    // Follow the track and each segment when they resize, and once the fonts are in.
+    useEffect(() => {
+        const rootEl = rootRef.current;
+        if (!rootEl) return undefined;
+        let live = true;
+        const remeasure = () => { if (live) place(false); };
+        let observer;
+        if (typeof ResizeObserver !== 'undefined') {
+            observer = new ResizeObserver(remeasure);
+            observer.observe(rootEl);
+            rootEl.querySelectorAll('.plus-segmented-control__item').forEach((el) => observer.observe(el));
+        }
+        document.fonts?.ready?.then(remeasure);
+        return () => {
+            live = false;
+            observer?.disconnect();
+        };
+    }, [optionsKey, place]);
+
+    useEffect(() => () => { animRef.current?.stop?.(); }, []);
 
     const renderSegment = (option) => {
         const glyph = option.icon
@@ -174,7 +216,7 @@ const SegmentedControl = ({
 SegmentedControl.propTypes = {
     /** The group's accessible name, such as "Format". Required: the control has no visible title of its own. */
     label: PropTypes.string.isRequired,
-    /** The segments, two to five (six when all are icon-only). Each is `{ value, label, icon, isIconOnly, isDisabled }`; an icon-only segment draws just the icon and shows `label` in a Tooltip and as its accessible name. */
+    /** The segments: two to five, or up to six when every segment is icon-only (one text segment makes it five). Each is `{ value, label, icon, isIconOnly, isDisabled }`; an icon-only segment draws just the icon and shows `label` in a Tooltip and as its accessible name. */
     options: PropTypes.arrayOf(PropTypes.shape({
         value: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
@@ -182,7 +224,7 @@ SegmentedControl.propTypes = {
         isIconOnly: PropTypes.bool,
         isDisabled: PropTypes.bool,
     })).isRequired,
-    /** The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored. */
+    /** The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored. Keep it set, or leave it out, for the life of the control. */
     value: PropTypes.string,
     /** Starting value of an uncontrolled control. Defaults to the first enabled segment. */
     defaultValue: PropTypes.string,

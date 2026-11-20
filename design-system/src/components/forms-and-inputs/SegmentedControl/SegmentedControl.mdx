@@ -47,7 +47,7 @@ A segmented control switches how the same content is shown, such as Table or Car
 
 ## State
 
-<ComponentExample of={SegmentedControlStories.SelectedLook} title="Selected" description="The selected segment is the raised surface with its shadow on a neutral track. The others are clear." />
+<ComponentExample of={SegmentedControlStories.SelectedLook} title="Selected" description="The selected segment sits on a raised indicator with a neutral edge, on a neutral track. Its label is the strong ink; the others are subtle." />
 
 <ComponentExample of={SegmentedControlStories.Disabled} title="Disabled" description="The whole control, or one segment, leaves the tab order and takes the disabled ink." />
 
@@ -123,9 +123,9 @@ Use `SegmentedControl` to change how the same content is shown: Table or Cards, 
 
 ## Parts
 
-1. **Track.** A neutral fill that holds the segments, inset by 2.
+1. **Track.** A neutral fill that holds the segments, inset by 2. It reads on the sunken page and on white.
 2. **Segments.** Text, an icon with text, or an icon alone. Each is a toggle button.
-3. **Indicator.** One raised surface under the selected segment. It slides to the new segment when the choice changes.
+3. **Indicator.** One raised surface with a 1px neutral edge, under the selected segment at rest. It is measured, so it follows the segments when the container resizes, the fonts load or the options change, and it slides to the new segment when the choice changes.
 
 ### States
 
@@ -134,8 +134,8 @@ Use `SegmentedControl` to change how the same content is shown: Table or Cards, 
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Selected</td><td>The segment takes the raised surface, the raised shadow and the default ink, and sets <code>aria-pressed="true"</code>.</td></tr>
-<tr><td>Hovered, pressed</td><td>An unselected segment takes the neutral hovered and pressed fills. The selected one takes the raised hovered and pressed fills.</td></tr>
+<tr><td>Selected</td><td>The indicator sits under the segment, and the segment takes the default ink and sets <code>aria-pressed="true"</code>. The edge is 3:1 or better against the track in dark and in both increased-contrast themes, so selection never rests on the fill alone.</td></tr>
+<tr><td>Hovered, pressed</td><td>An unselected segment takes the neutral hovered and pressed fills. The selected segment keeps its indicator unchanged.</td></tr>
 <tr><td>Focused</td><td>A 2px ring on the segment, inside the track, for keyboard focus only.</td></tr>
 <tr><td>Disabled</td><td>The disabled ink, and the segment leaves the tab order.</td></tr>
 </tbody>
@@ -151,7 +151,7 @@ Use `SegmentedControl` to change how the same content is shown: Table or Cards, 
 <tr><td>Height</td><td>32: <code>--control-md</code>. Compact 24: <code>--control-sm</code>.</td></tr>
 <tr><td>Track</td><td><code>--ds-background-neutral</code>, corners <code>--radius-control-md</code> (compact <code>--radius-control-sm</code>), inset <code>--pad-y-sm</code>.</td></tr>
 <tr><td>Segment</td><td>Padding <code>--pad-x-md</code> (compact <code>--pad-x-sm</code>), icon gap <code>--inline-sm</code>.</td></tr>
-<tr><td>Indicator</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>.</td></tr>
+<tr><td>Indicator</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code> and a 1px neutral edge: <code>--ds-border</code>, and <code>--ds-border-bold</code> in dark.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -169,12 +169,12 @@ Every segment shows the same content a different way.
     doExample={<SegmentedControl label="Format" defaultValue="table" options={[{ value: 'table', label: 'Table' }, { value: 'cards', label: 'Cards' }]} />}
     doCaption="Table and Cards show the same students."
     dontExample={<SegmentedControl label="Students" defaultValue="students" options={[{ value: 'students', label: 'Students' }, { value: 'sessions', label: 'Sessions' }]} />}
-    dontCaption="Students and Sessions are different content. Use Tabs."
+    dontCaption="Students and Sessions are different content, so use Tabs."
 />
 
 ### Keep it to two to five segments.
 
-A longer list is a menu. Six is the limit when every segment is icon-only.
+A longer list is a menu. Six is the limit only when every segment is icon-only; one text segment makes the limit five.
 
 ### Name the group and every icon-only segment.
 
@@ -220,7 +220,7 @@ The segments share the width equally instead of hugging their labels. Labels tha
 - **Keyboard.** Tab enters the control on the selected segment. Arrow keys move focus between segments and wrap at the ends. Space or Enter selects the focused segment.
 - **One always selected.** Pressing the selected segment keeps it selected.
 - **Icon-only.** The `label` is the accessible name, and the Tooltip shows on hover and on keyboard focus.
-- **Reduced motion.** The indicator does not slide; the selected segment takes its fill at once.
+- **Reduced motion.** The indicator jumps to the new segment with no slide.
 
 </div>
 

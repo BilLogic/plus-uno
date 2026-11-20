@@ -12959,7 +12959,7 @@
       "import": "import { SegmentedControl } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.jsx",
-      "summary": "Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment and glides to the new one on a spatial spring; under reduced motion it does not glide.",
+      "summary": "Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it jumps. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.",
       "props": [
         {
           "name": "label",
@@ -12985,7 +12985,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored.",
+          "description": "The selected segment's value. Pair it with `onChange`; when set, `defaultValue` is ignored. Keep it set, or leave it out, for the life of the control.",
           "deprecated": null
         },
         {
@@ -13066,6 +13066,8 @@
         "Disabled",
         "SelectedLook",
         "Motion",
+        "IndicatorFollowsResize",
+        "IndicatorFollowsOptions",
         "Overflow",
         "Interactive"
       ],
@@ -13077,6 +13079,8 @@
         "--ds-background-neutral",
         "--ds-background-neutral-hovered",
         "--ds-background-neutral-pressed",
+        "--ds-border",
+        "--ds-border-bold",
         "--ds-icon",
         "--ds-icon-disabled",
         "--ds-icon-subtle",
@@ -13084,8 +13088,6 @@
         "--ds-motion-appearance-fast-duration",
         "--ds-shadow-raised",
         "--ds-surface-raised",
-        "--ds-surface-raised-hovered",
-        "--ds-surface-raised-pressed",
         "--ds-text",
         "--ds-text-disabled",
         "--ds-text-subtle",

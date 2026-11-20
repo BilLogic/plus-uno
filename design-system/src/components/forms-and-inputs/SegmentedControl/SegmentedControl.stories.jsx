@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import SegmentedControl from './SegmentedControl';
+import { Button } from '@/components';
 import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
 const FORMATS = [
@@ -15,6 +16,20 @@ const RANGES = [
     { value: 'week', label: 'Week' },
     { value: 'month', label: 'Month' },
 ];
+/** The indicator is drawn exactly over the selected segment (within a pixel), once it has settled. */
+const expectIndicatorUnder = async (group) => {
+    await waitFor(() => {
+        const indicator = group.querySelector('.plus-segmented-control__indicator');
+        const selected = group.querySelector('[aria-pressed="true"]');
+        const a = indicator.getBoundingClientRect();
+        const b = selected.getBoundingClientRect();
+        expect(indicator.dataset.ready, 'the indicator is measured').toBe('true');
+        for (const key of ['left', 'top', 'width', 'height']) {
+            expect(Math.abs(a[key] - b[key]), `indicator ${key} matches the selected segment`).toBeLessThanOrEqual(1);
+        }
+    }, { timeout: 3000 });
+};
+
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'center' };
 
 export default {
@@ -160,33 +175,86 @@ export const Disabled = {
     },
 };
 
-/** The selected segment is the raised surface; an unselected one is clear on the neutral track. */
+/** Selected: the raised indicator with a neutral edge sits under the segment, on a neutral track; the label is the strong ink and the others are subtle. */
 export const SelectedLook = {
     render: () => <Controlled label="Calendar range" options={RANGES} />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const group = canvas.getByRole('group', { name: 'Calendar range' });
         const selected = canvas.getByRole('button', { name: 'Day' });
+        const indicator = group.querySelector('.plus-segmented-control__indicator');
         await expect(getComputedStyle(group).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
-        await expect(getComputedStyle(selected).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-raised'));
-        await expect(getComputedStyle(canvas.getByRole('button', { name: 'Week' })).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(indicator).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-raised'));
+        await expect(getComputedStyle(indicator).borderTopWidth, 'the indicator has a 1px edge').toBe('1px');
+        await expect(getComputedStyle(selected).backgroundColor, 'the segment paints no fill of its own').toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(selected).color).toBe(tokenColor(canvasElement, '--ds-text'));
+        await expect(getComputedStyle(canvas.getByRole('button', { name: 'Week' })).color).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
+        await expectIndicatorUnder(group);
     },
 };
 
-/** The indicator glides on `spatial.fast`; under reduced motion it does not glide. */
+/** The indicator glides on `spatial.fast` to a newly selected segment; under reduced motion it jumps straight there. */
 export const Motion = {
     render: () => <Controlled label="Calendar range" options={RANGES} />,
     beforeEach: async () => async () => { await emulateReducedMotion(null); },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const group = canvas.getByRole('group', { name: 'Calendar range' });
+        const indicator = group.querySelector('.plus-segmented-control__indicator');
         await userEvent.click(canvas.getByRole('button', { name: 'Month' }));
         await expect(canvas.getByRole('button', { name: 'Month' })).toHaveAttribute('aria-pressed', 'true');
-        await waitFor(() => expect(group.dataset.gliding).toBeUndefined());
+        await expectIndicatorUnder(group);
         if (!(await emulateReducedMotion('reduce'))) return;
         await userEvent.click(canvas.getByRole('button', { name: 'Day' }));
-        await expect(canvas.getByRole('button', { name: 'Day' })).toHaveAttribute('aria-pressed', 'true');
-        await expect(group.dataset.gliding, 'no glide under reduced motion').toBeUndefined();
+        const day = canvas.getByRole('button', { name: 'Day' });
+        await expect(Math.abs(indicator.getBoundingClientRect().left - day.getBoundingClientRect().left), 'it jumps with no glide').toBeLessThanOrEqual(1);
+    },
+};
+
+/** The indicator rests under the selected segment, and follows it when the container resizes. */
+export const IndicatorFollowsResize = {
+    render: () => {
+        const [width, setWidth] = useState(420);
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                <div style={{ width: `${width}px` /* demo frame */ }}>
+                    <Controlled label="Format" options={FORMATS} defaultValue="cards" shouldFitContainer />
+                </div>
+                <Button text="Narrow" onClick={() => setWidth(220)} />
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const group = canvas.getByRole('group', { name: 'Format' });
+        await expectIndicatorUnder(group);
+        await userEvent.click(canvas.getByRole('button', { name: 'Narrow' }));
+        await expectIndicatorUnder(group);
+        await userEvent.click(canvas.getByRole('button', { name: 'Table' }));
+        await expectIndicatorUnder(group);
+    },
+};
+
+/** The indicator re-measures when the options change: longer labels move and widen the selected segment. */
+export const IndicatorFollowsOptions = {
+    render: () => {
+        const [long, setLong] = useState(false);
+        const options = long
+            ? [{ value: 'day', label: 'Day, by the hour' }, { value: 'week', label: 'Week, by the day' }, { value: 'month', label: 'Month, by the week' }]
+            : RANGES;
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+                <SegmentedControl label="Calendar range" options={options} defaultValue="week" />
+                <Button text="Longer labels" onClick={() => setLong(true)} />
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const group = canvas.getByRole('group', { name: 'Calendar range' });
+        await expectIndicatorUnder(group);
+        await userEvent.click(canvas.getByRole('button', { name: 'Longer labels' }));
+        await expectIndicatorUnder(group);
     },
 };
 
