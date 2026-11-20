@@ -5,6 +5,7 @@ import { Banner, Flag, FlagGroup } from '@/components';
 import { Page, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { holdFlagsOpen } from '@/storybook-docs/lib/hold-flags-open.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './NotificationsExamples.jsx';
 import examplesSource from './NotificationsExamples.jsx?raw';
@@ -188,12 +189,12 @@ const FlagStage = ({ children }) => (
 
 /** Do: a passing notice, one line of next step, held at the top right of the picture. */
 export const FlagDo = () => (
-    <FlagStage><Example.FlagDo /></FlagStage>
+    <FlagStage>{holdFlagsOpen(Example.FlagDo())}</FlagStage>
 );
 
 /** Don't: a decision in a Flag, which is gone before it is answered. */
 export const FlagDont = () => (
-    <FlagStage><Example.FlagDont /></FlagStage>
+    <FlagStage>{holdFlagsOpen(Example.FlagDont())}</FlagStage>
 );
 
 /** Do: one Banner, one line, at the tier it concerns. */

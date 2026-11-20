@@ -1,5 +1,6 @@
 import React from 'react';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { holdMenuOpen } from '@/storybook-docs/lib/hold-menu-open.jsx';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './LoadingExamples.jsx';
 import examplesSource from './LoadingExamples.jsx?raw';
@@ -19,10 +20,10 @@ const MenuStage = ({ children }) => (
 );
 
 /** Do: a menu that waits shows one "Loading options" row with a spinner. */
-export const MenuOneRowCase = () => <MenuStage><Example.MenuOneRow /></MenuStage>;
+export const MenuOneRowCase = () => <MenuStage>{holdMenuOpen(Example.MenuOneRow())}</MenuStage>;
 
 /** Don't: a menu filled with skeleton rows promises items it may not have. */
-export const MenuSkeletonRowsCase = () => <MenuStage><Example.MenuSkeletonRows /></MenuStage>;
+export const MenuSkeletonRowsCase = () => <MenuStage>{holdMenuOpen(Example.MenuSkeletonRows())}</MenuStage>;
 
 /** Do: a skeleton in the table's own shape, text bars throughout. */
 export const SkeletonInShape = () => <Example.SkeletonInShape />;

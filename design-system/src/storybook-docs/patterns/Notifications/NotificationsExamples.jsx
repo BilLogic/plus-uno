@@ -9,13 +9,13 @@ import { Banner, Flag, FlagGroup } from '@/components';
 
 export const FlagDo = () => (
     <FlagGroup>
-        <Flag icon="circle-check" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>
+        <Flag icon="circle-check" title="Session logged">Maya's supervisor will see it Friday.</Flag>
     </FlagGroup>
 );
 
 export const FlagDont = () => (
     <FlagGroup>
-        <Flag title="Move this session to 4:30 PM?" autohide={false} show actions={[{ text: 'Move', onClick: () => {} }, { text: 'Keep', onClick: () => {} }]} />
+        <Flag title="Move this session to 4:30 PM?" actions={[{ text: 'Move', onClick: () => {} }, { text: 'Keep', onClick: () => {} }]} />
     </FlagGroup>
 );
 

@@ -34,12 +34,11 @@ export const BreadcrumbOnRecordPage = () => (
         header={(
             <PageHeader
                 title="Maya Rodriguez"
-                titleAs="h4"
                 breadcrumbs={(
                     <Breadcrumb
                         label="Record page breadcrumb"
                         items={[
-                            { text: 'Students', href: '#students', onClick: (e) => e.preventDefault() },
+                            { text: 'Students', href: '#students' },
                             { text: 'Maya Rodriguez' },
                         ]}
                     />
@@ -58,12 +57,11 @@ export const BreadcrumbOnAreaPage = () => (
         header={(
             <PageHeader
                 title="Students"
-                titleAs="h4"
                 breadcrumbs={(
                     <Breadcrumb
                         label="Area page breadcrumb"
                         items={[
-                            { text: 'Home', href: '#home', onClick: (e) => e.preventDefault() },
+                            { text: 'Home', href: '#home' },
                             { text: 'Students' },
                         ]}
                     />
@@ -125,14 +123,14 @@ const SidebarWithOpenItems = ({ label, openItems }) => {
 
 export const OpenItemsByTimeAndWho = () => (
     <SidebarWithOpenItems
-        label="Open items — do"
+        label="Main"
         openItems={[openItem('4:00 PM · Ms. Ortiz', 'Hillside · Ms. Ortiz'), openItem('5:30 PM · Mr. Patel', 'Roosevelt · Mr. Patel')]}
     />
 );
 
 export const OpenItemsCarryEverything = () => (
     <SidebarWithOpenItems
-        label="Open items — don't"
+        label="Main"
         openItems={[
             openItem('Session at Hillside with Ms. Ortiz, 4:00 PM', 'Hillside · Ms. Ortiz'),
             openItem('Session at Roosevelt with Mr. Patel, 5:30 PM', 'Roosevelt · Mr. Patel'),
@@ -157,7 +155,6 @@ export const OneTabSystem = () => {
             header={(
                 <PageHeader
                     title="Maya Rodriguez"
-                    titleAs="h4"
                     bottomBar={(
                         <Tabs activeKey={tab} onSelect={setTab} aria-label="Student pages">
                             <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
@@ -190,7 +187,6 @@ export const TwoTabSystems = () => {
             header={(
                 <PageHeader
                     title="Maya Rodriguez"
-                    titleAs="h4"
                     bottomBar={(
                         <Tabs activeKey={tab} onSelect={setTab} aria-label="Student pages">
                             <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>

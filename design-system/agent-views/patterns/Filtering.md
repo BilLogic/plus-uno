@@ -57,13 +57,13 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Name categories as nouns: "Grade", "School", "Subject". | "Filter by grade", "Choose a school". |
 | Label the menu footer "Clear" and "Apply". | "Reset", "OK", "Done". |
 | Put "Reset filters" at the top of a side; "Apply filters" only for a batch. | "Clear all", "Submit". |
-| Name the Filter button with filters on: "Filters 2". | "Filters (2)". |
+| Name the Filter button with filters on: "Filters, 2 applied". | "Filters (2)". |
 | Count the results in words: "1 of 8 students". | "1 result". |
 | Go back from the filters on a narrow Section with "Show results". | "Done", "Close". |
 
 ## Accessibility
 
-- The Filter button's name is "Filters"; with a count it reads "Filters 2". Apply returns focus to it, so its new name is read.
+- The Filter button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
 - Clear and Apply are the last tab stops in a menu.

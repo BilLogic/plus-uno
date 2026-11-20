@@ -33,7 +33,8 @@ describe('Loading live cases and TypeCard links', () => {
         expect(CODE.SkeletonInShape).not.toContain('@/lib');
         expect(CODE.SkeletonInShape).toContain('const SkeletonRows');
         expect(CODE.SpinnerInBlank).toContain('<Spinner size={24} label="Loading students" />');
-        expect(CODE.MenuOneRow).toMatch(/<DropdownMenu[^>]*isOpen[^>]*isLoading/s);
+        expect(CODE.MenuOneRow).toMatch(/<DropdownMenu[^>]*isLoading/s);
+        expect(CODE.MenuOneRow).not.toContain('isOpen');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 

@@ -7,41 +7,31 @@ import { ButtonItem, DropdownMenu, IconButton, Select, Tooltip } from '@/compone
  * `DisabledCases.jsx`.
  */
 
-const MoreMenu = ({ children }) => (
-    <DropdownMenu
-        // isOpen forces the menu open so the page can show it; a real menu opens from its trigger.
-        isOpen
-        placement="bottom-start"
-        minWidth="var(--menu-group-min-width)"
-        trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
-    >
-        {children}
-    </DropdownMenu>
-);
-
 export const ReasonInCaption = () => (
     <Select label="Group" options={[]} value={null} onChange={() => {}} isDisabled caption="Choose a school first." />
 );
 
 export const ReasonInTooltip = () => (
-    <Tooltip text="Choose a school first." placement="bottom" show>
+    <Tooltip text="Choose a school first." placement="bottom">
         <div style={{ inlineSize: '100%' }}>
             <Select label="Group" options={[]} value={null} onChange={() => {}} isDisabled />
         </div>
     </Tooltip>
 );
 
+const moreTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />;
+
 export const LeftOutOfMenu = () => (
-    <MoreMenu>
+    <DropdownMenu placement="bottom-end" minWidth="var(--menu-group-min-width)" trigger={moreTrigger}>
         <ButtonItem onClick={() => {}}>Edit</ButtonItem>
         <ButtonItem onClick={() => {}}>Remove from group</ButtonItem>
-    </MoreMenu>
+    </DropdownMenu>
 );
 
 export const DimmedInMenu = () => (
-    <MoreMenu>
+    <DropdownMenu placement="bottom-end" minWidth="var(--menu-group-min-width)" trigger={moreTrigger}>
         <ButtonItem onClick={() => {}}>Edit</ButtonItem>
         <ButtonItem onClick={() => {}}>Remove from group</ButtonItem>
         <ButtonItem isDisabled onClick={() => {}}>Delete school</ButtonItem>
-    </MoreMenu>
+    </DropdownMenu>
 );

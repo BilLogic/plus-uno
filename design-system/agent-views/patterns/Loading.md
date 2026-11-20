@@ -62,7 +62,7 @@ Use Loading while someone waits for a fetch or save. Choose the indicator by wha
 | Spinner | Spinner | Inside a Button through `isLoading`; the button keeps its width. |
 | Long job | Progress bar | A value and a label that says what is happening. |
 | Wait explained | Flag | Information appearance, held until the work finishes. |
-| Menu rows | Dropdown menu | `loading` shows "Loading options"; `hasError` with `onRetry` shows "Couldn't load options". |
+| Menu rows | Dropdown menu | `isLoading` shows "Loading options"; `hasError` with `onRetry` shows "Couldn't load options". |
 
 ## Related
 

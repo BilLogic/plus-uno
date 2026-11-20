@@ -82,7 +82,8 @@ describe('Forms live cases', () => {
         expect(CODE.EditInPanel).toContain('const SessionFields');
         expect(CODE.EditInPanel).toContain('const SessionsBehind');
         expect(CODE.EditInPanel).toMatch(/from '@\/templates';/);
-        expect(CODE.EditInModal).toContain('<Modal inline show title="Ana Ruiz"');
+        expect(CODE.EditInModal).toContain('<Modal show title="Ana Ruiz"');
+        expect(CODE.EditInModal).not.toContain('inline');
         expect(CODE.EditInModal).not.toMatch(/Dialog|Blanket|100%/);
         expect(CODE.EditInPanel).not.toContain('flex');
         expect(CODE.ErrorOnField).toContain('const LogSessionFooter');

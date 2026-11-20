@@ -20,7 +20,7 @@ import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook
  */
 
 /** The width a tier's picture lays out at: past the Section's 960, so a filter side sits beside its rows. Docs geometry, in px. */
-export const STAGE = 1024;
+export const STAGE = 1024; // docs-literal: stage width, px
 
 /** The room a held-open picture keeps, so its menu hangs below its trigger whole: a stacked menu runs to its max height. Docs geometry, in px. */
 const OPEN_ROOM = { short: 500, stacked: 700 };

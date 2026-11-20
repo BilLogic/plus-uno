@@ -75,7 +75,7 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 The control that holds a filter shows it: the FilterButton's count, or the Filter button's own count on the selected fill. No row of tags under the header.
 
-<ComponentExample of={FilteringStories.FilterCount} title="The Filter button's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters 2&quot;. The result count above the rows narrows in words. Clear in the menu clears the ticks; Apply then clears the count." />
+<ComponentExample of={FilteringStories.FilterCount} title="The Filter button's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Clear in the menu clears the ticks; Apply then clears the count." />
 
 </div>
 
@@ -227,7 +227,7 @@ Below 960 the side hides and the Filter button returns with its count; pressing 
 <tr><td>Name categories as nouns: "Grade", "School", "Subject".</td><td>"Filter by grade", "Choose a school".</td></tr>
 <tr><td>Label the menu footer "Clear" and "Apply".</td><td>"Reset", "OK", "Done".</td></tr>
 <tr><td>Put "Reset filters" at the top of a side; "Apply filters" only for a batch.</td><td>"Clear all", "Submit".</td></tr>
-<tr><td>Name the Filter button with filters on: "Filters 2".</td><td>"Filters (2)".</td></tr>
+<tr><td>Name the Filter button with filters on: "Filters, 2 applied".</td><td>"Filters (2)".</td></tr>
 <tr><td>Count the results in words: "1 of 8 students".</td><td>"1 result".</td></tr>
 <tr><td>Go back from the filters on a narrow Section with "Show results".</td><td>"Done", "Close".</td></tr>
 </tbody>
@@ -239,7 +239,7 @@ Below 960 the side hides and the Filter button returns with its count; pressing 
 
 ## Accessibility
 
-- The Filter button's name is "Filters"; with a count it reads "Filters 2". Apply returns focus to it, so its new name is read.
+- The Filter button's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
 - Clear and Apply are the last tab stops in a menu.
