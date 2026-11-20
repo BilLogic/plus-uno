@@ -117,11 +117,11 @@ export const TwoTables = () => (
 /* ------------------------------------------------------------------ types */
 
 const roster = [
-    ['Ava Thompson', 'Priya Nair', 'Oct 24', 12, '92%'],
-    ['Marcus Lee', 'Daniel Kim', 'Oct 23', 9, '78%'],
-    ['Sofia Ramirez', 'Priya Nair', 'Oct 23', 15, '100%'],
-    ['Jordan Patel', 'Grace Okafor', 'Oct 21', 4, '50%'],
-    ['Emily Chen', 'Daniel Kim', 'Oct 20', 11, '85%'],
+    ['Ava Thompson', 'Priya Nair', 'Oct 24', 12, 1],
+    ['Marcus Lee', 'Daniel Kim', 'Oct 23', 9, 3],
+    ['Sofia Ramirez', 'Priya Nair', 'Oct 23', 15, 0],
+    ['Jordan Patel', 'Grace Okafor', 'Oct 21', 4, 8],
+    ['Emily Chen', 'Daniel Kim', 'Oct 20', 11, 2],
 ];
 
 const rosterHead = {
@@ -130,18 +130,18 @@ const rosterHead = {
         { key: 'tutor', content: 'Tutor', isSortable: true },
         { key: 'last', content: 'Last session', isSortable: true },
         { key: 'sessions', content: 'Sessions', isSortable: true, align: 'number' },
-        { key: 'attendance', content: 'Attendance', isSortable: true, align: 'number' },
+        { key: 'missed', content: 'Missed', isSortable: true, align: 'number' },
     ],
 };
 
-const rosterRows = roster.map(([student, tutor, last, sessions, attendance]) => ({
+const rosterRows = roster.map(([student, tutor, last, sessions, missed]) => ({
     key: student,
     cells: [
         { key: student, content: student },
         { key: tutor, content: tutor },
         { key: last, content: last },
         { key: sessions, content: String(sessions) },
-        { key: parseInt(attendance, 10), content: attendance },
+        { key: 'missed-' + student, content: String(missed) },
     ],
 }));
 
@@ -166,16 +166,12 @@ export const DynamicRoster = () => {
 };
 
 export const RosterAsStatic = () => (
-    <StaticTable
-        headers={['Student', 'School', { text: 'Sessions', align: 'number' }]}
-        rows={[
-            ['Ava Thompson', 'Lincoln Middle', { content: 12, align: 'number' }],
-            ['Marcus Lee', 'Lincoln Middle', { content: 9, align: 'number' }],
-            ['Sofia Ramirez', 'Lincoln Middle', { content: 15, align: 'number' }],
-            ['Jordan Patel', 'Lincoln Middle', { content: 4, align: 'number' }],
-            ['Emily Chen', 'Roosevelt K-8', { content: 11, align: 'number' }],
-        ]}
-    />
+    <Section title="Students" {...listHeader('students', 340)}>
+        <StaticTable
+            headers={['Student', 'Tutor', 'Last session', { text: 'Sessions', align: 'number' }, { text: 'Missed', align: 'number' }]}
+            rows={roster.map(([student, tutor, last, sessions, missed]) => [student, tutor, last, { content: sessions, align: 'number' }, { content: missed, align: 'number' }])}
+        />
+    </Section>
 );
 
 const treeNode = (id, name, type, sessions, more = {}) => ({

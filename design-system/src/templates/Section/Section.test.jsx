@@ -232,7 +232,7 @@ describe('Template docs live examples', () => {
 
         const r3 = render(<Cases.ActionsInTitleRow />);
         expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'More section actions' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Add students' })).toBeInTheDocument();
         r3.unmount();
 

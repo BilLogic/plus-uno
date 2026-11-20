@@ -28,6 +28,14 @@ describe.each(pages)('%s page printed code', (name, code) => {
             for (const [, from] of text.matchAll(/from '([^']+)'/g)) {
                 expect(ALLOWED.has(from), `${example} imports ${from}`).toBe(true);
             }
+            const known = new Set();
+            for (const [, names] of text.matchAll(/import\s+([^;]+?)\s+from/g)) {
+                for (const n of names.match(/[A-Za-z_$][\w$]*/g)) known.add(n);
+            }
+            for (const [, n] of text.matchAll(/^(?:const|function)\s+([A-Za-z_$][\w$]*)/gm)) known.add(n);
+            for (const [, tag] of text.matchAll(/<([A-Z][\w$]*)/g)) {
+                expect(known.has(tag), `${example} uses <${tag}> without importing or defining it`).toBe(true);
+            }
         }
     });
 

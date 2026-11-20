@@ -102,7 +102,7 @@ export const ActionsInTitleRow = () => (
         description="Lincoln Middle · 24 students"
         actions={(
             <>
-                <Button text="Export" iconBefore="download" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -182,8 +182,8 @@ export const CardOwnsSave = () => (
         <Card
             footer={(
                 <>
-                    <Button text="Save" appearance="primary" onClick={() => {}} />
-                    <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+                    <Button text="Save" spacing="compact" onClick={() => {}} />
+                    <Button text="Cancel" spacing="compact" onClick={() => {}} />
                 </>
             )}
         >

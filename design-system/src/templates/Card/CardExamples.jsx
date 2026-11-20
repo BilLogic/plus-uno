@@ -37,8 +37,8 @@ export const CardJobs = () => (
         </Card>
         <Card title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <ProgressBar value={68} ariaLabel="68% of goals met" />
-                <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
+                <ProgressBar value={68} ariaLabel="68 percent of goals met" />
+                <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>68 percent of goals met</p>
             </div>
         </Card>
         <Card
@@ -98,10 +98,7 @@ export const MetricsAsNestedCards = () => (
 export const LoadingInPlace = () => (
     <Card aria-busy="true" style={{ maxWidth: 'var(--card-min-width-md)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
-            <Skeleton shape="text" width="50%" />
-            <Skeleton shape="text" width="75%" />
-            <Skeleton shape="text" width="100%" />
-            <Skeleton shape="text" width="40%" />
+            <Skeleton shape="text" lines={4} />
         </div>
     </Card>
 );
