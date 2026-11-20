@@ -248,7 +248,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 <tr><td>Rest</td><td><code>sunken</code> (default): <code>--ds-surface-sunken</code>, flat. <code>default</code>: <code>--ds-surface</code> with a 1px <code>--ds-border</code>, flat. <code>raised</code>: <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>. Every surface keeps a 1px border (transparent on sunken and raised) for forced colors.</td></tr>
 <tr><td>Hovered</td><td>A clickable card only: <code>sunken</code> and <code>default</code> lift in place to <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>; <code>raised</code> lifts to <code>--ds-surface-raised-hovered</code> with <code>--ds-shadow-overlay</code>. A card with no <code>onClick</code> does not change.</td></tr>
 <tr><td>Pressed</td><td>A clickable card only: settles to <code>--ds-surface-raised-pressed</code> with <code>--ds-shadow-raised</code>.</td></tr>
-<tr><td>Focused</td><td>The card has no focus style of its own. A card made clickable as a whole takes <code>role</code> and <code>tabIndex</code> from you.</td></tr>
+<tr><td>Focused</td><td>A card made clickable as a whole draws the focus ring when the keyboard reaches it; a pointer click does not. It takes <code>role</code> and <code>tabIndex</code> from you.</td></tr>
 <tr><td>Disabled</td><td>A card is never disabled. Disable the controls inside it.</td></tr>
 <tr><td>Dragging</td><td><code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code>, held under hover and press.</td></tr>
 <tr><td>Loading</td><td>Skeleton bars in the body, with <code>aria-busy</code> on the card. Figma's <code>loading?</code> has no prop in code.</td></tr>

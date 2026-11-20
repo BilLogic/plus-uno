@@ -15,7 +15,7 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 Neither has a Blanket. Details opens on the right, docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths); floating at every width is Planned. Notifications opens at the start, beside the Sidebar.
 
 - **Details.** A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.
-- **Notifications.** The Inbox, opened from the bell beside your name. It docks beside the Sidebar, 360 wide, and stays open as you pick one.
+- **Notifications.** The Inbox, opened from the bell beside your name. It opens beside the Sidebar, 360 wide, and stays open as you pick one.
 
 ## Anatomy
 
@@ -37,7 +37,7 @@ Picking an item opens its page behind the Panel and marks it read. The Inbox sta
 2. **Tabs.** Unread, with its count, and All.
 3. **Items.** One `NotificationItem` per update, grouped by day. An unread item says "Unread" to a screen reader.
 
-The bell at the end of the Sidebar's account row, with its unread count, opens the Inbox. The Inbox docks beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
+The bell at the end of the Sidebar's account row, with its unread count, opens the Inbox. The Inbox opens beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
 
 ## Width behavior
 
@@ -94,7 +94,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell and docks beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 
@@ -112,7 +112,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
 5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
-6. **Overlay** (`PanelOverlay`). A Panel that floats over the Page with no Blanket, opened from a trigger. `placement="start"` docks it on the Sidebar's end edge at `--inbox-width`; `"end"` opens at the far edge. Escape and a press outside close it, a press on the trigger is its own toggle, and focus returns to the trigger. It fades on `appearance.fast`, like a menu.
+6. **Overlay** (`PanelOverlay`). A Panel that floats over the Page with no Blanket, opened from a trigger. `placement="start"` opens it on the Sidebar's end edge at `--inbox-width`; `"end"` opens at the far edge. Escape and a press outside close it, a press on the trigger is its own toggle, and focus returns to the trigger. It fades on `appearance.fast`, like a menu.
 
 ### States
 
@@ -229,7 +229,7 @@ Don't: The floating Panel drawn over the AI panel, hiding part of it.
 
 If the person must not look at anything outside it, it is a Modal.
 
-### Dock the Inbox against the Sidebar. {#dock-the-inbox-against-the-sidebar}
+### Open the Inbox beside the Sidebar. {#open-the-inbox-beside-the-sidebar}
 
 **Checked:** Review
 

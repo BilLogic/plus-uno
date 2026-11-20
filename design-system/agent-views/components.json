@@ -1741,6 +1741,7 @@
         "SurfaceRaised",
         "Static",
         "Clickable",
+        "ClickableFocus",
         "Dragging",
         "ForcedColors",
         "LoadingCard",
@@ -1770,7 +1771,8 @@
         "--card-title-font-lg",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-utility-elevation-surface-current"
+        "--ds-utility-elevation-surface-current",
+        "--focus-ring-width"
       ]
     },
     {
@@ -14967,6 +14969,42 @@
           "default": null,
           "values": null,
           "description": "Inline styles on the Section; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "views",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The views row of the Section header, usually Tabs in the pill appearance; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "search",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The Search field in the Section header, at compact spacing; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "filters",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does",
+          "deprecated": null
+        },
+        {
+          "name": "count",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "How many rows match, such as \"3 of 12\", once a filter is applied; passed to the Section",
           "deprecated": null
         }
       ],

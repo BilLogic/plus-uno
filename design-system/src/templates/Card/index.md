@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/templates/Card/Card.jsx`
 
-**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
+**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, ClickableFocus, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
 
 **Storybook page:** `design-system/src/templates/Card/Card.mdx`
 
@@ -124,7 +124,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | Rest | `sunken` (default): `--ds-surface-sunken`, flat. `default`: `--ds-surface` with a 1px `--ds-border`, flat. `raised`: `--ds-surface-raised` with `--ds-shadow-raised`. Every surface keeps a 1px border (transparent on sunken and raised) for forced colors. |
 | Hovered | A clickable card only: `sunken` and `default` lift in place to `--ds-surface-raised` with `--ds-shadow-raised`; `raised` lifts to `--ds-surface-raised-hovered` with `--ds-shadow-overlay`. A card with no `onClick` does not change. |
 | Pressed | A clickable card only: settles to `--ds-surface-raised-pressed` with `--ds-shadow-raised`. |
-| Focused | The card has no focus style of its own. A card made clickable as a whole takes `role` and `tabIndex` from you. |
+| Focused | A card made clickable as a whole draws the focus ring when the keyboard reaches it; a pointer click does not. It takes `role` and `tabIndex` from you. |
 | Disabled | A card is never disabled. Disable the controls inside it. |
 | Dragging | `--ds-surface-overlay` with `--ds-shadow-overlay`, held under hover and press. |
 | Loading | Skeleton bars in the body, with `aria-busy` on the card. Figma's `loading?` has no prop in code. |
@@ -194,7 +194,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current`
+`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current` · `--focus-ring-width`
 
 From `design-system/src/templates/Card/Card.scss`. Override these through the token layer, never with a literal.
 

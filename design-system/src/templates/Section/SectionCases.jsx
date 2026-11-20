@@ -111,7 +111,7 @@ const RightSideInOrderCase = () => (
     </Section>
 );
 
-/** Six controls in no order, the Primary first and a second labeled button: fold extras into More. */
+/** Five controls in no order, the Primary first and a second labeled button: fold extras into More. */
 const RightSideCrowdedCase = () => (
     <Section
         title="Sessions"

@@ -155,6 +155,10 @@ Row states are layered over each cell's fill, never swapped for it.
 | `title` | node | — | The Section title above the table; passed to the Section |
 | `actions` | node | — | Actions slot in the Section's title row; passed to the Section |
 | `style` | object | — | Inline styles on the Section; passed to the Section |
+| `views` | node | — | The views row of the Section header, usually Tabs in the pill appearance; passed to the Section |
+| `search` | node | — | The Search field in the Section header, at compact spacing; passed to the Section |
+| `filters` | arrayOf | — | The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does |
+| `count` | node | — | How many rows match, such as "3 of 12", once a filter is applied; passed to the Section |
 
 ## Variants
 
