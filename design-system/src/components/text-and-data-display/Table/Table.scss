@@ -319,6 +319,8 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    // The pager stays at the end of the footer, whether it sits beside the range or has wrapped under it.
+    margin-inline-start: auto;
     gap: var(--table-inline);
 }
 

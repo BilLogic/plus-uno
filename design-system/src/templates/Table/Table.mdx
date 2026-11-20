@@ -144,7 +144,7 @@ Search, filters and actions sit in the Section header: `<Table title="Students" 
 
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
-3. **Footer** (optional). The `footer` slot under the rows, aligned to the end: the range, the page-size Select and Pagination. The template draws no default footer: the slot is the contract. It hides while the empty state shows. A Dynamic or Tree table draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` are for a Static table.
+3. **Footer** (optional). The `footer` slot under the rows, aligned to the end: the range, the page-size Select and Pagination. The template draws no default footer: the slot is the contract. On a narrow screen its parts wrap onto lines of their own, and the pager stays at the end. It hides while the empty state shows. A Dynamic or Tree table draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` are for a Static table.
 4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true; with `empty` and no `emptyState`, the table renders normally.
 
 ### States
