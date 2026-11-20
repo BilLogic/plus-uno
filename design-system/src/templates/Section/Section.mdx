@@ -25,6 +25,7 @@ import {
     SectionRepeatsCard,
     TitleInViewsRow,
     TitleRowAboveHeaderRows,
+    CODE,
 } from './SectionCases.jsx';
 
 <Meta of={SectionStories} />
@@ -277,8 +278,10 @@ A Section earns its own heading, its own actions or its own place in the grid. W
 
 <DoDontPair
     doExample={<CardStandsAlone />}
+    doCode={CODE.CardStandsAlone}
     doCaption="A card with its own title stands on its own in the page."
     dontExample={<SectionRepeatsCard />}
+    dontCode={CODE.SectionRepeatsCard}
     dontCaption="A Section whose heading repeats its only card's title: two headings for one thing."
 />
 
@@ -290,8 +293,10 @@ The title row sits `--section-stack-sm` above the header rows, and the header si
 
 <DoDontPair
     doExample={<TitleRowAboveHeaderRows />}
+    doCode={CODE.TitleRowAboveHeaderRows}
     doCaption="The title row first, the header rows under it, sharing one left edge."
     dontExample={<TitleInViewsRow />}
+    dontCode={CODE.TitleInViewsRow}
     dontCaption="The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go."
 />
 
@@ -303,8 +308,10 @@ Actions sit at the end of the title row, More then the labeled Primary, whether 
 
 <DoDontPair
     doExample={<ActionsInTitleRow />}
+    doCode={CODE.ActionsInTitleRow}
     doCaption="The actions at the end of the title row, with the views under it."
     dontExample={<ActionsInTwoHomes />}
+    dontCode={CODE.ActionsInTwoHomes}
     dontCaption="Add students in the title row and again in the views row: one action, two homes."
 />
 
@@ -322,8 +329,10 @@ The title row ends with More, then the labeled Primary, which is last. The views
 
 <DoDontPair
     doExample={<RightSideInOrder />}
+    doCode={CODE.RightSideInOrder}
     doCaption="More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead the filters row."
     dontExample={<RightSideCrowded />}
+    dontCode={CODE.RightSideCrowded}
     dontCaption="Five controls in no order, the Primary first, a second labeled button and a Filter icon in the title row: fold extras into More and give the filter its own row."
 />
 
@@ -353,8 +362,10 @@ Actions that commit changes belong in the card or form that holds the fields.
 
 <DoDontPair
     doExample={<CardOwnsSave />}
+    doCode={CODE.CardOwnsSave}
     doCaption={'The form card holds its own Save; the Section footer is for paging and "View all".'}
     dontExample={<FooterCommits />}
+    dontCode={CODE.FooterCommits}
     dontCaption="Cancel and Save in the Section footer, away from the fields they commit."
 />
 

@@ -21,6 +21,7 @@ import {
     MetricsAsNestedCards,
     LoadingInPlace,
     LoadingLine,
+    CODE,
 } from './CardCases.jsx';
 
 <Meta of={CardStories} />
@@ -289,8 +290,10 @@ Visible empty space inside the card means a narrower minimum width. A clipped or
 
 <DoDontPair
     doExample={<MetricAtMin224 />}
+    doCode={CODE.MetricAtMin224}
     doCaption="One number fits the 224 minimum; the card is only as wide as it needs, so a row of them stays tidy."
     dontExample={<MetricAtMin480 />}
+    dontCode={CODE.MetricAtMin480}
     dontCaption="The same number at 480 leaves most of the card empty; narrow it instead of filling the space."
 />
 
@@ -300,8 +303,10 @@ A card's fill and edge are its own object boundary. Group related cards in a Sec
 
 <DoDontPair
     doExample={<MetricsWithDividers />}
+    doCode={CODE.MetricsWithDividers}
     doCaption="One card; three metrics stacked in its body, split by dividers."
     dontExample={<MetricsAsNestedCards />}
+    dontCode={CODE.MetricsAsNestedCards}
     dontCaption="Three mini cards inside the card; borders and shadows pile up and the hierarchy flattens."
 />
 
@@ -309,8 +314,10 @@ A card's fill and edge are its own object boundary. Group related cards in a Sec
 
 <DoDontPair
     doExample={<LoadingInPlace />}
+    doCode={CODE.LoadingInPlace}
     doCaption="Loading keeps the card in place: a skeleton fills the body, so the layout does not jump when data arrives."
     dontExample={<LoadingLine />}
+    dontCode={CODE.LoadingLine}
     dontCaption="A bare loading line takes the card away; the row collapses and everything below it moves."
 />
 
