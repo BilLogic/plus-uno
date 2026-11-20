@@ -28,7 +28,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Panel | template | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Panel | template | narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` |  |
 | Panel | template | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` |  |
-| Popup | template | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Popup | template | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Popup | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Section | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Section | template | side-open | Expand and collapse | `--ds-motion-spatial-default` |  |
@@ -47,7 +47,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Errors | pattern | appear | Call attention | `--ds-motion-appearance-fast` |  |
 | Errors | pattern | field | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Errors | pattern | blocked | Call attention | `--ds-motion-spatial-fast` |  |
-| Filtering | pattern | menu-open | Open and close an overlay | `--ds-motion-spatial-fast` |  |
+| Filtering | pattern | menu-open | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | menu-close | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | count-change | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -80,16 +80,16 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Notifications | pattern | stack | Add or remove an item | `--ds-motion-spatial-default` |  |
 | Notifications | pattern | message | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Notifications | pattern | banner | Add or remove an item | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
-| Overflow | pattern | fold-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Overflow | pattern | fold-close | Open and close an overlay | `--ds-motion-spatial-exit` |  |
+| Overflow | pattern | fold-open | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Overflow | pattern | fold-close | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Overflow | pattern | truncate | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Read-only | pattern | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Search | pattern | grow | Swap content in place | `--ds-motion-spatial-fast` |  |
 | Search | pattern | narrow | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Search | pattern | shrink | Swap content in place | `--ds-motion-spatial-fast` |  |
-| Search | pattern | panel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Search | pattern | panel | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
-| AiChat | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| AiChat | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | AiChat | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |  |
 | AiMessage | component | ready | Load content | `--ds-motion-appearance-fast` | `sound.ai.ready` on land: the feedback took over 1 s, so a Spinner showed |
@@ -100,13 +100,13 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Breadcrumb | component | enter | Drill into and climb back out | `--ds-motion-spatial-fast` |  |
 | Breadcrumb | component | exit | Drill into and climb back out | `--ds-motion-appearance-fast` |  |
 | Button | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Calendar | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Calendar | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Calendar | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Calendar | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | Carousel | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | Carousel | component | enter | Update a value or state | `--ds-motion-appearance-default` |  |
 | Carousel | component | exit | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Cascader | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Cascader | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
 | Checkbox | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -114,13 +114,13 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | CheckboxGroup | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | ChoiceGrid | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | CloseButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| DatePicker | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| DatePicker | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DatePicker | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DatePicker | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
-| DateTimePicker | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| DateTimePicker | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DateTimePicker | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DateTimePicker | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
-| DropdownMenu | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| DropdownMenu | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DropdownMenu | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | DynamicTable | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | DynamicTable | component | roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | `sound.roster` on land: in a session; changes within 2 s play once |
@@ -129,7 +129,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | FileUpload | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | FileUpload | component | progress | Load content | `--ds-motion-linear` |  |
 | FilterButton | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| FilterMenu | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| FilterMenu | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | FilterMenu | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Flag | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.notify` on land: outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once |
 | Flag | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` |  |
@@ -153,9 +153,9 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Pagination | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Popup | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Popup | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
-| PopupSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Popup | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Popup | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| PopupSelect | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | PopupSelect | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | ProgressBar | component | change | Load content | `--ds-motion-linear` |  |
 | ProgressBar | component | success | Update a value or state | `--ds-motion-appearance-fast` | `sound.done.step` on land: a module or lesson is done |
@@ -173,8 +173,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SearchField | component | exit | Update a value or state | `--ds-motion-appearance-fast` |  |
 | SectionMessage | component | enter | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | SectionMessage | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Select | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Select | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
+| Select | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Select | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | SettingRow | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
@@ -182,7 +182,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |
 | Spinner | component | change | Load content | `--ds-motion-loop` |  |
 | SplitButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| SplitButton | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| SplitButton | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | SplitButton | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Spotlight | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
 | Spotlight | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
@@ -192,13 +192,13 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | TagInput | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TextArea | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TextField | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| TimePicker | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| TimePicker | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | TimePicker | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | TimePicker | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | Toggle | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Tooltip | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Tooltip | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
-| TreeSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| TreeSelect | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
+| TreeSelect | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| TreeSelect | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
 | TreeTable | component | expand | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |

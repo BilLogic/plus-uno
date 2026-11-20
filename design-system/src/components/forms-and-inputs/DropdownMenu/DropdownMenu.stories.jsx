@@ -7,6 +7,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import DropdownMenu from './DropdownMenu';
+import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
     OrderDo,
     OrderDont,
@@ -96,6 +97,7 @@ Spacing.play = async ({ canvasElement }) => {
     const defaultRow = await body.findByRole('menuitem', { name: 'Edit note' });
     await expect(Math.round(defaultRow.getBoundingClientRect().height), 'default rows are 32').toBe(32);
     await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(body.queryByRole('menuitem')).toBeNull());
 
     await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
     const compactRow = await body.findByRole('menuitem', { name: 'Edit note' });
@@ -254,8 +256,27 @@ export const Open = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await expect(await body(canvasElement).findByRole('menuitem', { name: 'Edit note' })).toBeVisible();
+        const item = await body(canvasElement).findByRole('menuitem', { name: 'Edit note' });
+        await waitFor(() => expect(item).toBeVisible());
         await expect(within(canvasElement).getByRole('button', { name: 'Actions' })).toHaveAttribute('aria-expanded', 'true');
+    },
+};
+
+/** It opens and closes with a plain fade on appearance.fast: no clip, scale or travel. */
+export const OpensWithAFade = {
+    render: () => (
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
+            <DropdownMenu trigger={<Button text="Actions" />}>{basicMenu}</DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Actions' }));
+        const item = await body(canvasElement).findByRole('menuitem', { name: 'Edit note' });
+        const menu = item.closest('.plus-dropdown-menu');
+        await expectMenuFade(menu, 'enter');
+        await userEvent.keyboard('{Escape}');
+        await expectMenuFade(menu, 'exit');
+        await waitFor(() => expect(menu.isConnected).toBe(false));
     },
 };
 
@@ -303,7 +324,7 @@ export const DisabledRowWithReason = {
         const page = body(canvasElement);
         const row = await page.findByRole('menuitem', { name: /Archive/ });
         await expect(row).toHaveAttribute('aria-disabled', 'true');
-        await expect(page.getByText('End the open session first')).toBeVisible();
+        await waitFor(() => expect(page.getByText('End the open session first')).toBeVisible());
     },
 };
 
@@ -346,9 +367,10 @@ Loading.play = async ({ canvasElement }) => {
 WithSections.play = async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Views' }));
     const page = within(canvasElement.ownerDocument.body);
-    await expect(await page.findByRole('menuitem', { name: 'Rename' })).toBeVisible();
+    const rename = await page.findByRole('menuitem', { name: 'Rename' });
+    await waitFor(() => expect(rename).toBeVisible());
     await expect(page.getByRole('menuitem', { name: 'Archive' })).toHaveAttribute('aria-disabled', 'true');
-    await expect(page.getByRole('menuitem', { name: 'Open report' })).toBeVisible();
+    await waitFor(() => expect(page.getByRole('menuitem', { name: 'Open report' })).toBeVisible());
     await userEvent.keyboard('{Escape}');
 };
 
@@ -442,7 +464,7 @@ export const BestPracticesLive = {
             const doTrigger = within(doCard).getByRole('button', { name: 'Session actions' });
             await waitFor(() => expect(within(doCard).queryByRole('menuitem', { name: doItems[0] })).toBeNull());
             await expect(doTrigger).toHaveFocus();
-            await expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toBeVisible();
+            await waitFor(() => expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toBeVisible());
 
             await userEvent.click(doTrigger);
             await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toHaveFocus());
@@ -452,7 +474,7 @@ export const BestPracticesLive = {
             // Dismiss Don't card by clicking its first item, then reopen by clicking its trigger.
             await userEvent.click(within(dontCard).getByRole('menuitem', { name: dontFirst }));
             await waitFor(() => expect(within(dontCard).queryByRole('menuitem', { name: dontFirst })).toBeNull());
-            await expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toBeVisible();
+            await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toBeVisible());
             await userEvent.click(within(dontCard).getByRole('button', { name: 'Session actions' }));
             await waitFor(() => expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toHaveFocus());
         }

@@ -110,8 +110,8 @@ export const MOTION_REGISTRY = [
     name: 'Popup',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Clips open from the trigger\'s corner on the side it is aligned to. From the keyboard it opens with no animation.' },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place; no clip, no travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place, the same as the enter.' },
     },
   },
   // Patterns: how a pattern composes transitions, from 06-patterns. One row per Patterns page; check:motion-registry requires it.
@@ -119,7 +119,7 @@ export const MOTION_REGISTRY = [
     name: 'Filtering',
     tier: 'pattern',
     events: {
-      'menu-open': { transition: 'Open and close an overlay', spatial: 'spatial.fast', note: 'A filter menu clips open from the Filter icon\'s top-right corner; its right edge stays on the icon\'s.' },
+      'menu-open': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A filter menu fades in place under the Filter icon; nothing travels.' },
       'menu-close': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A filter menu fades closed.' },
       'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The first filter widens the Filter button to the left, right edge fixed, and the count fades in. A quick FilterButton\'s count hugs the label the same way. Below 960 a filter side hides with no animation: the Filter icon is back with its count in the same frame.' },
       'count-change': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The Filter count grows to the left; a changed number fades to its new value.' },
@@ -196,8 +196,8 @@ export const MOTION_REGISTRY = [
     name: 'Overflow',
     tier: 'pattern',
     events: {
-      'fold-open': { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The +n menu is a Popup: it enters on spatial.fast with a fade on appearance.fast.' },
-      'fold-close': { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'The +n menu leaves on spatial.exit.' },
+      'fold-open': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The +n menu is a Popup: it fades in place on appearance.fast.' },
+      'fold-close': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The +n menu fades out on appearance.fast.' },
       truncate: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A clipped value\'s Tooltip opens on hover and focus; nothing about the clip itself animates.' },
     },
   },
@@ -241,7 +241,7 @@ export const MOTION_REGISTRY = [
       grow: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'The Search icon grows into a field to the left on spatial.fast, its right edge fixed.' },
       narrow: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Typing swaps the rows in place as they narrow.' },
       shrink: { transition: 'Swap content in place', spatial: 'spatial.fast', note: 'Escape, or an empty blur, shrinks the field back to the icon on spatial.fast.' },
-      panel: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A focused search opens its panel the way a Popup opens: it clips open under the field, and closing is the fade.' },
+      panel: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A focused search opens its panel the way a Popup opens: it fades in place under the field, and closing is the same fade.' },
     },
   },
   {
@@ -250,15 +250,13 @@ export const MOTION_REGISTRY = [
     events: {
       enter: {
         transition: 'Open and close an overlay',
-        spatial: 'spatial.fast',
         appearance: 'appearance.fast',
-        note: "Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation.",
+        note: 'Fades in place on appearance.fast, with no clip, scale or travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.',
       },
       exit: {
         transition: 'Open and close an overlay',
-        spatial: 'spatial.exit',
         appearance: 'appearance.fast',
-        note: 'The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone.',
+        note: 'Fades in place on appearance.fast, the same as the enter. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.',
       },
     },
   },
@@ -302,8 +300,8 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'As Button; its menu is a Popup.' },
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The menu clips open from its trigger.' },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades in place.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades in place, the same as the enter.' },
     },
   },
   {
@@ -417,32 +415,32 @@ export const MOTION_REGISTRY = [
     name: 'DropdownMenu',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: "Clips open from the trigger's corner on the side it is aligned to." },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades. The exit is the fade.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, the same as the enter.' },
     },
   },
   {
     name: 'Select',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: "Clips open from the trigger's corner on the side it is aligned to." },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Clips back to the trigger and fades; stays mounted until the exit completes.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, the same as the enter; stays mounted until the exit completes.' },
     },
   },
   {
     name: 'FilterMenu',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: "Clips open from the trigger's corner on the side it is aligned to." },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades. The exit is the fade.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, the same as the enter.' },
     },
   },
   {
     name: 'PopupSelect',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: "Clips open from the trigger's corner on the side it is aligned to." },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades. The exit is the fade.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, the same as the enter.' },
     },
   },
   {
@@ -533,7 +531,7 @@ export const MOTION_REGISTRY = [
     name: 'AiChat',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
     },
   },
@@ -541,7 +539,7 @@ export const MOTION_REGISTRY = [
     name: 'Calendar',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
       change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A month change slides the grid flat.' },
     },
@@ -550,7 +548,7 @@ export const MOTION_REGISTRY = [
     name: 'DatePicker',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
       change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A month change slides the grid flat.' },
     },
@@ -559,7 +557,7 @@ export const MOTION_REGISTRY = [
     name: 'DateTimePicker',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
       change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A month change slides the grid flat.' },
     },
@@ -568,7 +566,7 @@ export const MOTION_REGISTRY = [
     name: 'TimePicker',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
       change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A month change slides the grid flat.' },
     },
@@ -577,7 +575,7 @@ export const MOTION_REGISTRY = [
     name: 'Cascader',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
       change: { transition: 'Expand and collapse', spatial: 'spatial.fast', note: 'Columns and branches expand.' },
     },
@@ -586,8 +584,8 @@ export const MOTION_REGISTRY = [
     name: 'TreeSelect',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Clips back to the trigger and fades; stays mounted until the exit completes.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place on appearance.fast, the same as the enter; stays mounted until the exit completes.' },
       change: { transition: 'Expand and collapse', spatial: 'spatial.fast', note: 'Columns and branches expand.' },
     },
   },

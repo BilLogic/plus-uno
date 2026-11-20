@@ -190,7 +190,7 @@ Tokens one component owns, named for it.
 --option-row-indent-step  /* Indent added for each level of a nested option row. */
 --page-header-gap  /* Horizontal gap between a PageHeader title and its actions. */
 --page-header-stack  /* Vertical gap between a PageHeader breadcrumbs row, title row and bottom bar. */
---popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
+--popup-clip-reach  /* Gutter around a Popup or menu in a story stage, so its shadow and the menu are never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
 --popup-width-range  /* Width of the range picker's Popup: the presets beside the calendar. */

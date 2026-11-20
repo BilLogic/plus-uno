@@ -12,11 +12,11 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Source:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.stories.jsx` — Overview, Keyboard, Placement, Searchable, Spacing, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.stories.jsx` — Overview, OpensWithAFade, Keyboard, Placement, Searchable, Spacing, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -31,8 +31,8 @@ PopupSelect reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter. |
 
 ## Alternatives
 
@@ -94,7 +94,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Open | The menu clips open from the trigger's corner. A keyboard open is instant. |
+| Open | The menu fades in place. A keyboard open is instant. |
 | Hovered row | The row takes the hovered fill; it is also the keyboard cursor. |
 | Picked | The row changes color, then the menu fades and the content behind it swaps in place. Nothing slides. |
 | No match | One "No results" row; set your own with `emptyMessage`. |

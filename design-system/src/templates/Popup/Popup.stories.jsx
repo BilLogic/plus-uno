@@ -1,11 +1,12 @@
 import React from 'react';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, ButtonItem, Popup, POPUP_WIDTH_PX } from '@/components';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import * as Demo from './popupDemo.jsx';
 
@@ -322,6 +323,30 @@ export const KeyLoadFailed = {
     },
 };
 
+/** The layer fades in place on appearance.fast, in and out: no clip, scale or travel. */
+export const KeyOpensWithAFade = {
+    name: 'Key: Opens with a fade',
+    render: () => (
+        <div style={{ padding: 'calc(var(--pad-x-lg) * 4)', display: 'flex', justifyContent: 'center' }}>
+            <Popup id="popup-template-fade" trigger={<Button text="Details" />} title="Session 12" placement="bottom-start">
+                Ran 45 minutes over.
+            </Popup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Details' }));
+        const layer = await waitFor(() => {
+            const node = canvasElement.ownerDocument.getElementById('popup-template-fade');
+            if (!node) throw new Error('the layer is not open');
+            return node;
+        });
+        await expectMenuFade(layer, 'enter');
+        await userEvent.keyboard('{Escape}');
+        await expectMenuFade(layer, 'exit');
+        await waitFor(() => expect(layer.isConnected).toBe(false));
+    },
+};
+
 /** No room below: the layer opens above its trigger and stays 8 from the stage's edge. */
 export const KeyFlipped = {
     name: 'Key: Flipped',
@@ -329,10 +354,12 @@ export const KeyFlipped = {
     play: async ({ canvas, canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
         const trigger = rect(canvas.getByRole('button', { name: 'More' }));
-        await expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
         const stage = canvasElement.querySelector('[data-popup-stage]');
         const scale = rect(stage).width / stage.offsetWidth;
-        await expect((rect(stage).bottom - rect(layer).bottom) / scale, 'and stays clear of the edge').toBeGreaterThanOrEqual(0);
+        await waitFor(() => {
+            expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
+            expect((rect(stage).bottom - rect(layer).bottom) / scale, 'and stays clear of the edge').toBeGreaterThanOrEqual(0);
+        });
     },
 };
 

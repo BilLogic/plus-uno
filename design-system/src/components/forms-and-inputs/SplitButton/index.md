@@ -14,7 +14,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.mdx`
 
-**Motion:** change `appearance.fast` · enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `appearance.fast` · enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -27,8 +27,8 @@ SplitButton reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | As Button; its menu is a Popup. |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The menu clips open from its trigger. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades in place. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades in place, the same as the enter. |
 
 ## Alternatives
 

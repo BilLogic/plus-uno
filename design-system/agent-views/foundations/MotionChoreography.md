@@ -85,7 +85,7 @@ When a few items change, each one moves (Add or remove, Reorder). When about a t
 
 ### Same meaning, same motion
 
-A row expanding and a Select opening are one reveal from a seam; size sets the speed. Visually similar things that live on different layers get different motion: a Panel on the page's layer pushes; one above it slides over. When one element changes both position and opacity, spatial and appearance run together.
+A row expanding is a reveal from its seam, and size sets the speed. A menu or a Select opening is not: it fades in place. That fade is instant from the keyboard and absent under the in-app Reduced setting; the system's reduced-motion setting keeps it. Visually similar things that live on different layers get different motion: a Panel on the page's layer pushes; one above it slides over. When one element changes both position and opacity, spatial and appearance run together.
 
 ### Forward is confirm, reverse is cancel
 
@@ -108,7 +108,7 @@ Every motion is built from these atoms, each on a family.
 | Opacity | `appearance` | Fades everywhere; Swap content; Tooltip |
 | Scale | `spatial` | Floating layers only: a Modal entering, and shrinking 2% as it leaves |
 | Position | `spatial` | Panel, Sidebar, Step, indicators, Reorder |
-| Mask (clip) | `spatial` | Popup opening from its trigger; a row opening from its seam |
+| Mask (clip) | `spatial` | A row opening from its seam |
 | Position and mask | `spatial` | A number rolling once, downward; use sparingly |
 | Scale and opacity | spatial with appearance | Modal |
 | Reveal from under another element | `spatial` | Breadcrumb row opening above the title |

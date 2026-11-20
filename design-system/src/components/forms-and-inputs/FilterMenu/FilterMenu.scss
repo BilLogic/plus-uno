@@ -1,7 +1,7 @@
 /*
  * Filter menu: filter categories in a Popup, with compact Clear and Apply at
  * the end of the bottom row. The Popup draws the surface, the column-step width and
- * the motion: it clips open from the trigger's corner and fades on close, so
+ * the motion: it fades in place, in and out, so
  * Apply reads as the fade and then the content behind swapping in place.
  * Ticks and Clear are the checkboxes' own color change; nothing moves.
  *

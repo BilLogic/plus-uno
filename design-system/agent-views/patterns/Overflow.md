@@ -92,8 +92,8 @@ Overflow reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| fold-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The +n menu is a Popup: it enters on spatial.fast with a fade on appearance.fast. |
-| fold-close | Open and close an overlay | `--ds-motion-spatial-exit` | The +n menu leaves on spatial.exit. |
+| fold-open | Open and close an overlay | `--ds-motion-appearance-fast` | The +n menu is a Popup: it fades in place on appearance.fast. |
+| fold-close | Open and close an overlay | `--ds-motion-appearance-fast` | The +n menu fades out on appearance.fast. |
 | truncate | Update a value or state | `--ds-motion-appearance-fast` | A clipped value's Tooltip opens on hover and focus; nothing about the clip itself animates. |
 
 ## Best practices

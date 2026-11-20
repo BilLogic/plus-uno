@@ -4,7 +4,12 @@
  * `elevation.surface.overlay`, its shadow (whose ring is the edge) and
  * Popup/radius-menu-md, capped at Popup/max-height-menu and
  * Popup/max-width-menu.
+ *
+ * MOTION. A fade in place on appearance.fast, in and out, the same as every
+ * menu; a keyboard open is instant, the in-app Reduced setting shows it with no
+ * animation, and the system's reduced-motion setting keeps the fade.
  */
+@use '../../../styles/overlay-motion' as *;
 
 .plus-dropdown-menu {
     box-sizing: border-box;
@@ -18,6 +23,7 @@
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
     z-index: var(--layer-popup);
+    @include menu-fade;
 
     .plus-menu-group {
         max-height: var(--dropdown-menu-max-height);

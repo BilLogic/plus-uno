@@ -14,11 +14,11 @@ Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge, BestPracticesLive
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, OpensWithAFade, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge, BestPracticesLive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -32,8 +32,8 @@ DropdownMenu reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter. |
 
 ## Alternatives
 

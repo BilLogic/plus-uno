@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FilterButton } from '../FilterButton/FilterButton';
+import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import PopupSelect, { POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from './PopupSelect';
 
 const STATUSES = ['Upcoming', 'Completed', 'Canceled'];
@@ -110,6 +111,19 @@ export const Overview = {
         await expect(canvas.getAllByRole('listitem')).toHaveLength(1);
         await expect(canvas.getByText('Reading with Ava')).toBeInTheDocument();
         await waitFor(() => expect(picked).toHaveFocus());
+    },
+};
+
+/** It opens and closes with a plain fade on appearance.fast: no clip, scale or travel. */
+export const OpensWithAFade = {
+    render: () => <ViewSwitch />,
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Status: Upcoming' }));
+        const menu = await openMenu(canvasElement);
+        await expectMenuFade(menu, 'enter');
+        await userEvent.keyboard('{Escape}');
+        await expectMenuFade(menu, 'exit');
+        await menuClosed(canvasElement);
     },
 };
 

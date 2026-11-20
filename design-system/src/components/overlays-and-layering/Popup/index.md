@@ -14,11 +14,11 @@ Also asked as: popover, flyout, inline dialog.
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAClip, KeyboardOpenIsInstant, OpensAndCloses, OpensOnTheMotionTokens, ReducedMotion, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
+**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthAuto, WidthAutoCaps, WidthColumns, OpensWithAFade, KeyboardOpenIsInstant, OpensAndCloses, ReducedMotion, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `spatial.exit` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -44,8 +44,8 @@ Popup reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation. |
-| exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, with no clip, scale or travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
 
 ## Alternatives
 

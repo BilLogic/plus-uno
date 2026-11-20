@@ -14,11 +14,11 @@ Also asked as: filter dropdown.
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.stories.jsx` — Overview, Staging, Stacked, Placement, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.stories.jsx` — Overview, OpensWithAFade, Staging, Stacked, Placement, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.mdx`
 
-**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -33,8 +33,8 @@ FilterMenu reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, with no clip or travel. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place on appearance.fast, the same as the enter. |
 
 ## Alternatives
 
@@ -89,7 +89,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Open | The menu clips open from the trigger's corner, on the values applied. A keyboard open is instant. |
+| Open | The menu fades in place, on the values applied. A keyboard open is instant. |
 | Ticked | The box changes color. The content behind does not change. |
 | Clear | Every box clears with the same color change. Nothing is applied yet. |
 | Applied | The menu fades, the content behind swaps in place once, and the trigger's count changes. Nothing slides. |

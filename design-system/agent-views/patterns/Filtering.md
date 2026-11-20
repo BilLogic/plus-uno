@@ -96,7 +96,7 @@ Filtering reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| menu-open | Open and close an overlay | `--ds-motion-spatial-fast` | A filter menu clips open from the Filter icon's top-right corner; its right edge stays on the icon's. |
+| menu-open | Open and close an overlay | `--ds-motion-appearance-fast` | A filter menu fades in place under the Filter icon; nothing travels. |
 | menu-close | Open and close an overlay | `--ds-motion-appearance-fast` | A filter menu fades closed. |
 | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | The first filter widens the Filter button to the left, right edge fixed, and the count fades in. A quick FilterButton's count hugs the label the same way. Below 960 a filter side hides with no animation: the Filter icon is back with its count in the same frame. |
 | count-change | Update a value or state | `--ds-motion-appearance-fast` | The Filter count grows to the left; a changed number fades to its new value. |

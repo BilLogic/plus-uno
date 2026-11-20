@@ -211,7 +211,5 @@
 }
 
 .plus-listbox {
-    @include trigger-clip;
-    @include overlay-motion(plus-popup-clip-open, plus-popup-clip-close);
-    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
+    @include menu-fade;
 }

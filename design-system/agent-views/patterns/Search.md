@@ -104,7 +104,7 @@ Search reads these motion tokens and no literal duration or curve.
 | grow | Swap content in place | `--ds-motion-spatial-fast` | The Search icon grows into a field to the left on spatial.fast, its right edge fixed. |
 | narrow | Swap content in place | `--ds-motion-appearance-fast` | Typing swaps the rows in place as they narrow. |
 | shrink | Swap content in place | `--ds-motion-spatial-fast` | Escape, or an empty blur, shrinks the field back to the icon on spatial.fast. |
-| panel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A focused search opens its panel the way a Popup opens: it clips open under the field, and closing is the fade. |
+| panel | Open and close an overlay | `--ds-motion-appearance-fast` | A focused search opens its panel the way a Popup opens: it fades in place under the field, and closing is the same fade. |
 
 ## Best practices
 
