@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
+import { PageViewBar, PageViewFullScreen, PageViewWell, usePageView } from './PageView';
 import './BrowserFrame.scss';
 
 /**
@@ -9,7 +10,8 @@ import './BrowserFrame.scss';
  * The chrome sits above the story and the outline is drawn outside the
  * content box, so the page inside keeps the width and left edge it has with
  * no frame. Nesting-safe: a frame inside another renders its children bare.
- * Not part of the component library; it is not exported from `@/components`.
+ * A view control above the window sets the page to Fit, 50%, 75%, 100% or
+ * Full screen (see PageView). Not part of the component library; it is not exported from `@/components`.
  */
 
 export const BROWSER_OPTIONS = ['none', 'chrome', 'safari', 'edge'];
@@ -88,17 +90,29 @@ const SafariBar = () => (
 const BrowserFrame = ({ browser = 'none', children }) => {
     const nested = useContext(BrowserContext);
     if (nested || !DRAWN.has(browser)) return <>{children}</>;
+    return <DrawnFrame browser={browser}>{children}</DrawnFrame>;
+};
+
+const DrawnFrame = ({ browser, children }) => {
+    const view = usePageView();
     return (
         <BrowserContext.Provider value>
-            <div className={`plus-browser-frame plus-browser-frame--${browser}`} data-browser={browser}>
-                <div className="plus-browser-frame__chrome" aria-hidden="true">
-                    {browser === 'safari' ? <SafariBar /> : <ChromeBar edge={browser === 'edge'} />}
+            <div className="plus-browser-view">
+                <PageViewBar view={view} />
+                <div className={`plus-browser-frame plus-browser-frame--${browser}`} data-browser={browser}>
+                    <div className="plus-browser-frame__chrome" aria-hidden="true">
+                        {browser === 'safari' ? <SafariBar /> : <ChromeBar edge={browser === 'edge'} />}
+                    </div>
+                    <div className="plus-browser-frame__page">
+                        <PageViewWell view={view}>{children}</PageViewWell>
+                    </div>
                 </div>
-                <div className="plus-browser-frame__page">{children}</div>
+                <PageViewFullScreen view={view}>{children}</PageViewFullScreen>
             </div>
         </BrowserContext.Provider>
     );
 };
+DrawnFrame.propTypes = { browser: PropTypes.oneOf(BROWSER_OPTIONS).isRequired, children: PropTypes.node.isRequired };
 
 BrowserFrame.propTypes = {
     browser: PropTypes.oneOf(BROWSER_OPTIONS),

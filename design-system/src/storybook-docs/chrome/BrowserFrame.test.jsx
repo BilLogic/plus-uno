@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
 import BrowserFrame from './BrowserFrame';
 
 const PRIMITIVE_READ = /var\(\s*--(?:space|radius|size|stroke)-\d/;
@@ -43,10 +44,44 @@ describe('BrowserFrame', () => {
         expect(container.querySelectorAll('[data-browser]')).toHaveLength(1);
     });
 
+    it('puts a labeled view control on a drawn frame and none on a bare one', () => {
+        const bare = render(<BrowserFrame browser="none"><p>page</p></BrowserFrame>);
+        expect(bare.queryByRole('group', { name: 'Page zoom' })).toBeNull();
+        bare.unmount();
+        render(<BrowserFrame browser="chrome"><p>page</p></BrowserFrame>);
+        const group = screen.getByRole('group', { name: 'Page zoom' });
+        expect(within(group).getByRole('button', { name: 'Fit' })).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByRole('button', { name: 'Full screen' })).toBeInTheDocument();
+    });
+
+    it('changes the zoom from the control', async () => {
+        const user = userEvent.setup();
+        const { container } = render(<BrowserFrame browser="chrome"><p>page</p></BrowserFrame>);
+        expect(container.querySelector('.plus-page-view__well')).toHaveAttribute('data-zoom', 'fit');
+        await user.click(screen.getByRole('button', { name: '50%' }));
+        expect(container.querySelector('.plus-page-view__well')).toHaveAttribute('data-zoom', '50');
+        expect(screen.getByRole('button', { name: '50%' })).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByRole('button', { name: 'Fit' })).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it('opens the page full screen, closes on Escape and returns focus', async () => {
+        const user = userEvent.setup();
+        render(<BrowserFrame browser="chrome"><p>page</p></BrowserFrame>);
+        const trigger = screen.getByRole('button', { name: 'Full screen' });
+        await user.click(trigger);
+        expect(await screen.findByRole('dialog', { name: 'Full screen preview' })).toBeInTheDocument();
+        expect(screen.getAllByText('page')).toHaveLength(2);
+        await user.keyboard('{Escape}');
+        await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        await vi.waitFor(() => expect(trigger).toHaveFocus());
+    });
+
     it('reads no numbered primitive tokens in BrowserFrame or BrowserWindow', () => {
         for (const file of [
             join(__dirname, 'BrowserFrame.scss'),
             join(__dirname, 'BrowserFrame.jsx'),
+            join(__dirname, 'PageView.scss'),
+            join(__dirname, 'PageView.jsx'),
             join(__dirname, '..', 'lib', 'template-page.jsx'),
         ]) {
             const source = readFileSync(file, 'utf8');

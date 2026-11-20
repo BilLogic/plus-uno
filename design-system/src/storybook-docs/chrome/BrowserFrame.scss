@@ -143,3 +143,9 @@
         border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 }
+
+// The view control and the window it governs share one column.
+.plus-browser-view {
+    inline-size: 100%;
+    min-inline-size: 0;
+}
