@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { TEXT_SIZE } from '@/dataviz/chartTheme';
 
 const METRIC_CLASSES = {
     'metric-lg': 'metric-lg',
@@ -96,8 +97,8 @@ const DonutChartSVG = ({
                         color: 'var(--ds-text)',
                         padding: 'var(--popup-pad)',
                         borderRadius: 'var(--popup-radius)',
-                        font: 'var(--body-default)',
-                        lineHeight: 'inherit', // the role's size only; the line height stays the page's
+                        fontSize: TEXT_SIZE.base,
+                        fontFamily: 'var(--type-family-body)',
                         fontWeight: 'var(--type-weight-medium)',
                         fontVariantNumeric: 'tabular-nums',
                         pointerEvents: 'none',
@@ -148,8 +149,8 @@ const DonutChartSVG = ({
                 {label && (
                     <span
                         style={{
-                            font: 'var(--body-sm)',
-                            lineHeight: 'inherit', // the role's size only; the line height stays the page's
+                            fontFamily: 'var(--type-family-body)',
+                            fontSize: TEXT_SIZE.small,
                             fontWeight: 'var(--type-weight-medium)',
                             color: 'var(--ds-text-subtle)',
                             marginTop: 'var(--pad-x-xs)',

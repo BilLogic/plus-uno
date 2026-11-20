@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { TEXT_SIZE } from '@/dataviz/chartTheme';
 
 const METRIC_CLASSES = {
     'metric-lg': 'metric-lg',
@@ -103,8 +104,8 @@ const DonutChartSVG = ({
                 {label && (
                     <span
                         style={{
-                            font: 'var(--body-sm)',
-                            lineHeight: 'inherit', // the role's size only; the line height stays the page's
+                            fontFamily: 'var(--type-family-body)',
+                            fontSize: TEXT_SIZE.small,
                             fontWeight: 'var(--type-weight-medium)',
                             color: 'var(--ds-text-subtle)',
                             marginTop: 'var(--pad-x-xs)',

@@ -96,11 +96,11 @@ Every text slot in a chart — title, subtitle, caption, axis labels and titles,
 <RefTable
     head={['Slot', 'Tokens and rules']}
     rows={[
-        ['Title and axis titles', <><C>--type-family-body</C> · <C>--type-weight-semibold</C> (600) · <C>--ds-text</C>; name the chart in its surrounding Section or Card header rather than an in-chart title</>],
-        ['Subtitle, caption and no-data notice', <><C>--type-family-body</C> · <C>--type-weight-medium</C> (500) · <C>--ds-text-subtle</C></>],
-        ['Axis tick labels', <><C>--type-family-body</C> · <C>--body-sm</C> size · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · <C>--ds-text-subtle</C> — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback</>],
-        ['Data labels and legend items', <><C>--type-family-body</C> · <C>--body-sm</C> size · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · no text outline · <C>--ds-text</C></>],
-        ['Tooltip text and emphasized values', <><C>--type-family-body</C> · <C>--body-default</C> size · <C>--type-weight-semibold</C> (600) on values with <C>tabular-nums</C> · <C>--ds-text</C> (series color on the swatch only)</>],
+        ['Title and axis titles', <><C>--type-family-body</C> · the size of <C>--heading-lg</C> (title) or <C>--body-sm</C> (axis titles) · <C>--type-weight-semibold</C> (600) · <C>--ds-text</C>; name the chart in its surrounding Section or Card header rather than an in-chart title</>],
+        ['Subtitle, caption and no-data notice', <><C>--type-family-body</C> · the size of <C>--body-default</C> (subtitle, no-data) or <C>--body-sm</C> (caption) · <C>--type-weight-medium</C> (500) · <C>--ds-text-subtle</C></>],
+        ['Axis tick labels', <><C>--type-family-body</C> · the size of <C>--body-sm</C> · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · <C>--ds-text-subtle</C> — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback</>],
+        ['Data labels and legend items', <><C>--type-family-body</C> · the size of <C>--body-sm</C> · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · no text outline · <C>--ds-text</C></>],
+        ['Tooltip text and emphasized values', <><C>--type-family-body</C> · the size of <C>--body-default</C> · <C>--type-weight-semibold</C> (600) on values with <C>tabular-nums</C> · <C>--ds-text</C> (series color on the swatch only)</>],
     ]}
 />
 
