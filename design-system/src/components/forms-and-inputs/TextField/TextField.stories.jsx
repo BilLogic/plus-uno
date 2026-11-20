@@ -233,6 +233,8 @@ Anatomy.play = async ({ canvasElement }) => {
 
     // Required: `aria-required` sits on the input; an unmarked majority label stays plain.
     await expect(input.getAttribute('aria-required')).toBe('true');
+    // And the browser holds a form to it.
+    await expect(input).toBeRequired();
     await expect(canvasElement.textContent).not.toContain('*');
 
     // The info button sits outside the label, so its name is not the field's.

@@ -334,7 +334,7 @@ Use `type="number"` for stepped quantities such as seats; for an ID, phone numbe
   accessible name whether or not you show it. If the visible label is rendered
   by the caller instead, point it at the input with `htmlFor`; if there is no
   text anywhere, pass `aria-label`.
-- **`isRequired` sets `aria-required` regardless of the label marker.** Pair it
+- **`isRequired` sets `required` and `aria-required` regardless of the label marker.** An empty required field fails the form's own check: submit is blocked and the field draws itself invalid until it is typed in. Pair it
   with `labelMarker="required"` only when required fields are the minority in
   the form; when most fields are required, mark the optional ones with
   `labelMarker="optional"` instead.

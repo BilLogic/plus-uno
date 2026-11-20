@@ -90,6 +90,7 @@ Don't: Disabled fades a value people need to read.
 
 - **The label is associated whether you pass `id` or not**, and `isLabelHidden`
   clips it out of sight without removing the name.
+- **`isRequired` sets `required` and `aria-required`.** An empty required field fails the form's own check: submit is blocked and the field draws itself invalid until it is typed in.
 - **An error is announced.** `isInvalid` sets `aria-invalid` and renders the
   message with `role="alert"`; a warning, a success message and standing help are
   described. A count is part of the description.
@@ -155,7 +156,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `name` | string | — | The form key the text submits under. |
 | `label` | node | — | The visible label above the field. Hide it with `isLabelHidden`. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
-| `isRequired` | bool | `false` | Sets `aria-required` on the textarea. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
+| `isRequired` | bool | `false` | Marks the textarea `required`: an empty field fails the form's own check, the browser blocks submit and the field draws itself invalid until it is typed in. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isLabelHidden` | bool | `false` | Hides the label without removing it. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |

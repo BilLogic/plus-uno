@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import DatePicker from './DatePicker';
@@ -12,7 +12,7 @@ import { FieldLabel } from '@/lib/field';
  * the calendar add up to.
  */
 
-/** DatePicker has no `label` prop (that opens the filter popup), so a page names it with a label tied by `htmlFor`. */
+/** DatePicker's `label` names a filter trigger, not the plain field, so a page names the field with a label tied by `htmlFor` (or `aria-label`). */
 const Dated = ({ text, id = `dated-${text.toLowerCase().replace(/\s+/g, '-')}`, ...props }) => (
     <>
         <FieldLabel htmlFor={id}>{text}</FieldLabel>
@@ -166,6 +166,21 @@ describe('DatePicker, the calendar', () => {
         expect(field()).toHaveValue('10/14/2026');
         expect(field()).toHaveAttribute('aria-expanded', 'false');
         expect(field()).toHaveFocus();
+    });
+
+    it('moves between days with the arrow keys once focus is in the calendar, and picks with Enter', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        render(<Dated text="Session date" defaultValue="2026-10-21" onChange={onChange} />);
+        await user.click(field());
+        await screen.findByRole('dialog');
+        act(() => day('October 21, 2026').focus());
+        await user.keyboard('{ArrowRight}{ArrowDown}');
+        expect(day('October 29, 2026')).toHaveFocus();
+        await user.keyboard('{PageDown}');
+        expect(day('November 29, 2026')).toHaveFocus();
+        await user.keyboard('{Enter}');
+        expect(onChange).toHaveBeenCalledWith('2026-11-29');
     });
 
     it('closes on Escape and reports nothing', async () => {
