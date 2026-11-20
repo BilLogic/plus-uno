@@ -117,3 +117,12 @@ test('ds-facts.ts is still the same value, only laid out one record per line', (
   const literal = text.slice(text.indexOf('= {') + 2, text.lastIndexOf('};') + 1);
   assert.deepEqual(JSON.parse(literal), baked());
 });
+
+test('two edits to different components of the committed ds-facts.ts merge cleanly', () => {
+  const base = fs.readFileSync(path.join(REPO_ROOT, 'agents/uno-bot/src/generated/ds-facts.ts'), 'utf8');
+  const rows = base.split('\n');
+  const touch = (name, mark) => rows.map((row) => (row.startsWith(`{"name":"${name}",`) ? row.replace(/"summary":"/, `"summary":"${mark} `) : row)).join('\n');
+  const { conflicts, text } = threeWay(base, touch('Accordion', 'A.'), touch('Button', 'B.'));
+  assert.equal(conflicts, 0);
+  assert.ok(text.includes('"summary":"A. ') && text.includes('"summary":"B. '));
+});

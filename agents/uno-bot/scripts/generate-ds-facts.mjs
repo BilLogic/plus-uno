@@ -22,7 +22,7 @@
 // Storybook docs map, so the Worker deployed is the facts on main at deploy.
 // The committed copy is there for the typecheck and the tests; `--check` says
 // whether it still matches. Both fail when the bake is over its byte budget
-// (`DS_FACTS_BYTE_BUDGET`), and `test:bundle` holds the committed copy to it.
+// (`DS_FACTS_BYTE_BUDGET`, measured on the shipped payload), and `test:bundle` holds the committed copy to it.
 //
 // Run: npm run generate:ds-facts  (`-- --check` to compare only)
 
@@ -106,7 +106,8 @@ export function bakeFacts(facts, { docFor = () => null, inventions }) {
 }
 
 /**
- * The most bytes the built-in facts may weigh. They ship in the Worker, which
+ * The most bytes the built-in facts may weigh, measured on the shipped payload
+ * (`JSON.stringify` of the baked value); the source file's layout is free. They ship in the Worker, which
  * stays on Workers Free and its script-size limit, and since the hosted MCP
  * answers first they are the fallback, so growth here buys an outage answer
  * and nothing else. 279,906 bytes on 2026-11-08, grown ~3.7k across the five
@@ -116,9 +117,13 @@ export function bakeFacts(facts, { docFor = () => null, inventions }) {
  */
 export const DS_FACTS_BYTE_BUDGET = 300_000;
 
-/** Null when `text` fits the budget, else what to say: the overrun in UTF-8 bytes. */
-export function budgetOverrun(text, budget = DS_FACTS_BYTE_BUDGET) {
-  const bytes = Buffer.byteLength(text, "utf8");
+/**
+ * Null when `payload` fits the budget, else what to say: the overrun in UTF-8 bytes.
+ * It measures the shipped payload, `JSON.stringify(baked)`; the source file's
+ * formatting (line breaks, one record per line) is free.
+ */
+export function budgetOverrun(payload, budget = DS_FACTS_BYTE_BUDGET) {
+  const bytes = Buffer.byteLength(payload, "utf8");
   if (bytes <= budget) return null;
   const over = bytes - budget;
   return `${OUT} is ${bytes} bytes, ${over} byte${over === 1 ? "" : "s"} over DS_FACTS_BYTE_BUDGET (${budget}): cut what the bake keeps, or raise the budget in scripts/generate-ds-facts.mjs and say why`;
@@ -174,17 +179,15 @@ export function artifacts(repoRoot = ROOT) {
   const inventions = existsSync(inventionsPath)
     ? JSON.parse(readFileSync(inventionsPath, "utf8"))
     : { components: [], props: [], tokens: [] };
-  const content = renderDsFacts(
-    bakeFacts(facts, { docFor: (name) => generatedDocFor(repoRoot, name), inventions }),
-  );
-  return [{ path: OUT, content }];
+  const baked = bakeFacts(facts, { docFor: (name) => generatedDocFor(repoRoot, name), inventions });
+  return [{ path: OUT, content: renderDsFacts(baked), payload: JSON.stringify(baked) }];
 }
 
 /** The drift check. Reports and never writes. */
 export function run({ repoRoot = ROOT, budget = DS_FACTS_BYTE_BUDGET } = {}) {
   const found = [];
-  for (const { path, content } of artifacts(repoRoot)) {
-    const overrun = budgetOverrun(content, budget);
+  for (const { path, content, payload } of artifacts(repoRoot)) {
+    const overrun = budgetOverrun(payload, budget);
     if (overrun) found.push({ file: path, message: overrun });
     const abs = join(repoRoot, path);
     if (!existsSync(abs) || NORM(readFileSync(abs, "utf8")) !== content) {
@@ -203,10 +206,10 @@ if (isEntry(import.meta.url)) {
   if (process.argv.includes("--check")) {
     runMain(import.meta.url, "check:ds-facts", { run, summary });
   } else {
-    const [{ content: text }] = artifacts(ROOT);
+    const [{ content: text, payload }] = artifacts(ROOT);
     const out = resolve(ROOT, OUT);
     const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
-    const overrun = budgetOverrun(text);
+    const overrun = budgetOverrun(payload);
     if (overrun) {
       console.error(overrun);
       process.exit(1);
