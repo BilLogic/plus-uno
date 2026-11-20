@@ -28,7 +28,7 @@ import { ElevationPanel } from './elevation-folder-figures.jsx';
 
 /** The six levels, lowest first. The one home for each level's tokens and job. */
 export const LEVELS = [
-    { id: 'sunken', name: 'Sunken', surface: '--ds-surface-sunken', shadow: null, use: 'The frame behind the work, and a subtle Section.' },
+    { id: 'sunken', name: 'Sunken', surface: '--ds-surface-sunken', shadow: null, use: 'The frame behind the work, and a sunken Card.' },
     { id: 'default', name: 'Default', surface: '--ds-surface', shadow: null, use: 'The page, and everything that flows in it.' },
     { id: 'raised', name: 'Raised', surface: '--ds-surface-raised', shadow: '--ds-shadow-raised', use: 'One object the person can act on: a Card.' },
     { id: 'overlay', name: 'Overlay', surface: '--ds-surface-overlay', shadow: '--ds-shadow-overlay', use: 'A layer that floats while the page stays usable.' },
@@ -48,7 +48,7 @@ const SLOT_WHY = {
 /** Rows of the behavior table, each landing on one level. */
 export const BEHAVIORS = [
     { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame, docked Sidebar' },
-    { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (sunken for a subtle one), Table, docked AI panel' },
+    { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (no fill), Table, docked AI panel' },
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },

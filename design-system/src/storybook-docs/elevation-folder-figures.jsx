@@ -19,6 +19,7 @@ import {
     Sidebar,
     SkeletonBar,
     StickyHeader,
+    SunkenCard,
 } from '@/storybook-docs/illustrations/primitives.jsx';
 import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
@@ -359,7 +360,7 @@ const OVERVIEW_PLATES = [
                 <Layer x={42} y={4} w={114} h={82} fill={PAINT.pageSurface} corner="card" />
                 <Rule x1={42} x2={42} y1={4} y2={86} stroke={PAINT.frameDivider} />
                 <SkeletonBar x={50} y={11} w={36} h={4.5} heading />
-                {/* One Raised focal card beside two flat Sunken backdrops */}
+                {/* One Raised focal card beside two flat Sunken Cards */}
                 <Layer x={50} y={20} w={36} h={24} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
                 <SkeletonBar x={55} y={25} w={22} h={3} />
                 <SkeletonBar x={55} y={31} w={15} h={3} />
@@ -538,8 +539,8 @@ const DIAGRAM_TITLE = {
     'non-blocking-overlay': 'Layer 3 Non-blocking overlay: floating Popup over the usable Page',
     'blocking-overlay': 'Layer 4 Blocking overlay: Modal on the Blanket over the dimmed Page',
     'surface-default': 'Default surface: page rows and side section without a fill',
-    'surface-sunken': 'Sunken surface: subtle Section grouping static content on the Page',
-    'surface-raised': 'Raised surface: one raised focal Card beside flat Sections',
+    'surface-sunken': 'Sunken surface: a sunken Card grouping static content on the Page',
+    'surface-raised': 'Raised surface: one raised focal Card beside flat sunken Cards',
 };
 
 const drawLayerDiagram = (variant) => {
@@ -573,7 +574,7 @@ const drawLayerDiagram = (variant) => {
                 <CardBox x={52} y={20} w={66} h={28} />
                 <SkeletonBar x={58} y={26} w={36} h={3.5} />
                 <SkeletonBar x={58} y={34} w={24} h={3.5} />
-                <Section x={124} y={20} w={64} h={28} rows={2} subtle />
+                <Section x={124} y={20} w={64} h={28} rows={2} />
                 <Row x={52} y={54} w={136} />
                 <Row x={52} y={68} w={136} />
                 <Row x={52} y={82} w={136} />
@@ -645,7 +646,7 @@ const drawLayerDiagram = (variant) => {
         return shell(
             <>
                 <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
-                <Section x={52} y={22} w={136} h={74} rows={4} subtle accent />
+                <SunkenCard x={52} y={22} w={136} h={74} rows={4} accent />
             </>,
         );
     }
@@ -658,8 +659,8 @@ const drawLayerDiagram = (variant) => {
             <SkeletonBar x={58} y={29} w={48} h={4} heading />
             <SkeletonBar x={58} y={38} w={32} h={3.5} />
             <ButtonShape x={58} y={54} w={30} appearance="primary" />
-            <Section x={140} y={22} w={48} h={48} rows={2} subtle />
-            <Section x={52} y={76} w={136} h={24} rows={1} subtle />
+            <SunkenCard x={140} y={22} w={48} h={48} rows={2} />
+            <SunkenCard x={52} y={76} w={136} h={24} rows={1} />
         </>,
     );
 };

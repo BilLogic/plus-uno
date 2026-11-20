@@ -90,7 +90,7 @@ Most of the page: a Section and its side, tables, lists, forms; rows are hairlin
 
 ### Sunken
 
-A backdrop that groups static content: a Card (the default surface), the table’s empty box (`--ds-surface-sunken`, card radius), a clickable card at rest.
+A ground that groups static content: a Card (the default surface), the table’s empty box (`--ds-surface-sunken`, card radius), a clickable card at rest.
 
 #### Usage & styling
 

@@ -3,7 +3,7 @@ import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { PAINT } from './paint.js';
 import {
-  Blanket, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar,
+  Blanket, ButtonShape, CardBox, Flag, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule, Section, SkeletonBar, SunkenCard,
 } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { BEAT, LOOP_PERIOD, measure, pair, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
@@ -719,7 +719,7 @@ const carryScene = ({ id, title, caption, token, card }) => ({
       {[0, 1, 2, 3].map((i) => (
         <Row key={i} x={16} y={44 + i * 14 - 14} w={72} />
       ))}
-      <Section x={96} y={20} w={48} h={68} subtle rows={0} />
+      <SunkenCard x={96} y={20} w={48} h={68} rows={0} />
       {card ? (
         <CardBox x={ix - 20} y={iy - 10} w={40} h={20} accent />
       ) : (

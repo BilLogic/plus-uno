@@ -21,8 +21,6 @@ Three jobs, three components. A category with a color is a Tag, not an indicator
 - **Change where up is bad.** Absences rose by 3: the value is up and the tone is danger, because the good direction is down.
 - **A roll-up.** A group's status shows the worst state among its children: danger over warning over information.
 
-A checklist tracks setup or compliance steps in three layouts: a dismissible card on Home, a persistent card in a page, and a compact summary at the foot of the Sidebar.
-
 ## Usage
 
 Use Indicators when something needs a small label that says how it is. Ask what the label says: a number is a Count tag; a condition that can change is a Status tag; how much a number moved is a Change tag; a subject, a person or a category is a Tag. Skip an indicator when no action follows from it; past five or six states, use text.
@@ -33,7 +31,6 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | How many | Count tag | Subtle neutral; bold for action now; nothing at 0; a cap past `max` with "+" | "12", "99+" |
 | How much it moved | Change tag | Signed value, arrow, tone from the good direction; neutral when there is no judgment | "+3 vs last week" |
 | A category, a subject, a person | Tag | Outline and text; a leading visual is optional | "Lincoln Middle" |
-| Setup or compliance steps left to finish | Checklist (`Card` + `Section` + `Progress bar`) | Header count and bar aligned to one 128 action column; open steps above done steps | "2 of 5 done" |
 | The shape of a trend | Sparkline | A word-sized line beside the number | Attendance over eight weeks |
 
 ## Alternatives
@@ -42,6 +39,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 - For a due or event date, use `DateTag`.
 - For a competency area, use `CompetencyTag`.
 - For something the AI proposes, use `Suggestion`.
+- For setup or compliance steps left to finish, use the Checklist on the Page template.
 
 ## Content guidelines
 
@@ -66,7 +64,6 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 | State | Status tag | Six appearances; `trailingMetric` nests a count inside it. |
 | How many | Count tag | `max` caps it, `isBold` asks for action, `label` names it for a screen reader. |
 | How much it moved | Change tag | `goodDirection` sets the tone; `comparison` names what it is measured against. |
-| Checklist | Card, Section, Progress bar | Composed step rows (`Icon`, text, `Button` or "Completed" text) on `--checklist-action-width`; `Icon button` dismisses an optional card. |
 | Category | Tag | Not an indicator: a subject, a person or a category. |
 
 ## Related
@@ -140,24 +137,6 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 **Checked:** Review
 
 "Needs review 3" reads as one label; two labels side by side read as unrelated.
-
-### Line up checklist actions in one column and mark done steps with text. {#line-up-checklist-actions-in-one-column-and-mark-done-steps-with-text}
-
-**Checked:** Review
-
-Build the checklist from `Card` and `Section`:
-
-1. Compose each row from an `Icon`, step text with one fact, and an action column. Use `--checklist-action-width` (128), with `--checklist-action-min-width` (120) as its floor. Buttons fill the column and align down the list.
-2. Put the title at the header's start and the count ("2 of 5 done") with a `ProgressBar` at the end. Align the bar's start edge with the action column: 128 wide on a persistent card, or 96 when a 32 dismiss `IconButton` occupies the end.
-3. Keep open steps in order above completed steps. Center a check icon and plain "Completed" text (Body small, subtle) in each completed row's action column.
-
-Choose the layout by where the checklist appears:
-
-| Layout | Use | Behavior |
-| --- | --- | --- |
-| Dismissible card | Home | When complete, shrinks to one line for a day, then disappears. |
-| Persistent card | Required work on a page | Keeps every completed row visible. |
-| Compact card | Foot of the Sidebar | Shows the count, progress bar and next step, which opens the full list. |
 
 ## In code
 

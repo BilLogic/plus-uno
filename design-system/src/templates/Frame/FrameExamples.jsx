@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, FooterActions, LinkButton, Logo, PageHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, Page, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Section } from '@/templates';
+import { Frame, Page } from '@/templates';
 
 /**
  * The Frame page's do and don't examples, as PLUS parts only. Show code prints
@@ -70,27 +70,6 @@ export const MultiStepStepsInPage = () => (
             <ProgressTracker label="Steps" orientation="vertical" items={STEPS} />
             <Skeleton preset="text" lines={4} />
         </div>
-    </Frame>
-);
-
-const AskPanel = () => (
-    <PanelContainer>
-        <PanelHeader title="AI chat" actions={<PanelCloseAction />} />
-        <PanelBody>Ask about this page.</PanelBody>
-    </PanelContainer>
-);
-
-export const AiPanel = () => (
-    <Frame
-        sidebar={<Sidebar user="tutor" activeTabId="home" account={ACCOUNT} />}
-        panelLabel="AI chat"
-        panelStorageKey={null}
-        panel={<AskPanel />}
-        panelOpen
-    >
-        <Section title="Upcoming sessions">
-            <Skeleton preset="text" lines={6} />
-        </Section>
     </Frame>
 );
 

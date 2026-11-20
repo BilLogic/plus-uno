@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
+import { BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
 import { FRAME_LAYOUT } from './frameLayout.js';
 import { readFileSync as readSource } from 'node:fs';
 
@@ -90,12 +90,6 @@ describe('Frame live cases', () => {
         const { container } = render(<Example />);
         expect(container.querySelector('.plus-frame')).not.toBeNull();
         expect(Boolean(container.querySelector('.plus-frame__sidebar'))).toBe(withSidebar);
-    });
-
-    it.each([['AiPanelDocked', AiPanelDocked], ['AiPanelFloating', AiPanelFloating]])('%s renders a live Frame with the AI chat panel open', (_name, Example) => {
-        const { container } = render(<Example />);
-        expect(container.querySelector('.plus-frame')).not.toBeNull();
-        expect(screen.getAllByText('AI chat').length).toBeGreaterThan(0);
     });
 
     it('has Show code source for every live pair in Frame.mdx', () => {
