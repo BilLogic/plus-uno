@@ -7,6 +7,7 @@ import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../Forms/formHosts.jsx';
+import { MessageOnField } from './ErrorsExamples.jsx';
 import { BackgroundJob, FieldError, FlagOnPage, InPage, LoadFailure, MenuError, NoAccess, PLACE_STAGE, PageCondition, STAGE } from './errorsDemo.jsx';
 
 /**
@@ -51,6 +52,28 @@ export const PlaceField = {
         await userEvent.type(field, 'ana@school.org');
         await expect(field).not.toHaveAttribute('aria-invalid', 'true');
         await waitFor(() => expect(canvas.queryByText('Enter a full email, like name@school.org')).toBeNull());
+    },
+};
+
+/** Validate on blur: no message on render or while focused, a message after leaving the field with a bad value, gone once fixed. */
+export const ValidateOnBlur = {
+    name: 'Test: A field validates on blur',
+    render: () => staged(<MessageOnField />, PLACE_STAGE),
+    play: async ({ canvas, canvasElement }) => {
+        const message = 'Enter a full email, like name@school.org';
+        const field = canvas.getByLabelText(/School email/);
+        await expect(field, 'no error on render').not.toHaveAttribute('aria-invalid', 'true');
+        await expect(canvas.queryByText(message)).toBeNull();
+        await userEvent.click(field);
+        await expect(canvas.queryByText(message), 'no error while the field has focus').toBeNull();
+        await userEvent.tab();
+        await waitFor(() => expect(canvas.getByText(message), 'the message shows after blur').toBeInTheDocument());
+        await expect(field).toHaveAttribute('aria-invalid', 'true');
+        await userEvent.clear(field);
+        await userEvent.type(field, 'ana@school.org');
+        await expect(field).not.toHaveAttribute('aria-invalid', 'true');
+        await waitFor(() => expect(canvas.queryByText(message)).toBeNull());
+        await noTooltipCopy(canvasElement);
     },
 };
 

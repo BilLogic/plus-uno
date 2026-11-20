@@ -189,6 +189,15 @@ describe('Modal live do and dont examples', () => {
     });
 
     it('has Show code source for each', () => {
-        expect(Object.keys(MODAL_CODE)).toEqual(['ConfirmNarrow', 'ConfirmWide', 'ConfirmsInside', 'ModalOnModal']);
+        expect(Object.keys(MODAL_CODE)).toEqual([
+            'ConfirmNarrow',
+            'ConfirmWide',
+            'ConfirmsInside',
+            'ModalOnModal',
+            'FooterPinned',
+            'ButtonInBody',
+            'StepsWithBackAndNext',
+            'NumberedTabsAsSteps',
+        ]);
     });
 });

@@ -14,7 +14,7 @@ Also asked as: path, navigation trail.
 
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
-**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused, Overflow
+**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused, Overflow, FoldedLevels, FoldedAtFive, NotFolded
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 
@@ -105,7 +105,7 @@ Don't: The trail starts mid-hierarchy, so the top is missing.
 
 ### Keep the trail on one line and truncate each level. {#keep-the-trail-on-one-line-and-truncate-each-level}
 
-A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Folding the middle of five or more levels is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Five or more levels fold the middle into a "…" button named "Show hidden levels", which opens the hidden levels as links, in order; the root and the last two stay. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use it for position, not for history. {#use-it-for-position-not-for-history}
 
@@ -179,7 +179,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | arrayOf (required) | `[]` | The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. |
+| `items` | arrayOf (required) | `[]` | The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. Five or more items fold all but the first and last two behind a "…" menu named "Show hidden levels". |
 | `id` | string | — | The `id` attribute of the last (current) item. |
 | `separator` | node | `'/'` | What is drawn between items. A string is used as is; the default is `/`. |
 | `label` | string | `'breadcrumb'` | Accessible label for the nav region that wraps the breadcrumbs. |

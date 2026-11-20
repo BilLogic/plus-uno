@@ -4,6 +4,8 @@
 
 The Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - A multi-step task runs in the Sidebar's inner mode: its steps are the rows, and the Page's footer holds the task's actions. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered (`width="full"` lifts the cap, `width="reading"` caps it at 864), on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.
 
+Every full page starts in the app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare. A multi-step task runs in the Sidebar's inner mode.
+
 Also asked as: page template, page shell, page layout, full page, new page, surface container.
 
 **Import:** `import { Frame } from '@/templates';`
@@ -134,6 +136,18 @@ The default type at 1440 with the AI panel docked.
 2. **Header row.** The Page's first row, 32 high on the logo row's center line: the breadcrumb, once a person has drilled into a record.
 3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width, no cap at full width).
 4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It docks from 1168 with a 400 panel, from 1408 beside an open Sidebar; under that it floats over the Page.
+
+## Width behavior
+
+The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel floats over the Page with no Blanket. Under 768 the panel is full width. The Sidebar docks from 1024 (in Figma, the `Sidebar docked` variable); in code the Frame measures its own width through the layout resolver and has no token for it.
+
+## Key states
+
+- **Panel collapses the Sidebar, 1200.** The Sidebar, a 400 panel and 720 of content cannot all fit, so the Sidebar collapses and the toggle moves to the Page's top left. It comes back when the panel closes.
+
+- **Under 1024.** The Sidebar never docks: opened by hand it floats over the Page. The panel floats over the Page with no Blanket, and one layer is open at a time.
+
+A system banner, when one is needed, spans the whole width above the Sidebar and the Page: Notifications.
 
 ## Slots
 

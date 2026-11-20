@@ -4,6 +4,8 @@
 
 The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. Inside a Frame the Frame owns the pad and the Page adds none. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
 
+The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading.
+
 Also asked as: surface.
 
 **Import:** `import { Page } from '@/templates';`
@@ -136,6 +138,16 @@ A record page one level down shows every header slot, with markers in the gutter
 5. **Page tabs** (optional). At the bottom of the header; they switch the whole page.
 6. **Banner** (optional). Under the header, one at a time.
 7. **Content.** Sections on the grid, under the header.
+
+## Width behavior
+
+Drag the width control. Above the content cap, content centers at the cap; below it, content fills the available width. The header keeps one h1 at every width.
+
+## Key states
+
+- **Page banner.** A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview.
+
+- **Header and banner slots.** Page owns the spacing from its header to the banner and content, including when the banner is removed.
 
 ## Slots
 

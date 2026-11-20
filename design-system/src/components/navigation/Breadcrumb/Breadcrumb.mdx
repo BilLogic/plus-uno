@@ -55,7 +55,9 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <ComponentExample of={BreadcrumbSubStories.Divider} title="Separator" description={<>A slash between items by default; <code>separator</code> swaps the character.</>} />
 
-<ComponentExample of={BreadcrumbStories.Overflow} title="Overflow" description="Truncate: the trail stays on one line and a level too long ends in an ellipsis; its full text opens in a Tooltip. Folding the middle of five or more levels into a menu is Planned." />
+<ComponentExample of={BreadcrumbStories.Overflow} title="Overflow" description="Truncate: the trail stays on one line and a level too long ends in an ellipsis; its full text opens in a Tooltip." />
+
+<ComponentExample of={BreadcrumbStories.FoldedLevels} title="Fold" description="Five or more levels keep the root and the last two; the middle folds behind a &quot;…&quot; button that opens the hidden levels as links, in order." />
 
 </div>
 
@@ -235,7 +237,7 @@ A trail that starts mid-hierarchy leaves people unsure where they are. List ever
 
 ### Keep the trail on one line and truncate each level.
 
-A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Folding the middle of five or more levels is Planned. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+A level longer than its room ends in an ellipsis with its full text in a Tooltip while clipped; the trail never wraps. Five or more levels fold the middle into a "…" button named "Show hidden levels", which opens the hidden levels as links, in order; the root and the last two stay. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Use it for position, not for history.
 

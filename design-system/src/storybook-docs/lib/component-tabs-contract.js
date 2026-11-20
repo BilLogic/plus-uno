@@ -84,7 +84,6 @@ const STYLES_ROOT = 'design-system/src/styles';
 const TEMPLATE_AGENT_FILES = 'design-system/agent-views/templates';
 const PATTERN_AGENT_FILES = 'design-system/agent-views/patterns';
 const FOUNDATION_AGENT_FILES = 'design-system/agent-views/foundations';
-const DOCS_ONLY_TEMPLATES = new Set(['Form', 'Panel', 'Popup']);
 
 /** Whether `path` is `<root>/<Name>/<file>`: one folder down, no deeper. */
 const inOwnFolder = (path, root) => path.startsWith(`${root}/`) && path.slice(root.length + 1).split('/').length === 2;
@@ -181,7 +180,6 @@ export function componentIdentity(entry) {
 export function importSourceFor(entry, hasGeneratedDoc = true) {
   const file = entry && typeof entry.importPath === 'string' ? repoPath(entry.importPath) : '';
   if (!file.startsWith(`${PATTERNS_ROOT}/`)) return '@/components';
-  if (inOwnFolder(file, PATTERNS_ROOT) && DOCS_ONLY_TEMPLATES.has(file.split('/').at(-2))) return null;
   return hasGeneratedDoc ? '@/templates' : null;
 }
 
@@ -221,9 +219,6 @@ export function generatedDocPathFor(entry) {
   if (inOwnFolder(file, TEMPLATE_PAGES_ROOT)) return `${TEMPLATE_AGENT_FILES}/${file.split('/').at(-2)}.md`;
   if (file.startsWith(`${TEMPLATE_PAGES_ROOT}/`)) return `${TEMPLATE_AGENT_FILES}/${componentNameOf(file.split('/').at(-1))}.md`;
   if (file.startsWith(`${STYLES_ROOT}/`)) return `${FOUNDATION_AGENT_FILES}/${componentNameOf(file.split('/').at(-1))}.md`;
-  if (inOwnFolder(file, PATTERNS_ROOT) && DOCS_ONLY_TEMPLATES.has(file.split('/').at(-2))) {
-    return `${TEMPLATE_AGENT_FILES}/${file.split('/').at(-2)}.md`;
-  }
   if (!file.startsWith('design-system/src/') || file.startsWith(`${COMPONENTS_ROOT}/`)) return null;
   return `${file.slice(0, file.lastIndexOf('/'))}/index.md`;
 }

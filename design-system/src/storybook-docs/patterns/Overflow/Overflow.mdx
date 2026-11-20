@@ -46,7 +46,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 <TypeGrid>
 <TypeCard of={OverflowStories.WrapTitlesAndErrors} to="#wrap-titles-and-messages" title="Wrap" stage={NARROW}>Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.</TypeCard>
 <TypeCard of={OverflowStories.TruncatedCell} to="#a-cell" title="Truncate with a Tooltip" stage={TABLE_STAGE}>A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.</TypeCard>
-<TypeCard of={OverflowStories.FoldedTagGroup} to="#fold-a-tag-group" title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={OverflowStories.FoldedTagGroup} to="#fold-a-tag-group" title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are built from a Button; no component carries them.</TypeCard>
 <TypeCard of={OverflowStories.PagedInFooter} to="#page-a-table" title="Page a table" stage={TABLE_STAGE}>A table pages instead of growing: the pager sits at the end of the Section footer.</TypeCard>
 </TypeGrid>
 
@@ -68,7 +68,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle** is Planned <PlannedTag />. Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. Today each level truncates and the Breadcrumb never wraps.
+- **The breadcrumb middle.** Five or more levels keep the root and the last two, and fold the rest into a "…" that opens a menu of the hidden levels as links, in order. Fewer levels truncate, and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
@@ -104,13 +104,13 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tbody>
 <tr><td>Page title, Section title, Card title, Modal title</td><td>Wrap</td><td>Always visible</td></tr>
 <tr><td>Field error, Section message, Flag, Banner, Tooltip</td><td>Wrap</td><td>Always visible</td></tr>
-<tr><td>Column header <PlannedTag /></td><td>Wrap with `shouldTruncate` false; wrap by default is Planned</td><td>Always visible</td></tr>
+<tr><td>Column header</td><td>Wrap; a header that must stay on one line sets `shouldTruncate`</td><td>Always visible</td></tr>
 <tr><td>Table cell</td><td>Truncate at the end, one line</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Tag (180), Status tag (200)</td><td>Truncate at the end</td><td>Tooltip when clipped; the tag becomes focusable</td></tr>
 <tr><td>Tags in a group</td><td>Fold into +n</td><td>The +n menu lists the hidden tags</td></tr>
 <tr><td>A table</td><td>Page</td><td>The range and the pager in the footer</td></tr>
 <tr><td>Tab label</td><td>Truncate at the end; with more tabs than fit, fold the rest into More</td><td>Tooltip when clipped; the More menu lists the hidden tabs by name</td></tr>
-<tr><td>Breadcrumb level</td><td>Truncate at the end; with five or more levels, fold the middle into "…" <PlannedTag /></td><td>Tooltip when clipped; the "…" opens a menu of the hidden levels</td></tr>
+<tr><td>Breadcrumb level</td><td>Truncate at the end; with five or more levels, fold the middle into "…"</td><td>Tooltip when clipped; the "…" opens a menu of the hidden levels</td></tr>
 <tr><td>Open item in the Sidebar</td><td>Truncate at the end</td><td>Tooltip with the school</td></tr>
 <tr><td>People in an Avatar group</td><td>Fold into +n</td><td>The +n menu lists the hidden people by name</td></tr>
 <tr><td>Inline edit, read view</td><td>Truncate at the end, one line</td><td>Tooltip when clipped; the edit view follows the Text field</td></tr>
@@ -119,7 +119,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tr><td>Button label</td><td>Truncate at the end, no Tooltip</td><td>Shorten the label; the full label stays in the accessible name</td></tr>
 <tr><td>File name</td><td>Truncate mid-line, keeping the extension</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
-<tr><td>A list of items, tags or notes <PlannedTag /></td><td>Planned: "Show n more", "Show less"</td><td>Expanded in place</td></tr>
+<tr><td>A list of items, tags or notes</td><td>"Show n more", "Show less" from a Button</td><td>Expanded in place</td></tr>
 </tbody>
 </DocsTable>
 
@@ -217,7 +217,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 <RuleTag kind="review" />
 
-"Show n more" carries the count and "Show less" closes; both are Planned <PlannedTag />. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
+"Show n more" carries the count and "Show less" closes; there is no dedicated component, so build both from a Button. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
 
 <DoDontPair
     doExample={<ShowMoreWithCountCase />}
@@ -239,7 +239,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>"Show 4 more" and "Show less" (Planned). <PlannedTag /></td><td>"Load more", "See all", "…".</td></tr>
+<tr><td>"Show 4 more" and "Show less", built from a Button.</td><td>"Load more", "See all", "…".</td></tr>
 <tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip.</td><td>The whole title in the Sidebar.</td></tr>
 <tr><td>Breadcrumb levels by the page's own title: "Lincoln Middle School".</td><td>"Back", "Up one level".</td></tr>
 <tr><td>File name mid-line: "reflection_…_week12.pdf".</td><td>"reflection_maya_rodrig…".</td></tr>
@@ -255,7 +255,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 - The full text is always in the DOM, so a screen reader hears all of it whether or not it is clipped.
 - A clipped element is a tab stop so a keyboard user can reach the Tooltip; an unclipped one is not.
 - The +n button of a Tag group names how many tags it holds, "+3 more tags", and opens a menu the arrow keys move through.
-- The breadcrumb's "…" button is named "Show hidden levels" <PlannedTag />.
+- The breadcrumb's "…" button is named "Show hidden levels".
 - "Show n more" announces the new count when the list expands <PlannedTag />.
 
 </div>
@@ -274,7 +274,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><td>Folded tags</td><td><a target="_top" href="./?path=/docs/components-labels-tag-group--docs">Tag group</a></td><td>`overflow="collapse"` keeps one line and folds the rest into +n.</td></tr>
 <tr><td>Cell</td><td><a target="_top" href="./?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a></td><td>A cell's `overflow` is `truncate` by default; `wrap` takes more lines.</td></tr>
 <tr><td>File name</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-file-upload-file-item--docs">File item</a></td><td>Keeps the start and the extension, and opens the full name in a Tooltip while clipped.</td></tr>
-<tr><td>Trail</td><td><a target="_top" href="./?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumb</a></td><td>The fold is Planned <PlannedTag />; the component never folds its middle yet.</td></tr>
+<tr><td>Trail</td><td><a target="_top" href="./?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumb</a></td><td>Five or more levels fold the middle into a "…" menu.</td></tr>
 <tr><td>Pager</td><td><a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a></td><td>Fills the Section's footer slot, aligned to the end.</td></tr>
 </tbody>
 </DocsTable>

@@ -48,7 +48,7 @@ const SaveFooter = () => (
 
 const LogSessionFooter = () => (
     <FooterActions>
-        <Button text="Cancel" />
+        <Button text="Discard" />
         <Button text="Save session" appearance="primary" />
     </FooterActions>
 );

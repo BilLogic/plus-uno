@@ -4,6 +4,8 @@
 
 Section: a span of the page grid under one heading, with its title row, views, search and filters.
 
+A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row, the views and the filters.
+
 Also asked as: page section, section header, block, region.
 
 **Import:** `import { Section } from '@/templates';`
@@ -171,6 +173,16 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the header rows with nothing between.
 4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
+
+## Width behavior
+
+Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. The title row and the header rows stay separate rows at every width.
+
+## Key states
+
+- **Empty, in a table.** The empty state replaces the whole table, column headers and footer too, and offers "Reset filters". The rule is the Empty pattern's.
+
+Loading, errors and the search field follow their patterns and components: Loading, Errors and Search, listed in Patterns.
 
 ## Slots
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, FooterActions, LinkButton, Logo, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Section } from '@/templates';
+import { Button, FooterActions, LinkButton, Logo, PageHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
+import { Frame, Page, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Section } from '@/templates';
 
 /**
  * The Frame page's do and don't examples, as PLUS parts only. Show code prints
@@ -45,23 +45,10 @@ export const MultiStepInnerSidebar = () => (
         )}
     >
         <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%', minBlockSize: 0 }}>
-            <div style={{ flex: '1 1 auto', minBlockSize: 0, overflowY: 'auto', padding: 'var(--page-pad)' }}>
-                <h1 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
+            <Page style={{ flex: '1 1 auto', minBlockSize: 0, overflowY: 'auto' }} header={<PageHeader title="Plan a tutoring term" />}>
                 <Skeleton preset="text" lines={4} />
-            </div>
-            <div
-                role="group"
-                aria-label="Task actions"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flex: '0 0 auto',
-                    blockSize: 'var(--footer-height)',
-                    paddingInline: 'var(--page-pad)',
-                    background: 'var(--ds-surface)',
-                    borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
-                }}
-            >
+            </Page>
+            <div style={{ flex: '0 0 auto', paddingInline: 'var(--page-pad)', borderBlockStart: 'var(--border-width-default) solid var(--ds-border)' }}>
                 <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
                     <Button text="Back" />
                     <Button text="Next" appearance="primary" />
@@ -110,8 +97,9 @@ export const AiPanel = () => (
 const SignInColumn = () => {
     const [email, setEmail] = useState('');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--stack-2xl)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--stack-2xl)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--stack-2xl)', maxInlineSize: 'var(--field-width-xl)', marginInline: 'auto', paddingBlock: 'var(--stack-2xl)' }}>
             <Logo />
+            <PageHeader title="Sign in" />
             <TextField label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
             <Button text="Sign in" appearance="primary" />
         </div>

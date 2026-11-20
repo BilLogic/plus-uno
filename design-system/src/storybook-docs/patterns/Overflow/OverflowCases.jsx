@@ -12,7 +12,7 @@ import examplesSource from './OverflowExamples.jsx?raw';
  */
 
 export const CODE = showCode(examplesSource, [
-    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList',
+    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList'
 ]);
 
 /** The table sits in a narrow column so the long note runs past its cell. Docs geometry. */

@@ -367,6 +367,16 @@
     overflow: hidden;
 }
 
+// A header wraps by default. A second line grows the head row, and the cell
+// keeps a small pad above and below so the lines clear the rules.
+.plus-table .plus-table-head-cell--wrap {
+    padding-block: var(--table-pad-y-cell);
+}
+
+.plus-table-head-cell-label:not(.plus-table-head-cell-label--truncate) {
+    overflow-wrap: anywhere;
+}
+
 .plus-table-head-cell.plus-table-cell--align-number {
     .plus-table-head-cell-inner,
     .plus-table-head-cell-button { justify-content: flex-end; }
@@ -385,9 +395,11 @@
 
 .plus-table-head-cell-button {
     appearance: none;
-    height: var(--plus-table-row-height, var(--row-height-md));
+    // At least a row tall; a header on several lines grows the button, and so
+    // the whole head cell, with it.
+    min-height: var(--plus-table-row-height, var(--row-height-md));
     margin: 0;
-    padding: 0 var(--table-pad-x-cell);
+    padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
     border: 0;
     background-color: transparent;
     color: inherit;

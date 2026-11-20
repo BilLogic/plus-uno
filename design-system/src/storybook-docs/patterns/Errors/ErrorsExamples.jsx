@@ -12,13 +12,15 @@ const isValidEmail = (value) => value.includes('@') && value.includes('.');
 
 export const MessageOnField = () => {
     const [email, setEmail] = useState('ana@school');
-    const invalid = !isValidEmail(email);
+    const [touched, setTouched] = useState(false);
+    const invalid = touched && !isValidEmail(email);
     return (
         <TextField
             label="School email"
             isRequired
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => setTouched(true)}
             isInvalid={invalid}
             errorMessage={invalid ? 'Enter a full email, like name@school.org' : undefined}
         />

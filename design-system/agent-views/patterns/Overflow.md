@@ -14,14 +14,14 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 - **Wrap.** Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.
 - **Truncate with a Tooltip.** A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.
-- **Fold a list.** A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned .
+- **Fold a list.** A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are built from a Button; no component carries them.
 - **Page a table.** A table pages instead of growing: the pager sits at the end of the Section footer.
 
 ## Key cases
 
 Two cases carry more than the one-line rule.
 
-- **The breadcrumb middle** is Planned . Five or more levels fold the middle into a "…" that opens a menu of the hidden levels. Today each level truncates and the Breadcrumb never wraps.
+- **The breadcrumb middle.** Five or more levels keep the root and the last two, and fold the rest into a "…" that opens a menu of the hidden levels as links, in order. Fewer levels truncate, and the Breadcrumb never wraps.
 - **An open item in the Sidebar.** Named by when and who, "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more".
 
 A file name is the one mid-line truncation: the File item keeps its start and its extension, because the end tells names apart, and opens the full name in a Tooltip.
@@ -34,7 +34,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | --- | --- | --- |
 | Page title, Section title, Card title, Modal title | Wrap | Always visible |
 | Field error, Section message, Flag, Banner, Tooltip | Wrap | Always visible |
-| Column header | Wrap with `shouldTruncate` false; wrap by default is Planned | Always visible |
+| Column header | Wrap; a header that must stay on one line sets `shouldTruncate` | Always visible |
 | Table cell | Truncate at the end, one line | Tooltip on hover and focus when clipped |
 | Tag (180), Status tag (200) | Truncate at the end | Tooltip when clipped; the tag becomes focusable |
 | Tags in a group | Fold into +n | The +n menu lists the hidden tags |
@@ -49,7 +49,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | Button label | Truncate at the end, no Tooltip | Shorten the label; the full label stays in the accessible name |
 | File name | Truncate mid-line, keeping the extension | Tooltip on hover and focus when clipped |
 | Id | Planned: truncate mid-line | Tooltip when clipped |
-| A list of items, tags or notes | Planned: "Show n more", "Show less" | Expanded in place |
+| A list of items, tags or notes | "Show n more", "Show less" from a Button | Expanded in place |
 
 ### Fields and inputs
 
@@ -74,7 +74,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 
 | Do | Don't |
 | --- | --- |
-| "Show 4 more" and "Show less" (Planned). | "Load more", "See all", "…". |
+| "Show 4 more" and "Show less", built from a Button. | "Load more", "See all", "…". |
 | Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip. | The whole title in the Sidebar. |
 | Breadcrumb levels by the page's own title: "Lincoln Middle School". | "Back", "Up one level". |
 | File name mid-line: "reflection_…_week12.pdf". | "reflection_maya_rodrig…". |
@@ -84,7 +84,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 - The full text is always in the DOM, so a screen reader hears all of it whether or not it is clipped.
 - A clipped element is a tab stop so a keyboard user can reach the Tooltip; an unclipped one is not.
 - The +n button of a Tag group names how many tags it holds, "+3 more tags", and opens a menu the arrow keys move through.
-- The breadcrumb's "…" button is named "Show hidden levels" .
+- The breadcrumb's "…" button is named "Show hidden levels".
 - "Show n more" announces the new count when the list expands .
 
 ## Parts
@@ -96,7 +96,7 @@ A field answers a value longer than its room with one of four rules, chosen by w
 | Folded tags | Tag group | `overflow="collapse"` keeps one line and folds the rest into +n. |
 | Cell | Dynamic table | A cell's `overflow` is `truncate` by default; `wrap` takes more lines. |
 | File name | File item | Keeps the start and the extension, and opens the full name in a Tooltip while clipped. |
-| Trail | Breadcrumb | The fold is Planned ; the component never folds its middle yet. |
+| Trail | Breadcrumb | Five or more levels fold the middle into a "…" menu. |
 | Pager | Pagination | Fills the Section's footer slot, aligned to the end. |
 
 ## Related
@@ -165,7 +165,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 **Checked:** Review
 
-"Show n more" carries the count and "Show less" closes; both are Planned . A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
+"Show n more" carries the count and "Show less" closes; there is no dedicated component, so build both from a Button. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
 
 Do: A button under the list that names how many more it holds, and the list grows in place.
 Don't: A fade over the list, hiding how much is there.

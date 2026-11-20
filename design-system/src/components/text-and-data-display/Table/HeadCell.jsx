@@ -31,9 +31,11 @@ const SORTS = {
  *   `descending`; the page owns it and gets the requested direction from
  *   `onSort`. The unsorted arrow shows on hover and focus; a sorted column
  *   keeps its arrow.
- * - `shouldTruncate`: one line with an ellipsis, and a tooltip with the full
- *   label while it is clipped. Pass `width` (or fix the column elsewhere) so
- *   there is a width to clip against.
+ * - `shouldTruncate`: off by default, so a header wraps onto more lines and is
+ *   read whole. Turn it on for a header that must stay on one line: it ends in
+ *   an ellipsis, with a tooltip holding the full label while it is clipped.
+ *   Pass `width` (or fix the column elsewhere) so there is a width to clip
+ *   against.
  * - `align`: `text` | `number` | `icon`
  * - `isIconOnlyHeader`: draws the icon alone; the label rides in
  *   VisuallyHidden.
@@ -46,7 +48,7 @@ const HeadCell = ({
     isSortable = false,
     sort = 'none',
     onSort,
-    shouldTruncate = true,
+    shouldTruncate = false,
     align = 'text',
     width,
     isIconOnlyHeader = false,
@@ -73,6 +75,7 @@ const HeadCell = ({
         'plus-table-head-cell',
         `plus-table-cell--align-${alignName(align)}`,
         truncate && 'plus-table-head-cell--truncate',
+        showLabel && !truncate && !isSortable && 'plus-table-head-cell--wrap',
         isSortable && 'plus-table-head-cell--sortable',
         className
     );
@@ -157,7 +160,7 @@ HeadCell.propTypes = {
     sort: PropTypes.oneOf(['none', 'ascending', 'descending']),
     /** Called with the direction a press asks for: `ascending`, `descending` or `none`. */
     onSort: PropTypes.func,
-    /** One line with an ellipsis and a tooltip while clipped. */
+    /** Keep the header to one line, with an ellipsis and a tooltip while clipped. Off by default: the header wraps. */
     shouldTruncate: PropTypes.bool,
     /** `text`, `number` or `icon`; the older `left`, `right`, `center`, `start`, `end` still map. */
     align: PropTypes.oneOf(['text', 'number', 'icon', 'left', 'right', 'center', 'start', 'end']),

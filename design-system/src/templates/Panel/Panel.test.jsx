@@ -24,10 +24,11 @@ const panelMdx = readFileSync(join(__dirname, 'Panel.mdx'), 'utf8');
 
 describe('Panel Show code', () => {
     it('prints each floating example as PLUS parts, with no docs helper or stage', () => {
-        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(Object.keys(CODE)).toHaveLength(9);
         Object.entries(CODE).forEach(([name, code]) => {
             expect(code, name).not.toMatch(/panelDemo|CaseSurface|FloatStage/);
-            expect(code, name).toContain('<PanelContainer');
+            // The one Don't that is not a Panel is the same details opened in a Modal.
+            expect(code, name).toContain(name === 'DetailsInModal' ? '<Modal' : '<PanelContainer');
         });
     });
 });
