@@ -70,9 +70,22 @@ const runningFiniteAnimations = (element) => {
 };
 
 /**
+ * A PresenceSlot still entering. Its opacity and height run on motion's
+ * JavaScript timeline and its fade starts on a timer after the room opens, so
+ * between those phases `getAnimations()` is empty while the content is still
+ * at opacity 0. The slot's phase attribute is the one signal that covers the
+ * whole entrance.
+ */
+const enteringPresenceSlots = (element) => {
+    if (!element?.querySelectorAll) return false;
+    return element.querySelector('[data-presence-phase="entering"]') != null;
+};
+
+/**
  * Geometry, hit testing, and the a11y scan read a settled surface rather than
  * an entrance frame. Loops until no finite running animations remain (so
- * multi-phase animations like PresenceSlot finish their follow-up fade), capped
+ * multi-phase animations finish their follow-up) and while a PresenceSlot is
+ * still entering, capped
  * at `timeoutMs` so a looping or stuck animation cannot hang.
  */
 export async function settleAnimations(element, timeoutMs = DEFAULT_SETTLE_TIMEOUT_MS) {
@@ -80,8 +93,12 @@ export async function settleAnimations(element, timeoutMs = DEFAULT_SETTLE_TIMEO
     const deadline = Date.now() + timeoutMs;
     while (true) {
         const animations = runningFiniteAnimations(element);
-        if (animations.length === 0) break;
         const remaining = deadline - Date.now();
+        if (animations.length === 0) {
+            if (!enteringPresenceSlots(element) || remaining <= 0) break;
+            await new Promise((resolve) => setTimeout(resolve, Math.min(16, remaining)));
+            continue;
+        }
         if (remaining <= 0) break;
         let timer;
         const settled = Promise.allSettled(animations.map((animation) => animation.finished));
