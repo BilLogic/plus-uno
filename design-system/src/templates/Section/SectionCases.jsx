@@ -23,6 +23,31 @@ export const CODE = showCode(examplesSource, [
     'FooterCommits',
 ]);
 
+/** The printed source of the page's live stories: each is an example from `SectionExamples.jsx`, staged by the story. */
+export const STORY_CODE = showCode(examplesSource, [
+    'SectionAnatomy',
+    'SearchableStudents',
+    'LoadingSearchAndFilters',
+    'LoadingViews',
+    'DetailExpand',
+    'ListType',
+    'ReflectionQueue',
+    'MainAndSide',
+    'FullHeaderRows',
+    'FiltersApplied',
+    'NoViews',
+    'ViewsOnly',
+    'ManyFilters',
+    'WrappedFilters',
+    'RowsSelected',
+    'NarrowHeader',
+    'SubsectionHeader',
+    'SideAtEnd',
+    'FilterSideStudents',
+    'EmptyInTable',
+    'ReflectionsAnatomy',
+]);
+
 const unstyled = (Example) => {
     const Wrapped = () => (
         <div className="sb-unstyled">
