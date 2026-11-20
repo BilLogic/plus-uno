@@ -2,7 +2,7 @@
 
 # Logo
 
-The PLUS logo: the mark, or the lockup of mark and wordmark. Seven sizes, six appearances. At 24 and below the mark uses its small-size drawing, and below 24 the lockup gives way to the mark alone.
+The PLUS logo: the mark, or the lockup of mark and wordmark. Seven sizes, six appearances. The lockup wordmark is Google Sans Flex, outlined, at a weight tuned to each size. At 24 and below the mark uses its small-size drawing, and below 24 the lockup gives way to the mark alone.
 
 **Import:** `import { Logo } from '@/components';`
 

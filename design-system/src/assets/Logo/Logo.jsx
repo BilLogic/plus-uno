@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import { GLOWS, WORDMARK, WORDMARK_WIDTH, CAP_TOP, CAP_BOTTOM } from './logoArt';
+import { GLOWS, WORDMARKS } from './logoArt';
 import './Logo.scss';
 
 /** Mark heights in pixels. */
@@ -19,7 +19,6 @@ const SMALL_MAX_SIZE = 24;
 
 const MARK_BOX = 96;
 const GLOW_SCALE = MARK_BOX / 92;
-const CAP = CAP_BOTTOM - CAP_TOP;
 
 /** The plus: center (68, 28), arms 24 long and 6 thick, 27 and 7.5 in the small-size drawing. */
 function Plus({ small }) {
@@ -103,7 +102,7 @@ Mark.propTypes = { appearance: PropTypes.string.isRequired, small: PropTypes.boo
  * Logo
  *
  * The PLUS logo: the mark, or the lockup of mark and wordmark. Seven sizes,
- * six appearances. At 24 and below the mark uses its small-size drawing, and
+ * six appearances. The lockup wordmark is Google Sans Flex, outlined, at a weight tuned to each size. At 24 and below the mark uses its small-size drawing, and
  * below 24 the lockup gives way to the mark alone.
  */
 const Logo = ({ appearance = 'colored', size = 32, wordmark = false, className = '', ...props }) => {
@@ -121,10 +120,12 @@ const Logo = ({ appearance = 'colored', size = 32, wordmark = false, className =
 
     // The lockup is drawn in mark units: a quarter-mark gap, then the wordmark
     // at half the mark's height in cap height, centered on the mark.
+    // Each lockup size has its own outlined wordmark, drawn at its own weight.
+    const wordmarkSet = lockup ? WORDMARKS[size] : null;
     const gap = MARK_BOX / 4;
-    const scale = (0.5 * MARK_BOX) / CAP;
-    const top = MARK_BOX / 2 - (CAP / 2 + CAP_TOP) * scale;
-    const total = lockup ? MARK_BOX + gap + WORDMARK_WIDTH * scale : MARK_BOX;
+    const scale = wordmarkSet ? (0.5 * MARK_BOX) / wordmarkSet.cap : 0;
+    const top = MARK_BOX / 2 - (0.5 * MARK_BOX) / 2;
+    const total = wordmarkSet ? MARK_BOX + gap + wordmarkSet.width * scale : MARK_BOX;
 
     return (
         <span className={classNames} {...props}>
@@ -137,10 +138,14 @@ const Logo = ({ appearance = 'colored', size = 32, wordmark = false, className =
                 xmlns="http://www.w3.org/2000/svg"
             >
                 <Mark appearance={appearance} small={small} ids={ids} />
-                {lockup && (
-                    <g className="plus-logo__wordmark" transform={`translate(${MARK_BOX + gap} ${top.toFixed(2)}) scale(${scale.toFixed(4)})`}>
-                        {WORDMARK.map((letter, i) => (
-                            <path key={i} transform={`translate(${letter.shift} 0)`} d={letter.d} />
+                {wordmarkSet && (
+                    <g
+                        className="plus-logo__wordmark"
+                        data-weight={wordmarkSet.weight}
+                        transform={`translate(${MARK_BOX + gap} ${top}) scale(${+scale.toFixed(6)})`}
+                    >
+                        {wordmarkSet.paths.map((d, i) => (
+                            <path key={i} d={d} />
                         ))}
                     </g>
                 )}
