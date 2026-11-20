@@ -118,7 +118,7 @@ Same group: `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 
-Choose one of two Frame types for every app page, shown here in browser windows. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
+Choose one of two Frame types for every app page, shown here in browser windows. Browser chrome frames full pages only: a Frame-rooted screen draws in a browser window, and a Section, Card, Table or any other block draws bare. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
 
 - **Default.** Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.
 - **Bare.** Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.

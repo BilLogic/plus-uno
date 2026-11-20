@@ -61,7 +61,8 @@ export default {
     id: 'templates-frame',
     component: Frame,
     tags: ['!dev', '!autodocs'],
-    parameters: { layout: 'fullscreen' },
+    // Every Frame story is a whole app page, so each takes the toolbar's browser chrome.
+    parameters: { layout: 'fullscreen', fullPage: true },
     // Each story starts with nothing remembered for the Panel.
     beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
@@ -210,14 +211,14 @@ export const Overview = {
         if (expected === 'none') {
             await expect(browserFrame, 'plusBrowser: none renders no browser frame').toBeNull();
         } else {
-            await expect(browserFrame, 'Templates/ stories render with a browser frame').not.toBeNull();
+            await expect(browserFrame, 'Full-page stories render with a browser frame').not.toBeNull();
             await expect(browserFrame).toHaveAttribute('data-browser', expected);
             await expect(browserFrame.querySelector('.plus-browser-frame__toolbar')).not.toBeNull();
         }
     },
 };
 
-/** Opting out of the default template browser frame via `parameters.browserFrame: 'none'`. */
+/** Opting a full page out of the toolbar's browser frame via `parameters.browserFrame: 'none'`. */
 export const WithoutBrowserFrame = {
     parameters: { browserFrame: 'none', docs: { disable: true } },
     play: async ({ canvasElement }) => {

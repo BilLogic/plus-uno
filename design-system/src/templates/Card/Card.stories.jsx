@@ -161,6 +161,9 @@ export const Overview = () => (
         </Card>
     </div>
 );
+Overview.play = async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('.plus-browser-frame'), 'a Card renders without browser chrome').toBeNull();
+};
 
 export const Interactive = {
     args: {
