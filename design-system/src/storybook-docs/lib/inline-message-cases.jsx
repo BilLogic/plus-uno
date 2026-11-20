@@ -1,6 +1,5 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { InlineMessage } from '@/components';
-import { guardBoundaryMountFocus } from './docs-open-at-top.js';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
 export const fieldRow = {
@@ -26,51 +25,26 @@ export const LiveInlineMessage = ({
     title,
     children,
 }) => {
-    const [resetKey, setResetKey] = useState(0);
-    const [host, setHost] = useState(null);
-    const insideGestureRef = useRef(false);
-    const userDismissedRef = useRef(!defaultOpen);
+    const [open, setOpen] = useState(defaultOpen);
 
-    const markInsideGesture = () => {
-        insideGestureRef.current = true;
-        setTimeout(() => {
-            insideGestureRef.current = false;
-        }, 0);
+    // An open-at-rest card stays open when another card is pressed. Every
+    // other change, a press on its own trigger or Escape, is Base UI's own.
+    const handleOpenChange = (next, details) => {
+        if (!next && defaultOpen && details?.reason === 'outside-press') {
+            details.cancel?.();
+            return;
+        }
+        setOpen(next);
     };
-
-    useLayoutEffect(() => {
-        if (!defaultOpen || !host || typeof MutationObserver === 'undefined') return undefined;
-        const boundary = host.closest('[data-docs-overlay-container]') ?? host;
-        const observer = new MutationObserver(() => {
-            const hasPopup = Boolean(boundary.querySelector('.plus-popup'));
-            if (hasPopup) {
-                userDismissedRef.current = false;
-            } else if (insideGestureRef.current) {
-                userDismissedRef.current = true;
-            } else if (!userDismissedRef.current) {
-                guardBoundaryMountFocus(boundary);
-                setResetKey((k) => k + 1);
-            }
-        });
-        observer.observe(boundary, { childList: true, subtree: true });
-        return () => observer.disconnect();
-    }, [defaultOpen, host]);
 
     return (
         <DocsOverlayBoundary fit={false} containHeight>
-            <div
-                ref={setHost}
-                style={fieldRow}
-                onPointerDownCapture={markInsideGesture}
-                onMouseDownCapture={markInsideGesture}
-                onClickCapture={markInsideGesture}
-                onKeyDownCapture={markInsideGesture}
-            >
+            <div style={fieldRow}>
                 <span>{field}</span>
                 <InlineMessage
-                    key={resetKey}
                     appearance={appearance}
-                    defaultOpen={defaultOpen}
+                    isOpen={open}
+                    onOpenChange={handleOpenChange}
                     placement="bottom"
                     label={label}
                     title={title}

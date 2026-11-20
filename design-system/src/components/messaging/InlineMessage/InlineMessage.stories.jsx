@@ -281,3 +281,55 @@ export const BestPracticesLive = {
         await waitFor(() => expect(within(cards[4]).queryByText('Heads up')).toBeNull());
     },
 };
+
+/**
+ * Closing a live card never reopens it in the same gesture, and the trigger's
+ * `aria-expanded` always matches whether the card is open. The check waits for
+ * the closing popup to leave the page and then holds the card shut for longer
+ * than the exit fade, so a card that comes back after the fade fails here
+ * however loaded the run is.
+ */
+export const ClosingNeverReopens = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
+            <DoDontPair doExample={<TintMeaningDo />} doCaption="Info for a neutral note." dontExample={<TintMeaningDont />} dontCaption="Danger for a neutral note." />
+            <DoDontPair doExample={<OnePerFieldDo />} doCaption="A single message." dontExample={<OnePerFieldDont />} dontCaption="An info note and a warning together." />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
+        const popupOf = (card) => card.querySelector('.plus-popup');
+        const settle = () => new Promise((resolve) => { setTimeout(resolve, 600); });
+        const expectClosedAndStaysClosed = async (card, trigger) => {
+            await waitFor(() => expect(popupOf(card)).toBeNull());
+            await settle();
+            await expect(popupOf(card)).toBeNull();
+            await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        };
+        const expectOpen = async (card, trigger) => {
+            await waitFor(() => expect(popupOf(card)).not.toBeNull());
+            await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+        };
+
+        // An open-at-rest card: a press on its trigger closes it for good, then opens and closes again.
+        const live = within(cards[0]).getByRole('button', { name: 'About this setting' });
+        await expectOpen(cards[0], live);
+        await userEvent.click(live);
+        await expectClosedAndStaysClosed(cards[0], live);
+        await userEvent.click(live);
+        await expectOpen(cards[0], live);
+        await userEvent.click(live);
+        await expectClosedAndStaysClosed(cards[0], live);
+
+        // An outside press closes a card opened by a press and it stays closed; the open-at-rest card beside it is unaffected.
+        await userEvent.click(live);
+        await expectOpen(cards[0], live);
+        await userEvent.click(within(cards[2]).getByRole('button', { name: 'About session length' }));
+        await expectOpen(cards[2], within(cards[2]).getByRole('button', { name: 'About session length' }));
+        await userEvent.click(canvasElement.ownerDocument.body);
+        const plain = within(cards[2]).getByRole('button', { name: 'About session length' });
+        await expectClosedAndStaysClosed(cards[2], plain);
+        await expect(within(cards[1]).getByText('Heads up')).toBeVisible();
+    },
+};

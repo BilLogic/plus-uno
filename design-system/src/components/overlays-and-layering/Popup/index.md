@@ -181,7 +181,7 @@ Same group: `Tooltip`
 | `triggerType` | string or arrayOf | `'click'` | Trigger behavior |
 | `defaultShow` | bool | `false` | — |
 | `show` | bool | — | — |
-| `onToggle` | func | — | — |
+| `onToggle` | func | — | Called with the next open state and Base UI's change details (`reason`, `event`, `cancel()`). Calling `cancel()` keeps the popup as it is. |
 | `container` | object | — | Where the popup portals to. Defaults to the page, or the modal the trigger sits in. |
 | `offset` | array | — | — |
 | `rootClose` | bool | — | Dismiss on a click outside. Defaults to true for every trigger but `manual`. |

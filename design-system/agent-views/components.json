@@ -8024,6 +8024,24 @@
           "deprecated": null
         },
         {
+          "name": "isOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controls whether the popup is open. Pair with `onOpenChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the next open state and Base UI's change details (`reason`, `event`, `cancel()`).",
+          "deprecated": null
+        },
+        {
           "name": "children",
           "type": "node",
           "required": false,
@@ -8064,7 +8082,8 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "BestPracticesLive"
+        "BestPracticesLive",
+        "ClosingNeverReopens"
       ],
       "tokens": [
         "--body-default",
@@ -9764,7 +9783,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the next open state and Base UI's change details (`reason`, `event`, `cancel()`). Calling `cancel()` keeps the popup as it is.",
           "deprecated": null
         },
         {
