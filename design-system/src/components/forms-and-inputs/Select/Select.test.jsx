@@ -263,7 +263,11 @@ describe('Select, multiple', () => {
         render(<Select label="Schools" isMulti maxSelections={1} options={SCHOOLS} onChange={onChange} />);
         await user.click(field('Schools'));
         await user.click(await screen.findByRole('option', { name: 'North High' }));
-        expect(screen.getAllByText('You can pick up to 1').length).toBeGreaterThan(0);
+        // Said twice on purpose: in the caption the field is described by, and in the list footer.
+        const said = screen.getAllByText('You can pick up to 1');
+        expect(said).toHaveLength(2);
+        expect(said.filter((node) => node.closest('[role="listbox"], .plus-listbox'))).toHaveLength(1);
+        expect(field('Schools')).toHaveAccessibleDescription('You can pick up to 1');
         await user.click(option('South High'));
         expect(onChange).toHaveBeenCalledTimes(1);
     });
@@ -278,6 +282,33 @@ describe('Select, multiple', () => {
         expect(onChange).toHaveBeenLastCalledWith(['north', 'south', 'riverside']);
         await user.click(screen.getByRole('button', { name: 'Select all' }));
         expect(onChange).toHaveBeenLastCalledWith([]);
+    });
+});
+
+describe('Select, list keys', () => {
+    it('moves the highlight to the first and last row with Home and End from an empty search', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        render(<Select label="School" options={SCHOOLS} onChange={onChange} />);
+        await user.click(field());
+        await screen.findAllByRole('option');
+        await user.keyboard('{End}');
+        await waitFor(() => expect(field().getAttribute('aria-activedescendant')).toBe(option('Riverside Academy').id));
+        await user.keyboard('{Home}');
+        await waitFor(() => expect(field().getAttribute('aria-activedescendant')).toBe(option('North High').id));
+        await user.keyboard('{End}{Enter}');
+        expect(onChange).toHaveBeenLastCalledWith('riverside');
+    });
+
+    it('keeps Home and End for the caret once text is typed', async () => {
+        const user = userEvent.setup();
+        render(<Select label="School" options={SCHOOLS} />);
+        await user.click(field());
+        await user.type(field(), 'high');
+        await waitFor(() => expect(options()).toHaveLength(2));
+        const before = field().getAttribute('aria-activedescendant');
+        await user.keyboard('{End}');
+        expect(field().getAttribute('aria-activedescendant')).toBe(before);
     });
 });
 
@@ -306,6 +337,8 @@ describe('Select, creating', () => {
 });
 
 describe('Select, not searchable', () => {
+    // Pins today's behavior: a field that is not searchable has no type-ahead,
+    // so typed letters neither filter nor move the highlight.
     it('is a combobox that is not a text input and opens on Space', async () => {
         const user = userEvent.setup();
         const onChange = vi.fn();
@@ -350,7 +383,8 @@ describe('Select, disabled, read-only and waiting', () => {
         expect(screen.queryByRole('button', { name: 'Clear school' })).toBeNull();
     });
 
-    it('waits on the field it depends on, then clears when that field changes', () => {
+    it('waits on the field it depends on, then clears when that field changes', async () => {
+        const user = userEvent.setup();
         const Pair = () => {
             const [school, setSchool] = useState('');
             return (
@@ -369,8 +403,8 @@ describe('Select, disabled, read-only and waiting', () => {
         render(<Pair />);
         expect(field('Teacher')).toBeDisabled();
         expect(screen.getByText('Choose School first')).toBeInTheDocument();
-        screen.getByRole('button', { name: 'North' }).click();
-        return waitFor(() => {
+        await user.click(screen.getByRole('button', { name: 'North' }));
+        await waitFor(() => {
             expect(field('Teacher')).toBeEnabled();
             expect(field('Teacher')).toHaveValue('');
         });
@@ -424,6 +458,19 @@ describe('Select, in a form', () => {
         await user.click(field());
         await user.click(await screen.findByRole('option', { name: 'Riverside Academy' }));
         expect(submitted(form)).toEqual([['school', 'riverside']]);
+    });
+
+    // Pins today's behavior: isRequired is announced (aria-required) but the
+    // field draws no native `required`, so an empty required Select does not
+    // fail the form's own validity check. A page validates it and sets isInvalid.
+    it('announces isRequired without blocking the form', () => {
+        const { container } = render(
+            <form>
+                <Select label="School" name="school" isRequired options={SCHOOLS} />
+            </form>,
+        );
+        expect(field()).toHaveAttribute('aria-required', 'true');
+        expect(container.querySelector('form').checkValidity()).toBe(true);
     });
 
     it('submits one entry per value when multiple', () => {
