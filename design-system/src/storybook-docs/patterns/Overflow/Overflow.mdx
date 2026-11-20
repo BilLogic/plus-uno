@@ -5,7 +5,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as OverflowStories from './Overflow.stories.jsx';
 import { FOLD_STAGE, NARROW, TABLE_STAGE } from './overflowDemo.jsx';
-import { CODE, ClippedCellNoTextCase, ClippedCellOpensTextCase, ClippedSectionTitleCase, FadedListCase, GrowingTableCase, PagedTableCase, ShowMoreWithCountCase, WrappedSectionTitleCase } from './OverflowCases.jsx';
+import { CODE, ClippedCellNoTextCase, ClippedCellOpensTextCase, ClippedSectionTitleCase, FadedListCase, ShowMoreWithCountCase, WrappedSectionTitleCase } from './OverflowCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -46,7 +46,7 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 <TypeGrid>
 <TypeCard of={OverflowStories.WrapTitlesAndErrors} to="#wrap-titles-and-messages" title="Wrap" stage={NARROW}>Titles, headers, labels, errors and notifications take more lines. They never end in an ellipsis.</TypeCard>
 <TypeCard of={OverflowStories.TruncatedCell} to="#a-cell" title="Truncate with a Tooltip" stage={TABLE_STAGE}>A cell ends in an ellipsis on one line. Its full text opens on hover and focus, only while it is clipped.</TypeCard>
-<TypeCard of={OverflowStories.FoldedTagGroup} to="#fold-a-tag-group" title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are Planned <PlannedTag />.</TypeCard>
+<TypeCard of={OverflowStories.FoldedTagGroup} to="#fold-a-tag-group" title="Fold a list" stage={FOLD_STAGE}>A Tag group keeps one line and folds the rest behind +n. For other lists, "Show n more" and "Show less" are built from a Button; no component carries them.</TypeCard>
 <TypeCard of={OverflowStories.PagedInFooter} to="#page-a-table" title="Page a table" stage={TABLE_STAGE}>A table pages instead of growing: the pager sits at the end of the Section footer.</TypeCard>
 </TypeGrid>
 
@@ -115,7 +115,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 <tr><td>Button label</td><td>Truncate at the end, no Tooltip</td><td>Shorten the label; the full label stays in the accessible name</td></tr>
 <tr><td>File name</td><td>Truncate mid-line, keeping the extension</td><td>Tooltip on hover and focus when clipped</td></tr>
 <tr><td>Id <PlannedTag /></td><td>Planned: truncate mid-line</td><td>Tooltip when clipped</td></tr>
-<tr><td>A list of items, tags or notes <PlannedTag /></td><td>Planned: "Show n more", "Show less"</td><td>Expanded in place</td></tr>
+<tr><td>A list of items, tags or notes</td><td>"Show n more", "Show less" from a Button</td><td>Expanded in place</td></tr>
 </tbody>
 </DocsTable>
 
@@ -213,7 +213,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 <RuleTag kind="review" />
 
-"Show n more" carries the count and "Show less" closes; both are Planned <PlannedTag />. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
+"Show n more" carries the count and "Show less" closes; there is no dedicated component, so build both from a Button. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
 
 <DoDontPair
     doExample={<ShowMoreWithCountCase />}
@@ -222,15 +222,6 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
     dontExample={<FadedListCase />}
     dontCode={CODE.FadedList}
     dontCaption="A fade over the list, hiding how much is there."
-/>
-
-<DoDontPair
-    doExample={<PagedTableCase />}
-    doCode={CODE.PagedTable}
-    doCaption="A table pages: the pager sits at the end of the Section footer."
-    dontExample={<GrowingTableCase />}
-    dontCode={CODE.GrowingTable}
-    dontCaption="A table that grows under Show more: a table pages, a list grows."
 />
 
 </div>
@@ -244,7 +235,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>"Show 4 more" and "Show less" (Planned). <PlannedTag /></td><td>"Load more", "See all", "…".</td></tr>
+<tr><td>"Show 4 more" and "Show less", built from a Button.</td><td>"Load more", "See all", "…".</td></tr>
 <tr><td>Open item: "4:00 PM · Ms. Ortiz"; the school in the Tooltip (Planned). <PlannedTag /></td><td>The whole title in the Sidebar.</td></tr>
 <tr><td>Breadcrumb levels by the page's own title: "Lincoln Middle School".</td><td>"Back", "Up one level".</td></tr>
 <tr><td>File name mid-line: "reflection_…_week12.pdf".</td><td>"reflection_maya_rodrig…".</td></tr>

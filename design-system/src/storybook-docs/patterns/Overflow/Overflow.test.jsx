@@ -9,8 +9,6 @@ import {
     ClippedCellOpensTextCase,
     ClippedSectionTitleCase,
     FadedListCase,
-    GrowingTableCase,
-    PagedTableCase,
     ShowMoreWithCountCase,
     WrappedSectionTitleCase,
 } from './OverflowCases.jsx';
@@ -75,25 +73,8 @@ describe('Overflow live cases and TypeCard links', () => {
         expect(screen.queryByRole('button', { name: /Show/ })).toBeNull();
     });
 
-    it('PagedTableCase pages its rows with a Pagination in the footer and never grows; GrowingTableCase grows the table', async () => {
-        const user = userEvent.setup();
-        const { unmount } = render(<PagedTableCase />);
-        expect(screen.getAllByRole('row')).toHaveLength(4);
-        expect(screen.queryByRole('button', { name: /Show/ })).toBeNull();
-        await user.click(screen.getByRole('button', { name: /next/i }));
-        expect(screen.getAllByRole('row')).toHaveLength(4);
-        expect(screen.getByText('Jordan Patel')).toBeVisible();
-        expect(screen.queryByText('Ava Thompson')).toBeNull();
-        unmount();
-
-        render(<GrowingTableCase />);
-        expect(screen.getAllByRole('row')).toHaveLength(4);
-        await user.click(screen.getByRole('button', { name: 'Show 3 more' }));
-        expect(screen.getAllByRole('row')).toHaveLength(7);
-    });
-
     it('prints each example from its own source', () => {
-        expect(Object.keys(CODE)).toHaveLength(8);
+        expect(Object.keys(CODE)).toHaveLength(6);
         expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
         expect(CODE.ShowMoreWithCount).toContain('const StudentList');
         expect(CODE.ClippedCellNoText).not.toContain('plus-table-cell-text');

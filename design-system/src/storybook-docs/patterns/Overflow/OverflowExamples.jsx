@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, DynamicTable, Pagination } from '@/components';
+import { Button, DynamicTable } from '@/components';
 import { Section } from '@/templates';
 
 /**
@@ -109,42 +109,3 @@ export const FadedList = () => (
         </div>
     </Section>
 );
-
-const PAGE_SIZE = 3;
-
-export const PagedTable = () => {
-    const [page, setPage] = useState(1);
-    return (
-        <Section
-            title="Students"
-            footer={(
-                <Pagination
-                    currentPage={page}
-                    totalPages={Math.ceil(STUDENTS.length / PAGE_SIZE)}
-                    onPageChange={setPage}
-                />
-            )}
-        >
-            <StudentsTable rows={STUDENTS.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)} />
-        </Section>
-    );
-};
-
-export const GrowingTable = () => {
-    const [expanded, setExpanded] = useState(false);
-    return (
-        <Section
-            title="Students"
-            footer={(
-                <Button
-                    text={expanded ? 'Show less' : 'Show 3 more'}
-                    appearance="subtle"
-                    spacing="compact"
-                    onClick={() => setExpanded((current) => !current)}
-                />
-            )}
-        >
-            <StudentsTable rows={STUDENTS.slice(0, expanded ? 6 : 3)} />
-        </Section>
-    );
-};

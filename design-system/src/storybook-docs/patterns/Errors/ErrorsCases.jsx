@@ -26,9 +26,8 @@ const SCREEN = { width: 1024, height: 300 }; // docs-literal
 export const MessageOnFieldCase = () => {
     const ref = useRef(null);
     useEffect(() => {
-        const input = ref.current?.querySelector('input');
-        input?.focus();
-        input?.blur();
+        // A blur event marks the field touched without moving the page's focus or scroll.
+        ref.current?.querySelector('input')?.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
     }, []);
     return (
         <CaseSurface>

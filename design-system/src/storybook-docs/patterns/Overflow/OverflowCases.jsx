@@ -12,7 +12,7 @@ import examplesSource from './OverflowExamples.jsx?raw';
  */
 
 export const CODE = showCode(examplesSource, [
-    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList', 'PagedTable', 'GrowingTable',
+    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList'
 ]);
 
 /** The table sits in a narrow column so the long note runs past its cell. Docs geometry. */
@@ -39,9 +39,3 @@ export const ShowMoreWithCountCase = () => <CaseSurface><Example.ShowMoreWithCou
 
 /** Don't: fading a list out hides how many items remain and gives no way to reveal them. */
 export const FadedListCase = () => <CaseSurface><Example.FadedList /></CaseSurface>;
-
-/** Do: a table pages in its Section footer instead of growing. */
-export const PagedTableCase = () => <CaseSurface><Example.PagedTable /></CaseSurface>;
-
-/** Don't: a table that grows under a Show more control, pushing the page down. */
-export const GrowingTableCase = () => <CaseSurface><Example.GrowingTable /></CaseSurface>;
