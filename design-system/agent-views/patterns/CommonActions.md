@@ -219,10 +219,10 @@ import { Card } from '@/templates';
 function ActionsExample() {
     return (
         <Card title="Review notes" footer={
-            <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
-                <Button text="Cancel" />
-                <Button text="Save notes" appearance="primary" />
-            </div>
+            <>
+                <Button text="Discard" spacing="compact" />
+                <Button text="Save notes" spacing="compact" />
+            </>
         }>
             <TextField label="Notes" defaultValue="Start with unit rates." />
         </Card>

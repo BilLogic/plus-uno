@@ -67,11 +67,9 @@ export const PageButtonsFarRight = () => (
 
 export const ModalFooterTracks = () => (
     <Modal
-        inline
         show
         width="4-col"
         title="Log a session"
-        onClose={() => {}}
         footer={(
             <FooterActions>
                 <Button text="Discard" />
@@ -85,11 +83,9 @@ export const ModalFooterTracks = () => (
 
 export const ModalFooterInset = () => (
     <Modal
-        inline
         show
         width="4-col"
         title="Log a session"
-        onClose={() => {}}
         footer={(
             <ButtonGroup label="Actions">
                 <Button text="Discard" spacing="compact" />

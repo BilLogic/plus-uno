@@ -8,7 +8,7 @@ Link: an inline navigation anchor.
 
 **Used in:** Card (`ds guide card`); Frame (`ds guide frame`); Modal (`ds guide modal`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Notifications (`ds guide notifications`)
+**Governed by:** Common actions (`ds guide common-actions`); Errors (`ds guide errors`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/navigation/Link/Link.jsx`
 

@@ -15,12 +15,23 @@ import examplesSource from './NavigationExamples.jsx?raw';
 
 export const CODE = showCode(examplesSource, ['BreadcrumbOnRecordPage', 'BreadcrumbOnAreaPage', 'OpenItemsByTimeAndWho', 'OpenItemsCarryEverything', 'OneTabSystem', 'TwoTabSystems']);
 
-export const BreadcrumbCase = ({ record = true }) => (
+const OnRecordPage = ({ children, level = 5 }) => (
     <CaseSurface border="none" padding="none" surface={false}>
-        <HeadingLevelContext.Provider value={5}>
-            {record ? <Example.BreadcrumbOnRecordPage /> : <Example.BreadcrumbOnAreaPage />}
-        </HeadingLevelContext.Provider>
+        <HeadingLevelContext.Provider value={level}>{children}</HeadingLevelContext.Provider>
     </CaseSurface>
+);
+
+/** The picture's links are plain hrefs, as a consumer writes them; a click here stays on the docs page. */
+const stayOnPage = (event) => {
+    if (event.target.closest?.('a[href^="#"]')) event.preventDefault();
+};
+
+export const BreadcrumbCase = ({ record = true }) => (
+    <div onClickCapture={stayOnPage}>
+        <OnRecordPage level={4}>
+            {record ? <Example.BreadcrumbOnRecordPage /> : <Example.BreadcrumbOnAreaPage />}
+        </OnRecordPage>
+    </div>
 );
 
 /** The Sidebar sits in the docked rail box it has in a Frame, in a column as wide as a card. */
@@ -35,12 +46,6 @@ export const OpenItemsDoCase = () => <SidebarStage><Example.OpenItemsByTimeAndWh
 
 /** Don't: an open item that carries everything, so the time it is found by is cut off. */
 export const OpenItemsDontCase = () => <SidebarStage><Example.OpenItemsCarryEverything /></SidebarStage>;
-
-const OnRecordPage = ({ children }) => (
-    <CaseSurface border="none" padding="none" surface={false}>
-        <HeadingLevelContext.Provider value={5}>{children}</HeadingLevelContext.Provider>
-    </CaseSurface>
-);
 
 /** Do: under page tabs the Section's views are one labeled PopupSelect at the start of its bar. */
 export const OneTabSystemCase = () => <OnRecordPage><Example.OneTabSystem /></OnRecordPage>;

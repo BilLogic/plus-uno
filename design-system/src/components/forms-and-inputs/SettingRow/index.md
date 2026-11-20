@@ -6,11 +6,11 @@ SettingRow — puts a setting's name and one-line description at the start and i
 
 **Import:** `import { SettingRow } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`)
+**Governed by:** Forms (`ds guide forms`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.stories.jsx` — Overview, ToggleControl, SelectControl, ConnectionRow, Rest, Saving, Saved, ErrorState, DisabledWithReason, ReadOnly, Motion, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.stories.jsx` — Overview, ToggleControl, SelectControl, ConnectionRow, Rest, Saving, Saved, ErrorState, DisabledWithReason, ReadOnly, Motion, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SettingRow/SettingRow.mdx`
 
@@ -56,6 +56,10 @@ When a setting waits on another setting on the same page, explain how to unlock 
 
 Do: Description names the prerequisite on the same page.
 Don't: Disabled control gives no clue why it cannot be changed.
+
+### Let a `SettingRow` label and description longer than their line wrap. {#let-a-settingrow-label-and-description-longer-than-their-line-wrap}
+
+The control keeps its size and place at the end of the row. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -35,21 +35,21 @@ const SessionFields = () => {
 
 const SessionsBehind = () => (
     <Section title="Sessions">
-        <Skeleton preset="text" lines={3} />
+        <Skeleton shape="text" lines={3} />
     </Section>
 );
 
 const SaveFooter = () => (
     <FooterActions>
-        <Button text="Discard" shouldFitContainer onClick={() => {}} />
-        <Button text="Save" appearance="primary" shouldFitContainer onClick={() => {}} />
+        <Button text="Discard" />
+        <Button text="Save" appearance="primary" />
     </FooterActions>
 );
 
 const LogSessionFooter = () => (
     <FooterActions>
-        <Button text="Cancel" onClick={() => {}} />
-        <Button text="Save session" appearance="primary" onClick={() => {}} />
+        <Button text="Cancel" />
+        <Button text="Save session" appearance="primary" />
     </FooterActions>
 );
 
@@ -101,28 +101,27 @@ export const EditInPanel = () => (
 );
 
 export const EditInModal = () => (
-    <Modal inline show title="Ana Ruiz" footer={<SaveFooter />}>
+    <Modal show title="Ana Ruiz" footer={<SaveFooter />}>
         <SessionFields />
     </Modal>
 );
 
 export const ErrorOnField = () => (
-    <Modal inline show title="Log a session" footer={<LogSessionFooter />}>
+    <Modal show title="Log a session" footer={<LogSessionFooter />}>
         <TextField label="Student" isRequired defaultValue="" isInvalid errorMessage="Enter the student’s name" />
     </Modal>
 );
 
 export const ErrorInSecondDialog = () => (
     <>
-        <Modal inline show title="Log a session" footer={<LogSessionFooter />}>
+        <Modal show title="Log a session" footer={<LogSessionFooter />}>
             <TextField label="Student" isRequired defaultValue="" isInvalid />
         </Modal>
         <Modal
-            inline
             show
             width="4-col"
             title="Something went wrong"
-            footer={<FooterActions><Button text="OK" appearance="primary" onClick={() => {}} /></FooterActions>}
+            footer={<FooterActions><Button text="OK" appearance="primary" /></FooterActions>}
         >
             <p style={{ margin: 0 }}>The session was not saved.</p>
         </Modal>

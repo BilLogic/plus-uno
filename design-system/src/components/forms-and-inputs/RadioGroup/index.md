@@ -12,7 +12,7 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Source:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Soft, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, SoftMixedFlow, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Soft, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, SoftMixedFlow, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx`
 
@@ -97,6 +97,10 @@ Don't: An ordinary five-item list without illustrations drawn as tiles.
 ### Use `reveal` instead of a separate conditional field. {#use-reveal-instead-of-a-separate-conditional-field}
 
 When choosing one option should show an extra field, such as "Other, please specify", pass that field as the option's `reveal` rather than rendering it outside the group. It stays scoped to the option that triggers it and disappears when another option is chosen.
+
+### Let a `RadioGroup` legend and options longer than their line wrap. {#let-a-radiogroup-legend-and-options-longer-than-their-line-wrap}
+
+The group grows by lines and nothing in it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -4,6 +4,7 @@ import { px, probe, tokenColor, tokenLength } from '@/storybook-docs/lib/style-p
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { Button, Flag, FlagGroup, Select, StatusTag, Toggle } from '@/components';
 import SettingRow from './SettingRow';
+import { LONG_SENTENCE, LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 const LEAD_TIME_OPTIONS = [
     { value: '15m', label: '15 minutes before' },
@@ -456,4 +457,28 @@ export const Interactive = {
             />
         </div>
     ),
+};
+
+/** Wrap: a long label and description take more lines at the start while the control keeps its size at the end. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '360px' /* demo frame */ }}>
+            <SettingRow
+                id="setting-overflow"
+                label={LONG_SCHOOL}
+                description={LONG_SENTENCE}
+                status={<StatusTag appearance="success">Connected</StatusTag>}
+                control={<Toggle isChecked onChange={() => {}} />}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = canvasElement.querySelector('.plus-setting-row');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(row, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SCHOOL);
+        const toggle = within(canvasElement).getByRole('switch');
+        await expect(toggle.getBoundingClientRect().right).toBeLessThanOrEqual(row.getBoundingClientRect().right + 1);
+        await expect(toggle.getBoundingClientRect().width).toBeGreaterThan(0);
+    },
 };

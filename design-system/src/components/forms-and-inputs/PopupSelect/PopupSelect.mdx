@@ -57,6 +57,14 @@ or sets one filter from a button, with no field and no Apply.
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={PopupSelectStories.Overflow} title="Truncate" description="A chosen value longer than the trigger ends in an ellipsis and opens its full text in a Tooltip." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="PopupSelect" />
@@ -174,6 +182,10 @@ The built-in labeled trigger shows the value automatically; with a custom `Filte
 ### Keep it to one list.
 
 Two lists, or picks that wait for an Apply, are a different menu.
+
+### Let a `PopupSelect` value longer than its trigger end in an ellipsis.
+
+The Tooltip is on only while the value is clipped; the chevron keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

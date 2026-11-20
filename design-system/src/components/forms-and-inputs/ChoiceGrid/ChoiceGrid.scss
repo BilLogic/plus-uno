@@ -6,6 +6,9 @@
 .plus-choice-grid-wrapper {
     display: block;
     width: 100%;
+    // Columns that cannot fit scroll inside the grid's own well, as a table
+    // does, so the page never scrolls sideways.
+    overflow-x: auto;
 
     // `size`: option-label font and the control width that goes with it.
     // Unset keeps the default rendering (the control's own size, body-default text).
@@ -70,7 +73,8 @@
     color: var(--ds-text);
     font: var(--_choice-grid-label-font, var(--body-default));
     background-color: var(--ds-surface-sunken);
-    white-space: nowrap;
+    // A long label takes more lines; the grid keeps to its well.
+    overflow-wrap: anywhere;
 }
 
 // Grid cells

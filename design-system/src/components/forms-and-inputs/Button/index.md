@@ -14,7 +14,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, WithCount, States, Default, Primary, Subtle, Warning, Danger, Link, DangerLink, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, LinkStates, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, WithCount, States, Default, Primary, Subtle, Warning, Danger, Link, DangerLink, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, LinkStates, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -81,6 +81,10 @@ Don't: A disabled submit button gives no direction and leaves the tab order.
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
 In Modal and Panel footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
+
+### Let a `Button` label longer than its room end in an ellipsis. {#let-a-button-label-longer-than-its-room-end-in-an-ellipsis}
+
+The button keeps its height, its icons stay at their ends and it never leaves its slot. Shorten the label rather than rely on the ellipsis: a clipped button label has no Tooltip, and the full label stays in the accessible name. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

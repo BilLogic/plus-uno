@@ -132,6 +132,13 @@
     @include surface-edge;
 }
 
+// The Frame owns the one page pad. A Page inside it keeps its surface and
+// stack but adds no pad of its own, so content sits 24 from the edge, not 48.
+.plus-frame__surface .plus-template-page {
+    padding: 0;
+    background-color: transparent;
+}
+
 // The Page's header row: 32 high on the Sidebar logo row's center line, so
 // it starts the Sidebar's pad from the top rather than the Page's. While the
 // Sidebar is closed, the toggle leads it, centered on the icon column (x 32),

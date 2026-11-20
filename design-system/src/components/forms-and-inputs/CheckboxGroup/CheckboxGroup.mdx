@@ -123,6 +123,14 @@ A checkbox group asks one question and offers a set of checkbox answers, any num
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={CheckboxGroupStories.Overflow} title="Wrap" description="A legend and options longer than their line take more lines; the group stays inside its well." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="CheckboxGroup" />
@@ -297,6 +305,10 @@ Pass `error` on `CheckboxGroup` so one message explains what to fix, rather than
     dontExample={<CheckboxGroup name="dont-cbg-error" legend="Which subjects can you tutor?" options={['Math', 'Reading']} isRequired isInvalid />}
     dontCaption="Invalid borders with no explanation."
 />
+
+### Let a `CheckboxGroup` legend and options longer than their line wrap.
+
+The group grows by lines and nothing in it is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

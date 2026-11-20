@@ -12,8 +12,11 @@
     align-items: center;
     vertical-align: middle;
     gap: 0;
+    // Buttons that do not fit shrink and end their labels in an ellipsis, so the row keeps to its well.
+    max-width: 100%;
 
     > .plus-btn {
+        min-width: 0;
         border-radius: var(--button-radius-default);
         position: relative;
 

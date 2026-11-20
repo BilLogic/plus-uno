@@ -67,13 +67,12 @@ export const FailureInSlot = () => (
 
 export const FailureInModal = () => (
     <Modal
-        inline
         show
         title="Couldn't load sessions"
         footer={(
             <FooterActions>
-                <Button text="Close" onClick={() => {}} />
-                <Button text="Try again" appearance="primary" onClick={() => {}} />
+                <Button text="Close" />
+                <Button text="Try again" appearance="primary" />
             </FooterActions>
         )}
     >

@@ -8,6 +8,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
 import { CheckboxGroup as CheckboxGroupComponent, Illustration } from '@/components';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 export default {
     title: 'Components/Forms and inputs/Checkbox/Checkbox',
     component: Checkbox,
@@ -556,4 +557,22 @@ TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
         await expect(art.top).toBeGreaterThanOrEqual(card.top);
         await expect(art.bottom).toBeLessThanOrEqual(card.bottom);
     }
+};
+
+/** Wrap: a label longer than its line takes more lines beside the box, which keeps its size and stays at the top. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '260px' /* demo frame */ }}>
+            <Checkbox id="cb-overflow" label={LONG_SENTENCE} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const box = within(canvasElement).getByRole('checkbox');
+        const row = canvasElement.querySelector('.plus-form-checkbox-row') || box.parentElement;
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(row, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+        await expect(row.getBoundingClientRect().height).toBeGreaterThan(box.getBoundingClientRect().height * 2);
+        await expect(box.getBoundingClientRect().width).toBe(box.getBoundingClientRect().height);
+    },
 };

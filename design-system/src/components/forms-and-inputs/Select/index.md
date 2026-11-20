@@ -10,11 +10,11 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Used in:** Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Read-only (`ds guide read-only`); +1 more
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`); +2 more
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen, RequiredBlocksSubmit
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen, RequiredBlocksSubmit, Overflow, OverflowNotSearchable
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -132,6 +132,10 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
 
 Do: Read-only keeps the value readable, and the caption says why.
 Don't: Disabled fades a value people need to read.
+
+### Let a single `Select` value longer than the field end in an ellipsis with a Tooltip. {#let-a-single-select-value-longer-than-the-field-end-in-an-ellipsis-with-a-tooltip}
+
+A Select you type in has no Tooltip, because focus reaches the value; one with `isSearchable={false}` opens the full text in a Tooltip while it is clipped and the list is closed. A multiple Select picks wrap, no wrap or truncate, shown above. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

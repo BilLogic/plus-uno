@@ -10,11 +10,11 @@ Also asked as: filter chip, filter control.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Label, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Label, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.mdx`
 
@@ -85,6 +85,10 @@ Don't: A verb phrase repeats what the button already does.
 
 `hasChevronDown` defaults to `true`. Set it `false` only for a filter that
 toggles directly on click, with nothing to open.
+
+### Let a `FilterButton` value longer than the button end in an ellipsis. {#let-a-filterbutton-value-longer-than-the-button-end-in-an-ellipsis}
+
+The name and the count keep their places, and the Tooltip is on only while the value is clipped. A filter button shows one value; a menu that picks several shows its choice as a count in `trailingMetric`. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

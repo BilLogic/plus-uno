@@ -6,6 +6,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { Illustration } from '@/components';
 import CheckboxGroup from '../CheckboxGroup';
 import RadioGroup from './RadioGroup';
+import { LONG_SENTENCE, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio group',
@@ -872,5 +873,27 @@ export const Disabled = {
         const radios = within(canvasElement).getAllByRole('radio');
         await expect(radios.every((r) => r.hasAttribute('data-disabled'))).toBe(true);
         await expect(getComputedStyle(radios[1]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+/** Wrap: a legend and options longer than their line take more lines; the group stays inside its well. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <RadioGroup
+                name="rg-overflow"
+                legend={LONG_SENTENCE}
+                options={[{ value: 'long', label: LONG_TOPIC }, { value: 'short', label: 'Fractions' }]}
+                value={null}
+                onChange={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const group = canvasElement.querySelector('fieldset');
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(group, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+        await expect(canvasElement).toHaveTextContent(LONG_TOPIC);
     },
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, ProgressBar, Skeleton, StatusTag } from '@/components';
+import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, ProgressBar, Range, Skeleton, StatusTag } from '@/components';
 import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
 import { Section } from '@/templates';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
@@ -225,18 +225,17 @@ export const LoadingTimeline = ({ kind = 'list', seconds = 2.5, reduced }) => {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                 <Button text={playing ? 'Pause' : 'Play'} iconBefore={playing ? 'pause' : 'play'} onClick={() => { if (time >= TIMELINE_MAX) setTime(0); setPlaying((p) => !p); }} />
-                <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', flex: '1 1 auto', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                    Time so far
-                    <input
-                        type="range"
+                <div style={{ flex: '1 1 auto' }}>
+                    <Range
+                        id="loading-time"
+                        label="Time so far"
                         min={0}
                         max={TIMELINE_MAX}
                         step={0.5}
                         value={time}
-                        onChange={(e) => { setPlaying(false); setTime(Number(e.target.value)); }}
-                        style={{ flex: '1 1 auto' }}
+                        onChange={(next) => { setPlaying(false); setTime(next); }}
                     />
-                </label>
+                </div>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)', fontVariantNumeric: 'tabular-nums' }}>{time.toFixed(1)} s</span>
                 <StatusTag appearance={band === 'over' ? 'warning' : 'neutral'}>{BAND_WORDS[band]}</StatusTag>
             </div>
@@ -255,7 +254,7 @@ export const LoadingRevealDemo = () => {
         <div aria-hidden="true" style={stack}>
             <Skeleton shape="text" width="40%" isShimmering={!reduced} />
             <SkeletonRows rows={4} reduced={reduced} />
-            <Skeleton width={140 /* token gap: 140px */} height="var(--control-lg)" radius="element-radius-sm" isShimmering={!reduced} />
+            <Skeleton width={140 /* docs-literal: a button-sized bar, px */} height="var(--control-lg)" radius="element-radius-sm" isShimmering={!reduced} />
         </div>
     );
     return (

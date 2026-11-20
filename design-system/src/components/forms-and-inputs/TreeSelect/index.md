@@ -6,9 +6,11 @@ TreeSelect: a field that picks from options that nest, at any level of the tree.
 
 **Import:** `import { TreeSelect } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, OpensWithAFade, MotionOpenClose, MotionReduced, MotionKeyboardOpen
+**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, OpensWithAFade, MotionOpenClose, MotionReduced, MotionKeyboardOpen, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
@@ -82,6 +84,10 @@ subtree is complete.
     ]}
 />
 ```
+
+### Let a `TreeSelect` value longer than the field end in an ellipsis. {#let-a-treeselect-value-longer-than-the-field-end-in-an-ellipsis}
+
+The full value opens in a Tooltip on hover and focus, only while it is clipped. The field keeps its height and the arrow keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Breadcrumb, Button, StaticTable } from '@/components';
-import { Frame, Section } from '@/templates';
+import { Button, PageHeader, StaticTable } from '@/components';
+import { Frame, Page } from '@/templates';
 
 const ROWS = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -8,19 +8,21 @@ const ROWS = [
 ];
 
 /**
- * ListPage: the registry's starter page. A Frame with a breadcrumb, and one
- * Section whose header carries the title and the action over a table. Copy it,
- * then replace the rows and the sidebar with the product's own.
+ * ListPage: the registry's starter page. A Frame holding a Page whose
+ * PageHeader is the h1, with the area's one action beside the title, over a
+ * table. An area page has no breadcrumb; that trail appears only after drilling
+ * into a record. Copy it, then replace the rows and the sidebar with the
+ * product's own.
  */
 const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
-    <Frame sidebar={sidebar} header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: title }]} />}>
-        <Section level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
+    <Frame sidebar={sidebar}>
+        <Page header={<PageHeader title={title} actions={<Button text="Add member" appearance="primary" onClick={onAdd} />} />}>
             <StaticTable
                 headers={['Name', 'Role', 'Status']}
                 rows={rows.map((row) => [row.name, row.role, row.status])}
                 titleColumn={0}
             />
-        </Section>
+        </Page>
     </Frame>
 );
 

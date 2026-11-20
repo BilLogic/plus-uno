@@ -121,6 +121,16 @@ type. A short list, such as a filter menu's, turns typing off with
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={SelectStories.Overflow} title="Single value: typed" description="A value longer than the field keeps one line and ends in an ellipsis. A Select you type in has no Tooltip: focus reaches the whole value." />
+
+<ComponentExample of={SelectStories.OverflowNotSearchable} title="Single value: picked only" description="With isSearchable false the full text opens in a Tooltip on hover and focus, only while it is clipped." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="Select" />
@@ -329,6 +339,10 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
     dontExample={<FigureStack width="medium"><Select label="Session length" options={lengths} defaultValue="45" isDisabled caption="Set by your supervisor." /></FigureStack>}
     dontCaption="Disabled fades a value people need to read."
 />
+
+### Let a single `Select` value longer than the field end in an ellipsis with a Tooltip.
+
+A Select you type in has no Tooltip, because focus reaches the value; one with `isSearchable={false}` opens the full text in a Tooltip while it is clipped and the list is closed. A multiple Select picks wrap, no wrap or truncate, shown above. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

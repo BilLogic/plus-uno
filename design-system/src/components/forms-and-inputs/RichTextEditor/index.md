@@ -6,9 +6,11 @@ RichTextEditor: a text field with a formatting toolbar, for where the formatting
 
 **Import:** `import { RichTextEditor } from '@/components';`
 
+**Governed by:** Overflow (`ds guide overflow`)
+
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive, BlockStyleMenu, Empty, Filled, BoxRadius, Focused, ReadOnly, DisabledState, Compact, FullToolbar, ToolbarButtonHovered, ToolbarButtonPressed
+**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive, BlockStyleMenu, Empty, Filled, BoxRadius, Focused, ReadOnly, DisabledState, Compact, FullToolbar, ToolbarButtonHovered, ToolbarButtonPressed, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx`
 
@@ -72,6 +74,10 @@ Pressing those buttons opens the platform `prompt()` dialog for a URL. It is uns
 
 Do: A label names the editor on screen and for assistive technology.
 Don't: No label, only a placeholder, which disappears as soon as someone types.
+
+### Let a `RichTextEditor` note longer than its area grow the area by whole lines. {#let-a-richtexteditor-note-longer-than-its-area-grow-the-area-by-whole-lines}
+
+The editor keeps its width, and the toolbar wraps instead of scrolling sideways. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

@@ -50,7 +50,7 @@ describe('Navigation live cases and links', () => {
         );
         expect(container.querySelector('[inert]')).toBeNull();
         const navs = screen.getAllByRole('navigation');
-        expect(navs.map((nav) => nav.getAttribute('aria-label'))).toEqual(['Open items — do', "Open items — don't"]);
+        expect(navs.map((nav) => nav.getAttribute('aria-label'))).toEqual(['Main', 'Main']);
 
         const item = screen.getByRole('button', { name: '4:00 PM · Ms. Ortiz' });
         await user.click(item);

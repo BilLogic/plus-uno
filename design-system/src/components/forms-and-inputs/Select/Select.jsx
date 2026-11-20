@@ -12,6 +12,7 @@ import useFieldId from '../useFieldId';
 import { Button } from '../Button/Button';
 import { IconButton } from '../IconButton/IconButton';
 import Icon from '../../images-and-icons/Icon';
+import ClippedTooltip from '@/lib/ClippedTooltip';
 import './Select.scss';
 
 export { SEARCH_FIRST_ABOVE };
@@ -316,30 +317,39 @@ const Select = ({
         onKeyDown: handleKeyDown,
     };
 
-    let control;
-    if (typeable) {
-        const typed = query !== null;
-        control = (
-            <input
-                {...comboProps}
-                type="text"
-                className="plus-field__control plus-select-input"
-                autoComplete="off"
-                aria-autocomplete="list"
-                disabled={disabled}
-                aria-disabled={disabled || undefined}
-                readOnly={isReadOnly}
-                value={multi ? filter : (typed ? query : singleText)}
-                placeholder={multi ? (hasValue ? '' : placeholder) : (singleText || placeholder)}
-                onChange={(event) => {
-                    setQuery(event.target.value);
-                    openList();
-                }}
-                onClick={(event) => { if (!typed && !multi) event.currentTarget.select(); }}
-            />
-        );
-    } else {
-        control = (
+    // A single value wider than the field ends in an ellipsis. A field that is
+    // typed in has no Tooltip: focus reaches the value. One that is only picked
+    // from (`isSearchable={false}`) opens the full text in a Tooltip on hover and
+    // focus, only while it is clipped and only while the list is closed (the open
+    // list shows the same value in its row).
+    const buildControl = (measureRef) => {
+        if (typeable) {
+            const typed = query !== null;
+            return (
+                <input
+                    {...comboProps}
+                    ref={(node) => {
+                        controlRef.current = node;
+                        if (measureRef) measureRef.current = node;
+                    }}
+                    type="text"
+                    className="plus-field__control plus-select-input"
+                    autoComplete="off"
+                    aria-autocomplete="list"
+                    disabled={disabled}
+                    aria-disabled={disabled || undefined}
+                    readOnly={isReadOnly}
+                    value={multi ? filter : (typed ? query : singleText)}
+                    placeholder={multi ? (hasValue ? '' : placeholder) : (singleText || placeholder)}
+                    onChange={(event) => {
+                        setQuery(event.target.value);
+                        openList();
+                    }}
+                    onClick={(event) => { if (!typed && !multi) event.currentTarget.select(); }}
+                />
+            );
+        }
+        return (
             <div
                 {...comboProps}
                 className="plus-select-combobox"
@@ -347,7 +357,7 @@ const Select = ({
                 aria-disabled={disabled || undefined}
             >
                 {!multi || displayMode === 'text' ? (
-                    <span className={`plus-select-text${hasValue ? '' : ' plus-select-placeholder'}`}>
+                    <span ref={measureRef} className={`plus-select-text${hasValue ? '' : ' plus-select-placeholder'}`}>
                         {hasValue ? (multi ? current.map(textFor).join(', ') : singleText) : placeholder}
                     </span>
                 ) : (
@@ -355,7 +365,14 @@ const Select = ({
                 )}
             </div>
         );
-    }
+    };
+
+    // The wrapper stays for every single Select that is not typed in, so picking a value never remounts the control.
+    const control = !multi && !typeable ? (
+        <ClippedTooltip text={shown || isReadOnly || disabled ? '' : singleText} placement="top" deps={[singleText, shown]}>
+            {({ measureRef }) => buildControl(measureRef)}
+        </ClippedTooltip>
+    ) : buildControl(null);
 
     const tags = multi && hasValue ? (
         <SelectTags

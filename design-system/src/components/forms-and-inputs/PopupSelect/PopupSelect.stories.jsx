@@ -5,6 +5,7 @@ import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FilterButton } from '../FilterButton/FilterButton';
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import PopupSelect, { POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from './PopupSelect';
+import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../_internal/overflowPlays';
 
 const STATUSES = ['Upcoming', 'Completed', 'Canceled'];
 
@@ -266,4 +267,21 @@ export const Interactive = {
         return <Demo />;
     },
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.popupSelect } } },
+};
+
+/** Truncate: a chosen value longer than the trigger ends in an ellipsis, and the full text opens in a Tooltip while the trigger is focused. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '220px' /* demo frame */ }}>
+            <PopupSelect label="School" options={[LONG_SCHOOL, 'Lincoln Middle']} defaultValue={LONG_SCHOOL} isSearchable={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const trigger = within(canvasElement).getByRole('button');
+        const clipped = await expectNoSilentClip(canvasElement);
+        await expect(clipped.length, 'the long value is clipped, so the rule is exercised').toBeGreaterThan(0);
+        await expectInsideWell(trigger, canvasElement.firstElementChild);
+        await expect(trigger).toHaveTextContent(LONG_SCHOOL);
+        await expectFullTextReachable(canvasElement, trigger, LONG_SCHOOL);
+    },
 };

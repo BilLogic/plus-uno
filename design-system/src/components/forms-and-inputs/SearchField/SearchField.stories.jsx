@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import SearchField, { SearchFieldAction } from './SearchField';
 import { Button } from '@/components';
+import { LONG_TUTOR, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectReachableByFocus } from '../_internal/overflowPlays';
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' };
 const SCOPES = [
     { value: 'students', label: 'Students', count: 42 },
@@ -384,4 +385,23 @@ export const FocusedKeyboard = {
 
 export const Interactive = {
     render: (args) => <SearchField {...args} />,
+};
+
+/** Truncate: a query longer than the field stays on one line; the clear action keeps its place at the end. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '280px' /* demo frame */ }}>
+            <SearchField placeholder="Search tutors" defaultValue={LONG_TUTOR} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const input = within(canvasElement).getByRole('searchbox');
+        const box = input.closest('.plus-field') || input.parentElement;
+        await expect(input.scrollWidth).toBeGreaterThan(input.clientWidth);
+        await expectNoSilentClip(box);
+        await expectInsideWell(box, canvasElement.firstElementChild);
+        const clear = within(box).getByRole('button');
+        await expectTrailingKept(box, clear);
+        await expectReachableByFocus(canvasElement, input, LONG_TUTOR);
+    },
 };

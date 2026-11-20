@@ -66,7 +66,7 @@ Don't: Two tables share one Section and one header; search and filters no longer
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
 Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected.
-Don't: A roster people act on as a Static table; with no sort, selection or paging, 340 students become one long scroll.
+Don't: A roster people act on as a Static table; with no sort, selection or paging, a roster of 340 becomes one long scroll.
 
 ### Use a Tree table for a hierarchy. {#use-a-tree-table-for-a-hierarchy}
 

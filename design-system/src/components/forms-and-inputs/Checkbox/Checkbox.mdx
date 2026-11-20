@@ -99,6 +99,14 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={CheckboxStories.Overflow} title="Wrap" description="A label longer than its line takes more lines beside the box, which keeps its size." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Motion
 
 <MotionSection component="Checkbox" />
@@ -280,6 +288,10 @@ A short label sits level with the box. A long one wraps and pushes the box away 
 ### Treat `isIndeterminate` as display only.
 
 The underlying value is still checked or unchecked. Clicking a mixed box resolves it like any other, so it cannot be used as a third stored value.
+
+### Let a `Checkbox` label longer than its line wrap.
+
+The box keeps its size at the top of the row, and the label is never clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 </div>
 

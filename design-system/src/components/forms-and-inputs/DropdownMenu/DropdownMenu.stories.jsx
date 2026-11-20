@@ -16,6 +16,7 @@ import {
     VerbCaseDo,
     VerbCaseDont,
 } from '@/storybook-docs/lib/dropdown-menu-cases';
+import { LONG_SCHOOL, expectNoSilentClip, expectFullTextReachable } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Dropdown menu',
@@ -478,5 +479,35 @@ export const BestPracticesLive = {
             await userEvent.click(within(dontCard).getByRole('button', { name: 'Session actions' }));
             await waitFor(() => expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toHaveFocus());
         }
+    },
+};
+
+/** Truncate: an item longer than the menu keeps one line and ends in an ellipsis; its full text opens in a Tooltip on focus, and the short items stay as they were. */
+export const Overflow = {
+    render: () => (
+        <div style={{ padding: `${DEMO_SIZE.top} var(--inline-2xl) 160px` /* demo frame */ }}>
+            <DropdownMenu trigger={<Button text="Move to site" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+                <ButtonItem onClick={() => {}}>{LONG_SCHOOL}</ButtonItem>
+                <ButtonItem onClick={() => {}}>Lincoln Middle</ButtonItem>
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Move to site' }));
+        const menu = await waitFor(() => {
+            const el = doc.querySelector('[role="menu"]');
+            if (!el) throw new Error('the menu has not opened');
+            return el;
+        });
+        const long = within(menu).getByRole('menuitem', { name: LONG_SCHOOL });
+        const label = long.querySelector('.plus-menu-item-label');
+        await waitFor(() => expect(label.scrollWidth).toBeGreaterThan(label.clientWidth));
+        await expectNoSilentClip(menu);
+        await expect(menu.scrollWidth).toBeLessThanOrEqual(menu.clientWidth + 1);
+        await expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(doc.documentElement.clientWidth);
+        await expect(Math.round(long.getBoundingClientRect().height)).toBe(Math.round(within(menu).getByRole('menuitem', { name: 'Lincoln Middle' }).getBoundingClientRect().height));
+        await expectFullTextReachable(canvasElement, long, LONG_SCHOOL);
+        await userEvent.keyboard('{Escape}');
     },
 };

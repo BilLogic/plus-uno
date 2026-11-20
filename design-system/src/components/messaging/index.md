@@ -48,7 +48,7 @@ authored half, counted rather than assumed.
 | [Dialog](Dialog/index.md) | 24 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 21 | ✅ | ✅ | ✅ |
-| [InlineMessage](InlineMessage/index.md) | 9 | ✅ | ✅ | ✅ |
+| [InlineMessage](InlineMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [NotificationItem](NotificationItem/index.md) | 13 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Spotlight](Spotlight/index.md) | 12 | ✅ | ✅ | ✅ |

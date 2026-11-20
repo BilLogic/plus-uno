@@ -8,11 +8,11 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Used in:** Page (`ds guide page`); Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`)
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.stories.jsx` — Overview, OpensWithAFade, Keyboard, Placement, Searchable, Spacing, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.stories.jsx` — Overview, OpensWithAFade, Keyboard, Placement, Searchable, Spacing, Interactive, Overflow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.mdx`
 
@@ -57,6 +57,10 @@ The built-in labeled trigger shows the value automatically; with a custom `Filte
 ### Keep it to one list. {#keep-it-to-one-list}
 
 Two lists, or picks that wait for an Apply, are a different menu.
+
+### Let a `PopupSelect` value longer than its trigger end in an ellipsis. {#let-a-popupselect-value-longer-than-its-trigger-end-in-an-ellipsis}
+
+The Tooltip is on only while the value is clipped; the chevron keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 

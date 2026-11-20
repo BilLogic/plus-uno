@@ -8,7 +8,7 @@ import './Page.scss';
  * Page template for PLUS design system.
  * The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24)
  * on every side and no radius, border, or shadow; children fill the content
- * slot.
+ * slot. Inside a Frame the Frame owns the pad and the Page adds none.
  *
  * A Page can carry its `title`: the page's one h1, at Heading/large 24,
  * above the content. Sections inside it open at h2.

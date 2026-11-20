@@ -8,6 +8,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import { Illustration } from '@/components';
 import Radio from './Radio';
+import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../_internal/overflowPlays';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio',
@@ -523,4 +524,22 @@ TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
         await expect(art.top).toBeGreaterThanOrEqual(card.top);
         await expect(art.bottom).toBeLessThanOrEqual(card.bottom);
     }
+};
+
+/** Wrap: a label longer than its line takes more lines beside the circle, which keeps its size. */
+export const Overflow = {
+    render: () => (
+        <div style={{ width: '260px' /* demo frame */ }}>
+            <Radio id="radio-overflow" name="radio-overflow" label={LONG_SENTENCE} value="a" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const radio = within(canvasElement).getByRole('radio');
+        const row = canvasElement.querySelector('.plus-form-radio-row') || radio.parentElement;
+        await expectNoSilentClip(canvasElement);
+        await expectInsideWell(row, canvasElement.firstElementChild);
+        await expect(canvasElement).toHaveTextContent(LONG_SENTENCE);
+        await expect(row.getBoundingClientRect().height).toBeGreaterThan(radio.getBoundingClientRect().height * 2);
+        await expect(radio.getBoundingClientRect().width).toBe(radio.getBoundingClientRect().height);
+    },
 };
