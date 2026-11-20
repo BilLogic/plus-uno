@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { InlineMessage } from '@/components';
+import { Icon, IconButton, InlineMessage, Popup } from '@/components';
+import { messageIcon } from '@/components/messaging/messageAppearance';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
 export const fieldRow = {
@@ -13,9 +14,12 @@ export const fieldRow = {
  * Shared live InlineMessage demo for the Best practices DoDontPair blocks on
  * `InlineMessage.mdx` and the `BestPracticesLive` story in `InlineMessage.stories.jsx`.
  *
- * Open-at-rest pairs pass `defaultOpen` and stay open when another card is
- * clicked; interacting inside a card (clicking its trigger or pressing Escape)
- * closes and reopens that card's popup normally.
+ * It is an InlineMessage's trigger and card built on Popup directly, because
+ * the demo needs Popup's `onToggle(next, details)`: an open-at-rest card
+ * (`defaultOpen`) ignores an outside press, so pressing another example does
+ * not close it, but only until the person first changes it. After a press on
+ * its trigger or Escape it is an ordinary popup that an outside press closes.
+ * Nothing here reopens a card: the open state is the only thing that does.
  */
 export const LiveInlineMessage = ({
     field = 'Session length',
@@ -26,14 +30,14 @@ export const LiveInlineMessage = ({
     children,
 }) => {
     const [open, setOpen] = useState(defaultOpen);
+    const [atRest, setAtRest] = useState(defaultOpen);
 
-    // An open-at-rest card stays open when another card is pressed. Every
-    // other change, a press on its own trigger or Escape, is Base UI's own.
-    const handleOpenChange = (next, details) => {
-        if (!next && defaultOpen && details?.reason === 'outside-press') {
+    const handleToggle = (next, details) => {
+        if (!next && atRest && details?.reason === 'outside-press') {
             details.cancel?.();
             return;
         }
+        setAtRest(false);
         setOpen(next);
     };
 
@@ -41,16 +45,28 @@ export const LiveInlineMessage = ({
         <DocsOverlayBoundary fit={false} containHeight>
             <div style={fieldRow}>
                 <span>{field}</span>
-                <InlineMessage
-                    appearance={appearance}
-                    isOpen={open}
-                    onOpenChange={handleOpenChange}
+                <Popup
+                    trigger={(
+                        <IconButton
+                            icon={<Icon name={messageIcon(appearance)} style={{ color: `var(--ds-icon-${appearance === 'info' ? 'information' : appearance})` }} />}
+                            label={label}
+                            appearance="subtle"
+                            spacing="compact"
+                            className="plus-inline-message-trigger"
+                        />
+                    )}
                     placement="bottom"
-                    label={label}
-                    title={title}
+                    show={open}
+                    onToggle={handleToggle}
+                    className="plus-inline-message"
                 >
-                    {children}
-                </InlineMessage>
+                    <div className="plus-inline-message-content">
+                        <div className="plus-inline-message-heading">
+                            <strong className="plus-inline-message-title">{title}</strong>
+                        </div>
+                        {children}
+                    </div>
+                </Popup>
             </div>
         </DocsOverlayBoundary>
     );

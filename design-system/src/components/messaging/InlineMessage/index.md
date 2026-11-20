@@ -142,7 +142,7 @@ The popup surface is Popup's; see `Popup`.
 | `placement` | enum | `'bottom-start'` | Where the popup opens relative to the trigger. |
 | `defaultOpen` | bool | `false` | Whether the message popup starts open. |
 | `isOpen` | bool | — | Controls whether the popup is open. Pair with `onOpenChange`. |
-| `onOpenChange` | func | — | Called with the next open state and Base UI's change details (`reason`, `event`, `cancel()`). |
+| `onOpenChange` | func | — | Called with the next open state, `onOpenChange(isOpen)`, when a press, Escape or an outside press changes it. |
 | `children` | node | — | The popup's body content. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

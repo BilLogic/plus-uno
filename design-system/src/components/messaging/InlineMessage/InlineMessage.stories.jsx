@@ -181,31 +181,34 @@ export const Focused = {
     },
 };
 
+/** The three live Best practices pairs, as the docs page shows them. */
+const BestPracticesPairs = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
+        <DoDontPair
+            doExample={<TintMeaningDo />}
+            doCaption="Info for a neutral note."
+            dontExample={<TintMeaningDont />}
+            dontCaption="Danger for a neutral note."
+        />
+        <DoDontPair
+            doExample={<ShortLineDo />}
+            doCaption="One short sentence."
+            dontExample={<ShortLineDont />}
+            dontCaption="A paragraph beside a field."
+        />
+        <DoDontPair
+            doExample={<OnePerFieldDo />}
+            doCaption="A single message."
+            dontExample={<OnePerFieldDont />}
+            dontCaption="An info note and a warning together."
+        />
+    </div>
+);
+
 /** Live DoDontPair inline messages stay bounded in their wells, have no inert wrappers, do not steal focus or scroll on load, and open, navigate by keyboard, and dismiss across every pair. */
 export const BestPracticesLive = {
     parameters: { docs: { disable: true } },
-    render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
-            <DoDontPair
-                doExample={<TintMeaningDo />}
-                doCaption="Info for a neutral note."
-                dontExample={<TintMeaningDont />}
-                dontCaption="Danger for a neutral note."
-            />
-            <DoDontPair
-                doExample={<ShortLineDo />}
-                doCaption="One short sentence."
-                dontExample={<ShortLineDont />}
-                dontCaption="A paragraph beside a field."
-            />
-            <DoDontPair
-                doExample={<OnePerFieldDo />}
-                doCaption="A single message."
-                dontExample={<OnePerFieldDont />}
-                dontCaption="An info note and a warning together."
-            />
-        </div>
-    ),
+    render: () => <BestPracticesPairs />,
     play: async ({ canvasElement }) => {
         const doc = canvasElement.ownerDocument;
         const win = doc.defaultView;
@@ -284,52 +287,69 @@ export const BestPracticesLive = {
 
 /**
  * Closing a live card never reopens it in the same gesture, and the trigger's
- * `aria-expanded` always matches whether the card is open. The check waits for
- * the closing popup to leave the page and then holds the card shut for longer
- * than the exit fade, so a card that comes back after the fade fails here
+ * `aria-expanded` always matches whether the card is open. After a close the
+ * check waits for the popup to leave and its animations to finish, then for a
+ * few more frames, so a card that comes back after the fade fails here
  * however loaded the run is.
  */
 export const ClosingNeverReopens = {
     parameters: { docs: { disable: true } },
-    render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
-            <DoDontPair doExample={<TintMeaningDo />} doCaption="Info for a neutral note." dontExample={<TintMeaningDont />} dontCaption="Danger for a neutral note." />
-            <DoDontPair doExample={<OnePerFieldDo />} doCaption="A single message." dontExample={<OnePerFieldDont />} dontCaption="An info note and a warning together." />
-        </div>
-    ),
+    render: () => <BestPracticesPairs />,
     play: async ({ canvasElement }) => {
-        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
-        const popupOf = (card) => card.querySelector('.plus-popup');
-        const settle = () => new Promise((resolve) => { setTimeout(resolve, 600); });
-        const expectClosedAndStaysClosed = async (card, trigger) => {
-            await waitFor(() => expect(popupOf(card)).toBeNull());
-            await settle();
-            await expect(popupOf(card)).toBeNull();
+        const doc = canvasElement.ownerDocument;
+        const win = doc.defaultView;
+        const card = (caption) => within(canvasElement).getAllByRole('figure').find((figure) => within(figure).queryByText(caption));
+        const popupOf = (figure) => figure.querySelector('.plus-popup');
+        const nextFrames = (count) => new Promise((resolve) => {
+            const step = (left) => (left ? win.requestAnimationFrame(() => step(left - 1)) : resolve());
+            step(count);
+        });
+        const expectClosedAndStaysClosed = async (figure, trigger) => {
+            await waitFor(() => expect(popupOf(figure)).toBeNull());
+            await Promise.all(doc.getAnimations().map((animation) => animation.finished.catch(() => {})));
+            await nextFrames(6);
+            await expect(popupOf(figure)).toBeNull();
             await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         };
-        const expectOpen = async (card, trigger) => {
-            await waitFor(() => expect(popupOf(card)).not.toBeNull());
+        const expectOpen = async (figure, trigger) => {
+            await waitFor(() => expect(popupOf(figure)).not.toBeNull());
             await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
         };
 
-        // An open-at-rest card: a press on its trigger closes it for good, then opens and closes again.
-        const live = within(cards[0]).getByRole('button', { name: 'About this setting' });
-        await expectOpen(cards[0], live);
-        await userEvent.click(live);
-        await expectClosedAndStaysClosed(cards[0], live);
-        await userEvent.click(live);
-        await expectOpen(cards[0], live);
-        await userEvent.click(live);
-        await expectClosedAndStaysClosed(cards[0], live);
+        const atRest = card('Info for a neutral note.');
+        const sibling = card('Danger for a neutral note.');
+        const byPress = card('A single message.');
+        const rest = within(atRest).getByRole('button', { name: 'About this setting' });
+        const pressed = within(byPress).getByRole('button', { name: 'About session length' });
 
-        // An outside press closes a card opened by a press and it stays closed; the open-at-rest card beside it is unaffected.
-        await userEvent.click(live);
-        await expectOpen(cards[0], live);
-        await userEvent.click(within(cards[2]).getByRole('button', { name: 'About session length' }));
-        await expectOpen(cards[2], within(cards[2]).getByRole('button', { name: 'About session length' }));
-        await userEvent.click(canvasElement.ownerDocument.body);
-        const plain = within(cards[2]).getByRole('button', { name: 'About session length' });
-        await expectClosedAndStaysClosed(cards[2], plain);
-        await expect(within(cards[1]).getByText('Heads up')).toBeVisible();
+        // An open-at-rest card: a press on its trigger closes it for good, then it opens and closes again.
+        await expectOpen(atRest, rest);
+        await userEvent.click(rest);
+        await expectClosedAndStaysClosed(atRest, rest);
+        await userEvent.click(rest);
+        await expectOpen(atRest, rest);
+        await userEvent.click(rest);
+        await expectClosedAndStaysClosed(atRest, rest);
+
+        // A card the person opened is an ordinary popup: an outside press closes it and it stays closed.
+        await userEvent.click(pressed);
+        await expectOpen(byPress, pressed);
+        await userEvent.click(doc.body);
+        await expectClosedAndStaysClosed(byPress, pressed);
+
+        // A card still in its open-at-rest state ignores an outside press: it stays open, and aria-expanded says so.
+        const restSibling = within(sibling).getByRole('button', { name: 'About this setting' });
+        await expectOpen(sibling, restSibling);
+        await userEvent.click(doc.body);
+        await nextFrames(6);
+        await expectOpen(sibling, restSibling);
+
+        // Once the person has changed it, the same card closes on an outside press like any popup.
+        await userEvent.click(restSibling);
+        await expectClosedAndStaysClosed(sibling, restSibling);
+        await userEvent.click(restSibling);
+        await expectOpen(sibling, restSibling);
+        await userEvent.click(doc.body);
+        await expectClosedAndStaysClosed(sibling, restSibling);
     },
 };
