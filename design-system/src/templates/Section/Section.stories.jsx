@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
-    DynamicTable,
     EmptyState,
     SearchField,
-    StatusTag,
     TextField,
     Toggle,
 } from '@/components';
@@ -15,14 +13,6 @@ import {
     Card,
     Section,
     SECTION_DETAIL_FLOOR,
-    PanelBody,
-    PanelCloseAction,
-    PanelContainer,
-    PanelDownAction,
-    PanelFooter,
-    PanelHeader,
-    PanelSubheader,
-    PanelUpAction,
 } from '@/templates';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
@@ -30,12 +20,14 @@ import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS 
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { InAppFrame, slotContent } from '@/storybook-docs/lib/template-demo.jsx';
-import { FilterSide, FormatSwitch, STUDENTS, StudentsTable, ViewPills, filterStudentList } from '@/storybook-docs/lib/view-bar.jsx';
-import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
+import { slotContent } from '@/storybook-docs/lib/template-demo.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { STORY_CODE } from './SectionCases.jsx';
+import * as Example from './SectionExamples.jsx';
+
+const codeOf = (name) => ({ docs: { source: { code: STORY_CODE[name] } } });
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad)' };
 
@@ -247,19 +239,10 @@ export const Footer = () => (
 );
 
 /** Every part of a section: header with actions and views, content, side and footer. */
-export const Anatomy = () => (
-    <Section
-        title="Upcoming sessions"
-        description={description}
-        actions={<Actions />}
-        views={<ViewPills views={['All students', 'Active', 'Paused']} />}
-        layout="split"
-        side={slotContent('Side · span 4')}
-        footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
-    >
-        {slotContent('Content · span 8')}
-    </Section>
-);
+export const Anatomy = {
+    render: () => <Example.SectionAnatomy />,
+    parameters: codeOf('SectionAnatomy'),
+};
 
 /** Level comes from nesting: a page title, a section inside it, a subsection inside that. */
 export const Levels = () => (
@@ -272,51 +255,15 @@ export const Levels = () => (
     </Section>
 );
 
-const SEARCH_STUDENTS = [
-    { name: 'Maya Chen', active: true },
-    { name: 'Marcus Lee', active: false },
-    { name: 'Ana Ruiz', active: true },
-    { name: 'Jordan Park', active: true },
-    { name: 'Priya Shah', active: false },
-    { name: 'Sam Okafor', active: true },
-];
-
 /**
  * The header's Search: the icon grows left into the field. Esc clears, a
  * second Esc closes; it stays open while it holds text. The count is a polite
  * live region, and Clear all clears the search with the filters.
  */
-const SearchableStudents = () => {
-    const [query, setQuery] = useState('');
-    const [activeOnly, setActiveOnly] = useState(false);
-    const rows = SEARCH_STUDENTS.filter((student) => (!activeOnly || student.active)
-        && student.name.toLowerCase().includes(query.trim().toLowerCase()));
-    const narrowed = query !== '' || activeOnly;
-    const reset = () => {
-        setQuery('');
-        setActiveOnly(false);
-    };
-    return (
-        <Section
-            title="Students"
-            actions={<SectionActions primary="Add student" more={false} />}
-            search={<SearchField mode="active" isCollapsible spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
-            filters={[{ key: 'status', label: 'Status', text: activeOnly ? 'Active' : 'All', isSelected: activeOnly, onClick: () => setActiveOnly((on) => !on) }]}
-            onClearAll={reset}
-        >
-            <p role="status" style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
-                {narrowed ? `${rows.length} of ${SEARCH_STUDENTS.length} students` : `${SEARCH_STUDENTS.length} students`}
-            </p>
-            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad)', font: 'var(--body-default)' }}>
-                {rows.map((student) => <li key={student.name}>{student.name}</li>)}
-            </ul>
-        </Section>
-    );
-};
-
 export const SearchInHeader = {
     name: 'Search',
-    render: () => <SearchableStudents />,
+    render: () => <Example.SearchableStudents />,
+    parameters: codeOf('SearchableStudents'),
     play: async ({ canvasElement, step }) => {
         const canvas = within(canvasElement);
         const icon = () => canvas.getByRole('button', { name: 'Search students' });
@@ -386,26 +333,14 @@ export const LoadingDefault = {
 
 export const LoadingSearchAndFilters = {
     name: 'Loading, search and filters',
-    render: () => (
-        <Section
-            title="Students"
-            description={description}
-            search={<HeaderSearch />}
-            filters={[{ key: 'status', label: 'Status', text: 'All' }]}
-            isLoading
-        >
-            {slotContent('Table')}
-        </Section>
-    ),
+    render: () => <Example.LoadingSearchAndFilters />,
+    parameters: codeOf('LoadingSearchAndFilters'),
 };
 
 export const LoadingViews = {
     name: 'Loading, views',
-    render: () => (
-        <Section title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} isLoading>
-            {slotContent('Content slot')}
-        </Section>
-    ),
+    render: () => <Example.LoadingViews />,
+    parameters: codeOf('LoadingViews'),
 };
 
 export const Interactive = {
@@ -497,11 +432,7 @@ export const SplitLayout = {
 
 /** Header to body is Section/stack-md; the header rows sit Section/stack-sm under the title row. */
 export const Spacing = {
-    render: () => (
-        <Section title="Students" description={description} views={<ViewPills views={['All students', 'Active', 'Paused']} />}>
-            {slotContent('Content slot')}
-        </Section>
-    ),
+    render: () => <Example.ViewsSpacing />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         const q = (s) => canvasElement.querySelector(s).getBoundingClientRect();
@@ -528,30 +459,12 @@ const atViewport = (width, run) => withTestViewport(width, DETAIL_HEIGHT, run);
 
 /** A Section with an inline detail expand that opens in place and pushes the content below it down. */
 export const Detail = {
-    render: (args) => (
+    render: () => (
         <div style={{ inlineSize: STAGE }}>
-            <Section
-                title="Reflections"
-                description="Week of Oct 20"
-                views={<ViewPills views={['All reflections', 'Needs follow-up']} />}
-                detailTitle="Ava Thompson"
-                detailDescription="Grade 7"
-                detail={(
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <StatusTag appearance="warning">Needs follow-up</StatusTag>
-                        <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                            The reflection names two goals for next week and asks for extra fraction practice.
-                        </p>
-                    </div>
-                )}
-                detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
-                footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
-                {...args}
-            >
-                <StudentsTable count={4} />
-            </Section>
+            <Example.DetailExpand />
         </div>
     ),
+    parameters: codeOf('DetailExpand'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const trigger = canvas.getByRole('button', { name: /Ava Thompson/ });
@@ -633,23 +546,10 @@ const STUDENT_FACTS = [['School', 'Lincoln Middle School'], ['Grade', 'Grade 7']
 
 /* ---- types */
 
-/** List: the views alone, one table, paging. */
-const TypeListDemo = () => {
-    const [view, setView] = useState('All students');
-    return (
-        <Section
-            title="Students"
-            actions={<SectionActions />}
-            views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
-        >
-            <StudentsTable count={6} rowsPerPage={4} sortable view={view} />
-        </Section>
-    );
-};
-
 export const TypeList = {
     name: 'Type: List',
-    render: () => <TypeListDemo />,
+    render: () => <Example.ListType />,
+    parameters: codeOf('ListType'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
@@ -675,99 +575,9 @@ export const TypeList = {
 /** Queue: a queue page docks the Panel beside the list, and the record opens on demand. */
 export const TypeQueue = {
     name: 'Type: Queue',
-    parameters: { layout: 'fullscreen' },
+    parameters: { layout: 'fullscreen', ...codeOf('ReflectionQueue') },
     beforeEach: resetPanel,
-    render: () => {
-        const queueRows = STUDENTS.slice(0, 4);
-        const [index, setIndex] = useState(0);
-        const [open, setOpen] = useState(true);
-        const [name, grade, lastSession, , , tutor] = queueRows[index];
-        const selectRow = (i) => {
-            setIndex(i);
-            setOpen(true);
-        };
-        const panel = (
-            <PanelContainer>
-                <div>
-                    <PanelHeader
-                        title={name}
-                        actions={(
-                            <>
-                                <PanelUpAction
-                                    disabled={index === 0}
-                                    onClick={() => setIndex((i) => Math.max(0, i - 1))}
-                                />
-                                <PanelDownAction
-                                    disabled={index === queueRows.length - 1}
-                                    onClick={() => setIndex((i) => Math.min(queueRows.length - 1, i + 1))}
-                                />
-                                <PanelCloseAction onClick={() => setOpen(false)} />
-                            </>
-                        )}
-                    />
-                    <PanelSubheader>
-                        <StatusTag appearance="warning">To review</StatusTag>
-                    </PanelSubheader>
-                </div>
-                <PanelBody>
-                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                        {grade} · Tutor: {tutor} · {lastSession}. The reflection names two goals for next week.
-                    </p>
-                </PanelBody>
-                <PanelFooter>
-                    <Button text="Open full review" appearance="subtle" onClick={() => {}} />
-                </PanelFooter>
-            </PanelContainer>
-        );
-        return (
-            <InAppFrame
-                panel={panel}
-                panelLabel="Reflection"
-                panelOpen={open}
-                onPanelOpenChange={setOpen}
-                panelStorageKey={null}
-            >
-                <Section
-                    title="Reflections to review"
-                    views={<ViewPills views={['To review']} />}
-                >
-                    <DynamicTable
-                        label="Reflections to review"
-                        isFixedSize
-                        highlightedRowIndex={open ? index : undefined}
-                        head={{
-                            cells: [
-                                { key: 'name', content: 'Name' },
-                                { key: 'grade', content: 'Grade' },
-                                { key: 'last', content: 'Last session' },
-                                { key: 'action', content: 'Action' },
-                            ],
-                        }}
-                        rows={queueRows.map(([studentName, studentGrade, studentDate], i) => ({
-                            key: studentName,
-                            cells: [
-                                { key: 'name', content: studentName },
-                                { key: 'grade', content: studentGrade },
-                                { key: 'last', content: studentDate },
-                                {
-                                    key: 'action',
-                                    content: (
-                                        <Button
-                                            text="Review"
-                                            appearance="default"
-                                            spacing="compact"
-                                            isSelected={open && i === index}
-                                            onClick={() => selectRow(i)}
-                                        />
-                                    ),
-                                },
-                            ],
-                        }))}
-                    />
-                </Section>
-            </InAppFrame>
-        );
-    },
+    render: () => <div style={{ height: '100vh' }}><Example.ReflectionQueue /></div>,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const canvas = within(canvasElement);
         await waitFor(() => expect(
@@ -779,11 +589,16 @@ export const TypeQueue = {
         const panel = within(canvas.getByRole('complementary', { name: 'Reflection' }));
         await expect(panel.getByRole('heading', { name: 'Ava Thompson' })).toBeInTheDocument();
 
+        const selectedReviews = () => canvas.getAllByRole('button', { name: 'Review' }).map((b) => b.getAttribute('aria-pressed') === 'true');
+        await expect(selectedReviews(), 'the first row is highlighted').toEqual([true, false, false, false]);
+
         await userEvent.click(panel.getByRole('button', { name: 'Next' }));
         await waitFor(() => expect(panel.getByRole('heading', { name: 'Marcus Lee' })).toBeInTheDocument());
+        await expect(selectedReviews(), 'Next moves the highlighted row').toEqual([false, true, false, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Reflection' })).toBeNull());
+        await expect(selectedReviews(), 'Close clears the highlight').toEqual([false, false, false, false]);
 
         await userEvent.click(canvas.getAllByRole('button', { name: 'Review' })[0]);
         await waitFor(() => expect(canvas.getByRole('complementary', { name: 'Reflection' })).toBeInTheDocument());
@@ -824,16 +639,11 @@ export const TypeDetails = {
     ),
 };
 
-const GROUP_FACTS = [['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']];
-
 /** Main and side: the side at the end, no fill, facts beside the main content. */
 export const TypeMainAndSide = {
     name: 'Type: Main and side',
-    render: () => (
-        <Section title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={GROUP_FACTS} columns={1} />}>
-            <StudentsTable count={4} />
-        </Section>
-    ),
+    render: () => <Example.MainAndSide />,
+    parameters: codeOf('MainAndSide'),
 };
 
 /** Form: fields in a card, with its own Cancel and Save. */
@@ -875,41 +685,6 @@ export const TypeSubsections = {
 
 /* ---- header rows */
 
-const HEADER_SESSIONS = [
-    ['Tue Nov 18', '3:30 PM', 'Whitaker · period 6', '4'],
-    ['Thu Nov 20', '3:30 PM', 'Whitaker · period 6', '4'],
-    ['Tue Nov 25', '3:30 PM', 'Whitaker · period 6', '4'],
-    ['Tue Dec 2', '3:30 PM', 'Whitaker · period 6', '4'],
-];
-const HEADER_STUDENTS = [
-    ['Maya R.', 'Grade 7', 'Whitaker', '12'],
-    ['Jonah T.', 'Grade 8', 'Lincoln', '9'],
-];
-const rowsOf = (list) => list.map((cells) => ({ key: cells.join(), cells: cells.map((content, i) => ({ key: `${i}`, content })) }));
-const headOf = (names) => ({ cells: names.map((content) => ({ key: content, content })) });
-const HeaderTable = ({ list = HEADER_SESSIONS.slice(0, 3), names = ['Date', 'Time', 'Group', 'Students'], ...props }) => (
-    <DynamicTable head={headOf(names)} rows={rowsOf(list)} label="Sessions" isFixedSize {...props} />
-);
-
-const signUp = <SectionActions primary="Sign up" icon="plus" />;
-
-const headerSearch = <HeaderSearch label="Search" />;
-
-const STATUS_FILTERS = [
-    { key: 'status', label: 'Status', text: 'Upcoming', onClick: () => {} },
-    { key: 'group', label: 'Group', text: 'All', onClick: () => {} },
-    { key: 'date', label: 'Date', text: 'All time', onClick: () => {} },
-];
-
-const fullHeader = {
-    title: 'Sessions',
-    actions: signUp,
-    views: <ViewPills views={['Upcoming', 'Past', 'All']} />,
-    format: <FormatSwitch />,
-    search: headerSearch,
-    filters: STATUS_FILTERS,
-};
-
 /** Every control in a header row is 32 (Tag 20): measured, not assumed. */
 const expectOneHeight = async (canvasElement) => {
     const header = canvasElement.querySelector('.plus-template-section-header');
@@ -942,11 +717,8 @@ const rowsIn = (canvasElement) => [...canvasElement.querySelectorAll('.plus-sect
 
 /** Full: a title with its actions, views and the format switch, then Search and three triggers. */
 export const Full = {
-    render: () => (
-        <Section {...fullHeader}>
-            <HeaderTable />
-        </Section>
-    ),
+    render: () => <Example.FullHeaderRows />,
+    parameters: codeOf('FullHeaderRows'),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
         await expectRowOne(canvasElement);
@@ -961,21 +733,10 @@ export const Full = {
 };
 
 /** Filters applied: the applied triggers take the selected state; the row ends with the count and Clear all. */
-const FiltersAppliedDemo = () => {
-    const [applied, setApplied] = useState(true);
-    const filters = STATUS_FILTERS.map((filter, i) => (
-        applied && i < 2 ? { ...filter, text: i === 0 ? 'Upcoming' : 'Whitaker', label: i === 0 ? 'Status' : 'Group', isSelected: true } : filter
-    ));
-    return (
-        <Section {...fullHeader} filters={filters} count="3 of 12" onClearAll={() => setApplied(false)}>
-            <HeaderTable />
-        </Section>
-    );
-};
-
 export const FiltersApplied = {
     name: 'Filters applied',
-    render: () => <FiltersAppliedDemo />,
+    render: () => <Example.FiltersApplied />,
+    parameters: codeOf('FiltersApplied'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
@@ -990,21 +751,8 @@ export const FiltersApplied = {
 /** No views: row 2 goes and the format switch joins the end of row 3. */
 export const NoViews = {
     name: 'No views',
-    render: () => (
-        <Section
-            title="Students"
-            actions={<SectionActions primary="Add student" />}
-            format={<FormatSwitch />}
-            search={headerSearch}
-            filters={[
-                { key: 'group', label: 'Group', text: 'All', onClick: () => {} },
-                { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
-                { key: 'status', label: 'Status', text: 'Active', onClick: () => {} },
-            ]}
-        >
-            <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
-        </Section>
-    ),
+    render: () => <Example.NoViews />,
+    parameters: codeOf('NoViews'),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
         const found = rowsIn(canvasElement);
@@ -1016,11 +764,8 @@ export const NoViews = {
 /** Views only: nothing to search or filter, so row 3 goes. */
 export const ViewsOnly = {
     name: 'Views only',
-    render: () => (
-        <Section title="Reflections" views={<ViewPills views={['Owed', 'Submitted']} />}>
-            <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
-        </Section>
-    ),
+    render: () => <Example.ViewsOnly />,
+    parameters: codeOf('ViewsOnly'),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
         await expect(rowsIn(canvasElement), 'row 3 is gone').toHaveLength(1);
@@ -1032,18 +777,8 @@ export const ViewsOnly = {
 /** Many filters: three triggers show, the rest sit in More filters with a count. */
 export const ManyFilters = {
     name: 'Many filters',
-    render: () => (
-        <Section
-            {...fullHeader}
-            filters={[
-                ...STATUS_FILTERS,
-                { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
-            ]}
-            onMoreFilters={() => {}}
-        >
-            <HeaderTable />
-        </Section>
-    ),
+    render: () => <Example.ManyFilters />,
+    parameters: codeOf('ManyFilters'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
@@ -1060,19 +795,10 @@ export const WrappedFilters = {
     name: 'Wrapped filters',
     render: () => (
         <div data-probe="stage" style={{ inlineSize: 800 }}>
-            <Section
-                {...fullHeader}
-                filters={[
-                    ...STATUS_FILTERS,
-                    { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
-                    { key: 'tutor', label: 'Tutor', text: 'Any', onClick: () => {} },
-                ]}
-                onMoreFilters={() => {}}
-            >
-                <HeaderTable />
-            </Section>
+            <Example.WrappedFilters />
         </div>
     ),
+    parameters: codeOf('WrappedFilters'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const stage = canvasElement.querySelector('[data-probe="stage"]');
@@ -1094,16 +820,8 @@ export const WrappedFilters = {
 /** Rows selected: the header stays and the table's head row becomes the bulk bar. */
 export const RowsSelected = {
     name: 'Rows selected',
-    render: () => (
-        <Section {...fullHeader}>
-            <HeaderTable
-                list={HEADER_SESSIONS}
-                isSelectable
-                defaultSelectedRowKeys={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.join())}
-                bulkActions={[{ label: 'Call off' }, { label: 'Export' }, { label: 'Move to group' }, { label: 'Remove from group' }]}
-            />
-        </Section>
-    ),
+    render: () => <Example.RowsSelected />,
+    parameters: codeOf('RowsSelected'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const head = within(canvasElement.querySelector('thead'));
@@ -1124,17 +842,10 @@ export const Narrow = {
     name: 'Narrow',
     render: () => (
         <div data-probe="stage" style={{ inlineSize: 600 }}>
-            <Section
-                {...fullHeader}
-                filters={STATUS_FILTERS.map((filter, i) => (i === 0 ? { ...filter, isSelected: true } : filter))}
-                count="3 of 12"
-                onClearAll={() => {}}
-                onOpenFilters={() => {}}
-            >
-                <HeaderTable list={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.slice(0, 3))} names={['Date', 'Time', 'Group']} maxHeight={320} />
-            </Section>
+            <Example.NarrowHeader />
         </div>
     ),
+    parameters: codeOf('NarrowHeader'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
@@ -1157,16 +868,8 @@ export const Narrow = {
 
 /** Subsection: the title drops to the subsection size; its primary acts on it alone. */
 export const Subsection = {
-    render: () => (
-        <Section title="Lincoln Middle">
-            <Section
-                {...fullHeader}
-                title="This week"
-            >
-                <HeaderTable />
-            </Section>
-        </Section>
-    ),
+    render: () => <Example.SubsectionHeader />,
+    parameters: codeOf('SubsectionHeader'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const title = canvas.getByRole('heading', { name: 'This week' });
@@ -1182,17 +885,8 @@ export const Subsection = {
 /** Side at the end: a summary beside the body, no fill; the header spans the full width. */
 export const SideAtEnd = {
     name: 'Side at the end',
-    render: () => (
-        <Section
-            title="Lincoln Middle"
-            actions={<SectionActions />}
-            views={<ViewPills views={['All students']} />}
-            layout="split"
-            side={<Facts pairs={GROUP_FACTS} columns={1} />}
-        >
-            <StudentsTable count={4} />
-        </Section>
-    ),
+    render: () => <Example.SideAtEnd />,
+    parameters: codeOf('SideAtEnd'),
 };
 
 /**
@@ -1205,59 +899,12 @@ export const SideAtEnd = {
 const FilterSideSection = () => {
     const ref = React.useRef(null);
     const width = useOwnWidth(ref, SECTION_DETAIL_FLOOR);
-    const [checked, setChecked] = useState(['Grade 7', 'Active']);
-    const [showFilters, setShowFilters] = useState(false);
-    const sideFits = width >= SECTION_DETAIL_FLOOR;
-    const narrow = width < FRAME_LAYOUT.fullWidthBelow;
-    const toggle = (v) => setChecked(checked.includes(v) ? checked.filter((c) => c !== v) : [...checked, v]);
-    const side = <FilterSide checked={checked} onToggle={toggle} onReset={() => setChecked([])} />;
-    const matching = filterStudentList({ count: STUDENTS.length, checked });
-    const table = matching.length > 0 ? (
-        <StudentsTable count={STUDENTS.length} checked={checked} />
-    ) : (
-        <EmptyState
-            spacing="compact"
-            icon="user-group"
-            header="No students match"
-            description="Try other filters, or reset them to see every student."
-            primaryAction={<Button text="Reset filters" appearance="primary" onClick={() => setChecked([])} />}
-        />
-    );
-    let body = table;
-    if (sideFits) {
-        body = (
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--section-min-width-side), 3fr) minmax(0, 9fr)', gap: 'var(--grid-gutter)' }}>
-                {side}
-                {table}
-            </div>
-        );
-    } else if (showFilters) {
-        body = (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-                {side}
-                <div><Button text="Show results" appearance="primary" onClick={() => setShowFilters(false)} /></div>
-            </div>
-        );
-    }
+    let Variant = Example.FilterSideStudents;
+    if (width < FRAME_LAYOUT.fullWidthBelow) Variant = Example.FilterSideStudentsNarrow;
+    else if (width < SECTION_DETAIL_FLOOR) Variant = Example.FilterSideStudentsCompact;
     return (
         <div ref={ref}>
-            <Section
-                title="Students"
-                description={`Lincoln Middle · ${matching.length} ${matching.length === 1 ? 'student' : 'students'}`}
-                actions={<SectionActions narrow={narrow} />}
-                views={<ViewPills views={['All students']} />}
-                filters={sideFits ? undefined : [{
-                    key: 'filters',
-                    text: 'Filters',
-                    iconBefore: 'filter',
-                    hasChevronDown: false,
-                    trailingMetric: checked.length || undefined,
-                    isSelected: checked.length > 0,
-                    onClick: () => setShowFilters(true),
-                }]}
-            >
-                {body}
-            </Section>
+            <Variant />
         </div>
     );
 };
@@ -1266,6 +913,7 @@ const FilterSideSection = () => {
 export const FilterSideAtStart = {
     name: 'Filter side at the start',
     render: () => <ScreenStage width={STAGE}><FilterSideSection /></ScreenStage>,
+    parameters: codeOf('FilterSideStudents'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByText('Lincoln Middle · 2 students')).toBeInTheDocument();
@@ -1292,7 +940,7 @@ export const FilterSideAtStart = {
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1024 },
-    parameters: { controls: { include: ['width'] } },
+    parameters: { controls: { include: ['width'] }, ...codeOf('FilterSideStudents') },
     argTypes: {
         width: { control: { type: 'range', min: 600, max: 1280, step: 8 }, description: 'The Section\'s own width, in px.', table: { category: 'Docs' } },
     },
@@ -1304,7 +952,7 @@ export const ResponsiveWidth = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const stage = canvasElement.querySelector('[data-probe="stage"]');
-        const side = () => canvasElement.querySelector('.plus-section-filter-side');
+        const side = () => within(canvasElement).queryByRole('group', { name: 'Student filters' });
         const filters = () => canvas.queryByRole('button', { name: /^Filters/ });
         const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
 
@@ -1337,17 +985,8 @@ export const ResponsiveWidth = {
 /** Empty, in a table: the empty state replaces the whole table, headers and footer too. */
 export const EmptyInTable = {
     name: 'Empty, in a table',
-    render: () => (
-        <Section title="Students" description="Lincoln Middle · 24 students" views={<ViewPills views={['All students', 'Needs follow-up']} />}>
-            <EmptyState
-                spacing="compact"
-                icon="user-group"
-                header="No students match"
-                description="Try other filters, or reset them to see every student."
-                primaryAction={<Button text="Reset filters" appearance="primary" onClick={() => {}} />}
-            />
-        </Section>
-    ),
+    render: () => <Example.EmptyInTable />,
+    parameters: codeOf('EmptyInTable'),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('table'), 'no table, no column headers').toBeNull();
@@ -1358,32 +997,22 @@ export const EmptyInTable = {
 /* ---- anatomy */
 
 const ANATOMY_PARTS = [
-    { selector: '[data-anatomy-root] > .plus-template-section-header .plus-template-section-title-row', label: 'Title row' },
-    { selector: '[data-anatomy-root] > .plus-template-section-header .plus-section-rows', label: 'Header rows' },
+    { selector: '[data-anatomy-root] .plus-template-section-header .plus-template-section-title-row', label: 'Title row' },
+    { selector: '[data-anatomy-root] .plus-template-section-header .plus-section-rows', label: 'Header rows' },
     { selector: '[data-anatomy-root] .plus-template-section-list', label: 'Body' },
     { selector: '[data-anatomy-root] .plus-template-section-detail', label: 'Detail', side: 'end' },
-    { selector: '[data-anatomy-root] > .plus-template-section-footer', label: 'Footer' },
+    { selector: '[data-anatomy-root] .plus-template-section-footer', label: 'Footer' },
 ];
 
 /** Every part once: a Section with its header rows, an inline detail and a footer. */
 export const AnatomyQueue = {
     name: 'Anatomy',
+    parameters: codeOf('ReflectionsAnatomy'),
     render: () => (
         <LiveAnatomy live title="A Section with its header, body, detail and footer numbered" parts={ANATOMY_PARTS}>
-            <Section
-                data-anatomy-root
-                title="Reflections"
-                description="Week of Oct 20"
-                views={<ViewPills views={['All reflections', 'Needs follow-up']} />}
-                detailTitle="Ava Thompson"
-                detailDescription="Grade 7"
-                detail={<p style={{ margin: 0, font: 'var(--body-default)' }}>The reflection names two goals for next week.</p>}
-                detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
-                defaultDetailOpen
-                footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
-            >
-                <StudentsTable count={4} />
-            </Section>
+            <div data-anatomy-root>
+                <Example.ReflectionsAnatomy />
+            </div>
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {

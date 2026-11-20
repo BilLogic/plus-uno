@@ -34,7 +34,7 @@ Use Overflow when a value may exceed its space. Choose by element so it behaves 
 | --- | --- | --- |
 | Page title, Section title, Card title, Modal title | Wrap | Always visible |
 | Field error, Section message, Flag, Banner, Tooltip | Wrap | Always visible |
-| Column header | Wrap with `shouldTruncate` false; wrap by default is Planned | Always visible |
+| Column header | Wrap; a header that must stay on one line sets `shouldTruncate` | Always visible |
 | Table cell | Truncate at the end, one line | Tooltip on hover and focus when clipped |
 | Tag (180), Status tag (200) | Truncate at the end | Tooltip when clipped; the tag becomes focusable |
 | Tags in a group | Fold into +n | The +n menu lists the hidden tags |
