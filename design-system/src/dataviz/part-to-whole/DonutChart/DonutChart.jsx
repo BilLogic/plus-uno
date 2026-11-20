@@ -120,8 +120,8 @@ const DonutChart = ({
                 {label && (
                     <div
                         style={{
-                            fontFamily: 'var(--type-family-body)',
-                            fontSize: 'var(--type-size-075)',
+                            font: 'var(--body-sm)',
+                            lineHeight: 'inherit', // the role's size only; the line height stays the page's
                             fontWeight: 'var(--type-weight-medium)',
                             color: 'var(--ds-text-subtle)',
                             marginTop: 'var(--pad-x-xs)',

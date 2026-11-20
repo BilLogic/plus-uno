@@ -96,8 +96,8 @@ const DonutChartSVG = ({
                         color: 'var(--ds-text)',
                         padding: 'var(--popup-pad)',
                         borderRadius: 'var(--popup-radius)',
-                        fontSize: 'var(--type-size-0875)',
-                        fontFamily: 'var(--type-family-body)',
+                        font: 'var(--body-default)',
+                        lineHeight: 'inherit', // the role's size only; the line height stays the page's
                         fontWeight: 'var(--type-weight-medium)',
                         fontVariantNumeric: 'tabular-nums',
                         pointerEvents: 'none',
@@ -148,8 +148,8 @@ const DonutChartSVG = ({
                 {label && (
                     <span
                         style={{
-                            fontFamily: 'var(--type-family-body)',
-                            fontSize: 'var(--type-size-075)',
+                            font: 'var(--body-sm)',
+                            lineHeight: 'inherit', // the role's size only; the line height stays the page's
                             fontWeight: 'var(--type-weight-medium)',
                             color: 'var(--ds-text-subtle)',
                             marginTop: 'var(--pad-x-xs)',

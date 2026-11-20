@@ -32,7 +32,7 @@ const sectionStyle = {
 
 const rowStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(var(--width-1500), 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(var(--field-width-md), 1fr))',
     gap: 'var(--stack-2xl) var(--inline-2xl)',
 };
 

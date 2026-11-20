@@ -45,11 +45,11 @@ function fontSize(role) {
 const ROLE_SWAPS = {
   '--height-250': '--control-lg', // InlineEdit, FieldBox
   '--width-1000': '--field-width-sm', // range picker presets column
-  '--width-1500': '--field-width-md', // docs browser tab
+  '--width-1500': '--field-width-md', // docs browser tab, gauge story column floor
   '--width-3000': '--field-width-xl', // docs browser field
   '--height-150': '--control-sm', // docs loop bar
-  '--stroke-1': '--border-width-default', // illustration strokes, docs dot ground, Colors border
-  '--stroke-2': '--border-width-selected', // illustration series stroke
+  '--stroke-1': '--border-width-default', // illustration strokes, docs dot ground, Colors border, chart grid width
+  '--stroke-2': '--border-width-selected', // illustration series stroke, chart line width
   '--type-size-200': '--image-md', // EmptyState and Carousel story glyph, 32
   '--type-size-150': '--icon-lg', // compact EmptyState glyph, 24
 };
@@ -66,10 +66,12 @@ test('the ring and outline reads keep their width', () => {
 
 /** Old font-size primitive -> the text role whose shorthand sets that size. */
 const TYPE_SWAPS = [
-  ['--type-size-075', ['--heading-xxs', '--body-sm']], // Avatar 16 and 24, docs code caption, figure labels
-  ['--type-size-0875', ['--heading-xs', '--body-default']], // Avatar 32, CodeBlock
+  ['--type-size-075', ['--heading-xxs', '--body-sm']], // Avatar 16 and 24, docs code caption, figure labels, chart axis, data and legend text, donut labels
+  ['--type-size-0875', ['--heading-xs', '--body-default']], // Avatar 32, CodeBlock, chart subtitle, tooltip and donut value text
   ['--type-size-100', ['--heading-sm', '--body-lg']], // Avatar 40, docs prose and tabs
   ['--type-size-200', ['--heading-xxl']], // Avatar 96 and 128
+  ['--type-size-125', ['--heading-md']], // chart colors story heading
+  ['--type-size-150', ['--heading-lg']], // chart title
 ];
 for (const [old, roles] of TYPE_SWAPS) {
   for (const role of roles) test(`${role} sets ${old}'s size`, () => assert.equal(fontSize(role), of(old)));

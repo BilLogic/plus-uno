@@ -115,8 +115,9 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
     labels: {
         style: {
             color: CHROME.textSubtle,
+            font: 'var(--body-sm)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
-            fontSize: 'var(--type-size-075)',
             fontWeight: MEDIUM,
             fontVariantNumeric: TABULAR,
         },
@@ -124,8 +125,9 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
     title: {
         style: {
             color: CHROME.text,
+            font: 'var(--body-sm)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
-            fontSize: 'var(--type-size-075)',
             fontWeight: SEMIBOLD,
         },
     },
@@ -133,8 +135,10 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
 
 const dataLabelsStyle = {
     color: CHROME.text,
+    font: 'var(--body-sm)',
+    lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
+    fontSize: 'inherit', // Highcharts scales an HTML label by `em` unless it is handed a fontSize; this one is the role's
     fontFamily: BODY,
-    fontSize: 'var(--type-size-075)',
     fontWeight: MEDIUM,
     fontVariantNumeric: TABULAR,
     textOutline: 'none',
@@ -194,25 +198,28 @@ const chartTheme = {
     title: {
         style: {
             color: CHROME.text,
+            font: 'var(--heading-lg)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
             fontWeight: SEMIBOLD,
-            fontSize: 'var(--type-size-150)',
         },
     },
     subtitle: {
         style: {
             color: CHROME.textSubtle,
+            font: 'var(--body-default)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
             fontWeight: MEDIUM,
-            fontSize: 'var(--type-size-0875)',
         },
     },
     caption: {
         style: {
             color: CHROME.textSubtle,
+            font: 'var(--body-sm)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
             fontWeight: MEDIUM,
-            fontSize: 'var(--type-size-075)',
         },
     },
     xAxis: axis(0),
@@ -289,8 +296,9 @@ const chartTheme = {
     legend: {
         itemStyle: {
             color: CHROME.text,
+            font: 'var(--body-sm)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
-            fontSize: 'var(--type-size-075)',
             fontWeight: MEDIUM,
             fontVariantNumeric: TABULAR,
         },
@@ -325,8 +333,9 @@ const chartTheme = {
         pointFormat: tooltipPointFormat(),
         style: {
             color: CHROME.text,
+            font: 'var(--body-default)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
-            fontSize: 'var(--type-size-0875)',
             fontWeight: MEDIUM,
             fontVariantNumeric: TABULAR,
         },
@@ -334,8 +343,9 @@ const chartTheme = {
     noData: {
         style: {
             color: CHROME.textSubtle,
+            font: 'var(--body-default)',
+            lineHeight: 'normal', // the role's size only; the SVG keeps its own line height
             fontFamily: BODY,
-            fontSize: 'var(--type-size-0875)',
             fontWeight: MEDIUM,
         },
     },
