@@ -266,7 +266,7 @@ $tag-colors: (
 }
 
 /*
- * Initials: Lato SemiBold 7, as in Figma. No text style is that small; 7 is
+ * Initials: Google Sans Flex Medium 7. No text style is that small; 7 is
  * the one size that fits two letters in the 16 disc, so it is the disc's size
  * scaled, not a number of its own. The ink is the one made for the disc's fill.
  */
@@ -274,7 +274,7 @@ $tag-colors: (
     color: var(--plus-tag-avatar-ink);
     font-family: var(--type-family-heading);
     font-size: calc(var(--icon-md) * 7 / 16);
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
     line-height: 1;
     letter-spacing: 0;
 }

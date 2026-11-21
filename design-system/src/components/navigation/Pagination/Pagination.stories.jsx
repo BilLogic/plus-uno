@@ -326,14 +326,14 @@ export const Focused = {
     },
 };
 
-/** Current: the selected fill and ink, semibold, and no hover step of its own. */
+/** Current: the selected fill and ink, medium, and no hover step of its own. */
 export const Current = {
     render: () => <StatePages />,
     play: async ({ canvasElement }) => {
         const one = pageOf(canvasElement, 'Page 1');
         await expectGroundUnder(canvasElement, one, undefined, '--ds-background-selected', 'current page');
         await expectInk(canvasElement, one, undefined, '--ds-text-selected', 'current page');
-        await expect(getComputedStyle(one).fontWeight).toBe('600');
+        await expect(getComputedStyle(one).fontWeight).toBe('500');
         await expectGroundUnder(canvasElement, one, ':hover', '--ds-background-selected', 'hovered current page');
     },
 };

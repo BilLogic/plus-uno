@@ -3380,7 +3380,7 @@
         "--inline-lg",
         "--stack-md",
         "--stack-sm",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ]
     },
     {
@@ -9657,8 +9657,7 @@
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
-        "--type-weight-medium",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ],
       "subComponents": [
         {
@@ -16022,7 +16021,7 @@
         "--stack-sm",
         "--tag-dot-size",
         "--type-family-heading",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ]
     },
     {
