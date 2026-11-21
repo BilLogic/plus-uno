@@ -18,6 +18,8 @@ import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFr
 import { INBOX_STAGE } from '@/storybook-docs/lib/inbox-demo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from './Panel';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './PanelCases.jsx';
 
 /**
  * Panel: the template page's examples, run in the Storybook tests. They compose
@@ -513,3 +515,11 @@ export const Focused = {
         await expectNotAControl(root(canvasElement), 'panel');
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the Panel page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeFloatsNoBlanket = fullSizeStory(FullSizeCases.FloatsNoBlanket, 1024, 'FloatsNoBlanket');
+export const FullSizePanelOnBlanket = fullSizeStory(FullSizeCases.PanelOnBlanket, 1024, 'PanelOnBlanket');
+export const FullSizeOneFloatingPanel = fullSizeStory(FullSizeCases.OneFloatingPanel, 1024, 'OneFloatingPanel');
+export const FullSizeTwoFloatingPanels = fullSizeStory(FullSizeCases.TwoFloatingPanels, 1024, 'TwoFloatingPanels');
+export const FullSizeBesideAiPanel = fullSizeStory(FullSizeCases.BesideAiPanel, 1024, 'BesideAiPanel');
+export const FullSizeCoversAiPanel = fullSizeStory(FullSizeCases.CoversAiPanel, 1024, 'CoversAiPanel');

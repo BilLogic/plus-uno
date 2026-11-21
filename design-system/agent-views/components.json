@@ -6900,7 +6900,11 @@
         "MotionRecordOverlay",
         "MotionRecordOverlayReduced",
         "MotionStepDown",
-        "MotionStepDownReduced"
+        "MotionStepDownReduced",
+        "FullSizeMultiStepInnerSidebar",
+        "FullSizeMultiStepStepsInPage",
+        "FullSizeBareColumn",
+        "FullSizeBareWithSidebar"
       ],
       "tokens": [
         "--border-width-default",
@@ -9025,7 +9029,15 @@
         "MotionReduced",
         "BlanketMotionOpenClose",
         "BlanketMotionReduced",
-        "Overflow"
+        "Overflow",
+        "FullSizeConfirmNarrow",
+        "FullSizeConfirmWide",
+        "FullSizeConfirmsInside",
+        "FullSizeModalOnModal",
+        "FullSizeFooterPinnedModal",
+        "FullSizeButtonInBodyModal",
+        "FullSizeStepsFooterModal",
+        "FullSizeTabsForStepsModal"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -9784,7 +9796,13 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "FullSizeFloatsNoBlanket",
+        "FullSizePanelOnBlanket",
+        "FullSizeOneFloatingPanel",
+        "FullSizeTwoFloatingPanels",
+        "FullSizeBesideAiPanel",
+        "FullSizeCoversAiPanel"
       ],
       "tokens": [
         "--body-sm",
@@ -12684,7 +12702,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Swaps the header for skeleton bars and marks the section busy",
+          "description": "Draws a skeleton shape at each header control's real size and position, with no text, and marks the section busy",
           "deprecated": null
         },
         {
@@ -12806,6 +12824,15 @@
           "deprecated": null
         },
         {
+          "name": "isTitleHidden",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hides the title visually and keeps it as the Section's heading and accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown.",
+          "deprecated": null
+        },
+        {
           "name": "named",
           "type": "bool",
           "required": false,
@@ -12859,6 +12886,8 @@
         "SearchInHeader",
         "LoadingDefault",
         "LoadingSearchAndFilters",
+        "LoadingFullHeader",
+        "LoadingScaled",
         "LoadingViews",
         "Interactive",
         "ColorModes",
@@ -12876,6 +12905,7 @@
         "Full",
         "FiltersApplied",
         "NoViews",
+        "TitleHidden",
         "ViewsOnly",
         "ManyFilters",
         "WrappedFilters",

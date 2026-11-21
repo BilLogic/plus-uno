@@ -9,7 +9,7 @@ import test from 'node:test';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { generate } from './generate-registry.mjs';
-import { expandBarrelImports, rewriteImports } from './lib/registry.mjs';
+import { expandBarrelImports, importsOf, rewriteImports } from './lib/registry.mjs';
 
 const L = 'design-system/src';
 function fixture(extra = {}) {
@@ -170,4 +170,9 @@ test('a template that imports a retired part is refused', () => {
 test('a template that imports a reserved spec is refused', () => {
   const root = withPatternsAndCharts({ [`${L}/specs/Old.jsx`]: 'export const Old = 1;\n', [`${L}/templates/ListPage/ListPage.jsx`]: "import { Old } from '../../specs/Old';\nexport default Old;\n" });
   assert.ok(generate(root, 'v1').problems.some((p) => /ListPage\.jsx: imports .*specs\/Old/.test(p)));
+});
+
+test('a multi-line export list is an import: its specifier is followed', () => {
+  const text = "export {\n    FieldFrame,\n    FieldLabel,\n} from './FieldFrame';\n";
+  assert.deepEqual(importsOf('index.js', text).map((i) => i.spec), ['./FieldFrame']);
 });

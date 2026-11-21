@@ -83,7 +83,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 ## Anatomy
 
-A Section with its header rows, a detail and a footer. The title, the first pill and the first column share one left edge.
+A Section with its header rows, a detail and a footer. The title, the first pill's box and the first table row's box share one left edge; the pill's label and the first cell's text sit inside their boxes.
 
 <ComponentExample of={SectionStories.AnatomyQueue} />
 
@@ -110,6 +110,8 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 <TypeCard of={SectionStories.FiltersApplied} to="#filters-applied" title="Filters applied">Applied triggers take the selected state; the row ends with the count and Reset filters.</TypeCard>
 <TypeCard of={SectionStories.NoViews} to="#no-views" title="No views">Row 2 goes; the format switch joins the end of row 3.</TypeCard>
 <TypeCard of={SectionStories.ViewsOnly} to="#views-only" title="Views only">Nothing to search or filter, so row 3 goes.</TypeCard>
+<TypeCard of={SectionStories.TitleHidden} to="#title-hidden" title="Title hidden">The page title is enough, so the Section starts at its rows and keeps its name.</TypeCard>
+<TypeCard of={SectionStories.LoadingFullHeader} to="#loading" title="Loading">A skeleton shape at each control's place, no text; the header keeps its height.</TypeCard>
 <TypeCard of={SectionStories.ManyFilters} to="#many-filters" title="Many filters">Three triggers show; the rest sit in More filters with a count.</TypeCard>
 <TypeCard of={SectionStories.WrappedFilters} to="#wrapped-filters" title="Wrapped filters">When the triggers do not fit beside Search they take their own row, end-aligned.</TypeCard>
 <TypeCard of={SectionStories.RowsSelected} to="#rows-selected" title="Rows selected">The header stays; the table's head row becomes the bulk bar.</TypeCard>
@@ -124,6 +126,10 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 <ComponentExample of={SectionStories.NoViews} title="No views" description="Row 2 goes; the format switch joins the end of row 3." />
 
 <ComponentExample of={SectionStories.ViewsOnly} title="Views only" description="Nothing to search or filter, so row 3 goes." />
+
+<ComponentExample of={SectionStories.TitleHidden} title="Title hidden" description="With one Section on the page, the page title is enough. The title stays as the Section's heading and accessible name but is not drawn, so the Section starts at its header rows. Pages with several Sections keep their titles." />
+
+<ComponentExample of={SectionStories.LoadingFullHeader} title="Loading" description="The title, description, pills, actions, Search and triggers draw as skeleton shapes at their real size and position, with no text and nothing shown as disabled. The loaded header, above, is the same height." />
 
 <ComponentExample of={SectionStories.ManyFilters} title="Many filters" description="Three triggers show; the rest sit in More filters with a count." />
 
@@ -222,7 +228,8 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row.</td></tr>
 <tr><td><code>views</code> · <code>format</code> · <code>search</code> · <code>filters</code> · <code>count</code></td><td>Rows 2 and 3 of the header: pill Tabs and the format switch (the `format` slot holds a `SegmentedControl`), then a compact Search and the "Field: value" triggers. A <code>filters</code> entry takes an optional <code>menu</code>, <code>(trigger) =&gt; node</code>, that wraps its trigger in a Popup select or a Filter menu.</td></tr>
 <tr><td><code>header</code> · <code>type</code></td><td>With <code>type="custom"</code> the <code>header</code> slot replaces the title and description; <code>title</code> stays as the visually hidden heading. <code>type</code> is <code>default</code> or <code>custom</code>, and is read from the slots when left off.</td></tr>
-<tr><td><code>isLoading</code></td><td>Swaps the header for skeleton bars while the Section loads.</td></tr>
+<tr><td><code>isLoading</code></td><td>Draws a skeleton shape at each header control's real size and position, with no text, while the Section loads. The header keeps its height.</td></tr>
+<tr><td><code>isTitleHidden</code></td><td>Hides the title visually and keeps it as the heading and the Section's accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown.</td></tr>
 <tr><td><code>level</code></td><td><code>page</code> makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it.</td></tr>
 <tr><td><code>named</code></td><td>Makes the Section a region named by its title, for one that stands apart as a landmark.</td></tr>
 <tr><td><code>hasNoMatches</code></td><td>True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains.</td></tr>
@@ -293,7 +300,7 @@ A Section earns its own heading, its own actions or its own place in the grid. W
 
 <RuleTag kind="automatic" />
 
-The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. Actions that do not fit beside the heading drop under it, still at the end of the row. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's box and the first table row's box share one left edge; the pill's label and the first cell's text sit inside their boxes. Actions that do not fit beside the heading drop under it, still at the end of the row. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
 
 <DoDontPair
     doExample={<TitleRowAboveHeaderRows />}

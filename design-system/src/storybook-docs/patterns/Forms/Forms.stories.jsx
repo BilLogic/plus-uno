@@ -9,6 +9,8 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formHosts.jsx';
 import { BoundInputs, Marks, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './FormsCases.jsx';
 
 /**
  * Forms: the pattern page's examples, run in the Storybook tests. The hosts and
@@ -383,3 +385,9 @@ export const BoundInput = {
         await fitsCanvas(canvasElement);
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the Forms page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeErrorOnField = fullSizeStory(FullSizeCases.ErrorOnField, 1024, 'ErrorOnField');
+export const FullSizeErrorInSecondDialog = fullSizeStory(FullSizeCases.ErrorInSecondDialog, 1024, 'ErrorInSecondDialog');
+export const FullSizeEditInPanel = fullSizeStory(FullSizeCases.EditInPanel, 1024, 'EditInPanel');
+export const FullSizeEditInModal = fullSizeStory(FullSizeCases.EditInModal, 1024, 'EditInModal');

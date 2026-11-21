@@ -10,7 +10,7 @@ import Icon from '../../images-and-icons/Icon';
  * (node 17118:127). A 32 row (`--control-md`) padded 12 at the sides, with
  * a 16 icon box and a Body/default 14/20 label that truncates.
  *
- * Slots, after Atlassian's side-nav item:
+ * Slots:
  * - `iconBefore`: the icon, by Font Awesome Free name. Leave it out for a row with no icon.
  * - `description`: a second line in Body/small. The row grows past 32 to hold it.
  * - `elemAfter`: a count, a countTag or a status at the end of the row.

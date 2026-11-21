@@ -18,6 +18,8 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './FrameCases.jsx';
 
 /**
  * Frame — the app frame: the Sidebar beside the Page (and the Panel). Open, the Sidebar's own toggle ends its logo row; closed, the
@@ -2810,3 +2812,9 @@ export const MotionStepDownReduced = {
     render: () => <StepMotionDemo count={4} />,
     play: stepMotionPlay({ reduced: true }),
 };
+
+/** Full size: each screen-sized Do/Don't example of the Frame page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeMultiStepInnerSidebar = fullSizeStory(FullSizeCases.MultiStepInnerSidebar, 1100, 'MultiStepInnerSidebar');
+export const FullSizeMultiStepStepsInPage = fullSizeStory(FullSizeCases.MultiStepStepsInPage, 1100, 'MultiStepStepsInPage');
+export const FullSizeBareColumn = fullSizeStory(FullSizeCases.BareColumn, 1100, 'BareColumn');
+export const FullSizeBareWithSidebar = fullSizeStory(FullSizeCases.BareWithSidebar, 1100, 'BareWithSidebar');

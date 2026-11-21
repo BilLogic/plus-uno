@@ -355,6 +355,22 @@ export const ViewsOnly = () => (
     </Section>
 );
 
+export const TitleHidden = () => (
+    <Section
+        title="Reflections"
+        isTitleHidden
+        named
+        views={(
+            <Tabs appearance="pill" defaultActiveKey="Owed" aria-label="Views">
+                <Tabs.Tab eventKey="Owed">Owed</Tabs.Tab>
+                <Tabs.Tab eventKey="Submitted">Submitted</Tabs.Tab>
+            </Tabs>
+        )}
+    >
+        <TermTable list={termStudents} names={studentColumns} />
+    </Section>
+);
+
 export const ManyFilters = () => (
     <Section
         {...fullHeader}
@@ -443,6 +459,12 @@ export const SideAtEnd = () => (
 export const ViewsSpacing = () => (
     <Section title="Students" description="Optional supporting description for this section." views={studentViews}>
         <RosterTable />
+    </Section>
+);
+
+export const LoadingFullHeader = () => (
+    <Section {...fullHeader} isLoading>
+        <TermTable />
     </Section>
 );
 

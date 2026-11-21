@@ -9,6 +9,8 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 import { expectMenuFade } from '@/storybook-docs/lib/overlay-motion-plays';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import * as Demo from './popupDemo.jsx';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './PopupCases.jsx';
 
 const { TYPE_STAGE } = Demo;
 
@@ -379,3 +381,7 @@ export const KeyFilterApplied = {
         await expect(canvasElement.querySelector('.plus-filter-menu'), 'the menu is closed').toBeNull();
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the Popup page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeFieldsInModalCase = fullSizeStory(FullSizeCases.FieldsInModalCase, 1024, 'FieldsInModalCase');
+export const FullSizeFormInPopupCase = fullSizeStory(FullSizeCases.FormInPopupCase, 1024, 'FormInPopupCase');
