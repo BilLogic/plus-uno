@@ -436,6 +436,18 @@ export const FloatingSidebarEscapeAt768 = {
         await waitFor(() => expect(doc.activeElement, 'focus is on the Page\'s toggle').toBe(p.toggle));
         await expect(p.toggle).toHaveAttribute('aria-label', 'Open sidebar');
 
+        // Focus that has moved out to the Page still comes back to the toggle on Escape.
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        p.content.setAttribute('tabindex', '-1');
+        p.content.focus();
+        await waitFor(() => expect(p.content).toHaveFocus());
+        await expect(p.sidebar(), 'focus leaving does not close it').not.toBeNull();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.sidebar()).toBeNull());
+        await waitFor(() => expect(doc.activeElement, 'focus is on the Page\'s toggle').toBe(p.toggle));
+        p.content.removeAttribute('tabindex');
+
         // A peek closed by Escape hands focus to the toggle too.
         await userEvent.hover(p.edge());
         await waitFor(() => expect(p.sidebar()).not.toBeNull());

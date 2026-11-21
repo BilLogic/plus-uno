@@ -136,8 +136,6 @@ const Frame = ({
     const refocusToggle = useRef(false);
     const sidebarRef = useRef(null);
     const sidebarHostRef = useRef(null);
-    // Set by an Escape that closes the floating Sidebar: Base UI hands focus to the toggle.
-    const sidebarReturnsFocus = useRef(false);
     const leaveTimer = useRef(null);
     const sidebarId = useId();
     const panelId = useId();
@@ -219,7 +217,6 @@ const Frame = ({
     }
     if (raised !== wasRaised) {
         raisedEnteringRef.current = raised && readyRef.current && !wasDocked;
-        if (raised) sidebarReturnsFocus.current = false;
         prevRaisedRef.current = raised;
     }
 
@@ -371,7 +368,9 @@ const Frame = ({
             details?.allowPropagation?.();
             return;
         }
-        sidebarReturnsFocus.current = details.reason === 'escape-key';
+        // Escape hands focus to the toggle that is left, even from outside the Sidebar:
+        // Base UI skips its return focus once focus has moved out, so the Frame does it.
+        if (details.reason === 'escape-key') refocusToggle.current = true;
         closeRaised();
     };
 
@@ -380,13 +379,6 @@ const Frame = ({
         if (!refocusToggle.current) return false;
         refocusToggle.current = false;
         return canFocus(closeRef.current) ? closeRef.current : false;
-    }, []);
-
-    // Escape hands focus to the toggle that is left; any other close leaves it where it is.
-    const sidebarFinalFocus = useCallback(() => {
-        if (!sidebarReturnsFocus.current) return false;
-        sidebarReturnsFocus.current = false;
-        return [toggleRef.current, closeRef.current].find(canFocus) ?? false;
     }, []);
 
     /* ------------------------------------------------------------- panel */
@@ -573,7 +565,7 @@ const Frame = ({
     // Floating, it is the popup of a non-modal Base UI `Dialog`, still with no role of its own.
     const sidebarPanel = (isRaised, leaving, entering) => {
         const Box = isRaised ? Dialog.Popup : 'div';
-        const dialogProps = isRaised ? { role: undefined, initialFocus: sidebarInitialFocus, finalFocus: sidebarFinalFocus } : {};
+        const dialogProps = isRaised ? { role: undefined, initialFocus: sidebarInitialFocus, finalFocus: false } : {};
         return (
             <Box
                 {...dialogProps}
