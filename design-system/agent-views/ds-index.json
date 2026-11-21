@@ -11860,6 +11860,16 @@
 					"- For a value the reader can select and copy from a field, use `TextField` with `isReadOnly`.\n",
 					"- For facts about many things in rows, use `Table`.\n",
 					"\n",
+					"## Best practices\n",
+					"\n",
+					"### Give each `Facts` label one value. {#give-each-facts-label-one-value}\n",
+					"\n",
+					"`Facts` keys each row by its label, so a repeated label collides and drops a row. Put several values for one label in that label's value.\n",
+					"\n",
+					"### Keep a `Facts` list free of controls. {#keep-a-facts-list-free-of-controls}\n",
+					"\n",
+					"A `Facts` list is plain text and takes no focus. For a value the reader edits or copies from a field, use `TextField` with `isReadOnly`.\n",
+					"\n",
 					"## Accessibility\n",
 					"\n",
 					"- **Paired for assistive technology.** The `dl`, `dt` and `dd` elements tell screen readers which value belongs to which label.\n",
@@ -11867,8 +11877,8 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- `TextField`: use with `isReadOnly` when the value is in a field.\n",
-					"- `Table`: use for facts about many things in rows.\n",
+					"- `TextField`: use with `isReadOnly` when the reader needs to select and copy the value from a field.\n",
+					"- `Table`: use when the facts describe many things, one per row.\n",
 					"\n",
 					"Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`\n",
 					"\n",
@@ -11929,11 +11939,21 @@
 						"the date it was created, when the reader only needs to read them."
 					]
 				},
-				"best": "",
+				"best": {
+					"$lines": [
+						"### Give each `Facts` label one value.\n",
+						"\n",
+						"`Facts` keys each row by its label, so a repeated label collides and drops a row. Put several values for one label in that label's value.\n",
+						"\n",
+						"### Keep a `Facts` list free of controls.\n",
+						"\n",
+						"A `Facts` list is plain text and takes no focus. For a value the reader edits or copies from a field, use `TextField` with `isReadOnly`."
+					]
+				},
 				"related": {
 					"$lines": [
-						"- `TextField`: use with `isReadOnly` when the value is in a field.\n",
-						"- `Table`: use for facts about many things in rows."
+						"- `TextField`: use with `isReadOnly` when the reader needs to select and copy the value from a field.\n",
+						"- `Table`: use when the facts describe many things, one per row."
 					]
 				}
 			}

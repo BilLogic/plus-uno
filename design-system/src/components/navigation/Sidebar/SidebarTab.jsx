@@ -104,28 +104,14 @@ const SidebarTab = ({
             {content}
         </a>
     ) : (
-        <div
+        <button
             {...shared}
-            onClick={!disabled ? onClick : undefined}
-            /*
-             * #320. Enter and Space activate a `button` ELEMENT; they do not
-             * activate `role="button"`. Without this handler the row was
-             * announced as a button, took a tab stop, and did nothing when
-             * pressed — every row of a sidebar reachable and none openable.
-             * Space is prevented so the page does not scroll under the press.
-             */
-            onKeyDown={!disabled && onClick ? (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onClick(event);
-                }
-            } : undefined}
-            role="button"
-            aria-disabled={disabled || undefined}
-            tabIndex={disabled ? -1 : 0}
+            type="button"
+            onClick={onClick}
+            disabled={disabled || undefined}
         >
             {content}
-        </div>
+        </button>
     );
 
     if (!actionsOnHover || disabled) return row;

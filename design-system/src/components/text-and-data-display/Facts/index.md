@@ -22,6 +22,16 @@ the date it was created, when the reader only needs to read them.
 - For a value the reader can select and copy from a field, use `TextField` with `isReadOnly`.
 - For facts about many things in rows, use `Table`.
 
+## Best practices
+
+### Give each `Facts` label one value. {#give-each-facts-label-one-value}
+
+`Facts` keys each row by its label, so a repeated label collides and drops a row. Put several values for one label in that label's value.
+
+### Keep a `Facts` list free of controls. {#keep-a-facts-list-free-of-controls}
+
+A `Facts` list is plain text and takes no focus. For a value the reader edits or copies from a field, use `TextField` with `isReadOnly`.
+
 ## Accessibility
 
 - **Paired for assistive technology.** The `dl`, `dt` and `dd` elements tell screen readers which value belongs to which label.
@@ -29,8 +39,8 @@ the date it was created, when the reader only needs to read them.
 
 ## Related
 
-- `TextField`: use with `isReadOnly` when the value is in a field.
-- `Table`: use for facts about many things in rows.
+- `TextField`: use with `isReadOnly` when the reader needs to select and copy the value from a field.
+- `Table`: use when the facts describe many things, one per row.
 
 Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
