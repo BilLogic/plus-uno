@@ -62,7 +62,13 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 - Forms: use for the enabled submit.
 - Common actions: use for the sending button.
 - Navigation: use for the Sidebar's locked Toolkit.
-- `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `DropdownMenu`, `SectionMessage`: the components.
+- `Button`: use for a text action that is not available yet.
+- `IconButton`: use for a glyph-only action that is not available yet.
+- `Select`: use for a choice that cannot be changed yet.
+- `Checkbox`: use for an option that cannot be toggled yet.
+- `RadioGroup`: use for a set of choices that cannot be picked yet.
+- `DropdownMenu`: use for a menu whose items are not available yet.
+- `SectionMessage`: use to say what unlocks a disabled control.
 
 ## Motion
 

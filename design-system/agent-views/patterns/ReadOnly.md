@@ -55,7 +55,14 @@ Use Read-only for a value someone could change but this person cannot right now:
 - Disabled: use for a prerequisite fixable on this screen.
 - Forms: use for the form the read-only field sits in.
 - Overflow: use for everything else that may clip.
-- `TextField`, `TextArea`, `Select`, `DatePicker`, `TimePicker`, `Checkbox`, `RadioGroup`, `Toggle`: the components with `isReadOnly`.
+- `TextField`: use for a single-line value that must stay readable.
+- `TextArea`: use for a multi-line value that must stay readable.
+- `Select`: use for a chosen option that must stay readable.
+- `DatePicker`: use for a date that must stay readable.
+- `TimePicker`: use for a time that must stay readable.
+- `Checkbox`: use for an on/off option that must stay readable.
+- `RadioGroup`: use for a picked choice that must stay readable.
+- `Toggle`: use for a switch setting that must stay readable.
 
 ## Motion
 
