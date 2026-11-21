@@ -8,6 +8,7 @@ import { CODE, BareStringCase, HeaderOverNothingCase, ReplacedTableCase, WhatBel
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta title="Patterns/States/Empty" tags={['manifest']} />
 
@@ -88,6 +89,14 @@ The place sets the spacing and the alignment. The words stay the same.
 <ComponentExample of={EmptyStories.KeyEmptyBoxHiddenByFilter} title="Empty box: hidden by a default filter" description="The title and filter rows stay above the box; Reset filters clears the filter to reveal rows." />
 
 <ComponentExample of={EmptyStories.KeyEmptyBoxNothingToCreate} title="Empty box: nothing to create" description="Title and one line only when nothing can be created." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Empty" tier="pattern" />
 
 </div>
 

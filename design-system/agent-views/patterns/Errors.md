@@ -69,6 +69,16 @@ Use Errors whenever something failed and the person needs to know. Put the messa
 - Disabled: use for a caution before something goes wrong.
 - `SectionMessage`, `Flag`, `Banner`, `EmptyState`, `TextField`: the components.
 
+## Motion
+
+Errors reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| appear | Call attention | `--ds-motion-appearance-fast` | Once; the message carries the meaning. |
+| field | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A field error makes room on spatial.fast, then fades in on appearance.fast; it reverses once fixed. |
+| blocked | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes once, a spring per Physics; never in Reduced mode. |
+
 ## Best practices
 
 ### Validate a field when it loses focus and clear the error once the rule is met. {#validate-a-field-when-it-loses-focus-and-clear-the-error-once-the-rule-is-met}
