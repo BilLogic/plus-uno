@@ -1768,6 +1768,7 @@
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
+        "ImageDarkVariant",
         "ImageRatioGrid",
         "ImageRatioDefault",
         "ImageTop",
