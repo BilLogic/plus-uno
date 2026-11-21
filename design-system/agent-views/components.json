@@ -15376,6 +15376,15 @@
           "deprecated": null
         },
         {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional description under the title; passed to the Section",
+          "deprecated": null
+        },
+        {
           "name": "actions",
           "type": "node",
           "required": false,
@@ -15403,6 +15412,15 @@
           "deprecated": null
         },
         {
+          "name": "format",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section",
+          "deprecated": null
+        },
+        {
           "name": "search",
           "type": "node",
           "required": false,
@@ -15427,6 +15445,35 @@
           "default": null,
           "values": null,
           "description": "How many rows match, such as \"3 of 12\", once a filter is applied; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "onClearAll",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"Reset filters\" is pressed; the button shows once a filter is applied; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "isTitleHidden",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "level",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "page"
+          ],
+          "description": "`page` makes the title the page's h1; by default it nests one level down; passed to the Section",
           "deprecated": null
         }
       ],
