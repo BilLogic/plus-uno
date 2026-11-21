@@ -183,11 +183,33 @@
     white-space: nowrap;
 }
 
-/* Loading: skeleton bars in place of the header, Element/stack-sm apart. */
-.plus-template-section-skeleton {
+/* Loading: the real header renders unseen to hold the layout; a skeleton shape covers each part at its measured size. */
+.plus-template-section-loading {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--stack-sm);
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+.plus-template-section-loading__shell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.plus-template-section-loading__layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.plus-template-section-loading__shape {
+    position: absolute;
+    display: block;
 }
 
 /* Body */

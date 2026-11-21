@@ -16,7 +16,7 @@ Also asked as: popover, flyout, inline dialog.
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
-**Stories:** `design-system/src/templates/Popup/Popup.stories.jsx` — TypeMenu, TypeSelectList, TypeFilterMenu, TypeFilterMenuStacked, TypeProfileMenu, TypeContent, AnatomyFilterMenu, WidthSteps, Placement, KeyLongLabel, KeyLoading, KeyLoadFailed, KeyOpensWithAFade, KeyFlipped, KeyFilterApplied
+**Stories:** `design-system/src/templates/Popup/Popup.stories.jsx` — TypeMenu, TypeSelectList, TypeFilterMenu, TypeFilterMenuStacked, TypeProfileMenu, TypeContent, AnatomyFilterMenu, WidthSteps, Placement, KeyLongLabel, KeyLoading, KeyLoadFailed, KeyOpensWithAFade, KeyFlipped, KeyFilterApplied, FullSizeFieldsInModalCase, FullSizeFormInPopupCase
 
 **Storybook page:** `design-system/src/templates/Popup/Popup.mdx`
 

@@ -28,6 +28,8 @@ import {
     Sending,
     PAGE_WIDTH,
 } from './commonActionsDemo.jsx';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './CommonActionsCases.jsx';
 
 /**
  * Common actions: the pattern page's examples, run in the Storybook tests. Each
@@ -410,3 +412,7 @@ export const SendingKeepsWidth = {
         await fitsCanvas(canvasElement);
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the CommonActions page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeModalFooterTracksCase = fullSizeStory(FullSizeCases.ModalFooterTracksCase, 1024, 'ModalFooterTracksCase');
+export const FullSizeModalFooterInsetCase = fullSizeStory(FullSizeCases.ModalFooterInsetCase, 1024, 'ModalFooterInsetCase');

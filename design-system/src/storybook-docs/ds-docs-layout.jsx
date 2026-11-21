@@ -379,8 +379,9 @@ function wellLabel(well) {
  * @param {React.ReactNode} children - the live example, built from real components
  * @param {React.ReactNode} caption - the rule, in one sentence
  * @param {string} [code] - the example's source, folded under the caption behind Show code
+ * @param {string} [fullSize] - a Storybook link (`?path=/story/...`) to the same live example at 100% in the page view, for a card that draws a whole screen scaled into the column
  */
-export function DoDontCard({ tone, children, caption, code }) {
+export function DoDontCard({ tone, children, caption, code, fullSize }) {
     const wellRef = useRef(null);
     const { scrolls, label } = useScrollsSideways(wellRef, wellLabel);
     return (
@@ -429,7 +430,17 @@ export function DoDontCard({ tone, children, caption, code }) {
             >
                 <div className="sb-ds-dodont-card__example sb-unstyled" style={{ inlineSize: '100%' }}>{children}</div>
             </div>
-            <DoDontCaption tone={tone}>{caption}</DoDontCaption>
+            {fullSize ? (
+                // The caption keeps its own row; the link joins it in the same grid cell so the pair's rows still line up.
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minInlineSize: 0 }}>
+                    <DoDontCaption tone={tone}>{caption}</DoDontCaption>
+                    <a className="sb-ds-dodont-card__full-size" href={fullSize} style={{ color: 'var(--ds-link)', font: 'var(--body-default)', textDecoration: 'underline' }}>
+                        Open full size
+                    </a>
+                </div>
+            ) : (
+                <DoDontCaption tone={tone}>{caption}</DoDontCaption>
+            )}
             {code ? (
                 <details className="sb-ds-dodont-card__code">
                     <summary>Show code</summary>
@@ -589,8 +600,10 @@ export function FigureGround({ ground, children }) {
  * `stacked` is the reason a figure needs the full width (a string); it puts the pair one above the other at every width.
  *
  * @param {string} [stacked] - why the figure cannot be halved
+ * @param {string} [doFullSize] - `?path=/story/...` link to the do example at 100% in the page view; set it, with `dontFullSize`, on a pair that draws a whole screen scaled into the half-width column
+ * @param {string} [dontFullSize] - the same for the don't example
  */
-export function DoDontPair({ doExample, doCaption, doCode, dontExample, dontCaption, dontCode, stacked = '' }) {
+export function DoDontPair({ doExample, doCaption, doCode, doFullSize, dontExample, dontCaption, dontCode, dontFullSize, stacked = '' }) {
     return (
         <div
             className="sb-ds-dodont-pair"
@@ -603,8 +616,8 @@ export function DoDontPair({ doExample, doCaption, doCode, dontExample, dontCapt
                 alignItems: 'stretch',
             }}
         >
-            <DoDontCard tone="do" caption={doCaption} code={doCode}>{doExample}</DoDontCard>
-            <DoDontCard tone="dont" caption={dontCaption} code={dontCode}>{dontExample}</DoDontCard>
+            <DoDontCard tone="do" caption={doCaption} code={doCode} fullSize={doFullSize}>{doExample}</DoDontCard>
+            <DoDontCard tone="dont" caption={dontCaption} code={dontCode} fullSize={dontFullSize}>{dontExample}</DoDontCard>
         </div>
     );
 }

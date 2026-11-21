@@ -340,6 +340,41 @@ export const LoadingSearchAndFilters = {
     parameters: codeOf('LoadingSearchAndFilters'),
 };
 
+/** Loading: a skeleton shape at each control's real size and position, no text, and the header as tall as the loaded one. */
+export const LoadingFullHeader = {
+    name: 'Loading, full header',
+    render: () => (
+        <div style={col}>
+            <div data-testid="loaded"><Example.FullHeaderRows /></div>
+            <div data-testid="loading"><Example.LoadingFullHeader /></div>
+        </div>
+    ),
+    parameters: codeOf('LoadingFullHeader'),
+    play: async ({ canvasElement }) => {
+        const header = (id) => canvasElement.querySelector(`[data-testid="${id}"] .plus-template-section-header`);
+        const loaded = header('loaded');
+        const loading = header('loading');
+        await waitFor(() => expect(loading.querySelectorAll('.plus-skeleton').length).toBeGreaterThan(0));
+        // Nothing shifts when data arrives: the loading header is as tall as the loaded one.
+        expect(loading.getBoundingClientRect().height).toBe(loaded.getBoundingClientRect().height);
+        // Title, description-free here: title + 3 pills + format + 2 actions + search + 3 filters.
+        const shapes = loading.querySelectorAll('.plus-skeleton');
+        expect(shapes.length).toBeGreaterThanOrEqual(10);
+        // No text is shown: every label is in the unseen shell, and visible text is empty.
+        // The only text left is the visually hidden heading that names the Section.
+        expect(loading.innerText.trim()).toBe('Sessions');
+        expect(within(loading).queryByRole('tab')).toBeNull();
+        expect(within(loading).queryByRole('button')).toBeNull();
+        // Each shape sits at the place of a loaded control.
+        const loadedTabs = [...loaded.querySelectorAll('[role="tab"]')].map((el) => el.getBoundingClientRect());
+        const rowTop = loading.getBoundingClientRect().top;
+        const shapeTops = [...shapes].map((el) => Math.round(el.getBoundingClientRect().top - rowTop));
+        loadedTabs.forEach((rect) => {
+            expect(shapeTops).toContain(Math.round(rect.top - loaded.getBoundingClientRect().top));
+        });
+    },
+};
+
 export const LoadingViews = {
     name: 'Loading, views',
     render: () => <Example.LoadingViews />,
@@ -765,6 +800,24 @@ export const NoViews = {
 };
 
 /** Views only: nothing to search or filter, so row 3 goes. */
+/** The title is optional: a page with one Section has its page title, so the Section drops its own and keeps an accessible name. */
+export const TitleHidden = {
+    name: 'Title hidden',
+    render: () => <Example.TitleHidden />,
+    parameters: codeOf('TitleHidden'),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const region = canvas.getByRole('region', { name: 'Reflections' });
+        const tabs = within(region).getAllByRole('tab')[0];
+        const heading = within(region).getByRole('heading', { name: 'Reflections' });
+        // Not shown: the heading is visually hidden and the header starts at the views row.
+        expect(heading.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+        expect(canvasElement.querySelector('.plus-template-section-title-row')).toBeNull();
+        const header = canvasElement.querySelector('.plus-template-section-header');
+        expect(Math.round(tabs.getBoundingClientRect().top)).toBe(Math.round(header.getBoundingClientRect().top));
+    },
+};
+
 export const ViewsOnly = {
     name: 'Views only',
     render: () => <Example.ViewsOnly />,

@@ -425,9 +425,11 @@ A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps 
 
 <DoDontPair
     doExample={<ConfirmNarrow />}
+    doFullSize="?path=/story/templates-modal--full-size-confirm-narrow"
     doCode={CODE.ConfirmNarrow}
     doCaption="A confirm at the narrow step: the title, one line and two buttons."
     dontExample={<ConfirmWide />}
+    dontFullSize="?path=/story/templates-modal--full-size-confirm-wide"
     dontCode={CODE.ConfirmWide}
     dontCaption="The same confirm at a wide step: empty width around one line, picked to make it look a certain way."
 />
@@ -444,9 +446,11 @@ Stacking holds the rule. The overlay module keeps a second Modal closed and call
 
 <DoDontPair
     doExample={<ConfirmsInside />}
+    doFullSize="?path=/story/templates-modal--full-size-confirms-inside"
     doCode={CODE.ConfirmsInside}
     doCaption="One Modal that confirms inside itself, with a message and its own buttons."
     dontExample={<ModalOnModal />}
+    dontFullSize="?path=/story/templates-modal--full-size-modal-on-modal"
     dontCode={CODE.ModalOnModal}
     dontCaption="A Modal opened on another Modal, a second Blanket dimming the first."
 />
@@ -459,9 +463,11 @@ Each width has a maximum height, the screen less `--blanket-pad-y` above and bel
 
 <DoDontPair
     doExample={<FooterPinnedModal />}
+    doFullSize="?path=/story/templates-modal--full-size-footer-pinned-modal"
     doCode={CODE.FooterPinned}
     doCaption="Past the cap the body scrolls; the footer stays pinned with its buttons."
     dontExample={<ButtonInBodyModal />}
+    dontFullSize="?path=/story/templates-modal--full-size-button-in-body-modal"
     dontCode={CODE.ButtonInBody}
     dontCaption="The button inside the scrolling body: it scrolls out of reach."
 />
@@ -474,9 +480,11 @@ Two to five views of one thing opened in any order; one footer saves them all. V
 
 <DoDontPair
     doExample={<StepsFooterModal />}
+    doFullSize="?path=/story/templates-modal--full-size-steps-footer-modal"
     doCode={CODE.StepsWithBackAndNext}
     doCaption="Views in order are Steps: Back and Next split across the footer."
     dontExample={<TabsForStepsModal />}
+    dontFullSize="?path=/story/templates-modal--full-size-tabs-for-steps-modal"
     dontCode={CODE.NumberedTabsAsSteps}
     dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
