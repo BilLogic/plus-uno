@@ -10,7 +10,7 @@ import { main } from './lib/findings.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 const ROOT = 'design-system/src/';
-const FONT = /\bfont:\s*(['"`])var\(--(?:heading|body|metric)-[a-z0-9-]+\)\1/;
+const FONT = /\bfont:\s*(['"`])var\(--(?:heading|body|metric)-[a-z0-9-]+\)\1/g;
 const MIN_SOURCES = 30;
 const REMEDY =
   "A `font` shorthand cannot carry letter spacing. Spread `typeStyle('<style>')` from storybook-docs/lib/type-style.js instead.";
@@ -25,9 +25,9 @@ export function inScope(rel) {
 /** 1-based lines holding a bare text-style `font`. */
 export function findUntracked(source) {
   const hits = [];
-  source.split('\n').forEach((line, i) => {
-    if (FONT.test(line)) hits.push(i + 1);
-  });
+  for (const m of source.matchAll(FONT)) {
+    hits.push(source.slice(0, m.index).split('\n').length);
+  }
   return hits;
 }
 
