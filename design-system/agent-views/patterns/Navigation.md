@@ -56,7 +56,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 | --- | --- |
 | Views as short parallel nouns: "Upcoming", "Past". | "Show upcoming sessions", "History". |
 | Page tabs name views of one subject: "Overview", "Sessions", "Notes". | Counts or status in the tab label. |
-| The labeled filter trigger names the view: "Status: Upcoming". | A bare "Upcoming". |
+| The labeled view picker names the view: "Status: Upcoming". | A bare "Upcoming". |
 | Breadcrumb levels by the page's own title. | "Back", "Home" as a level. |
 | Open item: "4:00 PM · Ms. Ortiz". | "Session #1028". |
 
@@ -139,7 +139,7 @@ The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. Ho
 
 "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more". Removing one is Add and remove; opening one is Go to.
 
-Do: Each item names the session by its time and the teacher.
+Do: Each item names the session by its time and the tutor.
 Don't: Each item carries everything, and the time it is found by is cut off.
 
 ### Put the collection's add action in its Section's title row, not the page header. {#put-the-collection-s-add-action-in-its-section-s-title-row-not-the-page-header}

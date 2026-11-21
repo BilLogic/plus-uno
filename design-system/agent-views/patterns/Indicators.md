@@ -109,7 +109,7 @@ Two statuses force people to decide which is true. A roll-up shows the worst chi
 
 **Checked:** Review
 
-A status is read at a glance; a sentence belongs in the row text. A Status tag truncates at 200 with its full text in a Tooltip.
+A status is read at a glance; a sentence belongs in the row text. A Status tag truncates at 200, its `maxWidth` default, with its full text in a Tooltip.
 
 ### Keep most counts quiet and show nothing at zero. {#keep-most-counts-quiet-and-show-nothing-at-zero}
 

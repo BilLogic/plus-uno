@@ -70,7 +70,7 @@ Where the buttons sit and in which look is each host's footer, and Common action
 | Part | Component | Notes |
 | --- | --- | --- |
 | Fields | `Fieldset` | There is no Form component: a Fieldset groups the fields inside a host. |
-| Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
+| Rejection at the top | `SectionMessage` | A danger message; scrolling it into view is Planned . |
 | Choices | `RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker` | A control that cannot be wrong; pictured tiles for one big question per step. |
 | Settings rows | `SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag` | Divided rows under section headings with no card per row; flipping a toggle confirms via Flag. |
 | Hosts | Section, Panel, Modal, Frame | A page (under its Section header, no Section around the fields), a Panel, a Modal, or the multi-step task on Frame. Each owns its footer. |
@@ -116,7 +116,7 @@ A disabled submit gives no direction and leaves the tab order. Pressing it marks
 
 **Checked:** Automatic
 
-Mark the field, say what to fix inline, scroll the body to it, and shake once . Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
+Mark the field and say what to fix inline. Scrolling the body to it and a single shake are Planned . Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: Errors.
 
 Do: The message under the field, in the same Modal.
 Don't: A second dialog over the first, with the field left unexplained.

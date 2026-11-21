@@ -151,7 +151,7 @@ A menu's footer says "Clear" and "Apply", compact at the end. "Reset filters" at
 
 **Checked:** Automatic
 
-Below 960 the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: Section › Drop the Filter button while a filter side shows. Below 768 quick filters become a stacked menu.
+Below 960 (`FRAME_LAYOUT.splitFloor`) the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: Section › Drop the Filter icon while a filter side shows. Below 768 (`FRAME_LAYOUT.fullWidthBelow`) quick filters become a stacked menu.
 
 ## In code
 

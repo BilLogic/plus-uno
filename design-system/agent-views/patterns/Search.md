@@ -166,7 +166,7 @@ Esc empties the text and keeps the field. In focused, the first Esc closes the p
 
 **Checked:** Review
 
-The Section header holds controls of one height, 32, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
+The Section header holds controls of one height, 32 (`--control-md`), so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
 
 ## In code
 
