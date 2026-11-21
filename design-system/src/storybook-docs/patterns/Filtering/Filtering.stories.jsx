@@ -2,7 +2,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { MotionPreferenceContext } from '@/lib/motionPreference';
-import { SECTION_DETAIL_FLOOR, FRAME_LAYOUT } from '@/templates';
+import { SECTION_DETAIL_FLOOR } from '@/templates';
+import { FRAME_LAYOUT } from '@/templates/Frame/frameLayout';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';

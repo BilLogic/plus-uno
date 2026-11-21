@@ -5,8 +5,6 @@
 
 export { default as Frame, PANEL_STORAGE_KEY } from './Frame';
 export { usePanelControl } from './Frame/PanelControl';
-export { FRAME_LAYOUT } from './Frame/frameLayout';
-export { useOwnWidth } from './Frame/useOwnWidth';
 export { default as Page } from './Page';
 export { default as Section, SECTION_DETAIL_FLOOR } from './Section';
 export { default as Card } from './Card';

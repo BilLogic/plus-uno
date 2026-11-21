@@ -307,13 +307,6 @@
     transform: rotate(-180deg);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .plus-template-section-detail-trigger,
-    .plus-template-section-detail-chevron {
-        transition: none;
-    }
-}
-
 .plus-template-section-detail-body {
     display: flex;
     flex-direction: column;

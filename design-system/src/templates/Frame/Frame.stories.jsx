@@ -146,6 +146,9 @@ const parts = (canvasElement) => {
 
 const rect = (el) => el.getBoundingClientRect();
 
+/** Under reduced motion a closing Sidebar fades out in place; wait until it has left the flow. */
+const faded = (frame) => waitFor(() => expect(frame.querySelector('.plus-frame__sidebar[data-leaving]'), 'the closing Sidebar has faded out').toBeNull());
+
 /** Where `el` sits relative to the frame's top-left corner. */
 const offset = (frame, el) => ({ x: rect(el).left - rect(frame).left, y: rect(el).top - rect(frame).top });
 
@@ -355,6 +358,7 @@ export const Medium768 = {
         const p = parts(canvasElement);
         const { frame, surface, content, sidebar, edge } = p;
         await waitFor(() => expect(sidebar(), `closed below 1024 (found ${sidebar()?.className}, viewport ${window.innerWidth})`).toBeNull());
+        await faded(frame);
         const toggle = p.toggle;
         await expectToggleHome(frame, toggle);
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
@@ -437,6 +441,7 @@ export const Large1024 = {
 
         await userEvent.click(p.toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
+        await faded(frame);
         await expect(offset(frame, surface).x, 'closed: the surface runs to the window edge').toBeCloseTo(0, 0);
         await expectCorner(frame, surface);
         await expectToggleHome(frame, p.toggle);
@@ -462,6 +467,7 @@ export const CtrlBracketToggle = {
 
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
+        await faded(frame);
         await expect(offset(frame, surface).x, 'the Page runs to the window edge').toBeCloseTo(0, 0);
         await expectCorner(frame, surface);
 
@@ -672,6 +678,7 @@ export const ModalFromFloatingSidebar = {
         await userEvent.click(within(p.sidebar()).getByRole('button', { name: 'Preferences' }));
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
         await waitFor(() => expect(p.sidebar(), 'the floating sidebar closed').toBeNull());
+        await settled(p.frame);
 
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
@@ -915,6 +922,7 @@ export const PanelAutoCollapsesSidebarAt1200 = {
         await expectCorner(p.frame, p.surface);
         await openPanel(p);
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses to keep 720').toBeNull());
+        await faded(p.frame);
         await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
         await expect(offset(p.frame, p.surface).x, 'the Page runs to the left edge').toBeCloseTo(0, 0);
         await expect(rect(p.content).width, '1200 - 400 - 48').toBeCloseTo(752, 0);
@@ -1136,6 +1144,7 @@ export const DockedPanelTakesLostFocusAt1200 = {
         await userEvent.keyboard('{Enter}');
         await waitFor(() => expect(p.panel()).not.toBeNull());
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses').toBeNull());
+        await settled(p.frame);
         await expect(getComputedStyle(p.panel()).position, 'docked').not.toBe('absolute');
         await waitFor(() => expect(doc.activeElement, 'focus moves into the Panel').toBe(p.panel()));
         await expect(p.surface.inert, 'docked, nothing goes inert').toBe(false);
@@ -1884,11 +1893,13 @@ const collapsePlay = (reduced) => async ({ canvasElement }) => atViewport(1440, 
 
     await userEvent.click(p.canvas.getByRole('button', { name: 'Close sidebar' }));
     if (reduced) {
-        await waitFor(() => expect(sidebarBox(p), 'it is gone at once').toBeNull());
+        await expect(box, 'it stays for its exit').toHaveAttribute('data-leaving', 'true');
+        await expect(getComputedStyle(box).animationName, 'it fades out, never a cut').toBe('plus-overlay-fade-out');
+        await waitFor(() => expect(sidebarBox(p), 'it leaves once the fade ends').toBeNull());
         await expect(rect(p.surface).left - rect(p.frame).left, 'the Page runs to the edge').toBeCloseTo(0, 0);
         await userEvent.click(p.canvas.getByRole('button', { name: 'Open sidebar' }));
         const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
-        await expect(getComputedStyle(back).animationName).toBe('none');
+        await expect(getComputedStyle(back).animationName, 'it fades in').toBe('plus-overlay-fade');
         await expect(rect(p.surface).left - rect(p.frame).left).toBeCloseTo(width, 0);
         return;
     }
@@ -1942,8 +1953,10 @@ const peekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
     p.edge().dispatchEvent(new PointerEvent('pointerenter', { bubbles: false }));
     const peek = await waitFor(() => { const el = p.frame.querySelector('.plus-frame__sidebar--raised'); expect(el).not.toBeNull(); return el; });
     if (reduced) {
-        await expect(getComputedStyle(peek).animationName).toBe('none');
+        await expect(getComputedStyle(peek).animationName, 'the peek fades in, never a cut').toBe('plus-overlay-fade');
+        await settled(p.frame);
         await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(getComputedStyle(peek).animationName, 'and fades out').toBe('plus-overlay-fade-out'));
         await waitFor(() => expect(p.frame.querySelector('.plus-frame__sidebar--raised')).toBeNull());
         return;
     }
@@ -1988,8 +2001,9 @@ const dockPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
     const full = tokenLength(p.frame, '--panel-width-default');
     await expect(rect(panel.querySelector('.plus-panel')).height, 'the Panel content fills the full height').toBeCloseTo(rect(panel).height, 0);
     if (reduced) {
-        await expect(getComputedStyle(panel).animationName, 'reduced motion does not animate').toBe('none');
-        await expect(rect(panel).width).toBeCloseTo(full, 0);
+        await expect(getComputedStyle(panel).animationName, 'reduced motion fades, never a cut').toBe('plus-overlay-fade');
+        await expect(rect(panel).width, 'in its final place').toBeCloseTo(full, 0);
+        await settled(p.frame);
     } else {
         await expect(getComputedStyle(panel).animationName, 'it docks on a spring').not.toBe('none');
         const running = pauseAt(panel);
@@ -2008,7 +2022,9 @@ const dockPlay = (reduced) => async ({ canvasElement }) => atViewport(1440, asyn
 
     await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
     if (reduced) {
-        await waitFor(() => expect(p.panel(), 'it is gone at once').toBeNull());
+        await waitFor(() => expect(panel).toHaveAttribute('data-ending-style'));
+        await expect(getComputedStyle(panel).animationName, 'it fades out').toBe('plus-overlay-fade-out');
+        await waitFor(() => expect(p.panel(), 'it leaves once the fade ends').toBeNull());
     } else {
         await waitFor(() => expect(panel).toHaveAttribute('data-ending-style'));
         const leaving = pauseAt(panel);
@@ -2046,7 +2062,8 @@ const overlayPlay = (reduced) => async ({ canvasElement }) => atViewport(1100, a
     const panel = await waitFor(() => { const el = p.panel(); expect(el).not.toBeNull(); return el; });
     await panelIs(p, 'overlay');
     if (reduced) {
-        await expect(getComputedStyle(panel).animationName).toBe('none');
+        await expect(getComputedStyle(panel).animationName, 'it fades in, never a cut').toBe('plus-overlay-fade');
+        await settled(p.frame);
         await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(p.panel()).toBeNull());
         return;
@@ -2090,7 +2107,8 @@ const panelPeekPlay = (reduced) => async ({ canvasElement }) => atViewport(1440,
     const panel = await waitFor(() => { const el = p.panel(); expect(el).not.toBeNull(); return el; });
     await expect(p.splitter(), 'a peek does not show a splitter').toBeNull();
     if (reduced) {
-        await expect(getComputedStyle(panel).animationName).toBe('none');
+        await expect(getComputedStyle(panel).animationName, 'it fades in, never a cut').toBe('plus-overlay-fade');
+        await settled(p.frame);
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(p.panel()).toBeNull());
         return;
@@ -2144,7 +2162,7 @@ const breakpointPlay = (reduced) => async ({ canvasElement }) => atViewport(1440
         await expect(edge()).toBeCloseTo(0, 0);
         stage.style.inlineSize = '1200px';
         const back = await waitFor(() => { const el = sidebarBox(p); expect(el).not.toBeNull(); return el; });
-        await expect(getComputedStyle(back).animationName).toBe('none');
+        await expect(getComputedStyle(back).animationName, 'it fades back in').toBe('plus-overlay-fade');
         await expect(edge()).toBeCloseTo(width, 0);
         return;
     }
