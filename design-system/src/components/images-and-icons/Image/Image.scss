@@ -13,8 +13,9 @@
     }
 
     /* With a dark variant, the light image shows by default and the dark one
-       when the app's color mode is dark, or auto on a dark system. */
-    &--dark {
+       when the app's color mode is dark, or auto on a dark system. Two classes,
+       so a parent's `> * { display: block }` cannot show both images. */
+    &.plus-image--dark {
         display: none;
     }
 }
