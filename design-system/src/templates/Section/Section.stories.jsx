@@ -394,11 +394,12 @@ export const LoadingScaled = {
         const local = scaled.offsetWidth;
         expect(Math.abs(scaled.getBoundingClientRect().width - local / 2)).toBeLessThan(1);
         const parent = canvasElement.querySelector('[data-testid="scaled"] .plus-template-section-loading');
-        const shape = scaled.closest('.plus-template-section-loading__shape');
         const shell = parent.querySelector('.plus-template-section-loading__shell');
-        const target = [...shell.querySelectorAll('[role="tab"], button')].find((el) => Math.abs(el.offsetWidth - local) <= 1);
-        expect(target).toBeTruthy();
-        expect(shape).toBeTruthy();
+        // Every hidden view pill has a shape at its own local width (the overflow ghosts draw none).
+        const widths = [...shapes('scaled')].map((el) => el.offsetWidth);
+        const controls = [...shell.querySelectorAll('[role="tab"]')].filter((el) => el.offsetWidth > 0 && !el.closest('.plus-tabs-ghosts'));
+        expect(controls.length).toBeGreaterThan(0);
+        controls.forEach((el) => expect(widths.some((w) => Math.abs(w - el.offsetWidth) <= 1)).toBe(true));
     },
 };
 
