@@ -50,6 +50,10 @@ Table reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | selection | Update a value or state | `--ds-motion-appearance-fast` | Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves. |
 
+## Alternatives
+
+- For a few objects people scan one by one, use `Card`.
+
 ## Best practices
 
 ### Put a plain table in a Section. {#put-a-plain-table-in-a-section}
@@ -72,7 +76,7 @@ Don't: Two tables share one Section and one header; search and filters no longer
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
 Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected.
-Don't: A roster people act on as a Static table; with no sort, selection or paging, a roster of 340 becomes one long scroll.
+Don't: A roster people act on as a Static table; with no sort, selection or paging, a roster of hundreds becomes one long scroll.
 
 ### Use a Tree table for a hierarchy. {#use-a-tree-table-for-a-hierarchy}
 
@@ -91,10 +95,10 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 
 ## Related
 
-- Section: the header rows that sit above every table.
-- Static table, Dynamic table and Tree table: the three table components the template takes.
-- Pagination: the pager that fills the footer slot.
-- Card: a table never sits inside a card.
+- Section: use when the table needs the header rows that sit above it.
+- Static table, Dynamic table and Tree table: use when building the table yourself, one per type.
+- Pagination: use when the rows span pages and the footer slot needs a pager.
+- Card: use when showing a few objects people scan; a table never sits inside a card.
 
 Same group: `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Section`
 

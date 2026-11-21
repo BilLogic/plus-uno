@@ -50,9 +50,9 @@ Panel reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For a decision that must happen before the page continues, use `Modal`.
-- For a queue page, use `Panel` docked beside the list; the record opens on demand.
+- For a record that opens in place and pushes the content below it down, use `Section` with a detail.
 - For a short aside off a control, use `Popup`.
-- For complex or multistep work, give the record its own page with a multi-step task on `Frame`.
+- For complex or multistep work, use `Frame` with a multi-step task.
 
 ## Best practices
 
@@ -152,7 +152,7 @@ Wrap the region that can open Panels in a `PanelProvider`, and read or change th
 
 **Checked:** Review
 
-"Session · Mar 4", not "Details", so someone who opened it from elsewhere still knows.
+"Session · Ana", not "Details", so someone who opened it from elsewhere still knows.
 
 ### Offer "Open as page" in More. {#offer-open-as-page-in-more}
 
