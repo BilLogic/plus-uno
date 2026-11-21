@@ -56,7 +56,7 @@
     // Hover state: the input's hovered fill, edged in the brand border.
     // Focus state: the state mixin's ring, 2px wide and 2px off the box, as
     // Toggle and Radio draw it. A pointer focus draws nothing. Disabled
-    // state: Atlassian's disabled colors, under the disabled fade.
+    // state: the disabled colors, under the disabled fade.
     @include plus-state(
         $states: (
             hovered: (border-color: var(--ds-border-brand), background-color: var(--ds-background-input-hovered)),

@@ -137,7 +137,7 @@ export const Queued = {
                     <FileItem
                         name="chat_transcript.txt"
                         status="queued"
-                        meta={cancelled ? 'Cancelled' : undefined}
+                        meta={cancelled ? 'Canceled' : undefined}
                         removal="cancel"
                         onRemove={() => setCancelled(true)}
                     />
@@ -152,7 +152,7 @@ export const Queued = {
         await expect(canvas.getByText('Waiting')).toBeInTheDocument();
         await expect(canvasElement.querySelector('.fa-clock')).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Cancel chat_transcript.txt' }));
-        await expect(canvas.getByText('Waiting · Cancelled')).toBeInTheDocument();
+        await expect(canvas.getByText('Waiting · Canceled')).toBeInTheDocument();
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
     },
 };

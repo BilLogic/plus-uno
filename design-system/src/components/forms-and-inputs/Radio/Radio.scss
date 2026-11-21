@@ -50,7 +50,7 @@
     // Hover: the input's hovered fill when unchecked; the named hovered step,
     // opaque, when checked, edged in the same step. Focus: the state mixin's
     // ring, 2px off the edge, as Checkbox and Toggle draw it. Disabled:
-    // Atlassian's disabled colors.
+    // the disabled colors.
     @include plus-state(
         $states: (
             hovered: (border-color: var(--ds-border-brand), background-color: var(--ds-background-input-hovered)),

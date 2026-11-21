@@ -14,10 +14,9 @@ import './TagGroup.scss';
  * whether the set is disabled. All four are properties of the set, not of any
  * member of it.
  *
- * THE GAP LIVES HERE, NOT ON THE TAG. Atlassian's tag carries its own margin,
- * which then has to be switched off with a `hasMargin` escape hatch whenever a
- * parent uses `gap` — an API that exists only to undo a decision made in the
- * wrong place. `Tag` sets `margin: 0` and this sets `gap`, so there is nothing
+ * THE GAP LIVES HERE, NOT ON THE TAG. A tag that carried its own margin would
+ * need a `hasMargin` escape hatch whenever a parent uses `gap` — an API that
+ * exists only to undo a decision made in the wrong place. `Tag` sets `margin: 0` and this sets `gap`, so there is nothing
  * to undo and nothing to double up.
  *
  * COLLAPSE FITS BY WIDTH. A collapsed group shows as many tags as fit on one
