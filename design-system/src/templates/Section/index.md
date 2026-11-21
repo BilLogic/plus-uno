@@ -20,7 +20,7 @@ Also asked as: page section, section header, block, region.
 
 **Storybook page:** `design-system/src/templates/Section/Section.mdx`
 
-**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.fast` + `appearance.fast` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · detail `spatial.fast` + `appearance.fast` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -35,8 +35,6 @@ Section reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Title row: nothing moves. The selected pill's fill and the format switch's indicator glide while the content swaps in place. Search and the Filter count grow to the left. |
-| side-open | Expand and collapse | `--ds-motion-spatial-default` | The side opens and collapses as a section. Below 960 it hides with no animation. |
-| side-close | Expand and collapse | `--ds-motion-spatial-default` | Collapses back the same way. Below 960 the side is gone in the same frame, with no animation. |
 | detail | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens in place inside the Section and pushes the content below it down. |
 | body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Content loads on arrival; add or remove, reorder and swap content as it changes. |
 | footer | Step to the next or previous | `--ds-motion-spatial-default` | Paging is Step. |

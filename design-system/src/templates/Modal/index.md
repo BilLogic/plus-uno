@@ -20,7 +20,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Storybook page:** `design-system/src/templates/Modal/Modal.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` + `appearance.fast` · swap `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -42,7 +42,6 @@ Modal reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
 | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` | Leaves at 98%, fading; stays mounted until the exit completes. |
 | swap | Swap content in place | `--ds-motion-appearance-fast` | One Modal at a time: a confirm replaces the content in place, never a second Modal. |
-| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
 ## Alternatives
 
@@ -110,7 +109,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 - Focus moves into the Dialog on open (to the first input or control) and stays trapped until it closes, while the page behind stops scrolling. Escape, Close and the Blanket close it, and focus returns to what opened it.
 - Set `blanket="static"` (or `false`) for an inline confirmation of a destructive action so a stray click outside does not abandon it.
 - A body that scrolls is a tab stop. With tabs, Left and Right move between tabs and the panel is named by its tab.
-- A blocked submit announces the first error; with reduced motion the color, icon, message and focus move carry it without the shake.
+- A blocked submit announces the first error; the color, icon, message and focus move carry it.
 - Close is named "Close". The Danger button in a type-the-name confirm stays disabled until the name matches, and the caption carries the reason.
 
 ## Related

@@ -18,7 +18,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Modal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
 | Modal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | Modal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |  |
-| Modal | template | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | Page | template | title | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | anchor | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -33,8 +32,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Popup | template | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Popup | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Section | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Section | template | side-open | Expand and collapse | `--ds-motion-spatial-default` |  |
-| Section | template | side-close | Expand and collapse | `--ds-motion-spatial-default` |  |
 | Section | template | detail | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Section | template | body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Section | template | footer | Step to the next or previous | `--ds-motion-spatial-default` |  |
