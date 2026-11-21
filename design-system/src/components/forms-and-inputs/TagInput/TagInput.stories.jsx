@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, TextField } from '@/components';
-import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
@@ -496,7 +496,10 @@ Controlled.play = async ({ canvasElement }) => {
  */
 const Tidy = ({
     onRenameSpy, onDeleteSpy, onColorChangeSpy, onReorderSpy,
-    menu = true, reorder = true, initialTags = [], ...props
+    menu = true, reorder = true, initialTags = [],
+    // Storybook's own action args would replace the handlers below, so they are dropped.
+    onRename, onDelete, onColorChange, onReorder,
+    ...props
 }) => {
     const [options, setOptions] = useState(TOPICS);
     const handlers = {};
@@ -684,21 +687,148 @@ export const DragReorder = {
         await userEvent.hover(within(listbox).getByRole('option', { name: 'Design judgment' }));
         const handle = body.getByRole('button', { name: 'Reorder Design judgment' });
 
+        // Pragmatic drag and drop listens for the browser's own drag events.
         const start = handle.getBoundingClientRect();
-        const pointer = (target, type, y) => target.dispatchEvent(new PointerEvent(type, {
-            bubbles: true, clientX: start.left + 2, clientY: y, pointerId: 1, isPrimary: true, button: 0,
+        const transfer = new DataTransfer();
+        const fire = (target, type, y) => target.dispatchEvent(new DragEvent(type, {
+            bubbles: true, cancelable: true, clientX: start.left + 2, clientY: y, dataTransfer: transfer,
         }));
-        pointer(handle, 'pointerdown', start.top + 2);
-        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' }).getBoundingClientRect();
-        pointer(window, 'pointermove', dev.top + dev.height * 0.75);
+        fire(handle, 'dragstart', start.top + 2);
+        // The engine starts the drag a beat after dragstart; the row lifts once it has.
         await waitFor(() => expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
-        await expect(within(listbox).getByRole('option', { name: 'Dev coordination' })).toHaveClass('has-drop-indicator-after');
+        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' });
+        const box = dev.getBoundingClientRect();
+        const y = box.top + box.height * 0.75;
+        fire(dev, 'dragenter', y);
+        // The engine reports a drag once per frame, so the pointer keeps moving until the line shows.
+        await waitFor(() => {
+            fire(dev, 'dragover', y);
+            expect(dev).toHaveClass('has-drop-indicator-after');
+        });
+        await expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging');
 
-        pointer(window, 'pointerup', dev.top + dev.height * 0.75);
+        fire(dev, 'drop', y);
+        fire(handle, 'dragend', y);
         await expect(args.onReorderSpy).toHaveBeenCalledWith(0, 3);
         await expect(rowNames(canvasElement)).toEqual(
             ['Decision recall', 'Design system taxonomy', 'Dev coordination', 'Design judgment']
         );
+    },
+};
+
+/** Opens the list, points at a row and returns its handle and a way to fire the browser's drag events. */
+const startDrag = async (canvasElement, name) => {
+    const body = bodyOf(canvasElement);
+    await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Topics' }));
+    const listbox = await body.findByRole('listbox', { name: 'Topics options' });
+    await userEvent.hover(within(listbox).getByRole('option', { name }));
+    const handle = body.getByRole('button', { name: `Reorder ${name}` });
+    const start = handle.getBoundingClientRect();
+    const transfer = new DataTransfer();
+    const fire = (target, type, y) => target.dispatchEvent(new DragEvent(type, {
+        bubbles: true, cancelable: true, clientX: start.left + 2, clientY: y, dataTransfer: transfer,
+    }));
+    const lowerQuarter = (rowName) => {
+        const box = within(listbox).getByRole('option', { name: rowName }).getBoundingClientRect();
+        return box.top + box.height * 0.75;
+    };
+    return { listbox, handle, start, fire, lowerQuarter };
+};
+
+/**
+ * A press on the handle leaves the browser free to start its drag, while a
+ * press elsewhere in the list still keeps the entry's focus.
+ */
+export const DragHandlePressStartsDrag = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement }) => {
+        const { listbox, handle } = await startDrag(canvasElement, 'Design judgment');
+        const press = (target) => {
+            const event = new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 });
+            target.dispatchEvent(event);
+            return event.defaultPrevented;
+        };
+        await expect(handle).toHaveAttribute('draggable', 'true');
+        await expect(press(handle)).toBe(false);
+        await expect(press(within(listbox).getByRole('option', { name: 'Decision recall' }))).toBe(true);
+        // A press and release that never drags leaves the entry ready to type in.
+        await userEvent.click(handle);
+        await waitFor(() => expect(within(canvasElement).getByRole('combobox')).toHaveFocus());
+    },
+};
+
+/** The drop lands where the pointer was let go, even when no drag frame reported that spot. */
+export const DragDropsWherePointerIs = {
+    args: tidyArgs(),
+    render: (args) => <div style={stack}><Tidy {...args} /></div>,
+    play: async ({ canvasElement, args }) => {
+        const { listbox, handle, fire, lowerQuarter } = await startDrag(canvasElement, 'Design judgment');
+        fire(handle, 'dragstart', handle.getBoundingClientRect().top + 2);
+        await waitFor(() => expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
+        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' });
+        fire(dev, 'dragenter', lowerQuarter('Dev coordination'));
+        await waitFor(() => {
+            fire(dev, 'dragover', lowerQuarter('Dev coordination'));
+            expect(dev).toHaveClass('has-drop-indicator-after');
+        });
+
+        // The pointer moves up a row and lets go in the same frame.
+        const recall = within(listbox).getByRole('option', { name: 'Decision recall' });
+        const y = lowerQuarter('Decision recall');
+        fire(recall, 'dragover', y);
+        fire(recall, 'drop', y);
+        fire(handle, 'dragend', y);
+        await expect(args.onReorderSpy).toHaveBeenCalledWith(0, 1);
+        await expect(rowNames(canvasElement)).toEqual(
+            ['Decision recall', 'Design judgment', 'Design system taxonomy', 'Dev coordination']
+        );
+    },
+};
+
+const LockableTidy = (args) => {
+    const [locked, setLocked] = useState(false);
+    return (
+        <div style={stack}>
+            <Tidy {...args} reorder={!locked} />
+            <Button onClick={() => setLocked((value) => !value)}>{locked ? 'Unlock order' : 'Lock order'}</Button>
+        </div>
+    );
+};
+
+/**
+ * When the handle goes away mid-drag, the move is canceled and the list stops
+ * taking drops, so the next drag starts clean.
+ */
+export const DragHandleRemovedMidDrag = {
+    args: tidyArgs(),
+    render: (args) => <LockableTidy {...args} />,
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const warn = spyOn(console, 'warn');
+        try {
+            const { listbox, handle, fire } = await startDrag(canvasElement, 'Design judgment');
+            fire(handle, 'dragstart', handle.getBoundingClientRect().top + 2);
+            await waitFor(() => expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
+
+            canvas.getByRole('button', { name: 'Lock order' }).click();
+            await waitFor(() => expect(handle).not.toBeInTheDocument());
+            await expect(within(listbox).getByRole('option', { name: 'Design judgment' })).not.toHaveClass('is-dragging');
+            await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Reorder canceled'));
+            fire(canvasElement.ownerDocument.body, 'dragend', 0);
+            await expect(args.onReorderSpy).not.toHaveBeenCalled();
+
+            canvas.getByRole('button', { name: 'Unlock order' }).click();
+            const again = await startDrag(canvasElement, 'Design judgment');
+            again.fire(again.handle, 'dragstart', again.handle.getBoundingClientRect().top + 2);
+            await waitFor(() => expect(within(again.listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
+            again.fire(again.handle, 'dragend', 0);
+            await expect(warn).not.toHaveBeenCalledWith(
+                expect.stringContaining('already registered'), expect.anything()
+            );
+        } finally {
+            warn.mockRestore();
+        }
     },
 };
 

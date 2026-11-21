@@ -10,7 +10,7 @@ TagInput — a field of Tags with a text entry after them, modeled on Notion's m
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, OverflowCollapse, OverflowGrow
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, DragHandlePressStartsDrag, DragDropsWherePointerIs, DragHandleRemovedMidDrag, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, OverflowCollapse, OverflowGrow
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 
