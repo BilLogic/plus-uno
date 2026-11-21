@@ -1,14 +1,38 @@
 .plus-image {
     display: block;
 
-    &--fixed {
+    &--natural {
         width: auto;
         height: auto;
         max-width: none;
     }
 
-    &--fluid {
+    &--container {
         width: 100%;
         height: auto;
+    }
+
+    /* With a dark variant, the light image shows by default and the dark one
+       when the app's color mode is dark, or auto on a dark system. */
+    &--dark {
+        display: none;
+    }
+}
+
+:is([data-color-mode="dark"]) .plus-image--light {
+    display: none;
+}
+
+:is([data-color-mode="dark"]) .plus-image--dark {
+    display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+    :is([data-color-mode="auto"]) .plus-image--light {
+        display: none;
+    }
+
+    :is([data-color-mode="auto"]) .plus-image--dark {
+        display: block;
     }
 }

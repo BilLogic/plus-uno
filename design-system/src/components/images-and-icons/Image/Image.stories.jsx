@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import { Image, IMAGE_SIZES } from '@/components';
+import { Image, IMAGE_FITS } from '@/components';
 import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
 import sessionSummaryDark from '@/assets/images/kit/session-summary-dark.svg';
 
@@ -9,24 +9,24 @@ export default {
     component: Image,
     tags: ['!dev', '!autodocs'],
     argTypes: {
-        size: { control: 'select', options: IMAGE_SIZES, table: { category: 'Design' } },
+        fit: { control: 'select', options: IMAGE_FITS, table: { category: 'Design' } },
         alt: { control: 'text', table: { category: 'Design' } },
     },
 };
 
-export const Sizes = () => (
+export const Fits = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
-        {IMAGE_SIZES.map((size) => (
-            <div key={size} style={{ width: '200px' /* token gap: 200px */ }}>
-                <Image src={sessionSummaryLight} alt="" size={size} testId={`image-${size}`} />
+        {IMAGE_FITS.map((fit) => (
+            <div key={fit} style={{ width: '200px' /* token gap: 200px */ }}>
+                <Image src={sessionSummaryLight} alt="" fit={fit} testId={`image-${fit}`} />
             </div>
         ))}
     </div>
 );
 
-Sizes.play = async ({ canvasElement }) => {
-    for (const size of IMAGE_SIZES) {
-        const node = canvasElement.querySelector(`[data-testid="image-${size}"]`);
+Fits.play = async ({ canvasElement }) => {
+    for (const fit of IMAGE_FITS) {
+        const node = canvasElement.querySelector(`[data-testid="image-${fit}"]`);
         await expect(node).toBeTruthy();
         await expect(node.tagName).toBe('IMG');
     }
@@ -42,14 +42,13 @@ export const DarkVariant = () => (
 );
 
 DarkVariant.play = async ({ canvasElement }) => {
-    const picture = canvasElement.querySelector('picture');
-    await expect(picture).toBeTruthy();
-    const source = picture.querySelector('source');
-    await expect(source.getAttribute('srcset')).toBe(sessionSummaryDark);
+    const dark = canvasElement.querySelector('.plus-image--dark');
+    await expect(dark).toBeTruthy();
+    await expect(dark.getAttribute('src')).toBe(sessionSummaryDark);
 };
 
 export const Interactive = {
-    args: { src: sessionSummaryLight, alt: 'Weekly tutoring session summary', size: 'fluid' },
+    args: { src: sessionSummaryLight, alt: 'Weekly tutoring session summary', fit: 'container' },
     render: (args) => <div style={{ width: '240px' }}><Image {...args} /></div>,
 };
 
