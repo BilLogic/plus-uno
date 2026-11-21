@@ -163,16 +163,16 @@ export const SwitchingModes = {
 
         await press(within(p.panel()), 'Full screen');
         await waitFor(() => expect(p.fullscreen(), 'full screen opens').not.toBeNull());
-        await expect(p.panel(), 'the Panel closes').toBeNull();
+        await waitFor(() => expect(p.panel(), 'the Panel closes').toBeNull());
         await expect(p.fab(), 'the button hides in full screen').toBeNull();
 
         await press(within(p.fullscreen()), 'Exit full screen');
         await waitFor(() => expect(p.landmark(), 'back in the Panel').not.toBeNull());
-        await expect(p.fullscreen()).toBeNull();
+        await waitFor(() => expect(p.fullscreen()).toBeNull());
 
         await press(within(p.panel()), 'Move to popup');
         await waitFor(() => expect(p.popup(), 'back in the popup').not.toBeNull());
-        await expect(p.panel()).toBeNull();
+        await waitFor(() => expect(p.panel()).toBeNull());
         await expect(p.fab(), 'the button is back').not.toBeNull();
 
         await press(within(p.popup()), 'Close chat');
