@@ -142,7 +142,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Label the moment by its role: "Session start", "Deadline". | A label for each half: "Date and time". |
 | Say what to fix: "Choose a start date and time." | "Invalid". |
-| Keep the placeholders as formats: MM/DD/YY and __ : __. | Instructions in the placeholders. |
+| Keep the placeholders as formats: MM/DD/YYYY and __ : __. | Instructions in the placeholders. |
 | Name the other person in the time-zone caption: "the student". | A time with no name: "also 1:00 PM". |
 
 ## Props

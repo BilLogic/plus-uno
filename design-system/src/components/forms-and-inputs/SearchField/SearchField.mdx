@@ -45,21 +45,9 @@ what is searched.
 
 <div className="sb-ds-doc-section">
 
-## Mode
-
-<PlannedTag /> Basic and Focused are Planned: Active is the one kind that ships. Search narrows inside a Section; there is no global search.
-
-<ComponentExample of={SearchFieldStories.Basic} title="Basic" description="Nothing runs per keystroke. Enter runs onSearch with the text." />
-
-<ComponentExample of={SearchFieldStories.Focused} title="Focused" description="On focus the panel lists recent searches. While typing it lists results grouped by type with counts, then See all, which acts as a basic search. A last action row is a slot." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Spacing
 
-<ComponentExample of={SearchFieldStories.Spacing} description="Default draws 40; compact draws 32, for bars." />
+<ComponentExample of={SearchFieldStories.Spacing} title="Default and compact" description="Default draws 40; compact draws 32, for bars." />
 
 </div>
 
@@ -118,15 +106,11 @@ what is searched.
 
 ## Usage
 
-Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
+Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
 
-Pick the mode by where the answer lands:
+`SearchField` filters rows as you type through `onValueChange`.
 
-- `active` (default): filters rows as you type through `onValueChange`.
-- `basic` <PlannedTag />: runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
-- `focused` <PlannedTag />: opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
-
-`name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
+`name` is the input's form key: a plain form submits the text under it.
 
 `isCollapsible` starts the field as an icon button (`defaultOpen` starts it open). Default strings can be overridden via `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
 

@@ -20,15 +20,11 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 ## Usage
 
-Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
+Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
 
-Pick the mode by where the answer lands:
+`SearchField` filters rows as you type through `onValueChange`.
 
-- `active` (default): filters rows as you type through `onValueChange`.
-- `basic` : runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
-- `focused` : opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
-
-`name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
+`name` is the input's form key: a plain form submits the text under it.
 
 `isCollapsible` starts the field as an icon button (`defaultOpen` starts it open). Default strings can be overridden via `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
 

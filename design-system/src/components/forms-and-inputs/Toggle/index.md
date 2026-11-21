@@ -83,7 +83,7 @@ The switch keeps its size, and the label is never clipped. See [Overflow](?path=
 
 - **Label every toggle.** Use a visible `label`, or pass `aria-label` when the layout already names the setting.
 - **Native checkbox with `role="switch"`.** The platform maps the checked state, so no `aria-checked` is written; a `role` prop on the toggle replaces it. Space flips the toggle.
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.**
+- **Keyboard focus is a 2px ring on `--ds-border-focused`, 2px off the track.**
 - **Explain a disabled toggle** in visible text beside it rather than a tooltip.
 
 ## Related

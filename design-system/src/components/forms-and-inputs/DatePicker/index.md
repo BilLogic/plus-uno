@@ -40,7 +40,7 @@ DatePicker reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Typing is checked on Enter or on leaving the field. {#typing-is-checked-on-enter-or-on-leaving-the-field}
+### Let the field check what people type. {#let-the-field-check-what-people-type}
 
 A real day inside `minDate` to `maxDate` is picked; anything else is kept exactly as typed and marked invalid, and `onChange` is not called until the text reads as a real date.
 
@@ -53,7 +53,7 @@ A real day inside `minDate` to `maxDate` is picked; anything else is kept exactl
 />
 ```
 
-### A range is two clicks, not a drag. {#a-range-is-two-clicks-not-a-drag}
+### Pick a range with two clicks, not a drag. {#pick-a-range-with-two-clicks-not-a-drag}
 
 The first click sets the first day, the second sets the last day, and `onChange` receives `[start, end]`. A click before the first day starts the range again rather than erroring.
 
@@ -68,12 +68,12 @@ The field says how to type the date before anyone types it. Without a hint peopl
 Do: The format is shown.
 Don't: No format given.
 
-### Show dates in one format everywhere. {#show-dates-in-one-format-everywhere}
+### Write the date in full in a message. {#write-the-date-in-full-in-a-message}
 
-Use the same order and separators in the field, the calendar and any message. Mixed formats read as different dates.
+The field takes MM/DD/YYYY. In text, write the month out, so the date reads the same in every locale.
 
-Do: One format throughout.
-Don't: A second format appears in the message.
+Do: The date is written in full in the message.
+Don't: An all-numeric date in the message reads differently by locale.
 
 ### Use one range field, not two dates. {#use-one-range-field-not-two-dates}
 

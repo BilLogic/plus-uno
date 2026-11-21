@@ -112,7 +112,7 @@ The box keeps its size at the top of the row, and the label is never clipped. Se
 - **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen. Include an error message for a required or invalid box, for example "Select an option".
 - **`isRequired` sets `aria-required` on the checkbox**, whether or not `labelMarker="required"` is shown for a minority required field.
 - **`isIndeterminate` is set on the DOM node** and announced as "mixed".
-- **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `border.focused`, 2px off the box; pointer focus draws none.
+- **Keyboard.** `Space` toggles the focused checkbox; `Enter` does not. Keyboard focus is a 2px ring on `--ds-border-focused`, 2px off the box; pointer focus draws none.
 
 ## Related
 

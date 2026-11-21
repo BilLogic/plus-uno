@@ -110,9 +110,7 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 ## Usage
 
-The days are one tab stop (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
-
-Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
+Use `Calendar` when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
 
 </div>
 
@@ -166,7 +164,7 @@ Use `Calendar` directly only when a month grid must stay visible on the page wit
 <tr><td>Day size</td><td><code>--calendar-day-sm</code> (24), <code>--calendar-day-md</code> (32), <code>--calendar-day-lg</code> (40).</td></tr>
 <tr><td>Day radius</td><td><code>--radius-md</code>.</td></tr>
 <tr><td>Gaps</td><td><code>--stack-md</code> between header, weekdays and days; <code>--stack-sm</code> between rows.</td></tr>
-<tr><td>Padding</td><td><code>--space-025</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
+<tr><td>Padding</td><td><code>--pad-x-xs</code> top and bottom, <code>--pad-x-sm</code> either side.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -255,6 +253,7 @@ Six weeks render every month, including the days of neighboring months that fill
 
 ## Accessibility
 
+- **The days are one tab stop** (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
 - **Each day is a real, named button.** The accessible name is the day's full date, not just a number, so a screen reader announces an unambiguous date on every cell.
 - **State is marked, not just styled.** `aria-pressed` marks the picked day or a range's ends, `aria-current="date"` marks today, and `data-in-range` marks the days between. None of this relies on color alone.
 - **Out-of-range and out-of-month days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`.

@@ -172,7 +172,7 @@ Use `TimePicker` to enter or choose a time of day, such as a reminder time or a 
 
 ## Best practices
 
-### The field always reports a 12-hour value.
+### Read the 12-hour value `onChange` reports.
 
 `onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given, or `null` once the field is cleared. A 24-hour `value` is accepted and read as the same time, but what it hands back is always 12-hour.
 

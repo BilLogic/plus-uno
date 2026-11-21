@@ -49,7 +49,7 @@ Set `isReadOnly` on content people need to read: it stays in the tab order at fu
 Do: The placeholder hints at what to write.
 Don't: The placeholder repeats the label.
 
-### `value` is written to the DOM as HTML. {#value-is-written-to-the-dom-as-html}
+### Sanitize `value` before it reaches the editor. {#sanitize-value-before-it-reaches-the-editor}
 
 ```jsx
 // Incorrect: the value is assigned to the editable region's innerHTML, so
@@ -62,11 +62,11 @@ Don't: The placeholder repeats the label.
 
 The same applies to what you receive: `onChange` hands you whatever the browser produced, which is markup from a paste as much as from the toolbar.
 
-### It is built on a deprecated browser API. {#it-is-built-on-a-deprecated-browser-api}
+### Store the HTML as given; do not depend on its shape. {#store-the-html-as-given-do-not-depend-on-its-shape}
 
 Formatting runs through `document.execCommand`, which every engine now documents as deprecated. It works today and its exact output differs between browsers: one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of the HTML; store it and render it, or convert it once on save.
 
-### Link and image ask with a browser prompt. {#link-and-image-ask-with-a-browser-prompt}
+### Leave out Link and Image where a browser prompt will not do. {#leave-out-link-and-image-where-a-browser-prompt-will-not-do}
 
 Pressing those buttons opens the platform `prompt()` dialog for a URL. It is unstyled, it is not translatable, and some environments suppress it. Where that matters, leave those two buttons out of `toolbarButtons`.
 
@@ -91,7 +91,6 @@ The editor keeps its width, and the toolbar wraps instead of scrolling sideways.
 
 - `TextArea`: use when plain multi-line text is enough.
 - `TextField`: use when collecting a single line of text.
-- Your own sanitized HTML render: use when formatted content is displayed and the user cannot edit it.
 - `Comment`: use when displaying a formatted note in a discussion thread.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`

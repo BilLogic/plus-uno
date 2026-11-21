@@ -18,7 +18,7 @@ authored half, counted rather than assumed.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
   - For large illustrated choices with a title and an illustration, use `ChoiceGrid` (or `RadioGroup` / `CheckboxGroup` in `tile` appearance).
-- **[Calendar](Calendar/index.md)** — The days are one tab stop (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
+- **[Calendar](Calendar/index.md)** — Use `Calendar` when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
   - For a date or date range field that opens this grid in a popup, use `DatePicker`.
   - For a combined date and time answer, use `DateTimePicker`.
 - **[Cascader](Cascader/index.md)** — Use `Cascader` when a single path through a hierarchy is chosen one level at a time in sequence, such as district, then school, then grade.
@@ -77,7 +77,8 @@ authored half, counted rather than assumed.
   - For one to three quick filter triggers in a bar, use `FilterButton`.
 - **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
   - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-  - For switching between views of the same content, use `SegmentedControl`. For a spaced row of related action buttons, use `ButtonGroup`.
+  - For switching between views of the same content, use `SegmentedControl`.
+  - For a spaced row of related action buttons, use `ButtonGroup`.
 - **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
   - For an action where space allows a text label, use `Button`.
   - For an icon that navigates to another page or site, use `LinkIconButton`.
@@ -117,7 +118,7 @@ authored half, counted rather than assumed.
   - For plain multi-line text with no formatting toolbar, use `TextArea`.
   - For single-line text, use `TextField`.
   - For a threaded discussion entry with an author and timestamp, use `Comment`.
-- **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
+- **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
   - For picking a value from a known option list, use `Select`.
   - For narrowing a list by a category in a Section header, use `FilterButton`, `PopupSelect` or `FilterMenu`.
   - For general single-line text entry in a form, use `TextField`.

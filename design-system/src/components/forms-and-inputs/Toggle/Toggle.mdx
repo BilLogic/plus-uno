@@ -31,7 +31,7 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Toggle"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -50,7 +50,7 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 ## Size
 
-<ComponentExample of={ToggleStories.Sizes} description="16 is the default for pages with many toggles. 20 calls attention to one setting." />
+<ComponentExample of={ToggleStories.Sizes} title="Sizes" description="16 is the default for pages with many toggles. 20 calls attention to one setting." />
 
 </div>
 
@@ -74,7 +74,7 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <ComponentExample of={ToggleStories.DisabledWithReason} title="Disabled with a reason" description="The reason is visible text beside the toggle, never a tooltip." />
 
-<ComponentExample of={ToggleStories.Disabled} title="Disabled" description="The disabled fill in both positions, with an icon.disabled thumb. The toggle leaves the tab order." />
+<ComponentExample of={ToggleStories.Disabled} title="Disabled" description="The disabled fill in both positions, with an `--ds-icon-disabled` thumb. The toggle leaves the tab order." />
 
 </div>
 
@@ -255,7 +255,7 @@ The switch keeps its size, and the label is never clipped. See [Overflow](?path=
 
 - **Label every toggle.** Use a visible `label`, or pass `aria-label` when the layout already names the setting.
 - **Native checkbox with `role="switch"`.** The platform maps the checked state, so no `aria-checked` is written; a `role` prop on the toggle replaces it. Space flips the toggle.
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.**
+- **Keyboard focus is a 2px ring on `--ds-border-focused`, 2px off the track.**
 - **Explain a disabled toggle** in visible text beside it rather than a tooltip.
 
 </div>

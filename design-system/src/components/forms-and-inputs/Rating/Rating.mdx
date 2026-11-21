@@ -37,7 +37,7 @@ A rating lets a person give one score out of five in a single gesture.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Rating"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -191,18 +191,18 @@ A pre-filled rating biases the answer.
     dontCaption="Four stars filled before the person has rated."
 />
 
-### Show a given rating as disabled.
+### Show a recorded rating as plain text.
 
-A rating that cannot change reads as a result.
+`Rating` has no read-only state, and `isDisabled` is for a rating that does not apply yet. A rating nobody can change is a result, so write it as text. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 <DoDontPair
-    doExample={<Rating label="How was the session?" value={4} isDisabled onChange={() => {}} />}
-    doCaption="A recorded rating, disabled."
-    dontExample={<Rating label="How was the session?" value={4} onChange={() => {}} />}
-    dontCaption="A recorded rating that still looks editable."
+    doExample={<span>Rated 4 out of 5.</span>}
+    doCaption="A recorded rating, written as text."
+    dontExample={<Rating label="How was the session?" value={4} isDisabled onChange={() => {}} />}
+    dontCaption="Disabled dims a result people need to read."
 />
 
-### It is always controlled.
+### Always control it.
 
 ```jsx
 // Incorrect: the component holds no state. Without an onChange the items are
@@ -213,7 +213,7 @@ A rating that cannot change reads as a result.
 <Rating label="How was the session?" value={score} onChange={setScore} />
 ```
 
-### It submits its value under `name`.
+### Set `name` to submit the value with a form.
 
 A hidden input carries the score with its form, so `name` is how a server reads it.
 

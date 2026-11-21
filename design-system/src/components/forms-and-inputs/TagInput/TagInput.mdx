@@ -60,7 +60,7 @@ from a list or adds, such as the topics a session covers.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-47559"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TagInput"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -241,14 +241,14 @@ On a row's handle and in its menu:
 </thead>
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-width-default</code> edge in <code>--ds-border-input</code>.</td></tr>
-<tr><td>Height</td><td>Starts at 40: <code>--height-250</code>. Compact 32: <code>--control-md</code>. Grows as tags wrap.</td></tr>
+<tr><td>Height</td><td>Starts at 40: <code>--control-lg</code>. Compact 32: <code>--control-md</code>. Grows as tags wrap.</td></tr>
 <tr><td>Radius</td><td>10: <code>--radius-control-lg</code>. Compact 8: <code>--radius-control-md</code>.</td></tr>
 <tr><td>Tags and entry</td><td><code>--stack-md</code> between them; with focus, up to three rows of tags before the content scrolls.</td></tr>
 <tr><td>Entry text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popup-radius</code> and <code>--ds-shadow-overlay</code>.</td></tr>
-<tr><td>List hint</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>, <code>--pad-x-xs</code> <code>--pad-x-md</code>.</td></tr>
+<tr><td>List hint</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>, <code>--pad-x-xs</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
 <tr><td>Row handle</td><td><code>--ds-icon-subtle</code>.</td></tr>
-<tr><td>Option menu</td><td><code>--option-menu-width</code> wide; the name field <code>--pad-x-xs</code> <code>--pad-x-sm</code>; a <code>--border-width-default</code> rule in <code>--ds-border</code> above the colors.</td></tr>
+<tr><td>Option menu</td><td><code>--option-menu-width</code> wide; the name field <code>--pad-x-xs</code> top and bottom, <code>--pad-x-sm</code> either side; a <code>--border-width-default</code> rule in <code>--ds-border</code> above the colors.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -282,18 +282,7 @@ The field carries the error state.
     dontCaption="A default field gives no sign of the problem."
 />
 
-### Disable instead of hiding.
-
-A disabled field tells people the option exists but is unavailable.
-
-<DoDontPair
-    doExample={<TagInput label="Topics" options={topics} defaultTags={['Fractions']} isDisabled />}
-    doCaption="Visible but disabled."
-    dontExample={<TagInput label="Topics" options={topics} defaultTags={['Fractions']} />}
-    dontCaption="An enabled field that cannot take tags."
-/>
-
-### The caller owns the options, and stores what is created.
+### Store the options and what people create.
 
 `options` is required. When the person creates a value, `onCreate` reports it
 once, with the color it was given. Store both on a new option, so the color
@@ -311,7 +300,7 @@ stays the same everywhere the tag appears.
 />
 ```
 
-### A value saved to a server holds a temporary id until it is confirmed.
+### Return a promise from `onCreate` when a server stores the tag.
 
 Return a promise from `onCreate` that resolves to the stored id. Until it
 does, the tag is saving and its `value` is a temporary id starting `new-`. If
@@ -326,7 +315,7 @@ failure is announced.
 />
 ```
 
-### A controlled field needs a handler to offer a ×.
+### Give a controlled field an `onChange` handler.
 
 ```jsx
 // Incorrect — controlled with no handler, so no tag can be removed and none shows a ×.

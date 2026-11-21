@@ -71,20 +71,20 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <div className="sb-ds-doc-section">
 
+## Overflow
+
+<ComponentExample of={RichTextEditorStories.Overflow} title="Grow" description="Text longer than the writing area wraps and grows the area by whole lines; the toolbar wraps instead of scrolling." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
     of={RichTextEditorStories.Interactive}
     description="Use the table below to change props."
 />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Overflow
-
-<ComponentExample of={RichTextEditorStories.Overflow} title="Grow" description="Text longer than the writing area wraps and grows the area by whole lines; the toolbar wraps instead of scrolling." />
 
 </div>
 
@@ -198,7 +198,7 @@ Set `isReadOnly` on content people need to read: it stays in the tab order at fu
     dontCaption="The placeholder repeats the label."
 />
 
-### `value` is written to the DOM as HTML.
+### Sanitize `value` before it reaches the editor.
 
 ```jsx
 // Incorrect: the value is assigned to the editable region's innerHTML, so
@@ -211,11 +211,11 @@ Set `isReadOnly` on content people need to read: it stays in the tab order at fu
 
 The same applies to what you receive: `onChange` hands you whatever the browser produced, which is markup from a paste as much as from the toolbar.
 
-### It is built on a deprecated browser API.
+### Store the HTML as given; do not depend on its shape.
 
 Formatting runs through `document.execCommand`, which every engine now documents as deprecated. It works today and its exact output differs between browsers: one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of the HTML; store it and render it, or convert it once on save.
 
-### Link and image ask with a browser prompt.
+### Leave out Link and Image where a browser prompt will not do.
 
 Pressing those buttons opens the platform `prompt()` dialog for a URL. It is unstyled, it is not translatable, and some environments suppress it. Where that matters, leave those two buttons out of `toolbarButtons`.
 
@@ -270,7 +270,6 @@ The editor keeps its width, and the toolbar wraps instead of scrolling sideways.
 
 - `TextArea`: use when plain multi-line text is enough.
 - `TextField`: use when collecting a single line of text.
-- Your own sanitized HTML render: use when formatted content is displayed and the user cannot edit it.
 - `Comment`: use when displaying a formatted note in a discussion thread.
 
 </div>

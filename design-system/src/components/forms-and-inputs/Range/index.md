@@ -83,7 +83,7 @@ If the slider needs explaining, put one line of helper text under it rather than
 ## Accessibility
 
 - **Label every slider.** `label` names the input; `showLabel={false}` visually hides the text while keeping the accessible name.
-- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `border.focused`, 2px off the handle; pointer focus draws none.
+- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `--ds-border-focused`, 2px off the handle; pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
 
 ## Related

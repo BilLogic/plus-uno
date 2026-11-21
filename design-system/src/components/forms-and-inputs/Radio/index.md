@@ -95,7 +95,7 @@ The circle keeps its size at the top of the row, and the label is never clipped.
 - **Unique ids.** Each instance derives its own id so labels never resolve to the first radio of the group; pass `aria-label` only when there is no visible label.
 - **Required or invalid group.** Include an error message, for example "Select an option".
 - **Disabled options.** Disable an option only for something the person can fix on the same screen, and put the reason in `description` at full contrast, never a tooltip; a disabled option leaves the tab order. For a choice that must stay reachable, keep it enabled and use validation, so a screen reader user hears why it cannot be chosen. See [Disabled](?path=/docs/patterns-states-disabled--docs).
-- **Keyboard.** Arrow keys move between radios that share a `name`. Focus is a 2px ring on `border.focused`, 2px off the radio.
+- **Keyboard.** Arrow keys move between radios that share a `name`. Focus is a 2px ring on `--ds-border-focused`, 2px off the radio.
 
 ## Related
 
