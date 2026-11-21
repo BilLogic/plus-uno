@@ -5,6 +5,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as TableStories from './Table.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -86,6 +87,14 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="Table" tier="template" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -97,14 +106,6 @@ The examples on this page follow the toolbar's Color mode switch.
         </>
     }
 />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Motion
-
-<MotionSection component="Table" tier="template" />
 
 </div>
 
@@ -209,6 +210,8 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ### Put a plain table in a Section.
 
+<RuleTag kind="review" />
+
 <DoDontPair
     doExample={<PlainTable />}
     doCode={CODE.PlainTable}
@@ -220,6 +223,8 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ### Put nothing between the header and the head row.
 
+<RuleTag kind="review" />
+
 <DoDontPair
     doExample={<FiltersInHeader />}
     doCode={CODE.FiltersInHeader}
@@ -229,7 +234,9 @@ Row states are layered over each cell's fill, never swapped for it.
     dontCaption="A second toolbar sits between the Section header and the head row; the table has no toolbar of its own."
 />
 
-### One table per block.
+### Put one table in each Section.
+
+<RuleTag kind="review" />
 
 Never mix a Static, Dynamic or Tree table in one Section either.
 
@@ -244,6 +251,8 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 
 ### Use a Dynamic table for rows people act on.
 
+<RuleTag kind="review" />
+
 <DoDontPair
     doExample={<DynamicRoster />}
     doCode={CODE.DynamicRoster}
@@ -254,6 +263,8 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 />
 
 ### Use a Tree table for a hierarchy.
+
+<RuleTag kind="review" />
 
 <DoDontPair
     doExample={<TreeHierarchy />}

@@ -52,13 +52,17 @@ export const ConfirmWide = () => {
 
 export const ConfirmsInside = () => {
     const [open, setOpen] = useState(false);
-    const [isConfirming, setIsConfirming] = useState(true);
+    const [isConfirming, setIsConfirming] = useState(false);
+    const close = () => {
+        setOpen(false);
+        setIsConfirming(false);
+    };
     return (
         <>
-            <Button text="Delete session" appearance="danger" onClick={() => setOpen(true)} />
+            <Button text="Session details" onClick={() => setOpen(true)} />
             <Modal
                 show={open}
-                onClose={() => setOpen(false)}
+                onClose={close}
                 title={isConfirming ? 'Delete session?' : 'Session details'}
                 body={isConfirming ? (
                     <SectionMessage appearance="warning" dismissible={false}>
@@ -67,8 +71,8 @@ export const ConfirmsInside = () => {
                 ) : 'Thursday · 4:00–5:00 PM with Ana Ruiz.'}
                 footer={(
                     <FooterActions>
-                        <Button text={isConfirming ? 'Back' : 'Keep session'} onClick={isConfirming ? () => setIsConfirming(false) : undefined} />
-                        <Button text="Delete session" appearance="danger" onClick={isConfirming ? undefined : () => setIsConfirming(true)} />
+                        <Button text={isConfirming ? 'Back' : 'Keep session'} onClick={isConfirming ? () => setIsConfirming(false) : close} />
+                        <Button text="Delete session" appearance="danger" onClick={isConfirming ? close : () => setIsConfirming(true)} />
                     </FooterActions>
                 )}
             />
@@ -117,7 +121,7 @@ const SESSION_NOTES = [
 
 const NotesList = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-        {SESSION_NOTES.map((line) => <p key={line} style={{ margin: 0 }}>{line}</p>)}
+        {SESSION_NOTES.map((line) => <p key={line} className="body-default" style={{ margin: 0 }}>{line}</p>)}
     </div>
 );
 
@@ -192,7 +196,7 @@ export const StepsWithBackAndNext = () => {
                         <ProgressTracker label="Steps" orientation="horizontal" items={stepItems(at, setAt)} />
                         {at === 0 && <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />}
                         {at === 1 && <TextField label="Time" value={slot} onChange={(e) => setSlot(e.target.value)} />}
-                        {at === 2 && <p style={{ margin: 0 }}>{`${student} · ${slot}`}</p>}
+                        {at === 2 && <p className="body-default" style={{ margin: 0 }}>{`${student} · ${slot}`}</p>}
                     </div>
                 )}
                 footer={(
@@ -224,7 +228,7 @@ export const NumberedTabsAsSteps = () => {
                 tabs={[
                     { key: 'student', label: '1. Student', content: <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} /> },
                     { key: 'when', label: '2. When', content: <TextField label="Time" value={slot} onChange={(e) => setSlot(e.target.value)} /> },
-                    { key: 'review', label: '3. Review', content: <p style={{ margin: 0 }}>{`${student} · ${slot}`}</p> },
+                    { key: 'review', label: '3. Review', content: <p className="body-default" style={{ margin: 0 }}>{`${student} · ${slot}`}</p> },
                 ]}
                 footer={(
                     <FooterActions>

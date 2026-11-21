@@ -11,6 +11,7 @@ import {
     ComponentExample,
     DocsTable,
     DoDontPair,
+    ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -49,6 +50,11 @@ import {
 <DocsTabs of={PopupStories}>
 
 <DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21757-21090"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/templates/Popup"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
@@ -142,7 +148,7 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 
 <DocsTable>
 <thead>
-<tr><th>Width</th><th>768</th><th>1024</th><th>1280</th><th>Used for</th></tr>
+<tr><th>Width</th><th>768</th><th>1024</th><th>1440</th><th>Used for</th></tr>
 </thead>
 <tbody>
 <tr><td><code>auto</code> (default)</td><td>160 to 320</td><td>160 to 320</td><td>160 to 320</td><td>Menus and select lists; at least the trigger</td></tr>

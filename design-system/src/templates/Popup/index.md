@@ -190,7 +190,7 @@ Popup is the component: placement, offset, outside click and Escape. Each type i
 
 ## Sizes
 
-| Width | 768 | 1024 | 1280 | Used for |
+| Width | 768 | 1024 | 1440 | Used for |
 | --- | --- | --- | --- | --- |
 | `auto` (default) | 160 to 320 | 160 to 320 | 160 to 320 | Menus and select lists; at least the trigger |
 | 2-col | 200 (floor) | 200 (floor) | about 224 | A short choice list, a small date or time picker |

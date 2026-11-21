@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 
 - Frame: use when deciding which type the page sits in.
 - Section: use when a region needs its own heading, views or detail.
-- Card: use when one object has a shape already agreed.
+- Card: use when one object has a shape already agreed, or a checklist is built.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
