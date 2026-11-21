@@ -29,6 +29,27 @@ const SessionsTable = ({ status = 'upcoming' }) => (
     />
 );
 
+const STUDENTS = [
+    ['Maya Rodriguez', '7th', 'Thu 4:00 PM'],
+    ['Jamal Carter', '8th', 'Thu 5:30 PM'],
+    ['Aisha Khan', '6th', 'Fri 3:30 PM'],
+];
+
+const StudentRoster = () => (
+    <DynamicTable
+        head={{ cells: ['Name', 'Grade', 'Next session'].map((content) => ({ key: content, content, isSortable: true })) }}
+        rows={STUDENTS.map((cells) => ({ key: cells.join(), cells: cells.map((content) => ({ key: content, content })) }))}
+        label="Students"
+        isFixedSize
+    />
+);
+
+const SessionViews = () => (
+    <Tabs appearance="pill" defaultActiveKey="upcoming" aria-label="Views">
+        <Tabs.Tab eventKey="upcoming">Upcoming</Tabs.Tab>
+    </Tabs>
+);
+
 const StudentViews = () => (
     <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
         <Tabs.Tab eventKey="all">All students</Tabs.Tab>
@@ -47,8 +68,8 @@ const RecordTabs = ({ active, onSelect }) => (
 );
 
 const StudentsSection = () => (
-    <Section title="Students" views={<StudentViews />}>
-        <SessionsTable />
+    <Section title="Students" isTitleHidden views={<StudentViews />}>
+        <StudentRoster />
     </Section>
 );
 
@@ -61,7 +82,7 @@ const TitleWithDescription = ({ title, children }) => (
 
 export const HeaderIsTheH1 = () => (
     <Page header={<PageHeader title="Students" />}>
-        <Section title="Sessions" views={<StudentViews />}>
+        <Section title="Sessions" views={<SessionViews />}>
             <SessionsTable />
         </Section>
     </Page>
@@ -129,7 +150,7 @@ export const ParagraphUnderTitle = () => (
 
 export const AddInTitleRow = () => (
     <Page header={<PageHeader title="Students" />}>
-        <Section title="Sessions" views={<StudentViews />} actions={<AddSessionAction />}>
+        <Section title="Sessions" views={<SessionViews />} actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>
@@ -137,7 +158,7 @@ export const AddInTitleRow = () => (
 
 export const AddTwice = () => (
     <Page header={<PageHeader title="Students" actions={<AddSessionAction />} />}>
-        <Section title="Sessions" views={<StudentViews />} actions={<AddSessionAction />}>
+        <Section title="Sessions" views={<SessionViews />} actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>
