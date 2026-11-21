@@ -111,8 +111,8 @@ SelectedIsAnnounced.play = async ({ canvasElement }) => {
     await expect(current).toHaveLength(1);
     await expect(current[0].textContent).toContain('Students');
 
-    // The disabled row still announces, and still refuses the tab order.
-    const disabled = rows.filter((row) => row.getAttribute('aria-disabled') === 'true');
+    // The disabled row is a native disabled button: announced as unavailable, no tab stop.
+    const disabled = rows.filter((row) => row.disabled);
     await expect(disabled).toHaveLength(1);
-    await expect(disabled[0].getAttribute('tabindex')).toBe('-1');
+    await expect(disabled[0].textContent).toContain('Reports');
 };
