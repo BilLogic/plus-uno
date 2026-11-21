@@ -684,17 +684,28 @@ export const DragReorder = {
         await userEvent.hover(within(listbox).getByRole('option', { name: 'Design judgment' }));
         const handle = body.getByRole('button', { name: 'Reorder Design judgment' });
 
+        // Pragmatic drag and drop listens for the browser's own drag events.
         const start = handle.getBoundingClientRect();
-        const pointer = (target, type, y) => target.dispatchEvent(new PointerEvent(type, {
-            bubbles: true, clientX: start.left + 2, clientY: y, pointerId: 1, isPrimary: true, button: 0,
+        const transfer = new DataTransfer();
+        const fire = (target, type, y) => target.dispatchEvent(new DragEvent(type, {
+            bubbles: true, cancelable: true, clientX: start.left + 2, clientY: y, dataTransfer: transfer,
         }));
-        pointer(handle, 'pointerdown', start.top + 2);
-        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' }).getBoundingClientRect();
-        pointer(window, 'pointermove', dev.top + dev.height * 0.75);
+        fire(handle, 'dragstart', start.top + 2);
+        // The engine starts the drag a beat after dragstart; the row lifts once it has.
         await waitFor(() => expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging'));
-        await expect(within(listbox).getByRole('option', { name: 'Dev coordination' })).toHaveClass('has-drop-indicator-after');
+        const dev = within(listbox).getByRole('option', { name: 'Dev coordination' });
+        const box = dev.getBoundingClientRect();
+        const y = box.top + box.height * 0.75;
+        fire(dev, 'dragenter', y);
+        // The engine reports a drag once per frame, so the pointer keeps moving until the line shows.
+        await waitFor(() => {
+            fire(dev, 'dragover', y);
+            expect(dev).toHaveClass('has-drop-indicator-after');
+        });
+        await expect(within(listbox).getByRole('option', { name: 'Design judgment' })).toHaveClass('is-dragging');
 
-        pointer(window, 'pointerup', dev.top + dev.height * 0.75);
+        fire(dev, 'drop', y);
+        fire(handle, 'dragend', y);
         await expect(args.onReorderSpy).toHaveBeenCalledWith(0, 3);
         await expect(rowNames(canvasElement)).toEqual(
             ['Decision recall', 'Design system taxonomy', 'Dev coordination', 'Design judgment']

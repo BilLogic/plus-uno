@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
 import Tag, { TAG_COLORS } from '@/components/labels/Tag';
 import TagGroup from '@/components/labels/TagGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton';
@@ -37,6 +39,48 @@ const REORDER_KEYS_SPOKEN = 'Space or Enter picks the row up. Up and down arrows
 
 /** Pasted text splits into tags on commas and line breaks. */
 const PASTE_SEPARATOR = /[,\n\r]+/;
+
+/**
+ * A row's reorder handle. Pragmatic drag and drop carries the pointer drag
+ * (ADR-046); the keys stay with the handle's own key handler.
+ */
+const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, ...props }, ref) {
+    const elementRef = useRef(null);
+    const dragRef = useRef(drag);
+    dragRef.current = drag;
+    useEffect(() => {
+        const element = elementRef.current;
+        if (!element) return undefined;
+        let dropTarget = () => {};
+        return draggable({
+            element,
+            onGenerateDragPreview: ({ nativeSetDragImage }) => disableNativeDragPreview({ nativeSetDragImage }),
+            onDragStart: () => {
+                // The list takes the drop, so a release outside it (or Escape) reads as a cancel.
+                const list = dragRef.current.listElement();
+                if (list) dropTarget = dropTargetForElements({ element: list });
+                dragRef.current.start();
+            },
+            onDrag: ({ location }) => dragRef.current.move(location.current.input.clientY),
+            onDrop: ({ location }) => {
+                dropTarget();
+                dropTarget = () => {};
+                if (location.current.dropTargets.length) dragRef.current.drop();
+                else dragRef.current.cancel();
+            },
+        });
+    }, []);
+    return (
+        <IconButton
+            {...props}
+            ref={(node) => {
+                elementRef.current = node;
+                if (typeof ref === 'function') ref(node);
+                else if (ref) ref.current = node;
+            }}
+        />
+    );
+});
 
 const warn = (message) => {
     if (process.env.NODE_ENV === 'production') return;
@@ -506,33 +550,17 @@ const TagInput = ({
         return options.length;
     };
 
-    const handleGripPointerDown = (index, event) => {
-        if (event.button !== 0) return;
-        event.preventDefault();
-        pickUp(index, true);
-        const onMove = (move) => {
-            const slot = slotAt(move.clientY);
+    /** What a handle's drag calls: the row it moves, the list that takes the drop, and the slot under the pointer. */
+    const gripDrag = (index) => ({
+        listElement: () => document.getElementById(listId)?.closest('.plus-listbox') ?? null,
+        start: () => pickUp(index, true),
+        move: (clientY) => {
+            const slot = slotAt(clientY);
             moveTo(slot > index ? slot - 1 : slot);
-        };
-        const stop = () => {
-            window.removeEventListener('pointermove', onMove);
-            window.removeEventListener('pointerup', onUp);
-            window.removeEventListener('pointercancel', onCancel);
-            window.removeEventListener('keydown', onKey, true);
-        };
-        const onUp = () => { stop(); drop(); };
-        const onCancel = () => { stop(); cancelReorder(); };
-        const onKey = (key) => {
-            if (key.key !== 'Escape') return;
-            key.preventDefault();
-            key.stopPropagation();
-            onCancel();
-        };
-        window.addEventListener('pointermove', onMove);
-        window.addEventListener('pointerup', onUp);
-        window.addEventListener('pointercancel', onCancel);
-        window.addEventListener('keydown', onKey, true);
-    };
+        },
+        drop,
+        cancel: cancelReorder,
+    });
 
     /** A row's handle and "…", drawn by the Listbox over the highlighted row. */
     const rowActions = (hasMenu || canReorder) ? (row) => {
@@ -542,8 +570,9 @@ const TagInput = ({
         return (
             <>
                 {canReorder && (
-                    <IconButton
+                    <ReorderGrip
                         ref={gripRef}
+                        drag={gripDrag(index)}
                         appearance="subtle"
                         spacing="compact"
                         icon="grip-vertical"
@@ -551,7 +580,6 @@ const TagInput = ({
                         aria-describedby={`${fieldId}-reorder-keys`}
                         className="plus-tag-input__row-action plus-tag-input__grip"
                         onKeyDown={(event) => handleGripKeyDown(index, event)}
-                        onPointerDown={(event) => handleGripPointerDown(index, event)}
                         onBlur={(event) => { cancelReorder(); handleBlur(event); }}
                     />
                 )}
