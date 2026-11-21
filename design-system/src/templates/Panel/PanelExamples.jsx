@@ -100,7 +100,7 @@ export const ReadingNoFooter = () => (
         <PanelHeader title="Ben Okafor · Thu 5:00 PM" actions={<PanelCloseAction onClick={() => {}} />} />
         <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
         <PanelBody>
-            <p style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
+            <p className="body-default" style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
         </PanelBody>
     </PanelContainer>
 );
@@ -110,7 +110,7 @@ export const ReadingNarrow = () => (
         <PanelHeader title="Ben Okafor · Thu 5:00 PM" actions={<PanelCloseAction onClick={() => {}} />} />
         <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
         <PanelBody>
-            <p style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
+            <p className="body-default" style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
         </PanelBody>
     </PanelContainer>
 );
@@ -120,7 +120,7 @@ export const ReadingWithFooter = () => (
         <PanelHeader title="Ben Okafor · Thu 5:00 PM" actions={<PanelCloseAction onClick={() => {}} />} />
         <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
         <PanelBody>
-            <p style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
+            <p className="body-default" style={{ margin: 0 }}>Math · 60 minutes · Room 2. Ben worked through fractions last week.</p>
         </PanelBody>
         <PanelFooter>
             <FooterActions>

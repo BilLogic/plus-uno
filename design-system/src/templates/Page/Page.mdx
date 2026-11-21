@@ -5,7 +5,6 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
 import * as ReferenceScreenStories from './ReferenceScreens.stories.jsx';
-import * as ChecklistStories from './Checklist.stories.jsx';
 import {
     AddInTitleRow,
     AddTwice,
@@ -37,7 +36,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <DocsLanding
     page="templates-page"
-    eyebrow="Template · Page"
+    eyebrow="Template"
     title="Page"
     purpose="The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading."
     links={{
@@ -141,41 +140,6 @@ Two whole screens built from the templates: a list that keeps search and quick f
 <ComponentExample of={ReferenceScreenStories.ListWithFilters} title="List with filters" description="Search and quick filters sit in the Section header rows, and the empty result keeps them in place." />
 
 <ComponentExample of={ReferenceScreenStories.DetailWithPanel} title="Detail with panel" description="The record stays visible beside a docked Panel for editing." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Checklist
-
-A checklist tracks setup or compliance steps in three layouts: a dismissible Card on Home, a persistent Card in a page, and a compact Card at the foot of the Sidebar.
-
-<ComponentExample of={ChecklistStories.ChecklistCardOnHome} title="Checklist: card on Home" description="Optional setup steps in a dismissible Card on Home: the title sits at the start, '2 of 5 done' and a 96-wide Progress bar sit beside the 32 dismiss Icon button so the bar's start edge lands on the 128 action column, open steps keep their order on top, and done steps move below with centered Completed text. Finish every step to shrink it to one line." />
-
-<ComponentExample of={ChecklistStories.ChecklistCardInPage} title="Checklist: card in a page" description="Required training or compliance steps in a persistent Card inside a page Section: the Progress bar fills the full 128 action column, and completing every step keeps the card on screen with all five steps ticked." />
-
-<ComponentExample of={ChecklistStories.ChecklistCompactInSidebar} title="Checklist: compact in the sidebar" description="At the foot of the Sidebar, a compact Card shows the count, the Progress bar and the next open step from any page; pressing it opens the full checklist." />
-
-Build the checklist from `Card`, `Section` and `ProgressBar`:
-
-- Compose each row from an `Icon`, step text with one fact, and an action column of one width (`--checklist-action-width`, with `--checklist-action-min-width` as its floor). Buttons fill the column and align down the list.
-- Put the title at the header's start and the count of steps done with a `ProgressBar` at the end. Align the bar's start edge with the action column. On a persistent card the bar fills the column; where a dismiss `IconButton` occupies the end, the bar is shorter by its width.
-- Keep open steps in order above completed steps. Center a check icon and the word "Completed" (Body small, subtle) in each completed row's action column.
-
-Choose the layout by where the checklist appears:
-
-<DocsTable>
-<thead>
-<tr><th>Layout</th><th>Use</th><th>Behavior</th></tr>
-</thead>
-<tbody>
-<tr><td>Dismissible card</td><td>Home</td><td>When complete, shrinks to one line for a day, then disappears.</td></tr>
-<tr><td>Persistent card</td><td>Required work on a page</td><td>Keeps every completed row visible.</td></tr>
-<tr><td>Compact card</td><td>Foot of the Sidebar</td><td>Shows the count, progress bar and next step, which opens the full list.</td></tr>
-</tbody>
-</DocsTable>
-
-The action column is 128 wide with a floor of 120; beside a 32 dismiss Icon button the Progress bar is 96.
 
 </div>
 
@@ -426,7 +390,7 @@ Which tier a message belongs to: the <DocsLink id="patterns-notifications">Notif
 
 - <DocsLink id="templates-frame">Frame</DocsLink>: use when deciding which type the page sits in.
 - <DocsLink id="templates-section">Section</DocsLink>: use when a region needs its own heading, views or detail.
-- <DocsLink id="templates-card">Card</DocsLink>: use when one object has a shape already agreed.
+- <DocsLink id="templates-card">Card</DocsLink>: use when one object has a shape already agreed, or a checklist is built.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 </div>

@@ -152,7 +152,7 @@ A system banner, when one is needed, spans the whole width above the Sidebar and
 | --- | --- |
 | `sidebar` | The Sidebar. Without it there is no Sidebar and no toggle. |
 | `header` | The Page's header row: the breadcrumb. |
-| `children` | The content: Sections in a 12-column grid. `width` sets the type: `default` caps it at 1232, `full` has no cap, `reading` caps it at 864. |
+| `children` | The content: Sections in a 12-column grid. `width` sets the Page type: `default` caps it at 1232, `full` has no cap, `reading` caps it at 864. |
 | `panel` · `panelLabel` · `panelOpen` | The AI panel region at the right, named for its content, filled with the Panel parts. |
 | `surfaceDirect` | Children go straight into the Page with no content box, for a bare column or a full-bleed view. |
 | `bar` | Planned. The multi-step footer, 52 high with 32-high buttons and its line level with the Sidebar account row, holding Save and exit, Back and Next. Today the page places the footer. |

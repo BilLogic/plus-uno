@@ -22,6 +22,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -46,6 +47,11 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 <DocsTabs of={PanelStories}>
 
 <DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21970-29"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/templates/Panel"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
@@ -155,7 +161,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 <tr><td><code>--inbox-width</code></td><td>360</td><td>The width the Inbox opens at, beside the Sidebar.</td></tr>
 <tr><td><code>--panel-min-width</code></td><td>320</td><td>The narrowest, and the cap under 1024.</td></tr>
 <tr><td><code>--ds-surface-material-overlay</code>, <code>--ds-border-material</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses <code>--ds-surface</code> and an edge line.</td></tr>
-<tr><td><code>--ds-border</code></td><td>1</td><td>The edge line where a docked Panel meets the Page.</td></tr>
+<tr><td><code>--ds-border</code>, <code>--border-width-default</code></td><td>color, 1</td><td>The edge line where a docked Panel meets the Page: the color and its width.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -232,7 +238,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - For a decision that must happen before the page continues, use `Modal`.
 - For a record that opens in place and pushes the content below it down, use `Section` with a detail.
 - For a short aside off a control, use `Popup`.
-- For complex or multistep work, use `Frame` with a multi-step task.
+- For complex or multi-step work, use `Frame` with a multi-step task.
 
 </div>
 
@@ -396,7 +402,7 @@ An icon, a back action and a subheader together bury the title; pick the one the
 
 <RuleTag kind="review" />
 
-Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own.
+Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own. Calling `usePanelManager` without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 
 ```jsx
 <PanelProvider>
@@ -454,7 +460,6 @@ For the step up when the quick look is not enough.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
-- **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.
 
 </div>

@@ -11,7 +11,8 @@ import examplesSource from './PopupExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Popup template page, composed from
- * `CaseBlanket`, `Dialog`, `Popup`, `DropdownMenu`, `FooterActions`, `TextField` and `Button`.
+ * `Popup`, `DropdownMenu`, `Modal`, `FooterActions`, `TextField` and `Button`,
+ * drawn open by `holdMenuOpen`, `holdPopupOpen` and `openModals`.
  */
 
 /** The stand-in screen width a Modal's Blanket is drawn at. Docs geometry, px. */

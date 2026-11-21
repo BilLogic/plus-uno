@@ -32,7 +32,7 @@ import {
 
 <DocsLanding
     page="templates-modal"
-    eyebrow="Template · Modal"
+    eyebrow="Template"
     title="Modal"
     purpose="A dialog for one task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps."
     links={{
@@ -63,7 +63,7 @@ Picked by what the person has to do. The <DocsLink id="components-messaging-dial
 <TypeGrid>
 <TypeCard of={ModalStories.TypePassive} to="#passive" title="Passive">Information only, with Close. No footer.</TypeCard>
 <TypeCard of={ModalStories.TypeActive} to="#active" title="Active">A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.</TypeCard>
-<TypeCard of={ModalStories.TypeAcknowledge} to="#acknowledge" title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
+<TypeCard of={ModalStories.TypeAcknowledge} to="#acknowledge" title="Acknowledge">One thing to read and one button on the right half of the footer.</TypeCard>
 <TypeCard of={ModalStories.TypeSteps} to="#steps" title="Steps">A short sequence at 10-col: Back and Next, split 50/50.</TypeCard>
 </TypeGrid>
 
@@ -71,7 +71,7 @@ Picked by what the person has to do. The <DocsLink id="components-messaging-dial
 
 <ComponentExample of={ModalStories.TypeActive} title="Active" description="A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel." />
 
-<ComponentExample of={ModalStories.TypeAcknowledge} title="Acknowledge" description="One thing to read and one button that fills the footer." />
+<ComponentExample of={ModalStories.TypeAcknowledge} title="Acknowledge" description="One thing to read and one button on the right half of the footer." />
 
 <ComponentExample of={ModalStories.TypeSteps} title="Steps" description="A short sequence at 10-col: Back and Next, split 50/50." />
 
@@ -88,7 +88,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 20 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
-4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
+4. **Footer** (optional). Buttons sit inside the Modal padding; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
 
 <DocsCanvasShell description="A modal with its title, description and a section.">
     <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />

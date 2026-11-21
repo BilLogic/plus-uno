@@ -52,7 +52,7 @@ Panel reads these motion tokens and no literal duration or curve.
 - For a decision that must happen before the page continues, use `Modal`.
 - For a record that opens in place and pushes the content below it down, use `Section` with a detail.
 - For a short aside off a control, use `Popup`.
-- For complex or multistep work, use `Frame` with a multi-step task.
+- For complex or multi-step work, use `Frame` with a multi-step task.
 
 ## Best practices
 
@@ -131,7 +131,7 @@ An icon, a back action and a subheader together bury the title; pick the one the
 
 **Checked:** Review
 
-Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own.
+Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own. Calling `usePanelManager` without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 
 ```jsx
 <PanelProvider>
@@ -166,7 +166,6 @@ For the step up when the quick look is not enough.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
-- **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.
 
 ## Related
@@ -287,7 +286,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | `--inbox-width` | 360 | The width the Inbox opens at, beside the Sidebar. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
 | `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
-| `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
+| `--ds-border`, `--border-width-default` | color, 1 | The edge line where a docked Panel meets the Page: the color and its width. |
 
 The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
 

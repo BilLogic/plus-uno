@@ -8,7 +8,8 @@ import examplesSource from './ModalExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Modal template page, composed from
- * `CaseBlanket`, `Dialog`, `FooterActions`, `ProgressTracker` and `Button`.
+ * `Modal`, `FooterActions`, `ProgressTracker` and `Button`, drawn open over a
+ * stand-in screen by `openModals`.
  */
 
 /** The Show code for each example, read from `ModalExamples.jsx`. */
