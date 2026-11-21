@@ -375,6 +375,33 @@ export const LoadingFullHeader = {
     },
 };
 
+/** Loading inside a scaled ancestor (a TypeCard preview): shapes keep local sizes, so they are not scaled twice. */
+export const LoadingScaled = {
+    name: 'Loading, scaled ancestor',
+    render: () => (
+        <div style={col}>
+            <div data-testid="plain"><Example.LoadingFullHeader /></div>
+            <div data-testid="scaled" style={{ transform: 'scale(0.5)', transformOrigin: 'top left', inlineSize: '200%' }}>
+                <Example.LoadingFullHeader />
+            </div>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const shapes = (id) => canvasElement.querySelectorAll(`[data-testid="${id}"] .plus-skeleton`);
+        await waitFor(() => expect(shapes('scaled').length).toBeGreaterThan(0));
+        const scaled = shapes('scaled')[1];
+        // Screen size is half the local size; a double-scaled shape would be a quarter.
+        const local = scaled.offsetWidth;
+        expect(Math.abs(scaled.getBoundingClientRect().width - local / 2)).toBeLessThan(1);
+        const parent = canvasElement.querySelector('[data-testid="scaled"] .plus-template-section-loading');
+        const shape = scaled.closest('.plus-template-section-loading__shape');
+        const shell = parent.querySelector('.plus-template-section-loading__shell');
+        const target = [...shell.querySelectorAll('[role="tab"], button')].find((el) => Math.abs(el.offsetWidth - local) <= 1);
+        expect(target).toBeTruthy();
+        expect(shape).toBeTruthy();
+    },
+};
+
 export const LoadingViews = {
     name: 'Loading, views',
     render: () => <Example.LoadingViews />,

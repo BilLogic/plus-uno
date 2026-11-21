@@ -12875,6 +12875,7 @@
         "LoadingDefault",
         "LoadingSearchAndFilters",
         "LoadingFullHeader",
+        "LoadingScaled",
         "LoadingViews",
         "Interactive",
         "ColorModes",

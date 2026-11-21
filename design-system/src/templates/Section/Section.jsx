@@ -180,6 +180,24 @@ SectionHeaderRows.propTypes = {
     narrow: PropTypes.bool,
 };
 
+/** The Skeleton radius tokens a measured corner can map to, with the CSS each stands for. */
+const RADIUS_TOKENS = [
+    ['element-radius-md', 'var(--radius-md)'],
+    ['element-radius-lg', 'var(--radius-lg)'],
+    ['card-radius-md', 'var(--card-radius)'],
+    ['element-radius-full', 'var(--radius-full)'],
+];
+
+/** A radius token's resolved pixels, read off a probe so the var() chain resolves. */
+const radiusPx = (root, value) => {
+    const probe = document.createElement('span');
+    probe.style.cssText = `position:absolute;visibility:hidden;border-radius:${value}`;
+    root.appendChild(probe);
+    const r = parseFloat(getComputedStyle(probe).borderTopLeftRadius) || 0;
+    probe.remove();
+    return r;
+};
+
 /** Pixel rounding for measured shapes, so a sub-pixel layout does not re-render forever. */
 const px = (n) => Math.round(n * 10) / 10;
 
@@ -198,20 +216,35 @@ const LoadingHeader = ({ children }) => {
         const root = rootRef.current;
         if (!root) return;
         const origin = root.getBoundingClientRect();
+        // A scaled ancestor (a TypeCard preview) scales every screen rect; divide it out so shapes get local sizes.
+        const scale = root.offsetWidth ? origin.width / root.offsetWidth : 1;
+        const local = (n) => px(n / (scale || 1));
+        const tokens = RADIUS_TOKENS.map(([name, value]) => [name, radiusPx(root, value)]);
+        const radiusToken = (el) => {
+            const r = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+            if (!r) return undefined;
+            if (r >= 999) return 'element-radius-full';
+            return tokens.reduce((best, t) => (Math.abs(t[1] - r) < Math.abs(best[1] - r) ? t : best))[0];
+        };
         const found = [];
-        const add = (el, width) => {
-            const rect = el.getBoundingClientRect();
+        const add = (el, rect = el.getBoundingClientRect()) => {
             if (!rect.width || !rect.height) return;
             found.push({
-                left: px(rect.left - origin.left),
-                top: px(rect.top - origin.top),
-                width: px(width ?? rect.width),
-                height: px(rect.height),
-                radius: getComputedStyle(el).borderRadius,
+                left: local(rect.left - origin.left),
+                top: local(rect.top - origin.top),
+                width: local(rect.width),
+                height: local(rect.height),
+                radius: radiusToken(el),
             });
         };
         const title = root.querySelector('.plus-template-section-title');
-        if (title) add(title, title.getBoundingClientRect().width / 2);
+        if (title) {
+            // The placeholder is the title text's own size, not the heading block's.
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            const text = range.getBoundingClientRect?.();
+            add(title, text?.width ? text : title.getBoundingClientRect());
+        }
         const description = root.querySelector('.plus-template-section-description');
         if (description) add(description);
         const whole = new Set(root.querySelectorAll('.plus-section-row__end > *, .plus-section-row__search > *'));

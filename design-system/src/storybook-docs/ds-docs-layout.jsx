@@ -435,7 +435,7 @@ export function DoDontCard({ tone, children, caption, code, fullSize }) {
                 // The caption keeps its own row; the link joins it in the same grid cell so the pair's rows still line up.
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minInlineSize: 0 }}>
                     <DoDontCaption tone={tone}>{caption}</DoDontCaption>
-                    <a className="sb-ds-dodont-card__full-size" href={fullSize} style={{ color: 'var(--ds-link)', font: 'var(--body-default)', textDecoration: 'underline' }}>
+                    <a className="sb-ds-dodont-card__full-size" href={fullSize} style={{ ...typeStyle('body-default'), color: 'var(--ds-link)', textDecoration: 'underline' }}>
                         Open full size
                     </a>
                 </div>
