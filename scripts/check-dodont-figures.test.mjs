@@ -9,7 +9,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, run, summary } from './check-dodont-figures.mjs';
+import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, loadTypeScript, run, summary } from './check-dodont-figures.mjs';
 
 const pair = (extra = '', doEx = '<Button label="Save" />', dontEx = '<Button label="OK" />') =>
   `<DoDontPair\n  doExample={${doEx}}\n  doCaption="Name the action."\n  dontExample={${dontEx}}\n  dontCaption="Say nothing about it."\n  ${extra}\n/>`;
@@ -157,6 +157,29 @@ test('printed examples: a hairline from a class may zero the other sides', () =>
 
 test('printed examples: the line of a finding is the style attribute line', () => {
   assert.deepEqual(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: 'red' }} />;").map((p) => p.line), [2]);
+});
+
+test('printed examples: the parser is the TypeScript agents/uno-bot installs, and its absence fails loudly', () => {
+  assert.equal(typeof loadTypeScript().createSourceFile, 'function');
+  const nowhere = path.join(os.tmpdir(), 'dodont-no-typescript', 'package.json');
+  assert.throws(() => loadTypeScript(nowhere), /check:dodont-figures cannot load TypeScript.*agents\/uno-bot/s);
+});
+
+test('printed examples: a shorthand property is read by its name', () => {
+  assert.ok(ex("const color = 'red';\nexport const A = () => <p style={{ color }} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a member style is followed, dotted or by a fixed key', () => {
+  assert.ok(ex("const s = { quiet: { color: 'red' } };\nexport const A = () => <p style={s.quiet} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("const s = { quiet: { color: 'red' } };\nexport const A = () => <p style={s['quiet']} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a style returned by a call is followed', () => {
+  assert.ok(ex("function tone() { return { boxShadow: 'x' }; }\nexport const A = () => <p style={tone()} />;").some((m) => /`boxShadow`/.test(m)));
+});
+
+test('printed examples: a file that does not parse is a finding on its line', () => {
+  assert.ok(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: }} />;").some((p) => p.line === 2 && /does not parse/.test(p.message)));
 });
 
 test('printed examples: the real tree is clean', () => {
