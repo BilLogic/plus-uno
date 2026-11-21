@@ -77,7 +77,7 @@ export const PopupBesidePopup = () => <Held>{open(Example.PopupBesidePopup())}</
 /** Fields the person must finish sit in a Modal over a Blanket. */
 export const FieldsInModalCase = () => (
     <FitStage width={SCREEN_WIDTH} reflow={false}>
-        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN_WIDTH}px`, '--plus-overlay-screen-height': '300px' }}>
+        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN_WIDTH}px`, '--plus-overlay-screen-height': '300px' /* demo frame */ }}>
             {openModals(Example.FieldsInModal())}
         </div>
     </FitStage>

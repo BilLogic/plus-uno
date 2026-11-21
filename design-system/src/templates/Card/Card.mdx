@@ -17,7 +17,7 @@ import {
 import {
     MetricAtMin224,
     MetricAtMin480,
-    MetricsWithDividers,
+    MetricsInOneCard,
     MetricsAsNestedCards,
     LoadingInPlace,
     LoadingLine,
@@ -317,9 +317,9 @@ A title takes more lines and never ends in an ellipsis; the actions stay at the 
 A card's fill and edge are its own object boundary. Group related cards in a Section instead.
 
 <DoDontPair
-    doExample={<MetricsWithDividers />}
-    doCode={CODE.MetricsWithDividers}
-    doCaption="One card; three metrics stacked in its body, split by dividers."
+    doExample={<MetricsInOneCard />}
+    doCode={CODE.MetricsInOneCard}
+    doCaption="One card; three metrics stacked in its body, spaced by the card's own rhythm."
     dontExample={<MetricsAsNestedCards />}
     dontCode={CODE.MetricsAsNestedCards}
     dontCaption="Three mini cards inside the card; borders and shadows pile up and the hierarchy flattens."

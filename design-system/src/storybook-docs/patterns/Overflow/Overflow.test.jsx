@@ -74,7 +74,7 @@ describe('Overflow live cases and TypeCard links', () => {
     });
 
     it('prints each example from its own source', () => {
-        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(Object.keys(CODE)).toHaveLength(5);
         expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
         expect(CODE.ShowMoreWithCount).toContain('const StudentList');
         expect(CODE.ClippedCellNoText).not.toContain('plus-table-cell-text');

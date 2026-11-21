@@ -24,7 +24,7 @@ const panelMdx = readFileSync(join(__dirname, 'Panel.mdx'), 'utf8');
 
 describe('Panel Show code', () => {
     it('prints each floating example as PLUS parts, with no docs helper or stage', () => {
-        expect(Object.keys(CODE)).toHaveLength(9);
+        expect(Object.keys(CODE)).toHaveLength(7);
         Object.entries(CODE).forEach(([name, code]) => {
             expect(code, name).not.toMatch(/panelDemo|CaseSurface|FloatStage/);
             // The one Don't that is not a Panel is the same details opened in a Modal.

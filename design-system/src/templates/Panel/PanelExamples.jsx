@@ -8,40 +8,34 @@ import { Modal, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelH
  * `PanelCases.jsx`.
  */
 
-const SessionsBehind = () => (
+export const SessionsBehind = () => (
     <Section title="Upcoming sessions">
         <Skeleton preset="text" lines={6} />
     </Section>
 );
 
-const DetailsPanel = ({ title = 'Ben Okafor · Thu 5:00 PM', onClose }) => (
+export const DetailsPanel = ({ title = 'Ben Okafor · Thu 5:00 PM', onClose }) => (
     <PanelContainer>
         <PanelHeader title={title} actions={<PanelCloseAction onClick={onClose} />} />
         <PanelSubheader><StatusTag appearance="warning">Needs a tutor</StatusTag></PanelSubheader>
         <PanelBody>
-            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ margin: 0 }}>
                 Math · 60 minutes · Room 2. Ben worked through fractions last week.
             </p>
         </PanelBody>
     </PanelContainer>
 );
 
-const AssistantPanel = () => (
+export const AssistantPanel = () => (
     <PanelContainer width="var(--panel-width-default)">
         <PanelHeader title="Assistant" actions={<PanelCloseAction />} />
         <PanelBody>
-            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ margin: 0 }}>
                 Ben has missed two Thursday sessions. Want a note for his tutor?
             </p>
         </PanelBody>
     </PanelContainer>
 );
-
-const DEMO_STAGE_END = { position: 'absolute', insetBlock: 0, insetInlineEnd: 0, display: 'flex', maxInlineSize: '100%' };
-
-const DEMO_STAGE_FLOATING = { ...DEMO_STAGE_END, boxShadow: 'var(--ds-shadow-overlay)' };
-
-const DEMO_STAGE_SECOND = { ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--inline-3xl)' };
 
 export const FloatsNoBlanket = () => {
     const [open, setOpen] = useState(true);
@@ -134,20 +128,4 @@ export const ReadingWithFooter = () => (
             </FooterActions>
         </PanelFooter>
     </PanelContainer>
-);
-
-export const BesideAiPanel = () => (
-    <>
-        <SessionsBehind />
-        <div style={DEMO_STAGE_END}><AssistantPanel /></div>
-        <div style={{ ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--panel-width-default)' }}><DetailsPanel /></div>
-    </>
-);
-
-export const CoversAiPanel = () => (
-    <>
-        <SessionsBehind />
-        <div style={DEMO_STAGE_END}><AssistantPanel /></div>
-        <div style={DEMO_STAGE_SECOND}><DetailsPanel /></div>
-    </>
 );

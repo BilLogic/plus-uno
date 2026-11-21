@@ -57,6 +57,14 @@ const PAIR = /<DoDontPair\b[\s\S]*?(?:\n\/>|\/>\n)/g;
  */
 export const DEFERRED_PAGES = {};
 
+/**
+ * Examples staged in a `*Cases.jsx` because no consumer can write them: the
+ * figure is a styled decoration (a fade) that printed code, which sets layout on
+ * tokens only, cannot carry. A pair may leave the matching code prop off for
+ * these and nothing else.
+ */
+export const STAGED_ONLY = new Set(['FadedListCase']);
+
 const CODE_PROP = /\b(doCode|dontCode)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
 const CODE_REFERENCE = /^\{CODE\.[A-Za-z_$][\w$]*\}$/;
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
@@ -103,7 +111,8 @@ export function checkFile(file, text) {
   }
   if (/\.mdx$/.test(file) && file.startsWith(PATTERNS_ROOT) && !DEFERRED_PAGES[file]) {
     for (const match of text.matchAll(PAIR)) {
-      const missing = ['doCode', 'dontCode'].filter((prop) => !new RegExp(`\\b${prop}=`).test(match[0]));
+      const staged = (side) => STAGED_ONLY.has(new RegExp(`\\b${side}Example=\\{<(\\w+)`).exec(match[0])?.[1]);
+      const missing = ['do', 'dont'].filter((side) => !staged(side) && !new RegExp(`\\b${side}Code=`).test(match[0])).map((side) => `${side}Code`);
       if (missing.length) found.push({ line: lineOf(text, match.index), message: `DoDontPair has no ${missing.join(' or ')}; every pair prints both examples' source` });
     }
   }

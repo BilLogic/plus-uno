@@ -67,6 +67,12 @@ test('a pattern DoDontPair needs both doCode and dontCode; a template page is no
   assert.deepEqual(messages('design-system/src/templates/X/X.mdx', '<DoDontPair\n    doExample={<A />}\n    dontExample={<B />}\n/>'), []);
 });
 
+test('a staged-only example may leave its code off, and no other may', () => {
+  const page = 'design-system/src/storybook-docs/patterns/X/X.mdx';
+  assert.deepEqual(messages(page, '<DoDontPair\n    doExample={<A />}\n    doCode={CODE.A}\n    dontExample={<FadedListCase />}\n/>'), []);
+  assert.ok(messages(page, '<DoDontPair\n    doExample={<FadedListCase />}\n    dontExample={<B />}\n/>').some((m) => /no dontCode/.test(m)));
+});
+
 test('no page is deferred, and any deferred page carries a reason and is a real pattern page', () => {
   assert.deepEqual(DEFERRED_PAGES, {});
   for (const [file, reason] of Object.entries(DEFERRED_PAGES)) {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ChangeTag, CountTag, DynamicTable, Heading, StatusTag } from '@/components';
+import { ChangeTag, CountTag, DynamicTable, PageHeader, StatusTag } from '@/components';
 import { typeStyle } from '../../lib/type-style.js';
 
 /**
@@ -90,9 +90,10 @@ export const InARow = () => (
 
 /** A spacious Status tag after the page title. */
 export const BesideTitle = () => (
-    <div style={{ ...frame, ...line }}>
-        <Heading size="lg">Session with Ana Ruiz</Heading>
-        <StatusTag appearance="warning" spacing="spacious">Needs review</StatusTag>
+    <div style={frame}>
+        <PageHeader
+            title={<>Session with Ana Ruiz <StatusTag appearance="warning" spacing="spacious">Needs review</StatusTag></>}
+        />
     </div>
 );
 

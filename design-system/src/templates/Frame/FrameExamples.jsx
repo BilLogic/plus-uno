@@ -48,7 +48,7 @@ export const MultiStepInnerSidebar = () => (
             <Page style={{ flex: '1 1 auto', minBlockSize: 0, overflowY: 'auto' }} header={<PageHeader title="Plan a tutoring term" />}>
                 <Skeleton preset="text" lines={4} />
             </Page>
-            <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', blockSize: 'calc(var(--frame-footer-height) + var(--border-width-default))', paddingInline: 'var(--page-pad)', borderBlockStart: 'var(--border-width-default) solid var(--ds-border)' }}>
+            <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', blockSize: 'var(--frame-footer-height)', paddingInline: 'var(--page-pad)' }}>
                 <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
                     <Button text="Back" spacing="default" />
                     <Button text="Next" appearance="primary" spacing="default" />

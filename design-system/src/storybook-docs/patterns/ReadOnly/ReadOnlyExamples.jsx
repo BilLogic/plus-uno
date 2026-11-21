@@ -24,10 +24,10 @@ export const FadedNoReason = () => (
 
 export const PlainValue = () => (
     <Section title="Details" description="Lincoln Middle">
-        <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-            <dt style={{ color: 'var(--ds-text-subtle)' }}>School</dt>
+        <dl className="body-default" style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)' }}>
+            <dt>School</dt>
             <dd style={{ margin: 0 }}>Lincoln Middle School</dd>
-            <dt style={{ color: 'var(--ds-text-subtle)' }}>Created</dt>
+            <dt>Created</dt>
             <dd style={{ margin: 0 }}>Sep 3, 2026</dd>
         </dl>
     </Section>

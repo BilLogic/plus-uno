@@ -6,9 +6,9 @@ An inline snippet for a short piece of code inside a sentence. It is a `code` el
 
 **Import:** `import { Code } from '@/components';`
 
-**Used in:** Card (`ds guide card`)
+**Used in:** Card (`ds guide card`); Panel (`ds guide panel`)
 
-**Governed by:** Empty (`ds guide empty`); Errors (`ds guide errors`)
+**Governed by:** Empty (`ds guide empty`); Errors (`ds guide errors`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/text-and-data-display/Code/Code.jsx`
 

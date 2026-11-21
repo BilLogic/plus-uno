@@ -1,6 +1,6 @@
 import React from 'react';
 import { DynamicTable, FilterButton, Icon, SearchField, StaticTable, TreeTable } from '@/components';
-import { Section } from '@/templates';
+import { Card, Section } from '@/templates';
 
 /**
  * The Table page's do and don't examples, as PLUS parts only: the composition
@@ -10,7 +10,6 @@ import { Section } from '@/templates';
  * level below the page outline) lives in `TableCases.jsx`.
  */
 
-const subtle = { color: 'var(--ds-text-subtle)' };
 const icon = (name) => <Icon name={name} size={12} />;
 
 /** The header rows a list carries: Search, one applied filter, then the count in words. */
@@ -42,9 +41,9 @@ export const PlainTable = () => (
 
 export const FramedTable = () => (
     <Section title="Students" {...listHeader('students', 340)}>
-        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
+        <Card>
             {studentsTable}
-        </div>
+        </Card>
     </Section>
 );
 
@@ -70,7 +69,7 @@ export const SecondToolbar = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                 <FilterButton label="Site" text="All" onClick={() => {}} />
-                <span style={{ font: 'var(--body-sm)', ...subtle }}>12 records</span>
+                <span className="body-sm">12 records</span>
             </div>
             {tutorsTable}
         </div>
@@ -231,7 +230,7 @@ export const TreeAsExpandable = () => (
                     style: { paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' },
                     content: (
                         <>
-                            <div style={{ font: 'var(--heading-xxs)', ...subtle }}>Classes</div>
+                            <div className="heading-xxs">Classes</div>
                             <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
                         </>
                     ),

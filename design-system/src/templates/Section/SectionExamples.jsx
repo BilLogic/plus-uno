@@ -91,7 +91,7 @@ export const TitleInViewsRow = () => (
         )}
         views={(
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}>
-                <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Students</span>
+                <span className="heading-sm">Students</span>
                 {studentViews}
             </div>
         )}
@@ -445,8 +445,8 @@ export const SideAtEnd = () => (
             <dl style={{ margin: 0, display: 'grid', gap: 'var(--stack-lg)' }}>
                 {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
                     <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
-                        <dd style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{value}</dd>
+                        <dt className="body-sm">{label}</dt>
+                        <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
                     </div>
                 ))}
             </dl>
@@ -537,10 +537,10 @@ export const SearchableStudents = () => {
             filters={[{ key: 'status', label: 'Status', text: activeOnly ? 'Active' : 'All', isSelected: activeOnly, onClick: () => setActiveOnly((on) => !on) }]}
             onClearAll={reset}
         >
-            <p role="status" style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+            <p role="status" className="body-sm" style={{ margin: 0 }}>
                 {narrowed ? `${found.length} of ${names.length} students` : `${names.length} students`}
             </p>
-            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad)', font: 'var(--body-default)' }}>
+            <ul className="body-default" style={{ margin: 0, paddingInlineStart: 'var(--page-pad)' }}>
                 {found.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
         </Section>
@@ -603,7 +603,7 @@ export const ReflectionQueue = () => {
                 </PanelSubheader>
             </div>
             <PanelBody>
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                <p className="body-default" style={{ margin: 0 }}>
                     {grade} · Tutor: {tutor} · {last}. The reflection names two goals for next week.
                 </p>
             </PanelBody>
@@ -671,8 +671,8 @@ export const MainAndSide = () => (
             <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 'var(--stack-lg) var(--inline-xl)' }}>
                 {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
                     <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
-                        <dd style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{value}</dd>
+                        <dt className="body-sm">{label}</dt>
+                        <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
                     </div>
                 ))}
             </dl>
@@ -697,7 +697,7 @@ export const DetailExpand = () => (
         detail={(
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <StatusTag appearance="warning">Needs follow-up</StatusTag>
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                <p className="body-default" style={{ margin: 0 }}>
                     The reflection names two goals for next week and asks for extra fraction practice.
                 </p>
             </div>
@@ -721,7 +721,7 @@ export const ReflectionsAnatomy = () => (
         )}
         detailTitle="Ava Thompson"
         detailDescription="Grade 7"
-        detail={<p style={{ margin: 0, font: 'var(--body-default)' }}>The reflection names two goals for next week.</p>}
+        detail={<p className="body-default" style={{ margin: 0 }}>The reflection names two goals for next week.</p>}
         detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
         defaultDetailOpen
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
@@ -761,7 +761,7 @@ const FilterSide = ({ checked, onToggle, onReset }) => (
             const on = values.filter((value) => checked.includes(value)).length;
             return (
                 <fieldset key={category} style={{ margin: 0, padding: 0, border: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                    <legend style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>
+                    <legend className="heading-xxs" style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: 0, marginBlockEnd: 'var(--stack-md)' }}>
                         {category}
                         <CountTag value={on} label={`${on} applied`} />
                     </legend>

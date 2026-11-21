@@ -1,6 +1,7 @@
 import React from 'react';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { Section } from '@/templates';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './OverflowExamples.jsx';
 import examplesSource from './OverflowExamples.jsx?raw';
@@ -12,7 +13,7 @@ import examplesSource from './OverflowExamples.jsx?raw';
  */
 
 export const CODE = showCode(examplesSource, [
-    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount', 'FadedList'
+    'WrappedSectionTitle', 'ClippedSectionTitle', 'ClippedCellOpensText', 'ClippedCellNoText', 'ShowMoreWithCount'
 ]);
 
 /** The table sits in a narrow column so the long note runs past its cell. Docs geometry. */
@@ -38,4 +39,22 @@ export const ClippedCellNoTextCase = () => <CaseSurface><div style={NARROW_TABLE
 export const ShowMoreWithCountCase = () => <CaseSurface><Example.ShowMoreWithCount /></CaseSurface>;
 
 /** Don't: fading a list out hides how many items remain and gives no way to reveal them. */
-export const FadedListCase = () => <CaseSurface><Example.FadedList /></CaseSurface>;
+export const FadedListCase = () => (
+    <CaseSurface>
+        <Section title="Students">
+            <div style={{ position: 'relative' }}>
+                <Example.StudentList count={4} />
+                <div
+                    aria-hidden="true"
+                    style={{
+                        position: 'absolute',
+                        insetInline: 0,
+                        insetBlockEnd: 0,
+                        blockSize: 'calc(var(--control-lg) * 3)',
+                        backgroundImage: 'linear-gradient(to bottom, transparent, var(--ds-surface))',
+                    }}
+                />
+            </div>
+        </Section>
+    </CaseSurface>
+);

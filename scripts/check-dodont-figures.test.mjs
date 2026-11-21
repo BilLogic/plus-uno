@@ -9,7 +9,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { captionText, checkSource, helperBody, isFoundationFile, isRunOn, run, summary } from './check-dodont-figures.mjs';
+import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, run, summary } from './check-dodont-figures.mjs';
 
 const pair = (extra = '', doEx = '<Button label="Save" />', dontEx = '<Button label="OK" />') =>
   `<DoDontPair\n  doExample={${doEx}}\n  doCaption="Name the action."\n  dontExample={${dontEx}}\n  dontCaption="Say nothing about it."\n  ${extra}\n/>`;
@@ -97,6 +97,27 @@ test('helperBody reads the whole definition and nothing after it', () => {
   assert.ok(helperBody(src, 'AFigure').includes('<div>'));
   assert.ok(!helperBody(src, 'AFigure').includes('style'));
   assert.equal(helperBody(src, 'MissingFigure'), '');
+});
+
+const ex = (src) => checkExamplesSource(src).map((p) => p.message);
+
+test('printed examples: layout on tokens is silent, the green twin', () => {
+  assert.deepEqual(ex("export const A = () => <div style={{ display: 'flex', gap: 'var(--stack-sm)', alignItems: 'center' }}><p className=\"body-default\">x</p></div>;"), []);
+  assert.deepEqual(ex("const column = { display: 'grid', gap: 'var(--stack-md)' };\nexport const A = () => <div style={column} />;"), []);
+  assert.deepEqual(ex("export const A = () => <fieldset style={{ margin: 0, padding: 0, border: 0 }} />;"), []);
+});
+
+test('printed examples: color, type, radius and elevation fail, inline or through a named style', () => {
+  const bad = { color: "color: 'var(--ds-text)'", font: "font: 'var(--body-default)'", letterSpacing: "letterSpacing: 'x'", fontVariantNumeric: "fontVariantNumeric: 'tabular-nums'", borderRadius: "borderRadius: 'var(--radius-md)'", boxShadow: "boxShadow: 'var(--ds-shadow-overlay)'", background: "background: 'var(--ds-surface)'", border: "border: '1px solid var(--ds-border)'" };
+  for (const [key, decl] of Object.entries(bad)) {
+    assert.ok(ex(`export const A = () => <p style={{ margin: 0, ${decl} }} />;`).some((m) => m.includes(`\`${key}\``)), key);
+  }
+  assert.ok(ex("const subtle = { color: 'var(--ds-text-subtle)' };\nexport const A = () => <p style={{ ...subtle }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("const clip = { overflow: 'hidden', font: 'var(--body-sm)' };\nexport const A = () => <p style={clip} />;").some((m) => /`font`/.test(m)));
+});
+
+test('printed examples: the real tree is clean', () => {
+  assert.deepEqual(run().filter((f) => /Examples\.jsx$/.test(f.file)), []);
 });
 
 test('a fixture root: only tracked pages are read, never a second copy of the tree', () => {

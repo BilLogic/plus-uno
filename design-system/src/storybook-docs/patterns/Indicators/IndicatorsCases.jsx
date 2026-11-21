@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, ChangeTag, CountTag, DynamicTable, Heading, StatusTag } from '@/components';
+import { Button, ChangeTag, CountTag, DynamicTable, PageHeader, StatusTag } from '@/components';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import examplesSource from './IndicatorsExamples.jsx?raw';
@@ -56,20 +56,26 @@ export const InARowCase = () => (
 export const BesideTitleCase = () => {
     const [reviewed, setReviewed] = useState(false);
     return (
-        <div style={{ ...frame, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
-            <div style={line}>
-                <Heading size="lg">Session with Ana Ruiz</Heading>
-                <StatusTag appearance={reviewed ? 'success' : 'warning'} spacing="spacious">
-                    {reviewed ? 'Completed' : 'Needs review'}
-                </StatusTag>
-            </div>
-            <Button
-                appearance="subtle"
-                spacing="compact"
-                onClick={() => setReviewed((prev) => !prev)}
-            >
-                {reviewed ? 'Reopen review' : 'Mark reviewed'}
-            </Button>
+        <div style={frame}>
+            <PageHeader
+                title={(
+                    <>
+                        Session with Ana Ruiz{' '}
+                        <StatusTag appearance={reviewed ? 'success' : 'warning'} spacing="spacious">
+                            {reviewed ? 'Completed' : 'Needs review'}
+                        </StatusTag>
+                    </>
+                )}
+                actions={(
+                    <Button
+                        appearance="subtle"
+                        spacing="compact"
+                        onClick={() => setReviewed((prev) => !prev)}
+                    >
+                        {reviewed ? 'Reopen review' : 'Mark reviewed'}
+                    </Button>
+                )}
+            />
         </div>
     );
 };

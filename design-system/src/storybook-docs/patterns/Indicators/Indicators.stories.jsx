@@ -95,9 +95,11 @@ export const StatusBesideHeading = {
     play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const title = canvas.getByRole('heading', { name: 'Session with Ana Ruiz' });
+        const title = canvas.getByRole('heading', { name: /^Session with Ana Ruiz/ });
         const status = tagOf(canvas.getByText('Needs review'));
-        await expect(rect(status).left, 'the tag follows the text').toBeGreaterThan(rect(title).right - 1);
+        const words = document.createRange();
+        words.selectNodeContents(title.firstChild);
+        await expect(rect(status).left, 'the tag follows the text').toBeGreaterThan(words.getBoundingClientRect().right - 1);
         await expect(rect(status).height, 'spacious is taller than the 20 default').toBeGreaterThan(24);
         await userEvent.click(canvas.getByRole('button', { name: 'Mark reviewed' }));
         await expect(tagOf(canvas.getByText('Completed')).className).toContain('success');

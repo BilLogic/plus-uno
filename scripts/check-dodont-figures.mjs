@@ -34,6 +34,13 @@
  * itself still takes the helper, never a styled wrapper, and svg, img, hex and
  * captions are checked everywhere. Pattern and component pages have no exemption.
  *
+ * PRINTED EXAMPLES. A page prints its `*Examples.jsx` as the code a consumer
+ * writes, so that code teaches. Its inline `style` may set layout on tokens
+ * (flex, grid, gap, alignment, size, margin, padding) and must not set color,
+ * type, radius or elevation: text takes a type utility class (`.body-default`,
+ * `.heading-sm`, `.metric-md`), which brings the letter spacing with it. A
+ * `style` named by an identifier or spread in the same file is followed.
+ *
  * WHAT IT CANNOT SEE. Whether the two halves of a pair show the same
  * component, and whether a live figure is the right one: those are a reader's
  * judgment, so they live in the docs review, not in an exit code. A helper
@@ -178,6 +185,81 @@ export function checkSource(source, { file = '' } = {}) {
   return problems;
 }
 
+/** Style keys a printed example may not set: color, type, radius, elevation. */
+const NOT_LAYOUT = /^(color|background\w*|fill|stroke|opacity|font\w*|letterSpacing|lineHeight|text(?:Transform|Decoration\w*|Shadow|Indent|Emphasis\w*)|border\w*Radius|border\w*Radius\w*|boxShadow|filter|backdropFilter|outline\w*|border\w*)$/;
+const NOT_LAYOUT_KEY = (key, value) => (key === 'border' || /^border(Block|Inline|Top|Bottom|Left|Right)?(Start|End)?$/.test(key)
+  ? !/^\s*(0|none|['"]none['"]|['"]0['"])\s*$/.test(value) : NOT_LAYOUT.test(key));
+
+/** The balanced `{...}` or `(...)` text that opens at `source[start]`. */
+function balanced(source, start) {
+  const pairs = { '{': '}', '(': ')', '[': ']' };
+  let depth = 0;
+  let quote = null;
+  for (let i = start; i < source.length; i++) {
+    const ch = source[i];
+    if (quote) {
+      if (ch === '\\') i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+    if (pairs[ch]) depth++;
+    else if (ch === '}' || ch === ')' || ch === ']') { depth--; if (depth === 0) return source.slice(start + 1, i); }
+  }
+  return source.slice(start + 1);
+}
+
+/** The `key: value` pairs at the top level of an object body, spreads and named styles followed. */
+function styleEntries(source, body, seen = new Set()) {
+  const entries = [];
+  let depth = 0;
+  let quote = null;
+  let piece = '';
+  const parts = [];
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (quote) { piece += ch; if (ch === '\\') piece += body[++i] ?? ''; else if (ch === quote) quote = null; continue; }
+    if (ch === '"' || ch === "'" || ch === '`') quote = ch;
+    else if ('{(['.includes(ch)) depth++;
+    else if ('})]'.includes(ch)) depth--;
+    if (ch === ',' && depth === 0) { parts.push(piece); piece = ''; } else piece += ch;
+  }
+  parts.push(piece);
+  for (const raw of parts.map((x) => x.trim()).filter(Boolean)) {
+    const spread = /^\.\.\.(\w+)$/.exec(raw);
+    if (spread) { entries.push(...namedStyle(source, spread[1], seen)); continue; }
+    const kv = /^(?:([A-Za-z_$][\w$]*)|['"]([^'"]+)['"])\s*:\s*([\s\S]*)$/.exec(raw);
+    if (kv) entries.push([kv[1] ?? kv[2], kv[3]]);
+  }
+  return entries;
+}
+
+function namedStyle(source, name, seen) {
+  if (seen.has(name)) return [];
+  seen.add(name);
+  const m = new RegExp(`(?:const|let)\\s+${name}\\s*=\\s*\\{`).exec(source);
+  return m ? styleEntries(source, balanced(source, m.index + m[0].length - 1), seen) : [];
+}
+
+/**
+ * Every problem in one printed `*Examples.jsx`: an inline style that sets color, type, radius or elevation.
+ *
+ * @returns {{ line: number, message: string }[]}
+ */
+export function checkExamplesSource(source) {
+  const problems = [];
+  for (const m of source.matchAll(/\bstyle=\{/g)) {
+    const open = m.index + m[0].length - 1;
+    const expr = balanced(source, open).trim();
+    const entries = expr.startsWith('{') ? styleEntries(source, balanced(expr, 0)) : /^\w+$/.test(expr) ? namedStyle(source, expr, new Set()) : [];
+    const line = source.slice(0, m.index).split('\n').length;
+    for (const [key, value] of entries) {
+      if (NOT_LAYOUT_KEY(key, value)) problems.push({ line, message: `printed example style sets \`${key}\`; style may set layout on tokens only, so text takes a type class such as .body-default and color, radius and elevation come from the component` });
+    }
+  }
+  return problems;
+}
+
 /** Every docs page and story source under the design-system source, tracked and still on disk. */
 const sources = (repoRoot) => trackedSources(repoRoot, [SRC], /\.(mdx|jsx)$/).filter(({ path: file }) => !/\.test\.jsx$/.test(file));
 
@@ -185,6 +267,7 @@ const sources = (repoRoot) => trackedSources(repoRoot, [SRC], /\.(mdx|jsx)$/).fi
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const findings = [];
   for (const { path: file, text: source } of sources(repoRoot)) {
+    if (/Examples\.jsx$/.test(file)) for (const { line, message } of checkExamplesSource(source)) findings.push({ file, line, message });
     if (DEFINITIONS.has(file)) continue;
     if (!/\bDo(Dont)?\b|DoDontPair|DoDontCard|<Dont\b/.test(source)) continue;
     for (const { line, message } of checkSource(source, { file })) findings.push({ file, line, message });
@@ -195,7 +278,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export const REMEDY =
   '  -> A Do or Don\'t figure is a live PLUS component or an illustration-kit drawing,\n'
   + '     with no inline style: arrange several parts with <FigureRow> or <FigureStack>\n'
-  + '     (storybook-docs/ds-docs-layout.jsx). Put one sentence under it as the caption.';
+  + '     (storybook-docs/ds-docs-layout.jsx). Put one sentence under it as the caption.\n'
+  + '     A printed *Examples.jsx style sets layout on tokens only: text takes a type class\n'
+  + '     (.body-default), never color, font, radius or shadow.';
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   let blocks = 0;
