@@ -110,7 +110,6 @@ A card's footer actions hug the start, under the content. One action that goes s
 - The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
 - Every card keeps a 1px border (transparent on sunken and raised) so forced colors draw its edge.
 - Text sits on each surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
-- The card sets `--ds-utility-elevation-surface-current` to its chosen surface, so a sticky table cell inside it matches the card.
 
 ## Related
 

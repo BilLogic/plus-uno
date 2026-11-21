@@ -179,10 +179,15 @@ describe('Modal live do and dont examples', () => {
         expect(wide.container.querySelector('[role="dialog"]').className).not.toBe(narrowClass);
     });
 
-    it('ConfirmsInside confirms in one dialog; ModalOnModal stacks two', () => {
+    it('ConfirmsInside opens on the details and every button does something; ModalOnModal stacks two', async () => {
+        const user = userEvent.setup();
         const inside = render(<ConfirmsInside />);
         expect(screen.getAllByRole('dialog')).toHaveLength(1);
+        expect(screen.getByRole('dialog', { name: 'Session details' })).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: 'Delete session' }));
         expect(screen.getByRole('dialog', { name: 'Delete session?' })).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: 'Back' }));
+        expect(screen.getByRole('dialog', { name: 'Session details' })).toBeInTheDocument();
         inside.unmount();
         render(<ModalOnModal />);
         expect(screen.getAllByRole('dialog')).toHaveLength(2);

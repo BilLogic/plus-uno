@@ -58,15 +58,21 @@ Table reads these motion tokens and no literal duration or curve.
 
 ### Put a plain table in a Section. {#put-a-plain-table-in-a-section}
 
+**Checked:** Review
+
 Do: The table spans the Section under its header: no frame, no card, no padding of its own.
 Don't: The table sits inside its own frame with padding; it stops lining up with the Section and the Section header.
 
 ### Put nothing between the header and the head row. {#put-nothing-between-the-header-and-the-head-row}
 
+**Checked:** Review
+
 Do: Search and filters live in the Section header rows, with the record count once a filter is applied; the head row follows directly.
 Don't: A second toolbar sits between the Section header and the head row; the table has no toolbar of its own.
 
-### One table per block. {#one-table-per-block}
+### Put one table in each Section. {#put-one-table-in-each-section}
+
+**Checked:** Review
 
 Never mix a Static, Dynamic or Tree table in one Section either.
 
@@ -75,10 +81,14 @@ Don't: Two tables share one Section and one header; search and filters no longer
 
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
+**Checked:** Review
+
 Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected.
 Don't: A roster people act on as a Static table; with no sort, selection or paging, a roster of hundreds becomes one long scroll.
 
 ### Use a Tree table for a hierarchy. {#use-a-tree-table-for-a-hierarchy}
+
+**Checked:** Review
 
 Do: Classes nest under their school and students under their class; each level indents and keeps the columns.
 Don't: A hierarchy faked with expandable rows: the classes and students lose their columns and can't be sorted or selected.

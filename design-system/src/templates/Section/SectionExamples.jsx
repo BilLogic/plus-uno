@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, CountTag, DynamicTable, EmptyState, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
+import { Button, Checkbox, CountTag, DynamicTable, EmptyState, Facts, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
 import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section } from '@/templates';
 
 /**
@@ -442,14 +442,7 @@ export const SideAtEnd = () => (
         )}
         layout="split"
         side={(
-            <dl style={{ margin: 0, display: 'grid', gap: 'var(--stack-lg)' }}>
-                {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
-                    <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt className="body-sm color-secondary">{label}</dt>
-                        <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
-                    </div>
-                ))}
-            </dl>
+            <Facts items={[{ label: 'Tutor', value: 'Priya Nair' }, { label: 'Meets', value: 'Tuesdays, 4:30 PM' }, { label: 'Room', value: 'Library 2' }]} />
         )}
     >
         <RosterTable />
@@ -540,7 +533,7 @@ export const SearchableStudents = () => {
             <p role="status" className="body-sm color-secondary" style={{ margin: 0 }}>
                 {narrowed ? `${found.length} of ${names.length} students` : `${names.length} students`}
             </p>
-            <ul className="body-default" style={{ margin: 0, paddingInlineStart: 'var(--page-pad)' }}>
+            <ul className="body-default" style={{ margin: 0, paddingInlineStart: 'var(--inline-xl)' }}>
                 {found.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
         </Section>
@@ -587,11 +580,11 @@ export const ReflectionQueue = () => {
                     actions={(
                         <>
                             <PanelUpAction
-                                disabled={activeIndex === 0}
+                                isDisabled={activeIndex === 0}
                                 onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
                             />
                             <PanelDownAction
-                                disabled={activeIndex === queueStudents.length - 1}
+                                isDisabled={activeIndex === queueStudents.length - 1}
                                 onClick={() => setActiveIndex((i) => Math.min(queueStudents.length - 1, i + 1))}
                             />
                             <PanelCloseAction onClick={() => setIsPanelOpen(false)} />
@@ -668,14 +661,7 @@ export const MainAndSide = () => (
         description="Tuesdays at 4:30 PM"
         layout="split"
         side={(
-            <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 'var(--stack-lg) var(--inline-xl)' }}>
-                {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
-                    <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt className="body-sm color-secondary">{label}</dt>
-                        <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
-                    </div>
-                ))}
-            </dl>
+            <Facts items={[{ label: 'Tutor', value: 'Priya Nair' }, { label: 'Meets', value: 'Tuesdays, 4:30 PM' }, { label: 'Room', value: 'Library 2' }]} />
         )}
     >
         <RosterTable />

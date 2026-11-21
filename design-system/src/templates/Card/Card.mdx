@@ -6,6 +6,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import * as CardStories from './Card.stories.jsx';
 import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
 import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import * as ChecklistStories from '../Page/Checklist.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -147,6 +148,49 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <div className="sb-ds-doc-section">
 
+## Checklist
+
+A checklist tracks setup or compliance steps in three layouts: a dismissible Card on Home, a persistent Card in a page, and a compact Card at the foot of the Sidebar.
+
+<ComponentExample of={ChecklistStories.ChecklistCardOnHome} title="Checklist: card on Home" description="Optional setup steps in a dismissible Card on Home: the title sits at the start, '2 of 5 done' and a 96-wide Progress bar sit beside the 32 dismiss Icon button so the bar's start edge lands on the 128 action column, open steps keep their order on top, and done steps move below with centered Completed text. Finish every step to shrink it to one line." />
+
+<ComponentExample of={ChecklistStories.ChecklistCardInPage} title="Checklist: card in a page" description="Required training or compliance steps in a persistent Card inside a page Section: the Progress bar fills the full 128 action column, and completing every step keeps the card on screen with all five steps ticked." />
+
+<ComponentExample of={ChecklistStories.ChecklistCompactInSidebar} title="Checklist: compact in the sidebar" description="At the foot of the Sidebar, a compact Card shows the count, the Progress bar and the next open step from any page; pressing it opens the full checklist." />
+
+Build the checklist from `Card`, `Section` and `ProgressBar`:
+
+- Compose each row from an `Icon`, step text with one fact, and an action column of one width (`--checklist-action-width`, with `--checklist-action-min-width` as its floor). Buttons fill the column and align down the list.
+- Put the title at the header's start and the count of steps done with a `ProgressBar` at the end. Align the bar's start edge with the action column. On a persistent card the bar fills the column; where a dismiss `IconButton` occupies the end, the bar is shorter by its width.
+- Keep open steps in order above completed steps. Center a check icon and the word "Completed" (Body small, subtle) in each completed row's action column.
+
+Choose the layout by where the checklist appears:
+
+<DocsTable>
+<thead>
+<tr><th>Layout</th><th>Use</th><th>Behavior</th></tr>
+</thead>
+<tbody>
+<tr><td>Dismissible card</td><td>Home</td><td>When complete, shrinks to one line for a day, then disappears.</td></tr>
+<tr><td>Persistent card</td><td>Required work on a page</td><td>Keeps every completed row visible.</td></tr>
+<tr><td>Compact card</td><td>Foot of the Sidebar</td><td>Shows the count, progress bar and next step, which opens the full list.</td></tr>
+</tbody>
+</DocsTable>
+
+The action column is 128 wide with a floor of 120; beside a 32 dismiss Icon button the Progress bar is 96.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Card" tier="template" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -158,14 +202,6 @@ The examples on this page follow the toolbar's Color mode switch.
         </>
     }
 />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Motion
-
-<MotionSection component="Card" tier="template" />
 
 </div>
 
@@ -369,7 +405,6 @@ A card's footer actions hug the start, under the content. One action that goes s
 - The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
 - Every card keeps a 1px border (transparent on sunken and raised) so forced colors draw its edge.
 - Text sits on each surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
-- The card sets `--ds-utility-elevation-surface-current` to its chosen surface, so a sticky table cell inside it matches the card.
 
 </div>
 

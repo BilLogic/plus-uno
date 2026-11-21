@@ -115,7 +115,7 @@ added. Five `##` sections carry it, in this order:
 4. **Accessibility:** keyboard, focus and naming, as the component behaves today.
 5. **Related:** one bullet per neighbor, each with its "use when": "`SectionMessage`: use when the message stays in the page."
 
-Parts and Content guidelines sit after Usage. Each section states current
+Parts and Content guidelines sit after Usage. A template page whose Examples tab already has an Anatomy section (Frame, Modal, Page, Popup, Section) carries no separate `## Parts` in Usage; Card, Panel and Table keep one for the parts their Anatomy does not cover. Each section states current
 behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
 `outdated` or `known stale` line.
 

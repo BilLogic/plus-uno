@@ -128,7 +128,7 @@ Picked by what the person has to do. The Dialog component page holds the panel's
 
 - **Passive.** Information only, with Close. No footer.
 - **Active.** A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.
-- **Acknowledge.** One thing to read and one button that fills the footer.
+- **Acknowledge.** One thing to read and one button on the right half of the footer.
 - **Steps.** A short sequence at 10-col: Back and Next, split 50/50.
 
 ## Anatomy
@@ -138,7 +138,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 20 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
-4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
+4. **Footer** (optional). Buttons sit inside the Modal padding; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
 
 ## Width behavior
 
