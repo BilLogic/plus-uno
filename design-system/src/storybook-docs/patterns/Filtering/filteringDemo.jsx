@@ -9,6 +9,7 @@ import { useOwnWidth } from '@/templates/Frame/useOwnWidth';
 import { PageTabs, SessionsTable } from '@/templates/Page/pageDemo.jsx';
 import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * The Filtering pattern's examples: a real Section with its view bar, the
@@ -178,7 +179,7 @@ export const FilteredStudents = ({
     // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, that menu waits, so none lands on the page. A held-open menu waits on its own (`held`).
     if (mount === null && !openMenu && filters?.some((entry) => entry.menu)) filters = undefined;
 
-    const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
+    const status = <span role="status" style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
     const rawResults = rows.length > 0 ? <StudentsTable rows={rows} columns={ROSTER_COLUMNS} /> : (
         <EmptyState

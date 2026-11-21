@@ -9,6 +9,7 @@ import { TypeThumbContext } from './fit-stage.jsx';
 import { PageView } from '../chrome/PageView.jsx';
 import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
+import { typeStyle } from './type-style.js';
 
 /**
  * The blocks a template page is built from (Section first; Frame, Page, Form,
@@ -124,10 +125,10 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
                 )}
             </ThumbTag>
             <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
-                <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
+                <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>
                     {href ? <a className="sb-docs-type-card__link" href={href} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{title}</a> : title}
                 </span>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
+                <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{children}</span>
             </figcaption>
         </figure>
     );
@@ -369,7 +370,7 @@ export const LiveAnatomy = ({ width, live = false, scrollable = false, parts, ti
                                 borderRadius: 'var(--radius-full)',
                                 background: 'var(--ds-background-brand-bold)',
                                 color: 'var(--ds-text-inverse)',
-                                font: 'var(--body-sm)',
+                                ...typeStyle('body-sm'),
                                 fontWeight: 'var(--type-weight-semibold)',
                             }}
                         >
@@ -428,7 +429,7 @@ const BrowserWindowBox = ({ address, height, fill, children }) => (
                     <span key={i} style={{ inlineSize: 'var(--icon-sm)', blockSize: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
                 ))}
             </span>
-            <span style={{ flex: '1 1 auto', padding: 'var(--pad-x-xs) var(--pad-x-lg)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+            <span style={{ flex: '1 1 auto', padding: 'var(--pad-x-xs) var(--pad-x-lg)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                 {address}
             </span>
         </div>

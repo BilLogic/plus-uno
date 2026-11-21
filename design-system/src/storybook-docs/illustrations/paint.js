@@ -1,3 +1,4 @@
+import { typeStyle } from '../lib/type-style.js';
 /**
  * The illustration kit's whole palette, as a role map. Every drawing paints with
  * these roles and nothing else, so a drawing follows the toolbar's Color mode and
@@ -239,7 +240,7 @@ export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
  * viewBox, so the label itself draws at half that role's size (`0.5em`): at full
  * width it reads at true size.
  */
-export const LABEL_ROLE = { font: 'var(--heading-xs)' };
+export const LABEL_ROLE = { ...typeStyle('heading-xs') };
 // Half the label role's size, which no token holds; a drawing shows at up to twice its viewBox.
 // `0.5em` reads the size LABEL_ROLE sets, so text drawn with LABEL_FONT must sit inside a LABEL_ROLE group.
 export const LABEL_FONT = { fontSize: '0.5em' }; // docs-literal: no token is half a text role
@@ -249,7 +250,7 @@ export const LABEL_FONT = { fontSize: '0.5em' }; // docs-literal: no token is ha
  * body-sm text style with the code family and a medium weight.
  */
 export const MONO_LABEL_FONT = {
-  font: 'var(--body-sm)',
+  ...typeStyle('body-sm'),
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
 };

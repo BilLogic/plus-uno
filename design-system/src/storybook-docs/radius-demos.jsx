@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { PAINT, HAIRLINE } from '@/storybook-docs/illustrations/paint.js';
 import { ButtonShape, Card, Frame, Rule, Screen, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Figures for Foundations/Radius. Every corner reads a radius token, and every
@@ -97,7 +98,7 @@ const show = (px) => (px === undefined || Number.isNaN(px) ? '' : px >= 999 ? 'f
 /* ---------------------------------------------------------------- layout */
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
-const small = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const small = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 const codeText = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 const well = {
     position: 'relative',
@@ -113,7 +114,7 @@ const countTag = {
     borderRadius: 'var(--radius-full)',
     background: 'var(--ds-background-brand-bold)',
     color: 'var(--ds-text-inverse)',
-    font: 'var(--heading-xs)',
+    ...typeStyle('heading-xs'),
 };
 
 /**
@@ -151,7 +152,7 @@ const Legended = ({ testid, title, stage, parts, children }) => {
                 {parts.map((p, i) => (
                     <li key={p.id} data-legend={p.id} style={{ display: 'grid', gridTemplateColumns: 'var(--image-xs) 1fr', columnGap: 'var(--inline-md)', alignItems: 'center' }}>
                         <span aria-hidden="true" style={countTag}>{i + 1}</span>
-                        <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                        <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                             <strong>{p.title}</strong>
                             <span data-value>{p.value ?? show(values[p.token])}</span>
                             {p.token && <code style={codeText}>{p.token}</code>}
@@ -191,7 +192,7 @@ export const ScaleStrip = () => {
                         <TokenRect x={0} y={0} w={64} h={64} token={s.token} fill={PAINT.shape} data-corner="" />
                     </Illustration>
                     <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <strong data-value style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{show(values[s.token])}</strong>
+                        <strong data-value style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{show(values[s.token])}</strong>
                         <span style={small}>{s.role}</span>
                     </figcaption>
                 </figure>
@@ -235,7 +236,7 @@ const Values = ({ items }) => {
         <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-sm) var(--inline-lg)' }}>
             {probes}
             {items.map((i) => (
-                <li key={i.id} data-legend={i.id} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-sm)', color: 'var(--ds-text)' }}>
+                <li key={i.id} data-legend={i.id} style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--inline-sm)', ...typeStyle('body-sm'), color: 'var(--ds-text)' }}>
                     <span style={{ color: 'var(--ds-text-subtle)' }}>{i.title}</span>
                     <strong data-value>{i.value ?? show(values[i.token])}</strong>
                     {i.token && <code style={codeText}>{i.token}</code>}

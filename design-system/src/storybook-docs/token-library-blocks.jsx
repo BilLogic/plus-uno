@@ -6,6 +6,7 @@ import { FoundationSection, FoundationSubsection } from '@/storybook-docs/founda
 import { COLLECTION_TITLES, COLLECTIONS, SCOPES, SCOPE_TITLES, TIERS } from '@/storybook-docs/lib/token-collections.mjs';
 import { buildLibrary, filterLibrary, groupLibrary } from '@/storybook-docs/lib/token-library.mjs';
 import { TOKEN_COLLECTIONS } from '@/storybook-docs/docs-tokens.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Foundations ▸ Tokens ▸ Library: one searchable list of every token. Rows come
@@ -116,11 +117,11 @@ export const TokenLibrary = () => {
                 <Select label="Tier" isSearchable={false} clearable={false} options={TIER_OPTIONS} value={tier} onChange={setTier} />
                 <Select label="Scope" isSearchable={false} clearable={false} options={SCOPE_OPTIONS} value={scope} onChange={setScope} />
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>
                 <p role="status" data-testid="token-count" style={{ margin: 0 }}>{rows.length.toLocaleString('en-US')} of {LIBRARY.length.toLocaleString('en-US')} tokens</p>
                 <p role="status" aria-live="polite" data-testid="copy-status" style={{ margin: 0 }}><span key={copied.n}>{copied.text}</span></p>
             </div>
-            {groups.length === 0 && <p style={{ margin: 0, font: 'var(--body-default)' }}>No tokens match. Clear the search or loosen a filter.</p>}
+            {groups.length === 0 && <p style={{ margin: 0, ...typeStyle('body-default') }}>No tokens match. Clear the search or loosen a filter.</p>}
             {groups.map((g) => (
                 <FoundationSection key={g.collection} title={g.title}>
                     {g.sections.map((s) => (

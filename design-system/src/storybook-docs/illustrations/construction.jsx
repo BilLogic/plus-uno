@@ -3,6 +3,7 @@ import { devWarn } from '../../lib/devWarn.js';
 import { Illustration, MAX_LABELED_ZONES, ZoneBudgetContext } from './Illustration.jsx';
 import { CORNER, HAIRLINE, MONO_LABEL_FONT, PAINT, scaledCorner } from './paint.js';
 import { Rect, SkeletonBar } from './primitives.jsx';
+import { typeStyle } from '../lib/type-style.js';
 
 /**
  * Construction-kit parts and layout figures built on top of the illustration
@@ -368,13 +369,13 @@ const MATRIX_CELL_STYLE = {
 };
 
 const MATRIX_LABEL_STYLE = {
-  font: 'var(--body-default)',
+  ...typeStyle('body-default'),
   fontWeight: 'var(--type-weight-medium)',
   color: 'var(--ds-text)',
 };
 
 const MATRIX_SUB_STYLE = {
-  font: 'var(--body-sm)',
+  ...typeStyle('body-sm'),
   color: 'var(--ds-text-subtle)',
 };
 

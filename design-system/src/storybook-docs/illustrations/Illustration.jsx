@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useRef } from 'react';
 import { devWarn } from '../../lib/devWarn.js';
+import { typeStyle } from '../lib/type-style.js';
 
 export const MAX_LABELED_ZONES = 3;
 export const ZoneBudgetContext = createContext(null);
@@ -63,7 +64,7 @@ export const IllustrationFigure = ({ caption, children }) => (
     {children}
     {caption && (
       <figcaption
-        style={{ marginBlockStart: 'var(--stack-sm)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
+        style={{ marginBlockStart: 'var(--stack-sm)', ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}
       >
         {caption}
       </figcaption>

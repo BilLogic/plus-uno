@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Icon, SegmentedControl } from '@/components';
 import { DocsTable, DoDontCard } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Building blocks for the Foundations docs pages: token tables whose values are
@@ -186,10 +187,10 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                             borderRadius: 'var(--card-radius)',
                             background: 'var(--ds-surface-sunken)',
                             color: 'var(--ds-text)',
-                            font: 'var(--body-default)',
+                            ...typeStyle('body-default'),
                         }}
                     >
-                        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>
+                        <span style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text-subtle)' }}>
                             {p === 'light' ? 'Light' : 'Dark'}
                         </span>
                         {typeof children === 'function' ? children(p) : children}
@@ -211,7 +212,7 @@ export const Callout = ({ title, children }) => (
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-surface-sunken)',
             color: 'var(--ds-text)',
-            font: 'var(--body-default)',
+            ...typeStyle('body-default'),
         }}
     >
         {title && <strong style={{ display: 'block', marginBottom: 'var(--stack-sm)', fontWeight: 'var(--type-weight-medium)' }}>{title}</strong>}

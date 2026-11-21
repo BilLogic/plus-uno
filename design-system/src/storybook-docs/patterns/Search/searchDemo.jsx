@@ -4,6 +4,7 @@ import { Button, DynamicTable, EmptyState, PageHeader, SearchField, SearchFieldA
 import { Section } from '@/templates';
 import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { STUDENTS, ViewPills, row, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * The Search pattern's examples: the real SearchField in each of its three
@@ -58,7 +59,7 @@ const SCOPES = [
 
 /** The results header: the count, always, in words. */
 const ResultsHeader = ({ children }) => (
-    <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{children}</span>
+    <span role="status" style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{children}</span>
 );
 
 /** Loading mirrors empty: the same body slot, three Skeleton bars where the rows will be. */
@@ -282,7 +283,7 @@ export const BasicPage = ({ text = 'Ava' }) => {
         <PageFrame
             field={(
                 <div style={{ ...row, inlineSize: '100%' }}>
-                    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
+                    <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
                     <div style={{ inlineSize: 'var(--field-width-md)' }}>
                         <SearchField mode="basic" spacing="compact" placeholder={SCOPE} defaultValue={text} onSearch={(next) => setSubmitted(next || text)} />
                     </div>

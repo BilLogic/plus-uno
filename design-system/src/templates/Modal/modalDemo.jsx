@@ -7,6 +7,7 @@ import Section from '../Section';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FormFields, FILLED } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
+import { typeStyle } from '../../storybook-docs/lib/type-style.js';
 
 /**
  * The Modal template's examples: the real PLUS parts, placed the way each type
@@ -17,7 +18,7 @@ import { FormFields, FILLED } from '@/storybook-docs/patterns/Forms/formHosts.js
 /** The stand-in screen the docs draw the Blanket at (docs geometry, px). */
 export const SCREEN = { width: 1024, height: 480 }; // docs-literal
 
-const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
+const text = (copy) => <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{copy}</p>;
 
 /** A Modal at a width step, centered in its Blanket at the stand-in screen. */
 export const ModalStage = ({ children, width = '6-col', height = 'hug', screenWidth = SCREEN.width, screenHeight = SCREEN.height, ...modal }) => (

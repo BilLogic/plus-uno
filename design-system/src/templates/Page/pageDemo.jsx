@@ -14,6 +14,7 @@ import {
 } from '@/components';
 import { Frame, Card, Section } from '@/templates';
 import { ReflowStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { typeStyle } from '../../storybook-docs/lib/type-style.js';
 
 /**
  * Page-template docs helpers: the page header assembled from its parts, a
@@ -50,7 +51,7 @@ export const DemoPageHeader = ({ breadcrumb, title, status, description, actions
                     <Heading size="lg">{title}</Heading>
                     {status && <StatusTag appearance={status.appearance} spacing="spacious">{status.text}</StatusTag>}
                 </div>
-                {description && <p data-part="description" style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{description}</p>}
+                {description && <p data-part="description" style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{description}</p>}
             </div>
         )}
         actions={actions}

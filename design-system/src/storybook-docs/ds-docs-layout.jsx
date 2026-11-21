@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArgTypes, Canvas, Controls, Source, Stories, useOf } from '@storybook/addon-docs/blocks';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Shared Storybook docs layout primitives (PLUS DS).
@@ -281,7 +282,7 @@ export function DoDontCaption({ tone, children, style }) {
                     ? 'var(--ds-background-success-subtler)'
                     : 'var(--ds-background-danger-subtler)',
                 color: 'var(--ds-text)',
-                font: 'var(--body-default)',
+                ...typeStyle('body-default'),
                 ...style,
             }}
         >
@@ -311,10 +312,10 @@ export function DoDontCaption({ tone, children, style }) {
                     flex: 1,
                 }}
             >
-                <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
+                <strong style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>
                     {isDo ? 'Do' : "Don't"}
                 </strong>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                     {children}
                 </span>
             </span>
@@ -424,7 +425,7 @@ export function DoDontCard({ tone, children, caption, code }) {
                     borderRadius: 'var(--radius-lg)',
                     backgroundColor: 'var(--ds-surface-sunken)',
                     color: 'var(--ds-text)',
-                    font: 'var(--body-default)',
+                    ...typeStyle('body-default'),
                 }}
             >
                 <div className="sb-ds-dodont-card__example sb-unstyled" style={{ inlineSize: '100%' }}>{children}</div>

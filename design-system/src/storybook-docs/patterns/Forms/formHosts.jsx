@@ -8,6 +8,7 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * The Forms pattern's host examples. There is no Form component: a form is the
@@ -298,7 +299,7 @@ export const FormInSteps = ({ start = 0 }) => {
                 const siteLabel = SITES.find((s) => s.value === f.values.site)?.label ?? (f.values.site || 'Lincoln Middle');
                 return (
                     <Fieldset legend="Review">
-                        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                             {`${f.values.student || 'Ana Ruiz'} · ${siteLabel} · ${schedule.date} at ${schedule.time}`}
                         </p>
                     </Fieldset>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button, Icon, IconButton, ProgressBar, Sidebar } from '@/components';
 import { Frame, Card, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { typeStyle } from '../../storybook-docs/lib/type-style.js';
 
 /**
  * The checklist: setup or compliance steps in three layouts (a
@@ -25,7 +26,7 @@ export const CHECKLIST_WINDOW_HEIGHT = 540; // docs-literal
 export const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 const frame = { padding: 'var(--page-pad)' };
-const subtle = { font: 'var(--body-default)', color: 'var(--ds-text-subtle)' };
+const subtle = { ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' };
 
 export const HOME_CHECKLIST_STEPS = [
     { id: 'calendar', title: 'Connect your calendar', fact: 'Google Calendar · 2 min', action: 'Connect', done: false },
@@ -125,7 +126,7 @@ export const ChecklistCard = ({
                         style={{
                             flex: '1 1 auto',
                             minInlineSize: 0,
-                            font: 'var(--body-default)',
+                            ...typeStyle('body-default'),
                             color: 'var(--ds-text)',
                         }}
                     >
@@ -223,13 +224,13 @@ export const ChecklistCard = ({
                             >
                                 <span
                                     style={{
-                                        font: 'var(--body-default)',
+                                        ...typeStyle('body-default'),
                                         color: step.done ? 'var(--ds-text-subtle)' : 'var(--ds-text)',
                                     }}
                                 >
                                     {step.title}
                                 </span>
-                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                                <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                                     {step.fact}
                                 </span>
                             </div>
@@ -252,7 +253,7 @@ export const ChecklistCard = ({
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             gap: 'var(--inline-sm)',
-                                            font: 'var(--body-sm)',
+                                            ...typeStyle('body-sm'),
                                             color: 'var(--ds-text-subtle)',
                                         }}
                                     >
@@ -305,7 +306,7 @@ export const CompactChecklist = ({
                         gap: 'var(--card-inline-sm)',
                     }}
                 >
-                    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>{title}</span>
+                    <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text)' }}>{title}</span>
                     <span
                         className="body-sm"
                         style={{

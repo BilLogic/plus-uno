@@ -14,6 +14,7 @@ import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreograph
 import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 import { ElevationPanel } from './elevation-folder-figures.jsx';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * The live blocks of Foundations/Elevation. Every value a block shows is read
@@ -174,8 +175,8 @@ const useModeVars = (names) => {
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' };
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
-const label = { font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' };
-const small = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const label = { ...typeStyle('heading-xxs'), color: 'var(--ds-text-subtle)' };
+const small = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 const codeText = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 /** A value that never breaks mid-value: a narrow table scrolls in its own container instead. */
 const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
@@ -185,7 +186,7 @@ const well = {
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
     color: 'var(--ds-text)',
-    font: 'var(--body-default)',
+    ...typeStyle('body-default'),
 };
 
 /** A segmented control that picks one value. */
@@ -469,7 +470,7 @@ export const ExplodedStack = () => {
                 onMouseEnter={() => setActive(plate.id)}
                 style={narrow ? null : { position: 'absolute', insetInline: 0, insetBlockStart: `${(tickY / STAGE.h) * 100}%`, transform: 'translateY(-50%)', paddingInlineStart: 'var(--inline-sm)' }}
             >
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-sm)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', ...typeStyle('body-sm') }}>
                     <Button
                         appearance="subtle"
                         spacing="compact"
@@ -539,8 +540,8 @@ export const LevelTiles = () => (
                             color: 'var(--ds-text)',
                         }}
                     >
-                        <strong style={{ font: 'var(--heading-xs)' }}>{l.name}</strong>
-                        <span style={{ font: 'var(--body-sm)' }}>{l.use}</span>
+                        <strong style={{ ...typeStyle('heading-xs') }}>{l.name}</strong>
+                        <span style={{ ...typeStyle('body-sm') }}>{l.use}</span>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.surface ?? 'no surface'}</code>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{l.shadow ?? 'no shadow'}</code>
                     </div>
@@ -637,7 +638,7 @@ export const BehaviorGuide = () => {
                                 aria-current={current ? 'true' : undefined}
                                 style={current ? { background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' } : undefined}
                             >
-                                <th scope="row" style={{ font: 'var(--heading-xs)' }}>{b.behavior}</th>
+                                <th scope="row" style={{ ...typeStyle('heading-xs') }}>{b.behavior}</th>
                                 <td>{level ? level.name : 'none'}</td>
                                 <td>{level?.shadow ? <code style={{ ...codeText, whiteSpace: 'nowrap' }}>{level.shadow}</code> : 'none'}</td>
                                 <td>
@@ -722,7 +723,7 @@ export const ShadowComposer = () => {
                                 background: `var(${level.surface})`,
                                 boxShadow: composed,
                                 color: 'var(--ds-text)',
-                                font: 'var(--heading-xs)',
+                                ...typeStyle('heading-xs'),
                             }}
                         >
                             {level.name}
@@ -785,7 +786,7 @@ export const CrossSection = () => {
                 <div style={{ ...row, justifyContent: 'space-between' }}>
                     <ul aria-label="Levels" style={{ ...row, margin: 0, padding: 0, listStyle: 'none' }}>
                         {series.map((s) => (
-                            <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                            <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                                 <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-width-default) * 2)', background: CHART_TONES[s.level.id] }} />
                                 {s.level.name} <span style={small}>reaches {Math.round(s.reach)}</span>
                             </li>
@@ -801,16 +802,16 @@ export const CrossSection = () => {
                         <line x1={L} y1={H - B} x2={W - 8} y2={H - B} stroke="var(--ds-border)" />
                         <line x1={L} y1={12} x2={L} y2={H - B} stroke="var(--ds-border)" />
                         {[0, 0.5, 1].map((t) => (
-                            <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
+                            <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ ...typeStyle('body-sm') }}>
                                 {`${Math.round(t * peak * 100)}%`}
                             </text>
                         ))}
                         {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-                            <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
+                            <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ ...typeStyle('body-sm') }}>
                                 {Math.round(t * span)}
                             </text>
                         ))}
-                        <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>px below the edge</text>
+                        <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ ...typeStyle('body-sm') }}>px below the edge</text>
                         {series.map((s) => {
                             const pts = samples(s.layers).filter(([d]) => d >= 1);
                             return (
@@ -909,7 +910,7 @@ const LadderPane = ({ mode }) => {
                                 boxShadow: l.shadow ? `var(${l.shadow})` : 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                             }}
                         />
-                        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{l.name}</strong>
+                        <strong style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{l.name}</strong>
                         <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{toHex(colors[l.id])}</code>
                         <span style={small} data-lightness={lightness(colors[l.id])}>L {lightness(colors[l.id])}</span>
                     </div>

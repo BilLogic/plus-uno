@@ -117,6 +117,7 @@
     "check:ds-writing": "node scripts/check-ds-writing.mjs",
     "check:ds-vocabulary": "node scripts/check-ds-vocabulary.mjs",
     "check:docs-token-literals": "node scripts/check-docs-token-literals.mjs",
+    "check:docs-type-tracking": "node scripts/check-docs-type-tracking.mjs",
     "check:docs-dead-selectors": "node scripts/check-docs-dead-selectors.mjs",
     "check:dodont-figures": "node scripts/check-dodont-figures.mjs",
     "check:show-code": "node scripts/check-show-code.mjs",

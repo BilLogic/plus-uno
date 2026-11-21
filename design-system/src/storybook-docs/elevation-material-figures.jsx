@@ -16,6 +16,7 @@ import {
 } from "@/storybook-docs/illustrations/primitives.jsx";
 import { PAINT } from "@/storybook-docs/illustrations/paint.js";
 import { usePageContrast } from "@/storybook-docs/lib/use-page-contrast.js";
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Figures for Elevation › Material (board EL-D6). A drawing never carries readable
@@ -220,7 +221,7 @@ export const MaterialRampFigure = () => (
             style={{
               display: "flex",
               gap: "var(--inline-lg)",
-              font: "var(--body-default)",
+              ...typeStyle('body-default'),
               color: "var(--ds-text-subtle)",
             }}
           >
@@ -247,7 +248,7 @@ const Operator = ({ children }) => (
   <span
     aria-hidden="true"
     style={{
-      font: "var(--heading-md)",
+      ...typeStyle('heading-md'),
       color: "var(--ds-text-subtle)",
       alignSelf: "center",
     }}
@@ -273,7 +274,7 @@ const AnatomyItem = ({ title, token, children, figure }) => (
     >
       <strong
         style={{
-          font: "var(--body-default)",
+          ...typeStyle('body-default'),
           fontWeight: "var(--type-weight-semibold)",
         }}
       >
@@ -281,7 +282,7 @@ const AnatomyItem = ({ title, token, children, figure }) => (
       </strong>
       <C>{token}</C>
       <span
-        style={{ font: "var(--body-default)", color: "var(--ds-text-subtle)" }}
+        style={{ ...typeStyle('body-default'), color: "var(--ds-text-subtle)" }}
       >
         {children}
       </span>
