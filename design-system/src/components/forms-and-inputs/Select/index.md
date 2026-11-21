@@ -120,7 +120,7 @@ A form's multi-select should fire `onChange` on every pick. `commitOnClose` fire
 />
 ```
 
-While a page is loading, the list shows one "Loading options" row rather than skeleton rows. If the request fails it shows "Couldn't load options" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, one `stagger` apart up to a capped total; reduced motion shows them at once.
+While a page is loading, the list shows one "Loading options" row rather than skeleton rows. If the request fails it shows "Couldn't load options" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, `STAGGER.gap` apart up to a total of `STAGGER.cap`; reduced motion shows them at once.
 
 ### Turn typing off for a short set of choices. {#turn-typing-off-for-a-short-set-of-choices}
 
