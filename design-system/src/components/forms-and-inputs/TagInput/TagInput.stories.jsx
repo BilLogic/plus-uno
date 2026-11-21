@@ -752,6 +752,9 @@ export const DragHandlePressStartsDrag = {
         await expect(handle).toHaveAttribute('draggable', 'true');
         await expect(press(handle)).toBe(false);
         await expect(press(within(listbox).getByRole('option', { name: 'Decision recall' }))).toBe(true);
+        // A press and release that never drags leaves the entry ready to type in.
+        await userEvent.click(handle);
+        await waitFor(() => expect(within(canvasElement).getByRole('combobox')).toHaveFocus());
     },
 };
 

@@ -79,6 +79,7 @@ const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, onMouseDown, .
                 } else {
                     dragRef.current.cancel();
                 }
+                dragRef.current.returnFocus();
             },
         });
         return () => {
@@ -102,6 +103,10 @@ const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, onMouseDown, .
             onMouseDown={(event) => {
                 event.stopPropagation();
                 if (onMouseDown) onMouseDown(event);
+            }}
+            // A mouse press that never became a drag hands focus back to the entry; a key's click (detail 0) stays.
+            onClick={(event) => {
+                if (event.detail > 0) dragRef.current.returnFocus();
             }}
         />
     );
@@ -585,6 +590,7 @@ const TagInput = ({
         },
         drop,
         cancel: cancelReorder,
+        returnFocus: () => inputRef.current?.focus(),
     });
 
     /** A row's handle and "…", drawn by the Listbox over the highlighted row. */
