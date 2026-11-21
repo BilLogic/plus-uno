@@ -38,14 +38,19 @@
  * writes, so that code teaches. Its inline `style` may set layout on tokens
  * (flex, grid, gap, alignment, size, margin, padding) and must not set color,
  * type, radius or elevation: text takes a type utility class (`.body-default`,
- * `.heading-sm`, `.metric-md`), which brings the letter spacing with it. A
- * `style` named by an identifier or spread in the same file is followed.
+ * `.heading-sm`, `.metric-md`), which brings the letter spacing with it. The
+ * file is parsed, so both branches of a conditional, a spread, and a style
+ * named, called or picked off an object in the same file are all followed.
+ * `borderSpacing` and `borderCollapse` arrange a table's cells, so they are
+ * layout; a border key set to `0` or `none` clears a side and passes.
  *
  * WHAT IT CANNOT SEE. Whether the two halves of a pair show the same
  * component, and whether a live figure is the right one: those are a reader's
  * judgment, so they live in the docs review, not in an exit code. A helper
  * defined in another file is not followed.
  */
+import { parse } from '@babel/parser';
+
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { attrsOf, readElement } from './lib/docs-page.mjs';
 import { main } from './lib/findings.mjs';
@@ -187,58 +192,89 @@ export function checkSource(source, { file = '' } = {}) {
 
 /** Style keys a printed example may not set: color, type, radius, elevation. */
 const NOT_LAYOUT = /^(color|background\w*|fill|stroke|opacity|font\w*|letterSpacing|lineHeight|text(?:Transform|Decoration\w*|Shadow|Indent|Emphasis\w*)|border\w*Radius|border\w*Radius\w*|boxShadow|filter|backdropFilter|outline\w*|border\w*)$/;
-const NOT_LAYOUT_KEY = (key, value) => (key === 'border' || /^border(Block|Inline|Top|Bottom|Left|Right)?(Start|End)?$/.test(key)
-  ? !/^\s*(0|none|['"]none['"]|['"]0['"])\s*$/.test(value) : NOT_LAYOUT.test(key));
+/** Border keys that arrange a table's cells rather than draw a line. */
+const TABLE_LAYOUT = new Set(['borderSpacing', 'borderCollapse']);
+const NOT_LAYOUT_KEY = (key, value) => {
+  if (TABLE_LAYOUT.has(key)) return false;
+  if (key === 'border' || /^border(Block|Inline|Top|Bottom|Left|Right)?(Start|End)?$/.test(key)) return !/^\s*(0|none|['"]none['"]|['"]0['"])\s*$/.test(value);
+  return NOT_LAYOUT.test(key);
+};
 
-/** The balanced `{...}` or `(...)` text that opens at `source[start]`. */
-function balanced(source, start) {
-  const pairs = { '{': '}', '(': ')', '[': ']' };
-  let depth = 0;
-  let quote = null;
-  for (let i = start; i < source.length; i++) {
-    const ch = source[i];
-    if (quote) {
-      if (ch === '\\') i++;
-      else if (ch === quote) quote = null;
-      continue;
+/** Every node under `node`, depth first. */
+function* walk(node) {
+  if (!node || typeof node.type !== 'string') return;
+  yield node;
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key === 'leadingComments' || key === 'trailingComments' || key === 'innerComments') continue;
+    if (Array.isArray(value)) for (const child of value) yield* walk(child);
+    else if (value && typeof value.type === 'string') yield* walk(value);
+  }
+}
+
+/** Every `const|let|var name = init` in the file, by name. */
+function bindingsOf(ast) {
+  const out = new Map();
+  for (const node of walk(ast)) {
+    if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init) {
+      out.set(node.id.name, [...(out.get(node.id.name) ?? []), node.init]);
     }
-    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
-    if (pairs[ch]) depth++;
-    else if (ch === '}' || ch === ')' || ch === ']') { depth--; if (depth === 0) return source.slice(start + 1, i); }
+    if (node.type === 'FunctionDeclaration' && node.id) out.set(node.id.name, [...(out.get(node.id.name) ?? []), node]);
   }
-  return source.slice(start + 1);
+  return out;
 }
 
-/** The `key: value` pairs at the top level of an object body, spreads and named styles followed. */
-function styleEntries(source, body, seen = new Set()) {
-  const entries = [];
-  let depth = 0;
-  let quote = null;
-  let piece = '';
-  const parts = [];
-  for (let i = 0; i < body.length; i++) {
-    const ch = body[i];
-    if (quote) { piece += ch; if (ch === '\\') piece += body[++i] ?? ''; else if (ch === quote) quote = null; continue; }
-    if (ch === '"' || ch === "'" || ch === '`') quote = ch;
-    else if ('{(['.includes(ch)) depth++;
-    else if ('})]'.includes(ch)) depth--;
-    if (ch === ',' && depth === 0) { parts.push(piece); piece = ''; } else piece += ch;
-  }
-  parts.push(piece);
-  for (const raw of parts.map((x) => x.trim()).filter(Boolean)) {
-    const spread = /^\.\.\.(\w+)$/.exec(raw);
-    if (spread) { entries.push(...namedStyle(source, spread[1], seen)); continue; }
-    const kv = /^(?:([A-Za-z_$][\w$]*)|['"]([^'"]+)['"])\s*:\s*([\s\S]*)$/.exec(raw);
-    if (kv) entries.push([kv[1] ?? kv[2], kv[3]]);
-  }
-  return entries;
+/** The expressions a function can return. */
+function returnsOf(fn) {
+  if (fn.body.type !== 'BlockStatement') return [fn.body];
+  const out = [];
+  for (const node of walk(fn.body)) if (node.type === 'ReturnStatement' && node.argument) out.push(node.argument);
+  return out;
 }
 
-function namedStyle(source, name, seen) {
-  if (seen.has(name)) return [];
-  seen.add(name);
-  const m = new RegExp(`(?:const|let)\\s+${name}\\s*=\\s*\\{`).exec(source);
-  return m ? styleEntries(source, balanced(source, m.index + m[0].length - 1), seen) : [];
+const keyName = (prop) => (prop.computed ? null : prop.key.type === 'Identifier' ? prop.key.name : prop.key.type === 'StringLiteral' ? prop.key.value : null);
+
+/**
+ * The `[key, value source]` pairs a style expression can set: both branches of
+ * a conditional, spreads, `&&` / `||` / `??`, and names, members and calls
+ * bound in the same file are followed.
+ */
+function styleEntries(ctx, node, seen = new Set()) {
+  if (!node || seen.has(node)) return [];
+  seen.add(node);
+  const next = (n) => styleEntries(ctx, n, seen);
+  switch (node.type) {
+    case 'ObjectExpression':
+      return node.properties.flatMap((prop) => {
+        if (prop.type === 'SpreadElement') return next(prop.argument);
+        if (prop.type !== 'ObjectProperty') return [];
+        const key = keyName(prop);
+        return key ? [[key, ctx.source.slice(prop.value.start, prop.value.end)]] : [];
+      });
+    case 'ConditionalExpression':
+      return [...next(node.consequent), ...next(node.alternate)];
+    case 'LogicalExpression':
+      return node.operator === '&&' ? next(node.right) : [...next(node.left), ...next(node.right)];
+    case 'ParenthesizedExpression':
+    case 'TSAsExpression':
+      return next(node.expression);
+    case 'Identifier':
+      return (ctx.bindings.get(node.name) ?? []).flatMap(next);
+    case 'ArrowFunctionExpression':
+    case 'FunctionExpression':
+    case 'FunctionDeclaration':
+      return returnsOf(node).flatMap(next);
+    case 'CallExpression':
+      return node.callee.type === 'Identifier' ? next(node.callee) : [];
+    case 'MemberExpression': {
+      const name = node.computed ? (node.property.type === 'StringLiteral' ? node.property.value : null) : node.property.name;
+      const objects = node.object.type === 'Identifier' ? ctx.bindings.get(node.object.name) ?? [] : [node.object];
+      return objects.flatMap((obj) => (obj.type === 'ObjectExpression' ? obj.properties : [])
+        .filter((prop) => prop.type === 'ObjectProperty' && keyName(prop) === name)
+        .flatMap((prop) => next(prop.value)));
+    }
+    default:
+      return [];
+  }
 }
 
 /**
@@ -247,13 +283,19 @@ function namedStyle(source, name, seen) {
  * @returns {{ line: number, message: string }[]}
  */
 export function checkExamplesSource(source) {
+  let ast;
+  try {
+    ast = parse(source, { sourceType: 'module', plugins: ['jsx'], errorRecovery: true });
+  } catch (error) {
+    return [{ line: error.loc?.line ?? 1, message: `printed example does not parse: ${error.message}` }];
+  }
+  const ctx = { source, bindings: bindingsOf(ast) };
   const problems = [];
-  for (const m of source.matchAll(/\bstyle=\{/g)) {
-    const open = m.index + m[0].length - 1;
-    const expr = balanced(source, open).trim();
-    const entries = expr.startsWith('{') ? styleEntries(source, balanced(expr, 0)) : /^\w+$/.test(expr) ? namedStyle(source, expr, new Set()) : [];
-    const line = source.slice(0, m.index).split('\n').length;
-    for (const [key, value] of entries) {
+  for (const node of walk(ast.program)) {
+    if (node.type !== 'JSXAttribute' || node.name.type !== 'JSXIdentifier' || node.name.name !== 'style') continue;
+    if (node.value?.type !== 'JSXExpressionContainer') continue;
+    const line = node.loc.start.line;
+    for (const [key, value] of styleEntries(ctx, node.value.expression)) {
       if (NOT_LAYOUT_KEY(key, value)) problems.push({ line, message: `printed example style sets \`${key}\`; style may set layout on tokens only, so text takes a type class such as .body-default and color, radius and elevation come from the component` });
     }
   }

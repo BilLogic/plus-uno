@@ -14,7 +14,7 @@ const metric = (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
         <p className="body-default" style={{ margin: 0 }}>Sessions this week</p>
         <p className="metric-md" style={{ margin: 0 }}>24</p>
-        <p className="body-default" style={{ margin: 0 }}>+3 from last week</p>
+        <p className="body-default color-secondary" style={{ margin: 0 }}>+3 from last week</p>
     </div>
 );
 
@@ -38,7 +38,7 @@ export const CardJobs = () => (
         <Card title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <ProgressBar value={68} ariaLabel="68 percent of goals met" />
-                <p className="body-sm" style={{ margin: 0 }}>68 percent of goals met</p>
+                <p className="body-sm color-secondary" style={{ margin: 0 }}>68 percent of goals met</p>
             </div>
         </Card>
         <Card
@@ -47,7 +47,7 @@ export const CardJobs = () => (
             minWidth="var(--card-min-width-md)"
             footer={<LinkButton text="View session" href="#view-session" appearance="link" spacing="compact" onClick={(event) => event.preventDefault()} />}
         >
-            <p className="body-default" style={{ margin: 0 }}>
+            <p className="body-default color-secondary" style={{ margin: 0 }}>
                 Tutor · Ana Ruiz
                 <br />
                 Students · 4
@@ -63,7 +63,7 @@ const tallies = [['128', 'Completed'], ['12', 'Canceled'], ['4', 'No-shows']];
 const tally = ([value, label]) => (
     <>
         <p className="metric-md" style={{ margin: 0 }}>{value}</p>
-        <p className="body-default" style={{ margin: 0 }}>{label}</p>
+        <p className="body-default color-secondary" style={{ margin: 0 }}>{label}</p>
     </>
 );
 
@@ -96,5 +96,5 @@ export const LoadingInPlace = () => (
 );
 
 export const LoadingLine = () => (
-    <p className="body-default" style={{ margin: 0 }}>Loading…</p>
+    <p className="body-default color-secondary" style={{ margin: 0 }}>Loading…</p>
 );

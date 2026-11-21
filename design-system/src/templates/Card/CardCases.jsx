@@ -48,7 +48,7 @@ export const MetricAtMin480 = inDocs(Example.MetricAtMin480);
 /** The same card shell serves a metric tile, a progress display and a session summary. */
 export const CardJobs = Example.CardJobs;
 
-/** One card: three metrics stacked in its body, split by rules. */
+/** One card: three metrics stacked in its body, spaced by its own rhythm. */
 export const MetricsInOneCard = underOutline(Example.MetricsInOneCard);
 
 /** Three mini cards nested inside the card. */

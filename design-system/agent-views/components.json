@@ -6914,7 +6914,9 @@
         "FullSizeBareColumn",
         "FullSizeBareWithSidebar",
         "MultiStepFooterLevelAt1440",
-        "MultiStepFooterLevelAt1280"
+        "MultiStepFooterLevelAt1280",
+        "MultiStepExampleFooterLevelAt1440",
+        "MultiStepExampleFooterLevelAt1280"
       ],
       "tokens": [
         "--border-width-default",

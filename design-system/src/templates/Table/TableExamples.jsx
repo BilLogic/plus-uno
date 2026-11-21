@@ -69,7 +69,7 @@ export const SecondToolbar = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                 <FilterButton label="Site" text="All" onClick={() => {}} />
-                <span className="body-sm">12 records</span>
+                <span className="body-sm color-secondary">12 records</span>
             </div>
             {tutorsTable}
         </div>
@@ -230,7 +230,7 @@ export const TreeAsExpandable = () => (
                     style: { paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' },
                     content: (
                         <>
-                            <div className="heading-xxs">Classes</div>
+                            <div className="heading-xxs color-secondary">Classes</div>
                             <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
                         </>
                     ),

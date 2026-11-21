@@ -445,7 +445,7 @@ export const SideAtEnd = () => (
             <dl style={{ margin: 0, display: 'grid', gap: 'var(--stack-lg)' }}>
                 {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
                     <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt className="body-sm">{label}</dt>
+                        <dt className="body-sm color-secondary">{label}</dt>
                         <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
                     </div>
                 ))}
@@ -537,7 +537,7 @@ export const SearchableStudents = () => {
             filters={[{ key: 'status', label: 'Status', text: activeOnly ? 'Active' : 'All', isSelected: activeOnly, onClick: () => setActiveOnly((on) => !on) }]}
             onClearAll={reset}
         >
-            <p role="status" className="body-sm" style={{ margin: 0 }}>
+            <p role="status" className="body-sm color-secondary" style={{ margin: 0 }}>
                 {narrowed ? `${found.length} of ${names.length} students` : `${names.length} students`}
             </p>
             <ul className="body-default" style={{ margin: 0, paddingInlineStart: 'var(--page-pad)' }}>
@@ -671,7 +671,7 @@ export const MainAndSide = () => (
             <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 'var(--stack-lg) var(--inline-xl)' }}>
                 {[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']].map(([label, value]) => (
                     <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <dt className="body-sm">{label}</dt>
+                        <dt className="body-sm color-secondary">{label}</dt>
                         <dd className="body-default" style={{ margin: 0 }}>{value}</dd>
                     </div>
                 ))}

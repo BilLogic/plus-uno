@@ -55,7 +55,7 @@ const StudentsSection = () => (
 const TitleWithDescription = ({ title, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <Heading size="lg">{title}</Heading>
-        <p className="body-default" style={{ margin: 0 }}>{children}</p>
+        <p className="body-default color-secondary" style={{ margin: 0 }}>{children}</p>
     </div>
 );
 

@@ -23,7 +23,7 @@ const Roster = ({ names }) => (
 );
 
 const Count = ({ children }) => (
-    <span role="status" className="body-sm">{children}</span>
+    <span role="status" className="body-sm color-secondary">{children}</span>
 );
 
 const Results = ({ query, count }) => {

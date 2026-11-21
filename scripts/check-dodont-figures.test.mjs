@@ -116,6 +116,44 @@ test('printed examples: color, type, radius and elevation fail, inline or throug
   assert.ok(ex("const clip = { overflow: 'hidden', font: 'var(--body-sm)' };\nexport const A = () => <p style={clip} />;").some((m) => /`font`/.test(m)));
 });
 
+test('printed examples: a conditional style is read on both branches', () => {
+  assert.ok(ex("export const A = ({ ok }) => <p style={ok ? { color: 'red' } : {}} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = ({ ok }) => <p style={ok ? {} : { color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.deepEqual(ex("export const A = ({ ok }) => <p style={ok ? { gap: 'var(--stack-sm)' } : {}} />;"), []);
+});
+
+test('printed examples: a conditional spread is followed', () => {
+  assert.ok(ex("export const A = ({ ok }) => <p style={{ margin: 0, ...(ok ? { color: 'red' } : {}) }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = ({ ok }) => <p style={{ margin: 0, ...(ok && { font: 'var(--body-sm)' }) }} />;").some((m) => /`font`/.test(m)));
+});
+
+test('printed examples: a named conditional style is followed', () => {
+  assert.ok(ex("const tone = (ok) => (ok ? { color: 'red' } : {});\nconst look = ok ? { boxShadow: 'x' } : { gap: 0 };\nexport const A = () => <p style={look} />;").some((m) => /`boxShadow`/.test(m)));
+  assert.ok(ex("const quiet = { color: 'red' };\nconst loud = { gap: 0 };\nexport const A = ({ ok }) => <p style={ok ? quiet : loud} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a comment before a property does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style={{ margin: 0, /* tone */ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = () => <p style={{\n  // tone\n  color: 'red',\n}} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: whitespace around style = does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style = {{ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = () => <p\n  style=\n  {{ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: table layout keys are layout', () => {
+  assert.deepEqual(ex("export const A = () => <table style={{ borderSpacing: 0, borderCollapse: 'collapse' }} />;"), []);
+});
+
+test('printed examples: a hairline from a class may zero the other sides', () => {
+  assert.deepEqual(ex("export const A = () => <div className=\"border-outline-variant\" style={{ borderInline: 0, borderBlockEnd: 0 }} />;"), []);
+});
+
+test('printed examples: the line of a finding is the style attribute line', () => {
+  assert.deepEqual(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: 'red' }} />;").map((p) => p.line), [2]);
+});
+
 test('printed examples: the real tree is clean', () => {
   assert.deepEqual(run().filter((f) => /Examples\.jsx$/.test(f.file)), []);
 });

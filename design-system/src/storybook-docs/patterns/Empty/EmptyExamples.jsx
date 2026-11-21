@@ -40,7 +40,7 @@ export const WhatBelongsHere = () => {
 export const BareString = () => (
     <Section title="Students" description="Lincoln Middle">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-xl) * 3)' }}>
-            <p className="body-default" style={{ margin: 0 }}>No results</p>
+            <p className="body-default color-secondary" style={{ margin: 0 }}>No results</p>
         </div>
     </Section>
 );
