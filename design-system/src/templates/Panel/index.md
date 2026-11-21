@@ -20,7 +20,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Source:** `design-system/src/templates/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused, FullSizeFloatsNoBlanket, FullSizePanelOnBlanket, FullSizeOneFloatingPanel, FullSizeTwoFloatingPanels, FullSizeBesideAiPanel, FullSizeCoversAiPanel
 
 **Storybook page:** `design-system/src/templates/Panel/Panel.mdx`
 

@@ -3,6 +3,13 @@ import PropTypes from 'prop-types';
 import { PageView, useInPageView } from '../chrome/PageView.jsx';
 import { STAGE_FLOOR, inTypeThumb, useStageLayout } from './use-fit-scale.js';
 
+/**
+ * True inside a story that shows a docs example at full size: every whole-screen
+ * stage in it lays out at its own width in a page view instead of scaling to
+ * fit its card.
+ */
+export const FullSizeContext = React.createContext(false);
+
 /** True when rendered inside a TypeCard thumbnail, keeping the thumbnail stage unscrollable as on main. */
 export const TypeThumbContext = React.createContext(false);
 
@@ -100,7 +107,8 @@ ScrollStage.propTypes = {
  * @param {boolean} [props.scrollable]  render at scale 1 and scroll horizontally when wider than the container
  * @param {boolean} [props.fluid]  fill the container at scale 1 without forcing `width` outside a thumbnail
  */
-export const FitStage = ({ width, reflow = true, scrollable = false, fluid = false, children }) => {
+export const FitStage = ({ width, reflow = true, scrollable: scrollableProp = false, fluid = false, children }) => {
+    const scrollable = scrollableProp || React.useContext(FullSizeContext);
     const [probeRef, inThumb] = useInTypeThumb(scrollable);
     if (scrollable && !inThumb) {
         if (fluid) return <div ref={probeRef} style={{ inlineSize: '100%' }} data-fit-stage>{children}</div>;

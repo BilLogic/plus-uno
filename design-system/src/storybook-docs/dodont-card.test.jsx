@@ -120,4 +120,23 @@ describe('DoDontPair and DoDontCard', () => {
         expect(within(captions[0]).getByText('Do').tagName).toBe('STRONG');
         expect(within(captions[1]).getByText("Don't").tagName).toBe('STRONG');
     });
+
+    it('adds an "Open full size" link on a side that names its story, and none on a side that does not', () => {
+        render(
+            <DoDontPair
+                doExample={<span>Do</span>}
+                doCaption="Do it."
+                doFullSize="?path=/story/templates-modal--full-size-confirm-narrow"
+                dontExample={<span>Dont</span>}
+                dontCaption="Don't."
+                dontFullSize="?path=/story/templates-modal--full-size-confirm-wide"
+            />,
+        );
+        const links = document.querySelectorAll('a.sb-ds-dodont-card__full-size');
+        expect([...links].map((a) => a.textContent)).toEqual(['Open full size', 'Open full size']);
+        expect([...links].map((a) => a.getAttribute('href'))).toEqual([
+            '?path=/story/templates-modal--full-size-confirm-narrow',
+            '?path=/story/templates-modal--full-size-confirm-wide',
+        ]);
+    });
 });

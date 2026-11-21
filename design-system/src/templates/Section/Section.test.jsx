@@ -83,32 +83,47 @@ describe('Section', () => {
     });
 
     describe('loading', () => {
-        it('swaps the header for skeleton bars and marks the section busy', () => {
+        it('holds the header unseen and marks the section busy', () => {
             const { container } = render(
-                <Section title="Sessions" description="This week" isLoading>
+                <Section title="Sessions" description="This week" views={<button type="button">All</button>} isLoading>
                     Body
                 </Section>,
             );
             expect(section(container)).toHaveAttribute('aria-busy', 'true');
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
-            // The heading stays, visually hidden, so the busy section keeps its title.
+            const shell = container.querySelector('.plus-template-section-loading__shell');
+            expect(shell).toHaveAttribute('aria-hidden', 'true');
+            expect(shell).toHaveAttribute('inert');
+            // The one heading in the accessibility tree is the visually hidden one.
+            expect(screen.getAllByRole('heading', { name: 'Sessions' })).toHaveLength(1);
             expect(screen.getByRole('heading', { name: 'Sessions' }).closest('.visually-hidden')).not.toBeNull();
-            expect(screen.queryByText('This week')).toBeNull();
+            // The text stays in the unseen shell for layout; none of it is exposed.
+            expect(screen.getByText('This week').closest('[aria-hidden="true"]')).toBe(shell);
+            expect(screen.queryByRole('button', { name: 'All' })).toBeNull();
             expect(screen.getByText('Body')).toBeInTheDocument();
         });
 
-        it('draws the skeleton before a title has arrived, with no description bar unless a description is set', () => {
-            const { container, rerender } = render(<Section isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
-            rerender(<Section description="This week" isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
+        it('adds no loading header when there is nothing to hold', () => {
+            const { container } = render(<Section isLoading>Body</Section>);
+            expect(container.querySelector('.plus-template-section-loading')).toBeNull();
+        });
+    });
+
+    describe('title is optional', () => {
+        it('isTitleHidden keeps the heading and the name, drops the visible title and its gap', () => {
+            const { container } = render(
+                <Section title="Students" isTitleHidden named views={<div>Views</div>}>Body</Section>,
+            );
+            const heading = screen.getByRole('heading', { name: 'Students' });
+            expect(heading.closest('.visually-hidden')).not.toBeNull();
+            expect(screen.getByRole('region', { name: 'Students' })).toBe(section(container));
+            expect(container.querySelector('.plus-template-section-title-row')).toBeNull();
+            expect(screen.getByText('Views')).toBeInTheDocument();
         });
 
-        it('adds a bar for the rows under the title row', () => {
-            const { container, rerender } = render(<Section title="S" isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
-            rerender(<Section title="S" views={<div />} isLoading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
+        it('with no rows the hidden heading adds no header block', () => {
+            const { container } = render(<Section title="Students" isTitleHidden>Body</Section>);
+            expect(container.querySelector('.plus-template-section-header')).toBeNull();
+            expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
         });
     });
 
@@ -403,8 +418,8 @@ describe('Section retired header props', () => {
         warn.mockRestore();
     });
 
-    it('draws the loading skeleton row for the three-row slots', () => {
+    it('holds the three-row slots while loading', () => {
         const { container } = render(<Section title="S" views={<div />} isLoading>Body</Section>);
-        expect(container.querySelector('.plus-template-section-skeleton__row')).not.toBeNull();
+        expect(container.querySelector('.plus-template-section-loading__shell .plus-section-row--views')).not.toBeNull();
     });
 });

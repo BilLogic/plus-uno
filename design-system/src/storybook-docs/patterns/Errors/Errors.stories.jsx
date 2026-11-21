@@ -9,6 +9,8 @@ import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../Forms/formHosts.jsx';
 import { MessageOnField } from './ErrorsExamples.jsx';
 import { BackgroundJob, FieldError, FlagOnPage, InPage, LoadFailure, MenuError, NoAccess, PLACE_STAGE, PageCondition, STAGE } from './errorsDemo.jsx';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './ErrorsCases.jsx';
 
 /**
  * Errors: the pattern page's examples, run in the Storybook tests. Each is
@@ -245,3 +247,7 @@ export const TestRetry = {
         await expect(canvas.getByRole('button', { name: 'Try again' })).toBeEnabled();
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the Errors page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeFailureInSlot = fullSizeStory(FullSizeCases.FailureInSlot, 1024, 'FailureInSlot');
+export const FullSizeFailureInModal = fullSizeStory(FullSizeCases.FailureInModal, 1024, 'FailureInModal');
