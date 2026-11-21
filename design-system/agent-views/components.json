@@ -5402,11 +5402,13 @@
       "stories": [
         "Overview",
         "AlignsValues",
+        "LongValueWraps",
         "NotAControl",
         "Interactive"
       ],
       "tokens": [
         "--body-default",
+        "--body-default-tracking",
         "--ds-text",
         "--ds-text-subtle",
         "--inline-lg",

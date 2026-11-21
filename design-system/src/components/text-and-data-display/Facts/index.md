@@ -8,7 +8,7 @@ A description list for read-only facts: each label sits beside its value in two 
 
 **Source:** `design-system/src/components/text-and-data-display/Facts/Facts.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/Facts/Facts.stories.jsx` — Overview, AlignsValues, NotAControl, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/Facts/Facts.stories.jsx` — Overview, AlignsValues, LongValueWraps, NotAControl, Interactive
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Facts/Facts.mdx`
 
@@ -74,7 +74,7 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit`
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--stack-sm`
+`--body-default` · `--body-default-tracking` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--stack-sm`
 
 From `design-system/src/components/text-and-data-display/Facts/Facts.scss`. Override these through the token layer, never with a literal.
 

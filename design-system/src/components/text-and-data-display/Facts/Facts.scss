@@ -6,9 +6,10 @@
 .plus-facts {
     margin: 0;
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: max-content minmax(0, 1fr);
     gap: var(--stack-sm) var(--inline-lg);
     font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
     color: var(--ds-text);
 }
 
@@ -22,4 +23,5 @@
 
 .plus-facts__value {
     margin: 0;
+    overflow-wrap: anywhere;
 }

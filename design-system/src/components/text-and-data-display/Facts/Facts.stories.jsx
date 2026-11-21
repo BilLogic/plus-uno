@@ -15,7 +15,7 @@ import Facts from './Facts';
  */
 
 export default {
-    title: 'Components/Text and data display/Facts/Facts',
+    title: 'Components/Text and data display/Facts',
     component: Facts,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -78,6 +78,25 @@ AlignsValues.play = async ({ canvasElement }) => {
     await expect(first, 'values sit right of the widest label').toBeGreaterThanOrEqual(
         canvas.getByText('Next session').getBoundingClientRect().right,
     );
+};
+
+/* ---------------------------------------------------------------- long values */
+
+const LONG_VALUE = 'https://tutors.example/sessions/lincoln-middle-school/2026/thursday-afternoon-group';
+
+export const LongValueWraps = () => (
+    <div style={{ inlineSize: '240px' /* demo frame */ }}>
+        <Facts items={[{ label: 'Link', value: LONG_VALUE }]} />
+    </div>
+);
+
+/** A long unbroken value wraps inside the list instead of widening it. */
+LongValueWraps.play = async ({ canvasElement }) => {
+    const list = canvasElement.querySelector('dl');
+    const value = within(canvasElement).getByText(LONG_VALUE);
+    await expect(list.getBoundingClientRect().width, 'the list keeps its container width').toBeLessThanOrEqual(240);
+    await expect(value.getBoundingClientRect().right, 'the value stays inside the list').toBeLessThanOrEqual(list.getBoundingClientRect().right + 0.5);
+    await expect(value.scrollWidth, 'nothing overflows the value').toBeLessThanOrEqual(value.clientWidth);
 };
 
 /* ------------------------------------------------------------------ not a field */
