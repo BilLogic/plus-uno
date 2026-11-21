@@ -228,6 +228,15 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For something that must be decided before the page can continue, use `Modal`.
+- For many objects of the same shape that people compare across columns, use `Table`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, `imageRatio` (16:9 default, 4:3 or 1:1) sets its height from the card width, rounded to a multiple of 4, and the picture crops to cover; beside the content it fills the full height at one third or one half of the width and crops to cover.
@@ -293,10 +302,10 @@ Visible empty space inside the card means a narrower minimum width. A clipped or
 <DoDontPair
     doExample={<MetricAtMin224 />}
     doCode={CODE.MetricAtMin224}
-    doCaption="One number fits the 224 minimum; the card is only as wide as it needs, so a row of them stays tidy."
+    doCaption="One number fits the `--card-min-width-sm` minimum; the card is only as wide as it needs, so a row of them stays tidy."
     dontExample={<MetricAtMin480 />}
     dontCode={CODE.MetricAtMin480}
-    dontCaption="The same number at 480 leaves most of the card empty; narrow it instead of filling the space."
+    dontCaption="The same number at `--card-min-width-lg` leaves most of the card empty; narrow it instead of filling the space."
 />
 
 ### Let a title longer than the card wrap.
@@ -368,10 +377,10 @@ A card's footer actions hug the start, under the content. One action that goes s
 
 ## Related
 
-- <DocsLink id="templates-section">Section</DocsLink> for a region that holds cards under one heading.
-- <DocsLink id="templates-table">Table</DocsLink> for many objects of the same shape that people compare across columns.
-- <DocsLink id="templates-page">Page</DocsLink> for the content area's own fill, header and elevation.
-- <DocsLink id="templates-modal">Modal</DocsLink> for something that must be decided before the page can continue.
+- <DocsLink id="templates-section">Section</DocsLink>: use when a region holds cards under one heading.
+- <DocsLink id="templates-table">Table</DocsLink>: use when people compare many objects of the same shape across columns.
+- <DocsLink id="templates-page">Page</DocsLink>: use when setting the content area's own fill, header and elevation.
+- <DocsLink id="templates-modal">Modal</DocsLink>: use when something must be decided before the page can continue.
 
 </div>
 

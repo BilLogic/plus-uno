@@ -68,14 +68,19 @@ Card reads these motion tokens and no literal duration or curve.
 | change | Update a value or state | `--ds-motion-appearance-fast` | It changes color on hover and press like a Button. Opening a clickable card is Drill. |  |
 | milestone | Load content | `--ds-motion-spatial-default` | The one card in a milestone page entrance is Expressive and leaves by the exit rules. | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, achievement claimed; goal reached is shared, so the student hears it |
 
+## Alternatives
+
+- For something that must be decided before the page can continue, use `Modal`.
+- For many objects of the same shape that people compare across columns, use `Table`.
+
 ## Best practices
 
 ### Fit the width to what the card holds. {#fit-the-width-to-what-the-card-holds}
 
 Visible empty space inside the card means a narrower minimum width. A clipped or crowded body means a wider one.
 
-Do: One number fits the 224 minimum; the card is only as wide as it needs, so a row of them stays tidy.
-Don't: The same number at 480 leaves most of the card empty; narrow it instead of filling the space.
+Do: One number fits the `--card-min-width-sm` minimum; the card is only as wide as it needs, so a row of them stays tidy.
+Don't: The same number at `--card-min-width-lg` leaves most of the card empty; narrow it instead of filling the space.
 
 ### Let a title longer than the card wrap. {#let-a-title-longer-than-the-card-wrap}
 
@@ -109,10 +114,10 @@ A card's footer actions hug the start, under the content. One action that goes s
 
 ## Related
 
-- Section for a region that holds cards under one heading.
-- Table for many objects of the same shape that people compare across columns.
-- Page for the content area's own fill, header and elevation.
-- Modal for something that must be decided before the page can continue.
+- Section: use when a region holds cards under one heading.
+- Table: use when people compare many objects of the same shape across columns.
+- Page: use when setting the content area's own fill, header and elevation.
+- Modal: use when something must be decided before the page can continue.
 
 Same group: `Frame` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
