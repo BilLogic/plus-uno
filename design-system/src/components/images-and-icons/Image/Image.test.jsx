@@ -15,10 +15,40 @@ describe('Image', () => {
         expect(screen.getByTestId('deco')).toHaveAttribute('alt', '');
     });
 
-    it('wraps in a <picture> with a dark source when srcDark is given', () => {
+    it('renders a light and a dark img when srcDark is given, so CSS can follow the app color mode', () => {
         const { container } = render(<Image src="/a.png" srcDark="/a-dark.png" alt="A" />);
-        const picture = container.querySelector('picture');
-        expect(picture).toBeTruthy();
-        expect(picture.querySelector('source')).toHaveAttribute('srcset', '/a-dark.png');
+        expect(container.querySelector('picture')).toBeNull();
+        const light = container.querySelector('.plus-image--light');
+        const dark = container.querySelector('.plus-image--dark');
+        expect(light).toHaveAttribute('src', '/a.png');
+        expect(light).toHaveAttribute('alt', 'A');
+        expect(dark).toHaveAttribute('src', '/a-dark.png');
+        expect(dark).toHaveAttribute('alt', 'A');
+    });
+
+    it('defaults fit to container', () => {
+        render(<Image src="/a.png" testId="i" />);
+        expect(screen.getByTestId('i')).toHaveClass('plus-image--container');
+    });
+
+    it('fit natural keeps the natural size', () => {
+        render(<Image src="/a.png" testId="i" fit="natural" />);
+        expect(screen.getByTestId('i')).toHaveClass('plus-image--natural');
+    });
+
+    it('still honors the deprecated size alias for one release', () => {
+        render(
+            <>
+                <Image src="/a.png" testId="fixed" size="fixed" />
+                <Image src="/a.png" testId="fluid" size="fluid" />
+            </>,
+        );
+        expect(screen.getByTestId('fixed')).toHaveClass('plus-image--natural');
+        expect(screen.getByTestId('fluid')).toHaveClass('plus-image--container');
+    });
+
+    it('lets fit win over the deprecated size', () => {
+        render(<Image src="/a.png" testId="i" fit="container" size="fixed" />);
+        expect(screen.getByTestId('i')).toHaveClass('plus-image--container');
     });
 });

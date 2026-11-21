@@ -18,7 +18,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/templates/Card/Card.jsx`
 
-**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, ClickableFocus, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary, Overflow
+**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageDarkVariant, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, ClickableFocus, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary, Overflow
 
 **Storybook page:** `design-system/src/templates/Card/Card.mdx`
 

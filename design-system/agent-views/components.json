@@ -1768,6 +1768,7 @@
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
+        "ImageDarkVariant",
         "ImageRatioGrid",
         "ImageRatioDefault",
         "ImageTop",
@@ -7565,7 +7566,7 @@
       "import": "import { Image } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Image/Image.jsx",
-      "summary": "Image: a decorative or meaningful bitmap, with a dark-mode variant swapped in by the browser rather than by script.",
+      "summary": "Image: a decorative or meaningful bitmap, with a dark variant that follows the app's color mode.",
       "props": [
         {
           "name": "src",
@@ -7582,7 +7583,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Shown instead of `src` when the OS is in dark mode.",
+          "description": "Shown instead of `src` when the app's color mode is dark.",
           "deprecated": null
         },
         {
@@ -7595,16 +7596,27 @@
           "deprecated": null
         },
         {
-          "name": "size",
+          "name": "fit",
           "type": "enum",
           "required": false,
-          "default": "'fluid'",
+          "default": null,
           "values": [
-            "fixed",
-            "fluid"
+            "natural",
+            "container"
           ],
-          "description": "`fixed` keeps its natural size; `fluid` (the default) scales to its container.",
+          "description": "`natural` keeps its natural size; `container` (the default) scales to its container.",
           "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "oneOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Use `fit`: `fixed` is `natural`, `fluid` is `container`.",
+          "deprecated": {
+            "replacement": "fit"
+          }
         },
         {
           "name": "testId",
@@ -7635,7 +7647,7 @@
         }
       ],
       "stories": [
-        "Sizes",
+        "Fits",
         "DarkVariant",
         "Interactive",
         "Rest"
