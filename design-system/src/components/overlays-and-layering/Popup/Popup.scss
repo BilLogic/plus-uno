@@ -1,5 +1,6 @@
 @use '../../../styles/overlay-motion' as *;
 @use '../../../styles/screen-grid' as *;
+@use '../../../styles/state' as *;
 
 /*
  * Popup Component Styles: the Popup template's Popup.
@@ -102,8 +103,8 @@
  * that button look like the text it replaced: no chrome, the surrounding
  * type, and the pointer of something you click.
  *
- * The focus ring is NOT reset. That is the one piece of browser chrome worth
- * keeping, and it is the reason a keyboard user can see where they are.
+ * The focus ring is the PLUS ring (`plus-state`), the same on this button as
+ * on every other control, not the browser's default outline.
  */
 .plus-popup-trigger {
     padding: 0;
@@ -113,4 +114,6 @@
     color: inherit;
     text-align: inherit;
     cursor: pointer;
+
+    @include plus-state((), $ring: true);
 }
