@@ -38,4 +38,12 @@ Bill approved these from the design system audit. Each is a documented exception
 
 Moved to Base UI by the same ruling: AiSources now sits on Collapsible.
 
+## Amendment (2026-11-21): PopupSelect, InlineEdit and Carousel
+
+Bill approved reading these three from the design system audit on 2026-11-20. None has a Base UI part to move to, so each is a documented exception, not a drift.
+
+- **PopupSelect.** Its trigger, open and closed state, outside press and focus return already run on Base UI Popover, through Popup. What stays hand-written is the list: it is the shared `Listbox`, so its keyboard (arrows, Enter, and Escape from the search field) is the Select case above and moves with that rewrite, not before. Held by the `Keyboard`, `Searchable` and `OpensWithAFade` stories.
+- **InlineEdit.** Base UI has no inline-edit part. Its Field and Input describe a control, not the swap from read view to edit view, Enter or leaving to confirm, Escape to cancel and focus back on the read view; and the edit view is the caller's own control, so there is nothing for a Base UI part to sit under. `handleKeyDown`, `handleBlur` and `keepFocus` in `InlineEdit.jsx` stay. Held by the `InlineEdit keyboard` block in `InlineEdit.test.jsx`.
+- **Carousel.** Base UI has no carousel, swipe or timer part. The arrow keys on the region, the swipe on the stage, the press on a neighbor and the autoplay clock with its holds (hover, keyboard focus, out of view, hidden tab) stay hand-written in `Carousel.jsx`; its controls are IconButton and ProgressIndicator. Held by the `ArrowKeysMove`, `SwipeMoves`, `HoverHolds` and `InactiveSlidesHidden` stories.
+
 — Claude (agent), Nov 2026, on Bill's approval to make Base UI the default behavior layer

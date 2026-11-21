@@ -316,6 +316,31 @@ export const ArrowKeysMove = {
     },
 };
 
+/** A sideways drag on the stage past the threshold moves one slide; a short one does not. */
+export const SwipeMoves = {
+    render: () => <CarouselFrame autoplay={false} />,
+    play: async ({ canvasElement }) => {
+        const stage = canvasElement.querySelector('.plus-carousel-stage');
+        const box = stage.getBoundingClientRect();
+        const y = box.top + box.height / 2;
+        const drag = (fromX, toX) => {
+            const at = (type, x) => stage.dispatchEvent(new PointerEvent(type, {
+                bubbles: true, button: 0, pointerType: 'mouse', clientX: x, clientY: y,
+            }));
+            at('pointerdown', fromX);
+            at('pointerup', toX);
+        };
+        const mid = box.left + box.width / 2;
+        drag(mid, mid - 20);
+        await wait(50);
+        await expect(activeLabel(canvasElement)).toBe('1 of 5');
+        drag(mid + 60, mid - 60);
+        await waitFor(() => expect(activeLabel(canvasElement)).toBe('2 of 5'));
+        drag(mid - 60, mid + 60);
+        await waitFor(() => expect(activeLabel(canvasElement)).toBe('1 of 5'));
+    },
+};
+
 /** The pointer resting on the stage holds the clock; leaving lets it run on. */
 export const HoverHolds = {
     render: () => <CarouselFrame interval={3000} />,

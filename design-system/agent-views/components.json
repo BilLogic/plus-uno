@@ -1959,6 +1959,7 @@
         "PauseStopsProgress",
         "DotRestartsClock",
         "ArrowKeysMove",
+        "SwipeMoves",
         "HoverHolds",
         "InactiveSlidesHidden",
         "RegionIsNamed",

@@ -10,7 +10,7 @@ Also asked as: slideshow, gallery.
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, CaptionFadesInPlace, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, DotFills, StaticBarFull, DotTargets
+**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, CaptionFadesInPlace, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, SwipeMoves, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, DotFills, StaticBarFull, DotTargets
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
