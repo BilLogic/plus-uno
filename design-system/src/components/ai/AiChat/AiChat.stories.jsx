@@ -286,6 +286,18 @@ export const ModalLeavesThePopupOpen = {
     }),
 };
 
+/** The popup without the button takes focus in its prompt input on open, and Escape closes it. */
+export const FloatingChatKeyboard = {
+    args: { launcher: false, defaultOpen: true, storageKey: null },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const popup = await within(canvasElement).findByRole('dialog', { name: 'AI chat' });
+        const input = within(popup).getByRole('textbox', { name: 'Message to AI chat' });
+        await waitFor(() => expect(input).toHaveFocus());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(within(canvasElement).queryByRole('dialog', { name: 'AI chat' })).toBeNull());
+    }),
+};
+
 /**
  * The trust marks: every answer carries the AI icon (once, from AiMessage),
  * and the fallibility line sits once under the prompt input, not per message.
