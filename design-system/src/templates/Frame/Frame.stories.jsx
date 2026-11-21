@@ -414,6 +414,50 @@ export const Medium768 = {
     }),
 };
 
+/** 768: Escape closes the floating Sidebar and hands focus to the Page's toggle; it stays a plain box, not a dialog. */
+export const FloatingSidebarEscapeAt768 = {
+    parameters: { frameWidth: 768 },
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const p = parts(canvasElement);
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(p.sidebar(), 'closed below 1024').toBeNull());
+
+        // Opened by hand, focus follows to the Sidebar's own toggle.
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        await expect(p.sidebar(), 'no dialog role of its own').not.toHaveAttribute('role');
+        await waitFor(() => expect(p.toggle, 'focus is on the Sidebar\'s toggle').toHaveFocus());
+
+        // Escape closes it, and focus goes back to the Page's toggle. (Focus leaves
+        // the Sidebar's toggle first: there the first Escape is its tooltip's.)
+        doc.activeElement.blur();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.sidebar()).toBeNull());
+        await waitFor(() => expect(doc.activeElement, 'focus is on the Page\'s toggle').toBe(p.toggle));
+        await expect(p.toggle).toHaveAttribute('aria-label', 'Open sidebar');
+
+        // Focus that has moved out to the Page still comes back to the toggle on Escape.
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        p.content.setAttribute('tabindex', '-1');
+        p.content.focus();
+        await waitFor(() => expect(p.content).toHaveFocus());
+        await expect(p.sidebar(), 'focus leaving does not close it').not.toBeNull();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.sidebar()).toBeNull());
+        await waitFor(() => expect(doc.activeElement, 'focus is on the Page\'s toggle').toBe(p.toggle));
+        p.content.removeAttribute('tabindex');
+
+        // A peek closed by Escape hands focus to the toggle too.
+        await userEvent.hover(p.edge());
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        doc.activeElement.blur();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.sidebar()).toBeNull());
+        await waitFor(() => expect(doc.activeElement, 'focus is on the Page\'s toggle').toBe(p.toggle));
+    }),
+};
+
 /** 1024: the sidebar docks; the toggle closes it and does not move. */
 export const Large1024 = {
     parameters: { frameWidth: 1024 },
