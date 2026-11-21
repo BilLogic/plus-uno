@@ -436,7 +436,9 @@ export const Motion = {
         await userEvent.click(toggle);
         await expect(toggle).toHaveAttribute('aria-checked', 'true');
         if (!(await emulateReducedMotion('reduce'))) return;
-        await expect(parseFloat(getComputedStyle(row).transitionDuration)).toBe(0);
+        await expect(getComputedStyle(row).transitionDuration).toBe(
+            probe(row, 'transitionDuration', 'var(--ds-motion-appearance-fast-duration)'),
+        );
     },
 };
 
