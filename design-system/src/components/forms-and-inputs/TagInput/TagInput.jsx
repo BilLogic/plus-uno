@@ -44,31 +44,51 @@ const PASTE_SEPARATOR = /[,\n\r]+/;
  * A row's reorder handle. Pragmatic drag and drop carries the pointer drag
  * (ADR-046); the keys stay with the handle's own key handler.
  */
-const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, ...props }, ref) {
+const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, onMouseDown, ...props }, ref) {
     const elementRef = useRef(null);
     const dragRef = useRef(drag);
     dragRef.current = drag;
     useEffect(() => {
         const element = elementRef.current;
         if (!element) return undefined;
+        let dragging = false;
         let dropTarget = () => {};
-        return draggable({
+        const end = () => {
+            dragging = false;
+            dropTarget();
+            dropTarget = () => {};
+        };
+        const stopDragging = draggable({
             element,
             onGenerateDragPreview: ({ nativeSetDragImage }) => disableNativeDragPreview({ nativeSetDragImage }),
             onDragStart: () => {
                 // The list takes the drop, so a release outside it (or Escape) reads as a cancel.
                 const list = dragRef.current.listElement();
                 if (list) dropTarget = dropTargetForElements({ element: list });
+                dragging = true;
                 dragRef.current.start();
             },
             onDrag: ({ location }) => dragRef.current.move(location.current.input.clientY),
             onDrop: ({ location }) => {
-                dropTarget();
-                dropTarget = () => {};
-                if (location.current.dropTargets.length) dragRef.current.drop();
-                else dragRef.current.cancel();
+                if (!dragging) return;
+                end();
+                // The last drag frame can be dropped unreported, so the slot comes from where the pointer let go.
+                if (location.current.dropTargets.length) {
+                    dragRef.current.move(location.current.input.clientY);
+                    dragRef.current.drop();
+                } else {
+                    dragRef.current.cancel();
+                }
             },
         });
+        return () => {
+            stopDragging();
+            // A handle that goes away mid-drag cancels the move and stops the list taking drops.
+            if (dragging) {
+                end();
+                dragRef.current.cancel();
+            }
+        };
     }, []);
     return (
         <IconButton
@@ -77,6 +97,11 @@ const ReorderGrip = React.forwardRef(function ReorderGrip({ drag, ...props }, re
                 elementRef.current = node;
                 if (typeof ref === 'function') ref(node);
                 else if (ref) ref.current = node;
+            }}
+            // The list holds a press so the entry keeps focus; the handle's press must reach the browser to start a drag.
+            onMouseDown={(event) => {
+                event.stopPropagation();
+                if (onMouseDown) onMouseDown(event);
             }}
         />
     );
@@ -580,7 +605,11 @@ const TagInput = ({
                         aria-describedby={`${fieldId}-reorder-keys`}
                         className="plus-tag-input__row-action plus-tag-input__grip"
                         onKeyDown={(event) => handleGripKeyDown(index, event)}
-                        onBlur={(event) => { cancelReorder(); handleBlur(event); }}
+                        onBlur={(event) => {
+                            // A pointer drag ends on its own drop or cancel; focus moving mid-drag is not one.
+                            if (!reorderRef.current?.pointer) cancelReorder();
+                            handleBlur(event);
+                        }}
                     />
                 )}
                 {hasMenu && (
