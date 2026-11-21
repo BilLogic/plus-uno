@@ -161,7 +161,8 @@ test('printed examples: the line of a finding is the style attribute line', () =
 
 test('printed examples: the parser is @babel/parser, and its absence fails loudly', () => {
   assert.equal(typeof loadParser(), 'function');
-  assert.throws(() => loadParser('@babel/parser-not-installed'), /check:dodont-figures cannot load @babel\/parser-not-installed.*npm ci/s);
+  const missing = () => { throw new Error("Cannot find module '@babel/parser'"); };
+  assert.throws(() => loadParser(missing), /check:dodont-figures cannot load @babel\/parser: run `npm ci`.*Cannot find module/s);
 });
 
 test('printed examples: a shorthand property is read by its name', () => {

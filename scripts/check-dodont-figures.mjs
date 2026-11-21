@@ -204,23 +204,21 @@ const NOT_LAYOUT_KEY = (key, value) => {
   return NOT_LAYOUT.test(key);
 };
 
-const requireHere = createRequire(import.meta.url);
-const parserCache = new Map();
+const require = createRequire(import.meta.url);
+
 /**
  * `parse` from the root devDependency `@babel/parser`, or a thrown error that
  * names the fix: the check fails rather than pass a tree it could not read.
  */
-export function loadParser(specifier = '@babel/parser') {
-  if (parserCache.has(specifier)) return parserCache.get(specifier);
-  let parse;
+export function loadParser(load = () => require('@babel/parser')) {
   try {
-    ({ parse } = requireHere(specifier));
+    return load().parse;
   } catch (error) {
-    throw new Error(`check:dodont-figures cannot load ${specifier}: run \`npm ci\` at the repo root. (${error.message.split('\n')[0]})`);
+    throw new Error(`check:dodont-figures cannot load @babel/parser: run \`npm ci\` at the repo root. (${error.message.split('\n')[0]})`);
   }
-  parserCache.set(specifier, parse);
-  return parse;
 }
+
+let parseCache;
 
 /** Every node under `node`, depth first. */
 function* walk(node) {
@@ -316,7 +314,7 @@ function styleEntries(ctx, node, seen = new Set()) {
  * @returns {{ line: number, message: string }[]}
  */
 export function checkExamplesSource(source) {
-  const parse = loadParser();
+  const parse = (parseCache ??= loadParser());
   let ast;
   try {
     ast = parse(source, { sourceType: 'module', plugins: ['jsx'], errorRecovery: true });
