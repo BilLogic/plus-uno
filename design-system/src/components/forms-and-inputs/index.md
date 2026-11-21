@@ -181,7 +181,7 @@ authored half, counted rather than assumed.
 | [Fieldset](Fieldset.md) | 9 | ✅ | ✅ | ✅ |
 | [FileItem](FileItem/index.md) | 15 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 20 | ✅ | ✅ | ✅ |
-| [FilterButton](FilterButton/index.md) | 11 | ✅ | ✅ | ✅ |
+| [FilterButton](FilterButton/index.md) | 12 | ✅ | ✅ | ✅ |
 | [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
 | [FooterActions](FooterActions/index.md) | 4 | ✅ | ✅ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
