@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { isPrimitive, measure, SEARCH_ROOTS, run } from './check-no-primitive-reads.mjs';
 
 test('numbered space, radius, size, stroke, height, width and type-size steps, and palette colors, are primitives', () => {
-  for (const name of ['--space-050', '--space-025', '--size-200', '--stroke-2', '--height-250', '--width-1000', '--type-size-0875', '--palette-blue-500']) {
+  for (const name of ['--space-050', '--space-025', '--size-200', '--stroke-2', '--height-250', '--width-1000', '--type-size-0875', '--type-line-height-125', '--palette-blue-500']) {
     assert.ok(isPrimitive(name), name);
   }
 });
@@ -95,4 +95,9 @@ test('a file with a read fails even in a component that once sat in a baseline',
     sources: [{ path: 'design-system/src/components/forms-and-inputs/_internal/FieldBox.scss', text: 'height: var(--height-250);' }],
   });
   assert.equal(findings.length, 1);
+});
+
+test('a read of a line-height primitive counts', () => {
+  const found = measure([{ path: 'a.scss', text: '.a { line-height: var(--type-line-height-125); }' }]);
+  assert.equal(found.get('a.scss').count, 1);
 });

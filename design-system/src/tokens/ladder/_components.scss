@@ -181,6 +181,10 @@
 
     /* Prompt input */
     --prompt-input-min-height: var(--height-250);
+    --prompt-input-line: var(--type-line-height-125);
+
+    /* Page text */
+    --page-text-line: var(--type-line-height-150);
 
     /* Inbox */
     --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */

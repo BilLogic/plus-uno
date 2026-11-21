@@ -298,6 +298,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | AI chat | `--ai-chat-height` | 640px |
 | AI chat | `--ai-chat-fab-size` |  |
 | Prompt input | `--prompt-input-min-height` |  |
+| Prompt input | `--prompt-input-line` |  |
+| Page text | `--page-text-line` |  |
 | Inbox | `--inbox-width` | 360px |
 | Table | `--table-cell-max-width` |  |
 | Table | `--table-message-gap` |  |

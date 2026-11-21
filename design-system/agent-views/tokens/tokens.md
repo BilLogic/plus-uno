@@ -190,6 +190,7 @@ Tokens one component owns, named for it.
 --option-row-indent-step  /* Indent added for each level of a nested option row. */
 --page-header-gap  /* Horizontal gap between a PageHeader title and its actions. */
 --page-header-stack  /* Vertical gap between a PageHeader breadcrumbs row, title row and bottom bar. */
+--page-text-line  /* Line height the page body gives text that sets no text style of its own. */
 --popup-clip-reach  /* Gutter around a Popup or menu in a story stage, so its shadow and the menu are never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
@@ -200,6 +201,7 @@ Tokens one component owns, named for it.
 --progress-ring-stroke  /* Stroke width of a ProgressRing track and fill. */
 --progress-tracker-connector-width  /* Width of the connecting line between steps in a horizontal ProgressTracker. */
 --progress-tracker-dot-size  /* Diameter of an unvisited step dot in a ProgressTracker. */
+--prompt-input-line  /* One line of PromptInput text; the text area grows to five of these. */
 --prompt-input-min-height  /* Shortest a PromptInput text area gets, one line plus its padding. */
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */

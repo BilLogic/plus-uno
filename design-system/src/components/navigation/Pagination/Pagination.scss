@@ -105,7 +105,7 @@
     z-index: 2;
 }
 
-// The current page is selected, so it reads as a selected tab does: semibold on
+// The current page is selected, so it reads as a selected tab does: medium on
 // the selected fill. Listed after hovered so it wins on a hover.
 .plus-pagination__page {
     @include plus-state((
@@ -114,7 +114,7 @@
         selected: (
             background-color: var(--ds-background-selected),
             color: var(--ds-text-selected),
-            font-weight: var(--type-weight-semibold),
+            font-weight: var(--type-weight-medium),
             cursor: default,
         ),
     ), $ring: false, $selected-selector: "&[aria-current='page']");

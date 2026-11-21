@@ -49,7 +49,7 @@ export const SEARCH_ROOTS = [
 ];
 export const SEARCHED = /\.(scss|css|jsx|js)$/;
 const SKIPPED = /\.test\.[cm]?[jt]sx?$/;
-const PRIMITIVE = /^--(?:(?:space|radius|size|stroke|height|width|type-size)-\d+|palette-.+)$/;
+const PRIMITIVE = /^--(?:(?:space|radius|size|stroke|height|width|type-size|type-line-height)-\d+|palette-.+)$/;
 
 /** Whether a custom property name is a primitive: a numbered step of a scale, or a palette color. */
 export const isPrimitive = (name) => PRIMITIVE.test(name);

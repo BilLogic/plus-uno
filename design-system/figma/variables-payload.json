@@ -1370,6 +1370,20 @@
           }
         },
         {
+          "name": "Prompt/input-line",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--prompt-input-line)"
+          }
+        },
+        {
+          "name": "Page/text-line",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-text-line)"
+          }
+        },
+        {
           "name": "Inbox/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

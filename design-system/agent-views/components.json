@@ -147,7 +147,6 @@
         "--ds-text-subtle",
         "--heading-sm",
         "--heading-sm-tracking",
-        "--icon-sm",
         "--image-md",
         "--inline-md",
         "--stack-sm"
@@ -3191,7 +3190,6 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-default-tracking",
         "--border-width-default",
         "--card-radius",
         "--ds-background-code-default",
@@ -3207,8 +3205,7 @@
         "--pad-y-lg",
         "--plus-code-block-digits",
         "--plus-code-block-gutter",
-        "--type-family-code",
-        "--type-line-height-125"
+        "--type-family-code"
       ]
     },
     {
@@ -3380,7 +3377,7 @@
         "--inline-lg",
         "--stack-md",
         "--stack-sm",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ]
     },
     {
@@ -9666,8 +9663,7 @@
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
-        "--type-weight-medium",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ],
       "subComponents": [
         {
@@ -10873,10 +10869,10 @@
         "--pad-x-xs",
         "--pad-y-md",
         "--plus-prompt-input-max-height",
+        "--prompt-input-line",
         "--prompt-input-min-height",
         "--stack-md",
-        "--stack-sm",
-        "--type-line-height-125"
+        "--stack-sm"
       ]
     },
     {
@@ -16031,7 +16027,7 @@
         "--stack-sm",
         "--tag-dot-size",
         "--type-family-heading",
-        "--type-weight-semibold"
+        "--type-weight-medium"
       ]
     },
     {

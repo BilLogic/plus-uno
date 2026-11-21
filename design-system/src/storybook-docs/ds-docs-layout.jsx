@@ -294,7 +294,7 @@ export function DoDontCaption({ tone, children, style }) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: 'var(--icon-md)',
-                    height: 'var(--type-line-height-125)',
+                    height: '1lh',
                     flexShrink: 0,
                     color: 'var(--ds-text)',
                     fontSize: 'var(--icon-md)',

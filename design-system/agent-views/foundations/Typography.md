@@ -58,7 +58,7 @@ Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--hea
 | `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |
 | `--type-weight-regular` | 400 | Body text and headings xxl, xl and lg |
 | `--type-weight-medium` | 500 | Headings md to xxs, metrics, labels and icon-paired text |
-| `--type-weight-semibold` | 600 | Inline bold emphasis only, not a text style |
+| `--type-weight-semibold` | 600 | Inline bold only: strong in running text, never a component or text style |
 | `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |
 | `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |
 | `--heading-lg-tracking` | −1.5% | Heading 24 |

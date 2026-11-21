@@ -275,7 +275,7 @@ Overflow.play = async ({ canvasElement }) => {
     const box = canvasElement.querySelector('.plus-field');
     const area = within(canvasElement).getByRole('textbox', { name: 'Message to AI chat' });
     const send = within(canvasElement).getByRole('button', { name: 'Send' });
-    const max = tokenLength(canvasElement, '--type-line-height-125') * 5 + tokenLength(canvasElement, '--pad-y-md') * 2;
+    const max = tokenLength(canvasElement, '--prompt-input-line') * 5 + tokenLength(canvasElement, '--pad-y-md') * 2;
     await expect(Math.round(area.getBoundingClientRect().height), 'it stops at five lines').toBe(Math.round(max));
     await expect(area.scrollHeight, 'the rest scrolls inside').toBeGreaterThan(area.clientHeight);
     await expect(getComputedStyle(area).overflowY).toBe('auto');

@@ -94,7 +94,7 @@ body {
     padding: 0;
     font-family: var(--type-family-body);
     font-weight: var(--type-weight-regular);
-    line-height: var(--type-line-height-150);
+    line-height: var(--page-text-line);
     // Text and its ground move together, so the page flips with the color mode.
     color: var(--ds-text);
     background-color: var(--ds-surface);

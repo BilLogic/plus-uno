@@ -146,7 +146,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--card-radius` · `--comment-gap` · `--comment-pad` · `--comment-replies-indent` · `--comment-replies-stack` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--inline-lg` · `--stack-md` · `--stack-sm` · `--type-weight-semibold`
+`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--card-radius` · `--comment-gap` · `--comment-pad` · `--comment-replies-indent` · `--comment-replies-stack` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--inline-lg` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Comment/Comment.scss`. Override these through the token layer, never with a literal.
 

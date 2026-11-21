@@ -1,6 +1,7 @@
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../../images-and-icons/Icon';
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Accordion.scss';
@@ -120,6 +121,7 @@ const AccordionItem = ({
                         <span className="plus-accordion-title">{header}</span>
                         {summary && <span className="plus-accordion-summary">{summary}</span>}
                     </span>
+                    <Icon name="chevron-down" size={12} className="plus-accordion-chevron" />
                 </BaseAccordion.Trigger>
             </BaseAccordion.Header>
             <BaseAccordion.Panel keepMounted render={(panelProps, state) => (
