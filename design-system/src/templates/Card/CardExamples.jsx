@@ -69,9 +69,15 @@ const tally = ([value, label]) => (
 
 export const MetricsInOneCard = () => (
     <Card title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
-            {tallies.map((row) => (
-                <div key={row[1]}>{tally(row)}</div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {tallies.map((row, i) => (
+                <div
+                    key={row[1]}
+                    className={i === 0 ? undefined : 'border-outline-variant'}
+                    style={{ paddingBlock: 'var(--card-stack-md)', borderInline: 0, borderBlockEnd: 0 }}
+                >
+                    {tally(row)}
+                </div>
             ))}
         </div>
     </Card>
