@@ -91,7 +91,7 @@ The switch keeps its size, and the label is never clipped. See [Overflow](?path=
 - `Checkbox`: use when an option requires a form button press to apply.
 - `RadioGroup`: use when choosing one option from a short visible set.
 - `Select`: use when choosing one option from a longer list.
-- `Tooltip`: use to explain what flipping a toggle does.
+- `Tooltip`: use when flipping a toggle needs an explanation.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect`
 

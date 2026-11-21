@@ -172,7 +172,7 @@ height hugs its content up to the cap (`--dialog-max-height`);
 
 ## Alternatives
 
-- For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/templates`).
+- For a blocking overlay over the page, use `Modal` (`@/templates`), which adds the Blanket, focus trap, Escape and scroll lock.
 - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
 - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
 - For a small aside anchored to a control, use `Popup`.
@@ -316,7 +316,7 @@ Don't: Render a bare `Dialog` over page content on your own.
 
 ## Related
 
-- `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.
+- `Modal` template: use when the `Dialog` must sit on a Blanket with portal, focus trap, Escape and scroll lock.
 - `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.
 - Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.
 

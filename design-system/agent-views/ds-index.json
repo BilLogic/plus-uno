@@ -641,6 +641,12 @@
 					"| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Opens as a Popup: a fade in place. |\n",
 					"| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For one reply on its own, use `AiMessage`.\n",
+					"- For the field alone, use `PromptInput`.\n",
+					"- For suggested prompts before anyone types, use `PromptStarters`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Use the popup for quick asks. {#use-the-popup-for-quick-asks}\n",
@@ -681,10 +687,10 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- Frame places the Panel the chat docks in.\n",
-					"- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.\n",
-					"- For one reply on its own, use `AiMessage`.\n",
-					"- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.\n",
+					"- Frame: use when the chat docks in a Panel beside the Page; the Panel never draws a Blanket and the Page stays in view.\n",
+					"- `AiMessage`: use when one reply stands on its own.\n",
+					"- `PromptInput`: use when only the field is needed.\n",
+					"- `PromptStarters`: use when people need suggested prompts before they type.\n",
 					"\n",
 					"Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`\n",
 					"\n",
@@ -827,10 +833,10 @@
 				},
 				"related": {
 					"$lines": [
-						"- Frame places the Panel the chat docks in.\n",
-						"- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.\n",
-						"- For one reply on its own, use `AiMessage`.\n",
-						"- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`."
+						"- Frame: use when the chat docks in a Panel beside the Page; the Panel never draws a Blanket and the Page stays in view.\n",
+						"- `AiMessage`: use when one reply stands on its own.\n",
+						"- `PromptInput`: use when only the field is needed.\n",
+						"- `PromptStarters`: use when people need suggested prompts before they type."
 					]
 				}
 			}
@@ -927,6 +933,11 @@
 					"\n",
 					"Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For an action that is not an AI action, use `Icon`.\n",
+					"- For the border that shows generation in progress, use `GenerativeBorder`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Pair it with visible text, or give it a `label`. {#pair-it-with-visible-text-or-give-it-a-label}\n",
@@ -957,8 +968,8 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- For any non-AI icon, use a Font Awesome Free glyph.\n",
-					"- For the border that shows generation in progress, use `GenerativeBorder`.\n",
+					"- Font Awesome Free glyph: use when the action is not an AI action.\n",
+					"- `GenerativeBorder`: use when the AI is generating into a piece of content.\n",
 					"\n",
 					"Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`\n",
 					"\n",
@@ -1045,8 +1056,8 @@
 				},
 				"related": {
 					"$lines": [
-						"- For any non-AI icon, use a Font Awesome Free glyph.\n",
-						"- For the border that shows generation in progress, use `GenerativeBorder`."
+						"- Font Awesome Free glyph: use when the action is not an AI action.\n",
+						"- `GenerativeBorder`: use when the AI is generating into a piece of content."
 					]
 				}
 			}
@@ -1214,6 +1225,11 @@
 					"| strong | Load content | `--ds-motion-appearance-fast` | Strong feedback fades in over its Spinner. | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |\n",
 					"| refine | Load content | `--ds-motion-appearance-fast` | Refine feedback fades in over its Spinner. | `sound.ai.refine` on land: the feedback took over 1 s, so a Spinner showed |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For a whole conversation with its field, use `AiChat`.\n",
+					"- For the field that sends the message, use `PromptInput`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Stream the answer, then settle. {#stream-the-answer-then-settle}\n",
@@ -1260,9 +1276,9 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- `AiChat`, which shows every reply in an `AiMessage`.\n",
-					"- `PromptInput`, which sends the message.\n",
-					"- AI sources and AI feedback, which sit under a finished reply.\n",
+					"- `AiChat`: use when the page needs the whole conversation; it shows every reply in an `AiMessage`.\n",
+					"- `PromptInput`: use when a person writes the message that starts a reply.\n",
+					"- AI sources and AI feedback, use when a finished reply needs its sources or a rating.\n",
 					"\n",
 					"Same group: `AiChat` · `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`\n",
 					"\n",
@@ -1384,9 +1400,9 @@
 				},
 				"related": {
 					"$lines": [
-						"- `AiChat`, which shows every reply in an `AiMessage`.\n",
-						"- `PromptInput`, which sends the message.\n",
-						"- AI sources and AI feedback, which sit under a finished reply."
+						"- `AiChat`: use when the page needs the whole conversation; it shows every reply in an `AiMessage`.\n",
+						"- `PromptInput`: use when a person writes the message that starts a reply.\n",
+						"- AI sources and AI feedback, use when a finished reply needs its sources or a rating."
 					]
 				}
 			}
@@ -3275,7 +3291,7 @@
 					"\n",
 					"## Alternatives\n",
 					"\n",
-					"- For switching how the same content is shown (Day / Week / Month, Table / Cards), use `SegmentedControl`.\n",
+					"- For switching how the same content is shown, use `SegmentedControl`.\n",
 					"- For a single standalone action, use `Button`.\n",
 					"- For one primary action joined to a menu of variations, use `SplitButton`.\n",
 					"- For mutually exclusive form answers, use `RadioGroup`.\n",
@@ -3332,7 +3348,7 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- `SegmentedControl`: use to switch how the same content is shown.\n",
+					"- `SegmentedControl`: use when switching how the same content is shown, such as Day / Week / Month or Table / Cards.\n",
 					"- `Button`: use when an action stands alone or sits in a spaced row.\n",
 					"- `SplitButton`: use when one primary action pairs with a chevron menu.\n",
 					"- `ChoiceGrid`: use when offering illustrated choices (or `RadioGroup` / `CheckboxGroup` with `appearance=\"tile\"`).\n",
@@ -3427,7 +3443,7 @@
 				},
 				"related": {
 					"$lines": [
-						"- `SegmentedControl`: use to switch how the same content is shown.\n",
+						"- `SegmentedControl`: use when switching how the same content is shown, such as Day / Week / Month or Table / Cards.\n",
 						"- `Button`: use when an action stands alone or sits in a spaced row.\n",
 						"- `SplitButton`: use when one primary action pairs with a chevron menu.\n",
 						"- `ChoiceGrid`: use when offering illustrated choices (or `RadioGroup` / `CheckboxGroup` with `appearance=\"tile\"`)."
@@ -9582,7 +9598,7 @@
 					"\n",
 					"### Show the date and the time in one pattern. {#show-the-date-and-the-time-in-one-pattern}\n",
 					"\n",
-					"Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, \"10/21/2026, 3:30 PM\" and not \"2026-10-21 15:30\", so people do not have to reread it.\n",
+					"Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, in the field's own format and not as a year-first or 24-hour string, so people do not have to reread it.\n",
 					"\n",
 					"### Always show AM or PM. {#always-show-am-or-pm}\n",
 					"\n",
@@ -9763,7 +9779,7 @@
 						"\n",
 						"### Show the date and the time in one pattern.\n",
 						"\n",
-						"Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, \"10/21/2026, 3:30 PM\" and not \"2026-10-21 15:30\", so people do not have to reread it.\n",
+						"Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, in the field's own format and not as a year-first or 24-hour string, so people do not have to reread it.\n",
 						"\n",
 						"### Always show AM or PM.\n",
 						"\n",
@@ -10088,7 +10104,7 @@
 					"\n",
 					"## Alternatives\n",
 					"\n",
-					"- For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/templates`).\n",
+					"- For a blocking overlay over the page, use `Modal` (`@/templates`), which adds the Blanket, focus trap, Escape and scroll lock.\n",
 					"- For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.\n",
 					"- For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.\n",
 					"- For a small aside anchored to a control, use `Popup`.\n",
@@ -10163,7 +10179,7 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.\n",
+					"- `Modal` template: use when the `Dialog` must sit on a Blanket with portal, focus trap, Escape and scroll lock.\n",
 					"- `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.\n",
 					"- Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.\n",
 					"\n",
@@ -10341,7 +10357,7 @@
 				},
 				"related": {
 					"$lines": [
-						"- `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.\n",
+						"- `Modal` template: use when the `Dialog` must sit on a Blanket with portal, focus trap, Escape and scroll lock.\n",
 						"- `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.\n",
 						"- Templates: use when choosing between a Modal and a full page; its Usage section weighs the two."
 					]
@@ -15125,6 +15141,12 @@
 					"| change | Load content | `--ds-motion-linear` | Its light travels while the AI drafts and stops when done. |\n",
 					"| pulse | Load content | `--ds-motion-loop` | A pulse uses the loop. |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For a general wait, use `Spinner`.\n",
+					"- For a wait where the layout is known, use `Skeleton`.\n",
+					"- For a wait with measurable progress, use `ProgressBar`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Animate one thing at a time. {#animate-one-thing-at-a-time}\n",
@@ -15160,8 +15182,8 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- For the icons that start an AI action, use `AiIcon`.\n",
-					"- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.\n",
+					"- `AiIcon`: use when an icon starts an AI action.\n",
+					"- `Spinner`, `Skeleton` and `ProgressBar`: use when the wait is general, not the AI generating into content.\n",
 					"\n",
 					"Same group: `AiChat` · `AiIcon` · `AiMessage` · `PromptInput` · `PromptStarters` · `Suggestion`\n",
 					"\n",
@@ -15259,8 +15281,8 @@
 				},
 				"related": {
 					"$lines": [
-						"- For the icons that start an AI action, use `AiIcon`.\n",
-						"- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`."
+						"- `AiIcon`: use when an icon starts an AI action.\n",
+						"- `Spinner`, `Skeleton` and `ProgressBar`: use when the wait is general, not the AI generating into content."
 					]
 				}
 			}
@@ -21125,7 +21147,7 @@
 					"every click calls `onPageChange` with the target page. It holds no state.\n",
 					"\n",
 					"Reach for it to page through results too many for one screen: a table's rows,\n",
-					"a search's matches, a long history.\n",
+					"a search's matches, a long history. A continuously loading feed takes no pages, so it takes no `Pagination`.\n",
 					"\n",
 					"The window of numbers is computed for you. `max` (default `5`) centers the\n",
 					"window on the current page, and first and last pages are pinned with an ellipsis\n",
@@ -21143,7 +21165,6 @@
 					"\n",
 					"- For a step-by-step workflow rather than pages of results, use `ProgressTracker`.\n",
 					"- For a bounded list that scrolls inside a fixed region, use `ScrollBar`.\n",
-					"- For a continuously loading feed, use infinite scroll rather than pages.\n",
 					"\n",
 					"## Best practices\n",
 					"\n",
@@ -21354,7 +21375,7 @@
 						"every click calls `onPageChange` with the target page. It holds no state.\n",
 						"\n",
 						"Reach for it to page through results too many for one screen: a table's rows,\n",
-						"a search's matches, a long history.\n",
+						"a search's matches, a long history. A continuously loading feed takes no pages, so it takes no `Pagination`.\n",
 						"\n",
 						"The window of numbers is computed for you. `max` (default `5`) centers the\n",
 						"window on the current page, and first and last pages are pinned with an ellipsis\n",
@@ -24239,6 +24260,12 @@
 					"| --- | --- | --- | --- |\n",
 					"| change | Update a value or state | `--ds-motion-appearance-fast` | Send becomes Stop at once while the AI writes. |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For a plain multi-line field with no AI behavior, use `TextArea`.\n",
+					"- For one short prompt a person taps, use `Suggestion`.\n",
+					"- For suggested prompts before anyone types, use `PromptStarters`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Let a long prompt grow to five lines, then scroll. {#let-a-long-prompt-grow-to-five-lines-then-scroll}\n",
@@ -24294,9 +24321,10 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- For a plain multi-line field with no AI behavior, use `TextArea`.\n",
-					"- For the border treatment shown while loading, see `GenerativeBorder`.\n",
-					"- For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.\n",
+					"- `TextArea`: use when the field has no AI behavior.\n",
+					"- `GenerativeBorder`: use when the border shows generation in progress.\n",
+					"- `Suggestion`: use when one short prompt is tappable.\n",
+					"- `PromptStarters`: use when an empty chat needs suggested prompts.\n",
 					"\n",
 					"Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptStarters` · `Suggestion`\n",
 					"\n",
@@ -24431,10 +24459,10 @@
 				},
 				"related": {
 					"$lines": [
-						"- For a plain multi-line field with no AI behavior, use `TextArea`.\n",
-						"- For the border treatment shown while loading, see `GenerativeBorder`.\n",
-						"- For a short, tappable prompt suggestion, use `Suggestion` or\n",
-						"  `PromptStarters`."
+						"- `TextArea`: use when the field has no AI behavior.\n",
+						"- `GenerativeBorder`: use when the border shows generation in progress.\n",
+						"- `Suggestion`: use when one short prompt is tappable.\n",
+						"- `PromptStarters`: use when an empty chat needs suggested prompts."
 					]
 				}
 			}
@@ -24521,6 +24549,11 @@
 					"| --- | --- | --- | --- |\n",
 					"| enter | Swap content in place | `--ds-motion-appearance-fast` | Fade in place, staggered; picking one fills the composer. |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For a single follow-up during a conversation, use `Suggestion`.\n",
+					"- For the field a selected starter fills, use `PromptInput`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Keep the label short, and put the prompt in `text`. {#keep-the-label-short-and-put-the-prompt-in-text}\n",
@@ -24563,8 +24596,8 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.\n",
-					"- For where a selected starter's text typically lands, see `PromptInput`.\n",
+					"- `Suggestion`: use when a single follow-up prompt fits once a conversation is underway.\n",
+					"- `PromptInput`: use when a selected starter's text needs somewhere to land.\n",
 					"\n",
 					"Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `Suggestion`\n",
 					"\n",
@@ -24657,9 +24690,8 @@
 				},
 				"related": {
 					"$lines": [
-						"- For a single follow-up prompt once a conversation is underway, use\n",
-						"  `Suggestion` directly.\n",
-						"- For where a selected starter's text typically lands, see `PromptInput`."
+						"- `Suggestion`: use when a single follow-up prompt fits once a conversation is underway.\n",
+						"- `PromptInput`: use when a selected starter's text needs somewhere to land."
 					]
 				}
 			}
@@ -26770,7 +26802,7 @@
 					"\n",
 					"- `TextArea`: use when plain multi-line text is enough.\n",
 					"- `TextField`: use when collecting a single line of text.\n",
-					"- To display formatted content the user cannot edit, render the HTML yourself after sanitizing it.\n",
+					"- Your own sanitized HTML render: use when formatted content is displayed and the user cannot edit it.\n",
 					"- `Comment`: use when displaying a formatted note in a discussion thread.\n",
 					"\n",
 					"Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`\n",
@@ -26932,7 +26964,7 @@
 					"$lines": [
 						"- `TextArea`: use when plain multi-line text is enough.\n",
 						"- `TextField`: use when collecting a single line of text.\n",
-						"- To display formatted content the user cannot edit, render the HTML yourself after sanitizing it.\n",
+						"- Your own sanitized HTML render: use when formatted content is displayed and the user cannot edit it.\n",
 						"- `Comment`: use when displaying a formatted note in a discussion thread."
 					]
 				}
@@ -29120,7 +29152,7 @@
 					"\n",
 					"## Alternatives\n",
 					"\n",
-					"- For switching between sections of a page, each with its own content, use `Tabs`.\n",
+					"- For switching between sections of a page that each hold their own content, use `Tabs`.\n",
 					"- For a row of related actions that each do something, use `ButtonGroup`.\n",
 					"- For one answer in a form that is saved with the form, use `RadioGroup`.\n",
 					"- For more than five choices, use `Select`.\n",
@@ -29833,9 +29865,9 @@
 					"\n",
 					"### Reach for `loadOptions` once a list is genuinely large or server-backed. {#reach-for-loadoptions-once-a-list-is-genuinely-large-or-server-backed}\n",
 					"\n",
-					"`recent` and `suggested` only change the order past 50 static options; `loadOptions` is for a list too large to ship as a static array.\n",
+					"`recent` and `suggested` only change the order once a list passes the long-list size; `loadOptions` is for a list too large to ship as a static array.\n",
 					"\n",
-					"`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (50 at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.\n",
+					"`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (one `limit` at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.\n",
 					"\n",
 					"```jsx\n",
 					"<Select\n",
@@ -29845,7 +29877,7 @@
 					"/>\n",
 					"```\n",
 					"\n",
-					"While a page is loading, the list shows one \"Loading options\" row rather than skeleton rows. If the request fails it shows \"Couldn't load options\" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, 20 ms apart, capped at 500 ms; reduced motion shows them at once.\n",
+					"While a page is loading, the list shows one \"Loading options\" row rather than skeleton rows. If the request fails it shows \"Couldn't load options\" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, one `stagger` apart up to a capped total; reduced motion shows them at once.\n",
 					"\n",
 					"### Turn typing off for a short set of choices. {#turn-typing-off-for-a-short-set-of-choices}\n",
 					"\n",
@@ -30085,9 +30117,9 @@
 						"\n",
 						"### Reach for `loadOptions` once a list is genuinely large or server-backed.\n",
 						"\n",
-						"`recent` and `suggested` only change the order past 50 static options; `loadOptions` is for a list too large to ship as a static array.\n",
+						"`recent` and `suggested` only change the order once a list passes the long-list size; `loadOptions` is for a list too large to ship as a static array.\n",
 						"\n",
-						"`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (50 at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.\n",
+						"`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (one `limit` at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.\n",
 						"\n",
 						"```jsx\n",
 						"<Select\n",
@@ -30097,7 +30129,7 @@
 						"/>\n",
 						"```\n",
 						"\n",
-						"While a page is loading, the list shows one \"Loading options\" row rather than skeleton rows. If the request fails it shows \"Couldn't load options\" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, 20 ms apart, capped at 500 ms; reduced motion shows them at once.\n",
+						"While a page is loading, the list shows one \"Loading options\" row rather than skeleton rows. If the request fails it shows \"Couldn't load options\" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, one `stagger` apart up to a capped total; reduced motion shows them at once.\n",
 						"\n",
 						"### Turn typing off for a short set of choices.\n",
 						"\n",
@@ -30274,7 +30306,7 @@
 					"\n",
 					"## Alternatives\n",
 					"\n",
-					"- For fields edited and submitted together with a Save button, use stacked form fields inside `Fieldset` (see Forms).\n",
+					"- For fields edited and submitted together with a Save button, use `Fieldset` with stacked form fields (see Forms).\n",
 					"- For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.\n",
 					"- For one value on a record page read far more often than edited, use `InlineEdit`.\n",
 					"\n",
@@ -30314,10 +30346,10 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- `Toggle`: use as `control` when a setting turns on or off and applies immediately.\n",
-					"- `Select`: use with `spacing=\"compact\"` as `control` when a setting picks one option from a short list.\n",
-					"- `StatusTag`: pass to `status` to show connection or feature state beside the setting name.\n",
-					"- `Flag`: use in `FlagGroup` to confirm background saves on a settings page.\n",
+					"- `Toggle`: use when a setting turns on or off and applies immediately; pass it as `control`.\n",
+					"- `Select`: use when a setting picks one option from a short list; pass it as `control` with `spacing=\"compact\"`.\n",
+					"- `StatusTag`: use when connection or feature state shows beside the setting name; pass it to `status`.\n",
+					"- `Flag`: use when a background save on a settings page needs confirming; place it in `FlagGroup`.\n",
 					"\n",
 					"Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`\n",
 					"\n",
@@ -30429,10 +30461,10 @@
 				},
 				"related": {
 					"$lines": [
-						"- `Toggle`: use as `control` when a setting turns on or off and applies immediately.\n",
-						"- `Select`: use with `spacing=\"compact\"` as `control` when a setting picks one option from a short list.\n",
-						"- `StatusTag`: pass to `status` to show connection or feature state beside the setting name.\n",
-						"- `Flag`: use in `FlagGroup` to confirm background saves on a settings page."
+						"- `Toggle`: use when a setting turns on or off and applies immediately; pass it as `control`.\n",
+						"- `Select`: use when a setting picks one option from a short list; pass it as `control` with `spacing=\"compact\"`.\n",
+						"- `StatusTag`: use when connection or feature state shows beside the setting name; pass it to `status`.\n",
+						"- `Flag`: use when a background save on a settings page needs confirming; place it in `FlagGroup`."
 					]
 				}
 			}
@@ -32950,7 +32982,7 @@
 					"Do: On track.\n",
 					"Don't: A sentence in the tag.\n",
 					"\n",
-					"### Let a label longer than 200 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-200-end-in-an-ellipsis-with-a-tooltip}\n",
+					"### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip. {#let-a-label-longer-than-maxwidth-end-in-an-ellipsis-with-a-tooltip}\n",
 					"\n",
 					"The Tooltip is on only while the label is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).\n",
 					"\n",
@@ -33113,7 +33145,7 @@
 						"Do: On track.\n",
 						"Don't: A sentence in the tag.\n",
 						"\n",
-						"### Let a label longer than 200 end in an ellipsis with a Tooltip.\n",
+						"### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip.\n",
 						"\n",
 						"The Tooltip is on only while the label is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).\n",
 						"\n",
@@ -33300,6 +33332,11 @@
 					"| enter | Swap content in place | `--ds-motion-appearance-fast` | Fades in place. |\n",
 					"| exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Accepting folds it away; dismissing fades. |\n",
 					"\n",
+					"## Alternatives\n",
+					"\n",
+					"- For a value already in the field, use `Tag`.\n",
+					"- For an action that is not a proposed value, use `Button`.\n",
+					"\n",
 					"## Best practices\n",
 					"\n",
 					"### Name the action. {#name-the-action}\n",
@@ -33350,7 +33387,7 @@
 					"\n",
 					"## Related\n",
 					"\n",
-					"- For a value already in the field, use `Tag`, inside a `TagGroup`.\n",
+					"- `Tag`, inside a `TagGroup`: use when the value is already in the field.\n",
 					"\n",
 					"Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters`\n",
 					"\n",
@@ -33488,7 +33525,7 @@
 						"Don't: A Tag styled as a suggestion is not a button, so nobody can accept it with a keyboard."
 					]
 				},
-				"related": "- For a value already in the field, use `Tag`, inside a `TagGroup`."
+				"related": "- `Tag`, inside a `TagGroup`: use when the value is already in the field."
 			}
 		},
 		{
@@ -34778,7 +34815,7 @@
 					"\n",
 					"`useTagContext()` reads the same value from inside a custom tag.\n",
 					"\n",
-					"### Let a label longer than 180 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-180-end-in-an-ellipsis-with-a-tooltip}\n",
+					"### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip. {#let-a-label-longer-than-maxwidth-end-in-an-ellipsis-with-a-tooltip}\n",
 					"\n",
 					"The Tooltip is on only while the label is clipped, and a clipped tag is the one tab stop that reaches it. See [Overflow](?path=/docs/patterns-states-overflow--docs).\n",
 					"\n",
@@ -35038,7 +35075,7 @@
 						"\n",
 						"`useTagContext()` reads the same value from inside a custom tag.\n",
 						"\n",
-						"### Let a label longer than 180 end in an ellipsis with a Tooltip.\n",
+						"### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip.\n",
 						"\n",
 						"The Tooltip is on only while the label is clipped, and a clipped tag is the one tab stop that reaches it. See [Overflow](?path=/docs/patterns-states-overflow--docs).\n",
 						"\n",
@@ -38338,7 +38375,7 @@
 					"- `Checkbox`: use when an option requires a form button press to apply.\n",
 					"- `RadioGroup`: use when choosing one option from a short visible set.\n",
 					"- `Select`: use when choosing one option from a longer list.\n",
-					"- `Tooltip`: use to explain what flipping a toggle does.\n",
+					"- `Tooltip`: use when flipping a toggle needs an explanation.\n",
 					"\n",
 					"Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect`\n",
 					"\n",
@@ -38487,7 +38524,7 @@
 						"- `Checkbox`: use when an option requires a form button press to apply.\n",
 						"- `RadioGroup`: use when choosing one option from a short visible set.\n",
 						"- `Select`: use when choosing one option from a longer list.\n",
-						"- `Tooltip`: use to explain what flipping a toggle does."
+						"- `Tooltip`: use when flipping a toggle needs an explanation."
 					]
 				}
 			}

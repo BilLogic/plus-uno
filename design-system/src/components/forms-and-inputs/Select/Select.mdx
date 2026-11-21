@@ -311,9 +311,9 @@ A form's multi-select should fire `onChange` on every pick. `commitOnClose` fire
 
 ### Reach for `loadOptions` once a list is genuinely large or server-backed.
 
-`recent` and `suggested` only change the order past 50 static options; `loadOptions` is for a list too large to ship as a static array.
+`recent` and `suggested` only change the order once a list passes the long-list size; `loadOptions` is for a list too large to ship as a static array.
 
-`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (50 at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.
+`loadOptions` is `(text, { offset, limit }) => Promise<{ options, total }>`. The first page loads when the list opens and whenever the typed text changes; the next page loads as the list scrolls near its end (one `limit` at a time), and an older answer never overwrites a newer one. `isCreatable` works with it.
 
 ```jsx
 <Select
@@ -323,7 +323,7 @@ A form's multi-select should fire `onChange` on every pick. `commitOnClose` fire
 />
 ```
 
-While a page is loading, the list shows one "Loading options" row rather than skeleton rows. If the request fails it shows "Couldn't load options" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, 20 ms apart, capped at 500 ms; reduced motion shows them at once.
+While a page is loading, the list shows one "Loading options" row rather than skeleton rows. If the request fails it shows "Couldn't load options" with a Retry button, and Enter in the field retries too. A later page that fails keeps the rows already loaded and puts the same message in the footer. Options fade in one after another, one `stagger` apart up to a capped total; reduced motion shows them at once.
 
 ### Turn typing off for a short set of choices.
 

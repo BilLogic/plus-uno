@@ -42,7 +42,7 @@ SegmentedControl reads these motion tokens and no literal duration or curve.
 
 ## Alternatives
 
-- For switching between sections of a page, each with its own content, use `Tabs`.
+- For switching between sections of a page that each hold their own content, use `Tabs`.
 - For a row of related actions that each do something, use `ButtonGroup`.
 - For one answer in a form that is saved with the form, use `RadioGroup`.
 - For more than five choices, use `Select`.

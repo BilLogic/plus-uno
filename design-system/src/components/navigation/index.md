@@ -18,7 +18,6 @@ authored half, counted rather than assumed.
 - **[Pagination](Pagination/index.md)** — Use `Pagination` when a list is split into numbered pages and the user needs to move between them or jump to a known one — admin tables of sessions, students, tutors. It is fully controlled: `currentPage` and `totalPages` are required, and every click calls `onPageChange` with the target page. It holds no state.
   - For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
   - For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
-  - For a continuously loading feed, use infinite scroll rather than pages.
 - **[Sidebar](Sidebar/index.md)** — Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the rail from the role's config (`user`), and a prototype passes `groups` to add or override its own areas by `id` while keeping the role's navigation. The Frame decides whether it docks, collapses or floats; this page covers what is inside it.
   - For switching between views of a single subject inside a page, use `Tabs`.
   - For showing position inside a deep hierarchy above the page title, use `Breadcrumb`.

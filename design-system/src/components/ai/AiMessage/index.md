@@ -38,6 +38,11 @@ AiMessage reads these motion tokens and no literal duration or curve.
 | strong | Load content | `--ds-motion-appearance-fast` | Strong feedback fades in over its Spinner. | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |
 | refine | Load content | `--ds-motion-appearance-fast` | Refine feedback fades in over its Spinner. | `sound.ai.refine` on land: the feedback took over 1 s, so a Spinner showed |
 
+## Alternatives
+
+- For a whole conversation with its field, use `AiChat`.
+- For the field that sends the message, use `PromptInput`.
+
 ## Best practices
 
 ### Stream the answer, then settle. {#stream-the-answer-then-settle}
@@ -84,9 +89,9 @@ Don't: A finished answer with no way to rate it.
 
 ## Related
 
-- `AiChat`, which shows every reply in an `AiMessage`.
-- `PromptInput`, which sends the message.
-- AI sources and AI feedback, which sit under a finished reply.
+- `AiChat`: use when the page needs the whole conversation; it shows every reply in an `AiMessage`.
+- `PromptInput`: use when a person writes the message that starts a reply.
+- AI sources and AI feedback, use when a finished reply needs its sources or a rating.
 
 Same group: `AiChat` · `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 

@@ -91,7 +91,7 @@ The editor keeps its width, and the toolbar wraps instead of scrolling sideways.
 
 - `TextArea`: use when plain multi-line text is enough.
 - `TextField`: use when collecting a single line of text.
-- To display formatted content the user cannot edit, render the HTML yourself after sanitizing it.
+- Your own sanitized HTML render: use when formatted content is displayed and the user cannot edit it.
 - `Comment`: use when displaying a formatted note in a discussion thread.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
