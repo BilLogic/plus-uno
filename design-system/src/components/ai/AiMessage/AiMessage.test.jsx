@@ -1,6 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
 import AiMessage, { TypingText } from '.';
 
 afterEach(() => vi.useRealTimers());
@@ -56,6 +57,39 @@ describe('TypingText', () => {
         act(() => { vi.advanceTimersByTime(40); });
         expect(container.textContent).toBe('abc');
         expect(done).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the whole text at once when the preview context says reduced', () => {
+        const done = vi.fn();
+        const { container } = render(
+            <MotionPreferenceContext.Provider value>
+                <TypingText text="abc" speed={10} onComplete={done} />
+            </MotionPreferenceContext.Provider>,
+        );
+        expect(container.textContent).toBe('abc');
+        expect(done).toHaveBeenCalledTimes(1);
+    });
+
+    it('follows the system setting when it changes mid-typing', () => {
+        vi.useFakeTimers();
+        let listener;
+        const media = {
+            matches: false,
+            addEventListener: (_, fn) => { listener = fn; },
+            removeEventListener: () => {},
+        };
+        const real = window.matchMedia;
+        window.matchMedia = () => media;
+        try {
+            const { container } = render(<TypingText text="abcdef" speed={10} />);
+            act(() => { vi.advanceTimersByTime(20); });
+            expect(container.textContent).toBe('ab');
+            media.matches = true;
+            act(() => { listener({ matches: true }); });
+            expect(container.textContent).toBe('abcdef');
+        } finally {
+            window.matchMedia = real;
+        }
     });
 });
 

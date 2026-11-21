@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
+import { useMotionReduced } from '@/lib/motionPreference';
 import AiIcon from '../AiIcon';
 import AiSources from './AiSources';
 import AiFeedback from './AiFeedback';
@@ -14,8 +15,7 @@ export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
  * Under reduced motion the whole text shows at once.
  */
 export const TypingText = ({ text, speed = 14, onComplete }) => {
-    const reduced = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced = useMotionReduced();
     const [count, setCount] = useState(reduced ? text.length : 0);
 
     useEffect(() => {
