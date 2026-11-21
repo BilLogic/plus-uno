@@ -7,9 +7,9 @@ import Icon from '../../images-and-icons/Icon';
 import './InlineMessage.scss';
 
 /**
- * The appearances this library has a role token for. ADS also offers
- * `connectivity` and `confirmation`; we fold those into `info` and `success`
- * until those roles exist as their own tokens.
+ * The appearances this library has a role token for. `connectivity` and
+ * `confirmation` are folded into `info` and `success` until those roles exist
+ * as their own tokens.
  */
 export const INLINE_MESSAGE_APPEARANCES = ['info', 'warning', 'danger', 'success'];
 

@@ -2,7 +2,7 @@
  * `Tabs` — a WAI-ARIA tab strip, built on Base UI's `Tabs`.
  *
  * There is one mode: every strip is a real `role="tablist"` (roving tabindex,
- * arrow-key navigation, a labelled panel).
+ * arrow-key navigation, a labeled panel).
  *
  * Selection lives on the root, so the vocabulary is `eventKey` /
  * `activeKey` / `defaultActiveKey` / `onSelect` rather than a per-tab

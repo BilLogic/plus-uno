@@ -5,8 +5,8 @@
  * bold` for the default fill, `background.success.bold` for success (the
  * pattern-row rule). `inverse` reads on a
  * bold or colored page background, so both steps move to the inverse-subtle
- * pair instead: `background.inverse.subtle` for the track (Atlassian's own
- * use for "elements on a bold background") and its pressed step for the
+ * pair instead: `background.inverse.subtle` for the track (the inverse pair is
+ * for elements on a bold background) and its pressed step for the
  * fill, which needs the extra contrast since it carries the value.
  *
  * THE HEIGHT. 8px (`--progress-bar-height`), full pill radius.

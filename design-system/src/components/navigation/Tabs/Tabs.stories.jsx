@@ -19,7 +19,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Tabs is a WAI-ARIA tab strip built on Base UI\'s Tabs: a `role="tablist"` of buttons with roving tabindex, arrow-key navigation and a labelled panel per tab.'
+                component: 'Tabs is a WAI-ARIA tab strip built on Base UI\'s Tabs: a `role="tablist"` of buttons with roving tabindex, arrow-key navigation and a labeled panel per tab.'
             }
         }
     },
