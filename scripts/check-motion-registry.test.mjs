@@ -152,8 +152,16 @@ test('motionSectionPages reads each pattern MotionSection by component name', ()
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'motion-sections-'));
   const dir = path.join(root, 'design-system/src/storybook-docs/patterns/CommonActions');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'CommonActions.mdx'), '<MotionSection component="Common actions" tier="pattern" />');
+  fs.writeFileSync(path.join(dir, 'CommonActions.mdx'), '<Meta title="Patterns/Common actions" />\n<MotionSection component="Common actions" tier="pattern" />');
   assert.deepEqual([...motionSectionPages(root)], ['Common actions']);
+});
+
+test('a MotionSection on another page does not count for the page it names', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'motion-sections-'));
+  const dir = path.join(root, 'design-system/src/storybook-docs/patterns/Errors');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'Errors.mdx'), '<Meta title="Patterns/States/Errors" />\n<MotionSection component="Errors" tier="pattern" />\n<MotionSection component="Empty" tier="pattern" />');
+  assert.deepEqual([...motionSectionPages(root)], ['Errors']);
 });
 
 test('a template row of the same name does not satisfy a Patterns page', () => {

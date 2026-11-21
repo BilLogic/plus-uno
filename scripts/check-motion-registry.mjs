@@ -73,13 +73,19 @@ export function interactiveComponents(index) {
 const PATTERNS_DIR = 'design-system/src/storybook-docs/patterns';
 const NOT_PAGES = new Set(['Overview']);
 
+/** The page a `Patterns/...` title belongs to: `<Page>[/...]`, or `States/<Page>[/...]` for the States group. */
+const pageOfTitle = (title) => {
+  const parts = title.split('/');
+  return parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
+};
+
 /** Patterns pages by Storybook title (`Patterns/<Page>[/...]`, or `Patterns/States/<Page>[/...]` for the States group), the Overview excluded. */
 export function patternPages(repoRoot = REPO_ROOT) {
   const names = new Set();
   for (const { text } of trackedSources(repoRoot, [PATTERNS_DIR], /\.(mdx|stories\.jsx?)$/)) {
     for (const m of text.matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
       const parts = m[1].split('/');
-      const page = parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
+      const page = pageOfTitle(m[1]);
       // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
       if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
     }
@@ -94,11 +100,16 @@ const unregistered = (components, registry) => {
   return components.filter((c) => !rows.has(c));
 };
 
-/** Names of the pattern pages that render their registry rows: `<MotionSection component="<Name>" tier="pattern" />`. */
+/** Names of the pattern pages that render their own registry rows: `<MotionSection component="<Name>" tier="pattern" />` in the MDX titled for that page. */
 export function motionSectionPages(repoRoot = REPO_ROOT) {
   const names = new Set();
   for (const { text } of trackedSources(repoRoot, [PATTERNS_DIR], /\.mdx$/)) {
-    for (const m of text.matchAll(/<MotionSection\s+component=["']([^"']+)["']\s+tier=["']pattern["']/g)) names.add(m[1]);
+    const title = text.match(/<Meta\s+title=["']Patterns\/([^"']+)["']/)?.[1];
+    if (!title) continue;
+    const page = pageOfTitle(title);
+    for (const m of text.matchAll(/<MotionSection\s+component=["']([^"']+)["']\s+tier=["']pattern["']/g)) {
+      if (m[1] === page) names.add(page);
+    }
   }
   return names;
 }
