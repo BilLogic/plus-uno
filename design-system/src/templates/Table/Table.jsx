@@ -95,6 +95,10 @@ Table.propTypes = {
      * @ds-context Used in: Table.title (ds guide table)
      */
     title: PropTypes.node,
+    /** Optional description under the title; passed to the Section
+     * @ds-context Used in: Table.description (ds guide table)
+     */
+    description: PropTypes.node,
     /** Actions slot in the Section's title row; passed to the Section
      * @ds-context Used in: Table.actions (ds guide table)
      * @ds-context Governed by: Common actions (ds guide common-actions)
@@ -106,6 +110,11 @@ Table.propTypes = {
      * @ds-context Used in: Table.views (ds guide table)
      */
     views: PropTypes.node,
+    /** The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section
+     * @ds-context Used in: Table.format (ds guide table)
+     * @ds-context Governed by: Forms (ds guide forms)
+     */
+    format: PropTypes.node,
     /** The Search field in the Section header, at compact spacing; passed to the Section
      * @ds-context Used in: Table.search (ds guide table)
      * @ds-context Governed by: Search (ds guide search)
@@ -125,6 +134,12 @@ Table.propTypes = {
      * @ds-context Governed by: Filtering (ds guide filtering)
      */
     count: PropTypes.node,
+    /** Runs when "Reset filters" is pressed; the button shows once a filter is applied; passed to the Section */
+    onClearAll: PropTypes.func,
+    /** Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section */
+    isTitleHidden: PropTypes.bool,
+    /** `page` makes the title the page's h1; by default it nests one level down; passed to the Section */
+    level: PropTypes.oneOf(['page']),
 };
 
 export default Table;

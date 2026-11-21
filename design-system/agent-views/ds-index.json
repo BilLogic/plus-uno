@@ -33825,6 +33825,15 @@
 					"deprecated": null
 				},
 				{
+					"name": "description",
+					"type": "node",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "Optional description under the title; passed to the Section",
+					"deprecated": null
+				},
+				{
 					"name": "actions",
 					"type": "node",
 					"required": false,
@@ -33852,6 +33861,15 @@
 					"deprecated": null
 				},
 				{
+					"name": "format",
+					"type": "node",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section",
+					"deprecated": null
+				},
+				{
 					"name": "search",
 					"type": "node",
 					"required": false,
@@ -33876,6 +33894,35 @@
 					"default": null,
 					"values": null,
 					"description": "How many rows match, such as \"3 of 12\", once a filter is applied; passed to the Section",
+					"deprecated": null
+				},
+				{
+					"name": "onClearAll",
+					"type": "func",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "Runs when \"Reset filters\" is pressed; the button shows once a filter is applied; passed to the Section",
+					"deprecated": null
+				},
+				{
+					"name": "isTitleHidden",
+					"type": "bool",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section",
+					"deprecated": null
+				},
+				{
+					"name": "level",
+					"type": "enum",
+					"required": false,
+					"default": null,
+					"values": [
+						"page"
+					],
+					"description": "`page` makes the title the page's h1; by default it nests one level down; passed to the Section",
 					"deprecated": null
 				}
 			],
@@ -34050,16 +34097,23 @@
 					"| `label` | string | — | The table's accessible name, kept on the empty state box when the table is replaced |\n",
 					"| `className` | string | `''` | — |\n",
 					"| `title` | node | — | The Section title above the table; passed to the Section |\n",
+					"| `description` | node | — | Optional description under the title; passed to the Section |\n",
 					"| `actions` | node | — | Actions slot in the Section's title row; passed to the Section |\n",
 					"| `style` | object | — | Inline styles on the Section; passed to the Section |\n",
 					"| `views` | node | — | The views row of the Section header, usually Tabs in the pill appearance; passed to the Section |\n",
+					"| `format` | node | — | The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section |\n",
 					"| `search` | node | — | The Search field in the Section header, at compact spacing; passed to the Section |\n",
 					"| `filters` | arrayOf | — | The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does |\n",
 					"| `count` | node | — | How many rows match, such as \"3 of 12\", once a filter is applied; passed to the Section |\n",
+					"| `onClearAll` | func | — | Runs when \"Reset filters\" is pressed; the button shows once a filter is applied; passed to the Section |\n",
+					"| `isTitleHidden` | bool | — | Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section |\n",
+					"| `level` | enum | — | `page` makes the title the page's h1; by default it nests one level down; passed to the Section |\n",
 					"\n",
 					"## Variants\n",
 					"\n",
 					"**`kind`** — `static` · `dynamic` · `tree`\n",
+					"\n",
+					"**`level`** — `page`\n",
 					"\n",
 					"The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.\n",
 					"\n",
@@ -63811,16 +63865,23 @@
 				"| `label` | string | — | The table's accessible name, kept on the empty state box when the table is replaced |\n",
 				"| `className` | string | `''` | — |\n",
 				"| `title` | node | — | The Section title above the table; passed to the Section |\n",
+				"| `description` | node | — | Optional description under the title; passed to the Section |\n",
 				"| `actions` | node | — | Actions slot in the Section's title row; passed to the Section |\n",
 				"| `style` | object | — | Inline styles on the Section; passed to the Section |\n",
 				"| `views` | node | — | The views row of the Section header, usually Tabs in the pill appearance; passed to the Section |\n",
+				"| `format` | node | — | The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section |\n",
 				"| `search` | node | — | The Search field in the Section header, at compact spacing; passed to the Section |\n",
 				"| `filters` | arrayOf | — | The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does |\n",
 				"| `count` | node | — | How many rows match, such as \"3 of 12\", once a filter is applied; passed to the Section |\n",
+				"| `onClearAll` | func | — | Runs when \"Reset filters\" is pressed; the button shows once a filter is applied; passed to the Section |\n",
+				"| `isTitleHidden` | bool | — | Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section |\n",
+				"| `level` | enum | — | `page` makes the title the page's h1; by default it nests one level down; passed to the Section |\n",
 				"\n",
 				"## Variants\n",
 				"\n",
 				"**`kind`** — `static` · `dynamic` · `tree`\n",
+				"\n",
+				"**`level`** — `page`\n",
 				"\n",
 				"The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.\n",
 				"\n",

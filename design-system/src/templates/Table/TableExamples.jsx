@@ -1,6 +1,6 @@
 import React from 'react';
-import { DynamicTable, FilterButton, Icon, SearchField, StaticTable, TreeTable } from '@/components';
-import { Card, Section } from '@/templates';
+import { FilterButton, Icon, SearchField, StaticTable } from '@/components';
+import { Card, Section, Table } from '@/templates';
 
 /**
  * The Table page's do and don't examples, as PLUS parts only: the composition
@@ -22,46 +22,38 @@ const listHeader = (noun, count) => ({
 
 /* ------------------------------------------------------------ composition */
 
-const studentsTable = (
-    <StaticTable
-        headers={['Student', 'Tutor', { text: 'Sessions', align: 'number' }]}
-        rows={[
-            ['Ava Thompson', 'Priya Nair', { content: 12, align: 'number' }],
-            ['Marcus Lee', 'Daniel Kim', { content: 9, align: 'number' }],
-            ['Sofia Ramirez', 'Priya Nair', { content: 15, align: 'number' }],
-        ]}
-    />
-);
+const studentsTable = {
+    headers: ['Student', 'Tutor', { text: 'Sessions', align: 'number' }],
+    rows: [
+        ['Ava Thompson', 'Priya Nair', { content: 12, align: 'number' }],
+        ['Marcus Lee', 'Daniel Kim', { content: 9, align: 'number' }],
+        ['Sofia Ramirez', 'Priya Nair', { content: 15, align: 'number' }],
+    ],
+};
 
 export const PlainTable = () => (
-    <Section title="Students" {...listHeader('students', 340)}>
-        {studentsTable}
-    </Section>
+    <Table title="Students" {...listHeader('students', 340)} kind="static" tableProps={studentsTable} />
 );
 
 export const FramedTable = () => (
     <Section title="Students" {...listHeader('students', 340)}>
         <Card>
-            {studentsTable}
+            <StaticTable {...studentsTable} />
         </Card>
     </Section>
 );
 
-const tutorsTable = (
-    <StaticTable
-        headers={['Tutor', 'Site', { text: 'Students', align: 'number' }]}
-        rows={[
-            ['Priya Nair', 'Lincoln Middle', { content: 14, align: 'number' }],
-            ['Daniel Kim', 'Lincoln Middle', { content: 11, align: 'number' }],
-            ['Grace Okafor', 'Roosevelt K-8', { content: 8, align: 'number' }],
-        ]}
-    />
-);
+const tutorsTable = {
+    headers: ['Tutor', 'Site', { text: 'Students', align: 'number' }],
+    rows: [
+        ['Priya Nair', 'Lincoln Middle', { content: 14, align: 'number' }],
+        ['Daniel Kim', 'Lincoln Middle', { content: 11, align: 'number' }],
+        ['Grace Okafor', 'Roosevelt K-8', { content: 8, align: 'number' }],
+    ],
+};
 
 export const FiltersInHeader = () => (
-    <Section title="Tutors" {...listHeader('tutors', 12)}>
-        {tutorsTable}
-    </Section>
+    <Table title="Tutors" {...listHeader('tutors', 12)} kind="static" tableProps={tutorsTable} />
 );
 
 export const SecondToolbar = () => (
@@ -71,44 +63,38 @@ export const SecondToolbar = () => (
                 <FilterButton label="Site" text="All" onClick={() => {}} />
                 <span className="body-sm color-secondary">12 records</span>
             </div>
-            {tutorsTable}
+            <StaticTable {...tutorsTable} />
         </div>
     </Section>
 );
 
-const upcomingTable = (
-    <StaticTable
-        headers={['Date', 'Student', 'Status']}
-        rows={[
-            ['Oct 28', 'Ava Thompson', 'Scheduled'],
-            ['Oct 29', 'Marcus Lee', 'Scheduled'],
-            ['Oct 30', 'Sofia Ramirez', 'Scheduled'],
-        ]}
-    />
-);
+const upcomingTable = {
+    headers: ['Date', 'Student', 'Status'],
+    rows: [
+        ['Oct 28', 'Ava Thompson', 'Scheduled'],
+        ['Oct 29', 'Marcus Lee', 'Scheduled'],
+        ['Oct 30', 'Sofia Ramirez', 'Scheduled'],
+    ],
+};
 
-const pastTable = (
-    <StaticTable
-        headers={['Date', 'Student', 'Status']}
-        rows={[
-            ['Oct 24', 'Ava Thompson', 'Completed'],
-            ['Oct 23', 'Marcus Lee', 'Canceled'],
-            ['Oct 21', 'Jordan Patel', 'No-show'],
-        ]}
-    />
-);
+const pastTable = {
+    headers: ['Date', 'Student', 'Status'],
+    rows: [
+        ['Oct 24', 'Ava Thompson', 'Completed'],
+        ['Oct 23', 'Marcus Lee', 'Canceled'],
+        ['Oct 21', 'Jordan Patel', 'No-show'],
+    ],
+};
 
 export const OneTablePerSection = () => (
-    <Section title="Upcoming sessions" {...listHeader('sessions', 3)}>
-        {upcomingTable}
-    </Section>
+    <Table title="Upcoming sessions" {...listHeader('sessions', 3)} kind="static" tableProps={upcomingTable} />
 );
 
 export const TwoTables = () => (
     <Section title="Sessions" {...listHeader('sessions', 6)}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
-            {upcomingTable}
-            {pastTable}
+            <StaticTable {...upcomingTable} />
+            <StaticTable {...pastTable} />
         </div>
     </Section>
 );
@@ -147,30 +133,36 @@ const rosterRows = roster.map(([student, tutor, last, sessions, missed]) => ({
 export const DynamicRoster = () => {
     const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
     return (
-        <Section title="Students" {...listHeader('students', 340)}>
-            <DynamicTable
-                head={rosterHead}
-                rows={rosterRows}
-                label="Students"
-                defaultSortKey="student"
-                isSelectable
-                selectedRowKeys={selected}
-                onSelectionChange={setSelected}
-                bulkActions={['Message', 'Export', 'Remove'].map((label) => ({ label, onClick: () => {} }))}
-                rowsPerPage={25}
-                totalRows={340}
-            />
-        </Section>
+        <Table
+            title="Students"
+            {...listHeader('students', 340)}
+            kind="dynamic"
+            tableProps={{
+                head: rosterHead,
+                rows: rosterRows,
+                label: 'Students',
+                defaultSortKey: 'student',
+                isSelectable: true,
+                selectedRowKeys: selected,
+                onSelectionChange: setSelected,
+                bulkActions: ['Message', 'Export', 'Remove'].map((label) => ({ label, onClick: () => {} })),
+                rowsPerPage: 25,
+                totalRows: 340,
+            }}
+        />
     );
 };
 
 export const RosterAsStatic = () => (
-    <Section title="Students" {...listHeader('students', 340)}>
-        <StaticTable
-            headers={['Student', 'Tutor', 'Last session', { text: 'Sessions', align: 'number' }, { text: 'Missed', align: 'number' }]}
-            rows={roster.map(([student, tutor, last, sessions, missed]) => [student, tutor, last, { content: sessions, align: 'number' }, { content: missed, align: 'number' }])}
-        />
-    </Section>
+    <Table
+        title="Students"
+        {...listHeader('students', 340)}
+        kind="static"
+        tableProps={{
+            headers: ['Student', 'Tutor', 'Last session', { text: 'Sessions', align: 'number' }, { text: 'Missed', align: 'number' }],
+            rows: roster.map(([student, tutor, last, sessions, missed]) => [student, tutor, last, { content: sessions, align: 'number' }, { content: missed, align: 'number' }]),
+        }}
+    />
 );
 
 const treeNode = (id, name, type, sessions, more = {}) => ({
@@ -194,11 +186,14 @@ const schools = [
 ];
 
 export const TreeHierarchy = () => (
-    <TreeTable
-        head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
-        items={schools}
-        label="Schools"
-        defaultExpandedIds={['lincoln', 'g7']}
+    <Table
+        kind="tree"
+        tableProps={{
+            head: { cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }, { key: 'sessions', content: 'Sessions', align: 'number' }] },
+            items: schools,
+            label: 'Schools',
+            defaultExpandedIds: ['lincoln', 'g7'],
+        }}
     />
 );
 

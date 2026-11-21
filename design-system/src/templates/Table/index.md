@@ -163,16 +163,23 @@ Row states are layered over each cell's fill, never swapped for it.
 | `label` | string | — | The table's accessible name, kept on the empty state box when the table is replaced |
 | `className` | string | `''` | — |
 | `title` | node | — | The Section title above the table; passed to the Section |
+| `description` | node | — | Optional description under the title; passed to the Section |
 | `actions` | node | — | Actions slot in the Section's title row; passed to the Section |
 | `style` | object | — | Inline styles on the Section; passed to the Section |
 | `views` | node | — | The views row of the Section header, usually Tabs in the pill appearance; passed to the Section |
+| `format` | node | — | The format switch at the end of the views row (Table / Cards), a `SegmentedControl`; passed to the Section |
 | `search` | node | — | The Search field in the Section header, at compact spacing; passed to the Section |
 | `filters` | arrayOf | — | The filter triggers in the Section header, one `{ key, label, text, isSelected, onClick, menu }` each; passed to the Section, which reads them as Section does |
 | `count` | node | — | How many rows match, such as "3 of 12", once a filter is applied; passed to the Section |
+| `onClearAll` | func | — | Runs when "Reset filters" is pressed; the button shows once a filter is applied; passed to the Section |
+| `isTitleHidden` | bool | — | Hides the title visually and keeps it as the Section's heading and accessible name; passed to the Section |
+| `level` | enum | — | `page` makes the title the page's h1; by default it nests one level down; passed to the Section |
 
 ## Variants
 
 **`kind`** — `static` · `dynamic` · `tree`
+
+**`level`** — `page`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
