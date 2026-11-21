@@ -231,7 +231,12 @@ function returnsOf(fn) {
   return out;
 }
 
-const keyName = (prop) => (prop.computed ? null : prop.key.type === 'Identifier' ? prop.key.name : prop.key.type === 'StringLiteral' ? prop.key.value : null);
+/** A style key's name; a computed key counts when it is a fixed string (`['color']`). */
+const keyName = ({ computed, key }) => {
+  if (key.type === 'StringLiteral') return key.value;
+  if (key.type === 'TemplateLiteral' && key.expressions.length === 0) return key.quasis[0].value.cooked;
+  return !computed && key.type === 'Identifier' ? key.name : null;
+};
 
 /**
  * The `[key, value source]` pairs a style expression can set: both branches of

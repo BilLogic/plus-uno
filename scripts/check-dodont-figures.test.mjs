@@ -142,6 +142,11 @@ test('printed examples: whitespace around style = does not hide it', () => {
   assert.ok(ex("export const A = () => <p\n  style=\n  {{ color: 'red' }} />;").some((m) => /`color`/.test(m)));
 });
 
+test('printed examples: a fixed computed key does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style={{ ['color']: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex('export const A = () => <p style={{ [`color`]: "red" }} />;').some((m) => /`color`/.test(m)));
+});
+
 test('printed examples: table layout keys are layout', () => {
   assert.deepEqual(ex("export const A = () => <table style={{ borderSpacing: 0, borderCollapse: 'collapse' }} />;"), []);
 });
