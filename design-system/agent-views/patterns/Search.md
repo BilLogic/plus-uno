@@ -120,6 +120,9 @@ Active is the one kind that ships: the rows are in hand and narrow as the person
 
 "Search students". The label is hidden, so the placeholder is what a person reads and what names the collapsed icon.
 
+Do: The placeholder names the scope: "Search students".
+Don't: "Search…" names nothing, so the field and its collapsed icon say nothing about what is searched.
+
 ### Add a scope filter when the search covers more than one kind of record. {#add-a-scope-filter-when-the-search-covers-more-than-one-kind-of-record}
 
 **Checked:** Review
@@ -131,6 +134,9 @@ The filter sits before the field with "All" first and selected, and each scope c
 **Checked:** Review
 
 "2 of 6 students", "0 of 6 students". The count lives in the results header, in words, and updates as the rows narrow.
+
+Do: The count in words: "2 of 6 students".
+Don't: "2 results": no total and no noun for a screen reader to announce.
 
 ### Answer no matches in the results body. {#answer-no-matches-in-the-results-body}
 

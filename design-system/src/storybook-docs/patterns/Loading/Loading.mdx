@@ -8,6 +8,7 @@ import { CODE, MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInB
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta title="Patterns/States/Loading" tags={['manifest']} />
 
@@ -76,6 +77,14 @@ Four kinds of wait. Each has its own shape in the 1 to 10 s band; the time bands
 <ComponentExample of={LoadingStories.KeyLongJob} title="A long job" />
 
 <ComponentExample of={LoadingStories.KeyMenuFailed} title="A menu that could not load" description="Click Retry in the menu to load the options." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Loading" tier="pattern" />
 
 </div>
 

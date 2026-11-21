@@ -27,6 +27,12 @@ GenerativeBorder reads these motion tokens and no literal duration or curve.
 | change | Load content | `--ds-motion-linear` | Its light travels while the AI drafts and stops when done. |
 | pulse | Load content | `--ds-motion-loop` | A pulse uses the loop. |
 
+## Alternatives
+
+- For a general wait, use `Spinner`.
+- For a wait where the layout is known, use `Skeleton`.
+- For a wait with measurable progress, use `ProgressBar`.
+
 ## Best practices
 
 ### Animate one thing at a time. {#animate-one-thing-at-a-time}
@@ -62,8 +68,8 @@ Don't: Two rings nested around the same content.
 
 ## Related
 
-- For the icons that start an AI action, use `AiIcon`.
-- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
+- `AiIcon`: use when an icon starts an AI action.
+- `Spinner`, `Skeleton` and `ProgressBar`: use when the wait is general, not the AI generating into content.
 
 Same group: `AiChat` · `AiIcon` · `AiMessage` · `PromptInput` · `PromptStarters` · `Suggestion`
 

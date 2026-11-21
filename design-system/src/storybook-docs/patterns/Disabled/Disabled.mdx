@@ -8,6 +8,7 @@ import { CODE, DimmedInMenuCase, LeftOutOfMenuCase, ReasonInCaptionCase, ReasonI
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta title="Patterns/States/Disabled" tags={['manifest']} />
 
@@ -69,6 +70,14 @@ Try these options in order; disable only when the earlier options do not fit.
 <ComponentExample of={DisabledStories.AnswerHidden} title="Hidden" description="Open More to see only the actions a tutor can take." />
 
 <ComponentExample of={DisabledStories.KeyLocked} title="Locked, not hidden" description={<>The Toolkit in the Sidebar during onboarding: the rows show, faded. The visible line that says what unlocks them is Planned <PlannedTag />.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Disabled" tier="pattern" />
 
 </div>
 

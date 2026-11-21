@@ -27,6 +27,11 @@ PromptStarters reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Swap content in place | `--ds-motion-appearance-fast` | Fade in place, staggered; picking one fills the composer. |
 
+## Alternatives
+
+- For a single follow-up during a conversation, use `Suggestion`.
+- For the field a selected starter fills, use `PromptInput`.
+
 ## Best practices
 
 ### Keep the label short, and put the prompt in `text`. {#keep-the-label-short-and-put-the-prompt-in-text}
@@ -69,8 +74,8 @@ no conditional wrapper is needed.
 
 ## Related
 
-- For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
-- For where a selected starter's text typically lands, see `PromptInput`.
+- `Suggestion`: use when a single follow-up prompt fits once a conversation is underway.
+- `PromptInput`: use when a selected starter's text needs somewhere to land.
 
 Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `Suggestion`
 

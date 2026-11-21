@@ -128,7 +128,7 @@ and every tag inside follows:
 
 `useTagContext()` reads the same value from inside a custom tag.
 
-### Let a label longer than 180 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-180-end-in-an-ellipsis-with-a-tooltip}
+### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip. {#let-a-label-longer-than-maxwidth-end-in-an-ellipsis-with-a-tooltip}
 
 The Tooltip is on only while the label is clipped, and a clipped tag is the one tab stop that reaches it. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 

@@ -78,7 +78,8 @@
 // Space motion. The Sidebar keeps its width and moves by its margin, so the Page beside it
 // narrows on the same clock and nothing inside the Sidebar reflows. Opening settles on
 // spatial.default, closing on spatial.fast to the edge. Floating, it slides over the Page.
-// What starts open on mount stays put; reduced motion (the person's setting or `data-reduced`) is instant.
+// What starts open on mount stays put; under reduced motion (the person's setting or `data-reduced`) it
+// fades in its final place on appearance.fast instead, never a cut.
 @keyframes plus-frame-sidebar-dock-in { from { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
 @keyframes plus-frame-sidebar-dock-out { to { margin-inline-start: calc(-1 * var(--frame-sidebar-width)); } }
 @keyframes plus-frame-sidebar-float-in { from { translate: -100% 0; } }
@@ -99,7 +100,13 @@
         pointer-events: none;
         animation: #{$exit} #{$exit-duration} #{$exit-easing} forwards;
     }
-    &[data-reduced='true'] { animation: none; }
+    // Reduced motion fades in the final place, never a cut.
+    &[data-reduced='true'][data-entering='true'] {
+        animation: plus-overlay-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+    &[data-reduced='true'][data-leaving='true'], &[data-reduced='true'][data-ending-style] {
+        animation: plus-overlay-fade-out var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+    }
 }
 
 .plus-frame__sidebar--docked { @include frame-space-motion(plus-frame-sidebar-dock-in, plus-frame-sidebar-dock-out); }
@@ -232,7 +239,7 @@
 // clock (spatial.slow), and leaves on spatial.default; its content fades in once the Page is
 // about 90% done (60% of the spring's settle time). Floating, it slides over the Page:
 // spatial.default in, spatial.fast out; under 1024, spatial.slow in and spatial.default out.
-// Reduced motion is instant.
+// Reduced motion fades in the final place on appearance.fast, never a cut.
 @keyframes plus-frame-panel-dock-in { from { width: 0; } }
 @keyframes plus-frame-panel-dock-out { to { width: 0; } }
 @keyframes plus-frame-panel-float-in { from { translate: 100% 0; } }

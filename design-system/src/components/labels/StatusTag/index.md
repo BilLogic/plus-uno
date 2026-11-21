@@ -63,7 +63,7 @@ A status is read at a glance; a sentence belongs in the row text.
 Do: On track.
 Don't: A sentence in the tag.
 
-### Let a label longer than 200 end in an ellipsis with a Tooltip. {#let-a-label-longer-than-200-end-in-an-ellipsis-with-a-tooltip}
+### Let a label longer than `maxWidth` end in an ellipsis with a Tooltip. {#let-a-label-longer-than-maxwidth-end-in-an-ellipsis-with-a-tooltip}
 
 The Tooltip is on only while the label is clipped. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 

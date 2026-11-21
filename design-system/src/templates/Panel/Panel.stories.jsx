@@ -360,8 +360,9 @@ export const KeyRecordGone = {
     play: async ({ canvasElement }) => {
         await expectFloating(canvasElement);
         const { panel } = frameParts(canvasElement);
-        await expect(within(panel()).getByText('This session no longer exists')).toBeVisible();
-        await expect(within(panel()).getByRole('button', { name: 'Back to sessions' }), 'a way back').toBeVisible();
+        // The Panel fades in under reduced motion, so wait for it to finish.
+        await waitFor(() => expect(within(panel()).getByText('This session no longer exists')).toBeVisible());
+        await waitFor(() => expect(within(panel()).getByRole('button', { name: 'Back to sessions' }), 'a way back').toBeVisible());
     },
 };
 

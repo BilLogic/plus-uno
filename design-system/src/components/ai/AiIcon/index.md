@@ -16,6 +16,11 @@ An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or st
 
 Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.
 
+## Alternatives
+
+- For an action that is not an AI action, use `Icon`.
+- For the border that shows generation in progress, use `GenerativeBorder`.
+
 ## Best practices
 
 ### Pair it with visible text, or give it a `label`. {#pair-it-with-visible-text-or-give-it-a-label}
@@ -46,8 +51,8 @@ Don't: The sparkle on an action that is not AI.
 
 ## Related
 
-- For any non-AI icon, use a Font Awesome Free glyph.
-- For the border that shows generation in progress, use `GenerativeBorder`.
+- Font Awesome Free glyph: use when the action is not an AI action.
+- `GenerativeBorder`: use when the AI is generating into a piece of content.
 
 Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 

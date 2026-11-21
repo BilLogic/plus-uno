@@ -70,6 +70,15 @@ Use Loading while someone waits for a fetch or save. Choose the indicator by wha
 - Errors: use when the load fails.
 - Notifications: use for the Flag past 10 s.
 
+## Motion
+
+Loading reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| load | Load content | `--ds-motion-linear` · `--ds-motion-appearance-fast` | The Skeleton shimmers on linear in the real shape; the content fades in over it in load order. The shimmer stops in Reduced mode. |
+| action | Update a value or state | `--ds-motion-appearance-fast` | A button action keeps the button's width: its label fades out and a Spinner fades in. |
+
 ## Best practices
 
 ### Show nothing new under 1 s. {#show-nothing-new-under-1-s}

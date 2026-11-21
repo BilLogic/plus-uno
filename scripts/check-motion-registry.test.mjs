@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { BASELINE, interactiveComponents, patternPages, run, validTokens } from './check-motion-registry.mjs';
+import { BASELINE, interactiveComponents, motionSectionPages, patternPages, run, validTokens } from './check-motion-registry.mjs';
 
 const INDEX = '## UI components (3)\n\n- [Button](../x/Button/index.md)\n- [Popup](../x/Popup/index.md)\n- [Heading](../x/Heading/index.md)\n- Logo — exported here\n\n## Before you finish\n- [Nope](../n.md)\n';
 
@@ -72,7 +72,7 @@ test('an event naming a transition outside the 14 locked transitions fails with 
     { name: 'Card', tier: 'template', events: { milestone: { transition: 'Opening a page', spatial: 'spatial.default' } } },
     { name: 'Filtering', tier: 'pattern', events: { change: { appearance: 'appearance.fast' } } },
   ];
-  const f = run({ repoRoot: root, index: INDEX, registry: bad, patterns: ['Filtering'] });
+  const f = run({ repoRoot: root, index: INDEX, registry: bad, patterns: ['Filtering'], motionSections: new Set(['Filtering']) });
   assert.equal(f.length, 3, JSON.stringify(f));
   assert.match(f[0].message, /Popup/);
   assert.match(f[0].message, /component/);
@@ -95,7 +95,7 @@ test('a component row with a sound field passes; sound is ignored', () => {
 
 test('a pattern row passes without being in the component index', () => {
   const root = scratch(['Button', 'Popup']);
-  const f = run({ repoRoot: root, index: INDEX, registry: [withEvent('Wizard', { spatial: 'spatial.fast' }, 'pattern'), withEvent('Home', { appearance: 'linear' }, 'template')] });
+  const f = run({ repoRoot: root, index: INDEX, registry: [withEvent('Wizard', { spatial: 'spatial.fast' }, 'pattern'), withEvent('Home', { appearance: 'linear' }, 'template')], motionSections: new Set(['Wizard']) });
   assert.ok(!f.some((x) => /Wizard|Home/.test(x.message)), JSON.stringify(f));
 });
 
@@ -139,7 +139,29 @@ test('a Patterns page with no pattern row fails', () => {
 
 test('a Patterns page with a pattern row passes', () => {
   const root = scratch(['Button', 'Popup']);
-  assert.deepEqual(run({ repoRoot: root, index: INDEX, registry: [patternRow('Filtering')], patterns: ['Filtering'] }), []);
+  assert.deepEqual(run({ repoRoot: root, index: INDEX, registry: [patternRow('Filtering')], patterns: ['Filtering'], motionSections: new Set(['Filtering']) }), []);
+});
+
+test('a pattern row whose page renders no MotionSection fails', () => {
+  const root = scratch(['Button', 'Popup']);
+  const f = run({ repoRoot: root, index: INDEX, registry: [patternRow('Filtering')], patterns: ['Filtering'], motionSections: new Set() });
+  assert.ok(f.some((x) => /Patterns page "Filtering" has motion registry rows but no <MotionSection/.test(x.message)));
+});
+
+test('motionSectionPages reads each pattern MotionSection by component name', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'motion-sections-'));
+  const dir = path.join(root, 'design-system/src/storybook-docs/patterns/CommonActions');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'CommonActions.mdx'), '<Meta title="Patterns/Common actions" />\n<MotionSection component="Common actions" tier="pattern" />');
+  assert.deepEqual([...motionSectionPages(root)], ['Common actions']);
+});
+
+test('a MotionSection on another page does not count for the page it names', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'motion-sections-'));
+  const dir = path.join(root, 'design-system/src/storybook-docs/patterns/Errors');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'Errors.mdx'), '<Meta title="Patterns/States/Errors" />\n<MotionSection component="Errors" tier="pattern" />\n<MotionSection component="Empty" tier="pattern" />');
+  assert.deepEqual([...motionSectionPages(root)], ['Errors']);
 });
 
 test('a template row of the same name does not satisfy a Patterns page', () => {

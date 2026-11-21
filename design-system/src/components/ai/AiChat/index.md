@@ -49,6 +49,12 @@ AiChat reads these motion tokens and no literal duration or curve.
 | enter | Open and close an overlay | `--ds-motion-appearance-fast` | Opens as a Popup: a fade in place. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 
+## Alternatives
+
+- For one reply on its own, use `AiMessage`.
+- For the field alone, use `PromptInput`.
+- For suggested prompts before anyone types, use `PromptStarters`.
+
 ## Best practices
 
 ### Use the popup for quick asks. {#use-the-popup-for-quick-asks}
@@ -89,10 +95,10 @@ Don't: An answer from records with nothing to check it against.
 
 ## Related
 
-- Frame places the Panel the chat docks in.
-- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.
-- For one reply on its own, use `AiMessage`.
-- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
+- Frame: use when the chat docks in a Panel beside the Page; the Panel never draws a Blanket and the Page stays in view.
+- `AiMessage`: use when one reply stands on its own.
+- `PromptInput`: use when only the field is needed.
+- `PromptStarters`: use when people need suggested prompts before they type.
 
 Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 
