@@ -26,7 +26,7 @@ export const CODE = showCode(examplesSource, [
 /** The stand-in screen the Blanket is drawn on, scaled to the example's card so the Modal's width step reads against it. */
 const OnScreen = ({ children }) => (
     <FitStage width={SCREEN.width} reflow={false}>
-        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': '300px' }}>
+        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': '300px' /* demo frame */ }}>
             {children}
         </div>
     </FitStage>

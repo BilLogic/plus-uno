@@ -168,7 +168,7 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 "Show n more" carries the count and "Show less" closes; there is no dedicated component, so build both from a Button. A Tag group folds into +n today. A table pages in its footer instead of growing. No gradients, fades or inner scroll.
 
 Do: A button under the list that names how many more it holds, and the list grows in place.
-Don't: A fade over the list, hiding how much is there.
+Don't: A fade over the list, hiding how much is there; the fade is staged here, so this side prints no code.
 
 ## In code
 

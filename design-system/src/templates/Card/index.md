@@ -90,7 +90,7 @@ A title takes more lines and never ends in an ellipsis; the actions stay at the 
 
 A card's fill and edge are its own object boundary. Group related cards in a Section instead.
 
-Do: One card; three metrics stacked in its body, split by dividers.
+Do: One card; three metrics stacked in its body, spaced by the card's own rhythm.
 Don't: Three mini cards inside the card; borders and shadows pile up and the hierarchy flattens.
 
 ### Keep the card in place while it loads. {#keep-the-card-in-place-while-it-loads}

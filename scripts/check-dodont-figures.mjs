@@ -34,11 +34,27 @@
  * itself still takes the helper, never a styled wrapper, and svg, img, hex and
  * captions are checked everywhere. Pattern and component pages have no exemption.
  *
+ * PRINTED EXAMPLES. A page prints its `*Examples.jsx` as the code a consumer
+ * writes, so that code teaches. Its inline `style` may set layout on tokens
+ * (flex, grid, gap, alignment, size, margin, padding) and must not set color,
+ * type, radius or elevation: text takes a type utility class (`.body-default`,
+ * `.heading-sm`, `.metric-md`), which brings the letter spacing with it. The
+ * file is parsed, so both branches of a conditional, a spread, and a style
+ * named, called or picked off an object in the same file are all followed.
+ * `borderSpacing` and `borderCollapse` arrange a table's cells, so they are
+ * layout; a border key set to `0` or `none` clears a side and passes.
+ *
+ * The parser is `@babel/parser`, a root devDependency the harness job installs
+ * among its pinned packages. Without it the check fails and says so; it never
+ * passes unread.
+ *
  * WHAT IT CANNOT SEE. Whether the two halves of a pair show the same
  * component, and whether a live figure is the right one: those are a reader's
  * judgment, so they live in the docs review, not in an exit code. A helper
  * defined in another file is not followed.
  */
+import { createRequire } from 'node:module';
+
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { attrsOf, readElement } from './lib/docs-page.mjs';
 import { main } from './lib/findings.mjs';
@@ -178,6 +194,146 @@ export function checkSource(source, { file = '' } = {}) {
   return problems;
 }
 
+/** Style keys a printed example may not set: color, type, radius, elevation. */
+const NOT_LAYOUT = /^(color|background\w*|fill|stroke|opacity|font\w*|letterSpacing|lineHeight|text(?:Transform|Decoration\w*|Shadow|Indent|Emphasis\w*)|border\w*Radius|border\w*Radius\w*|boxShadow|filter|backdropFilter|outline\w*|border\w*)$/;
+/** Border keys that arrange a table's cells rather than draw a line. */
+const TABLE_LAYOUT = new Set(['borderSpacing', 'borderCollapse']);
+const NOT_LAYOUT_KEY = (key, value) => {
+  if (TABLE_LAYOUT.has(key)) return false;
+  if (key === 'border' || /^border(Block|Inline|Top|Bottom|Left|Right)?(Start|End)?$/.test(key)) return !/^\s*(0|none|['"]none['"]|['"]0['"])\s*$/.test(value);
+  return NOT_LAYOUT.test(key);
+};
+
+const require = createRequire(import.meta.url);
+
+/**
+ * `parse` from the root devDependency `@babel/parser`, or a thrown error that
+ * names the fix: the check fails rather than pass a tree it could not read.
+ */
+export function loadParser(load = () => require('@babel/parser')) {
+  try {
+    return load().parse;
+  } catch (error) {
+    throw new Error(`check:dodont-figures cannot load @babel/parser: run \`npm ci\` at the repo root. (${error.message.split('\n')[0]})`);
+  }
+}
+
+let parseCache;
+
+/** Every node under `node`, depth first. */
+function* walk(node) {
+  if (!node || typeof node.type !== 'string') return;
+  yield node;
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key === 'leadingComments' || key === 'trailingComments' || key === 'innerComments' || key === 'extra') continue;
+    if (Array.isArray(value)) for (const child of value) yield* walk(child);
+    else if (value && typeof value.type === 'string') yield* walk(value);
+  }
+}
+
+/** Every `const|let|var name = init` and `function name` in the file, by name. */
+function bindingsOf(ast) {
+  const out = new Map();
+  const add = (name, node) => out.set(name, [...(out.get(name) ?? []), node]);
+  for (const node of walk(ast)) {
+    if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init) add(node.id.name, node.init);
+    if (node.type === 'FunctionDeclaration' && node.id) add(node.id.name, node);
+  }
+  return out;
+}
+
+/** The expressions a function can return. */
+function returnsOf(fn) {
+  if (!fn.body) return [];
+  if (fn.body.type !== 'BlockStatement') return [fn.body];
+  const out = [];
+  for (const node of walk(fn.body)) if (node.type === 'ReturnStatement' && node.argument) out.push(node.argument);
+  return out;
+}
+
+/** A fixed string a key or index names (`'color'`, `` `color` ``), or null. */
+const fixedText = (node) => {
+  if (node?.type === 'StringLiteral') return node.value;
+  if (node?.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0].value.cooked;
+  return null;
+};
+
+/** A style key's name; a computed key counts when it is a fixed string (`['color']`). */
+const keyName = ({ computed, key }) => (!computed && key.type === 'Identifier' ? key.name : fixedText(key));
+
+/**
+ * The `[key, value source]` pairs a style expression can set: both branches of
+ * a conditional, spreads, `&&` / `||` / `??`, and names, members and calls
+ * bound in the same file are followed.
+ */
+function styleEntries(ctx, node, seen = new Set()) {
+  if (!node || seen.has(node)) return [];
+  seen.add(node);
+  const next = (n) => styleEntries(ctx, n, seen);
+  switch (node.type) {
+    case 'ObjectExpression':
+      return node.properties.flatMap((prop) => {
+        if (prop.type === 'SpreadElement') return next(prop.argument);
+        if (prop.type !== 'ObjectProperty') return [];
+        const key = keyName(prop);
+        return key ? [[key, ctx.source.slice(prop.value.start, prop.value.end)]] : [];
+      });
+    case 'ConditionalExpression':
+      return [...next(node.consequent), ...next(node.alternate)];
+    case 'LogicalExpression':
+      return node.operator === '&&' ? next(node.right) : [...next(node.left), ...next(node.right)];
+    case 'ParenthesizedExpression':
+    case 'TSAsExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSNonNullExpression':
+      return next(node.expression);
+    case 'Identifier':
+      return (ctx.bindings.get(node.name) ?? []).flatMap(next);
+    case 'ArrowFunctionExpression':
+    case 'FunctionExpression':
+    case 'FunctionDeclaration':
+      return returnsOf(node).flatMap(next);
+    case 'CallExpression':
+      return node.callee.type === 'Identifier' ? next(node.callee) : [];
+    case 'MemberExpression': {
+      const name = node.computed ? fixedText(node.property) : node.property.name;
+      if (name === null) return [];
+      const objects = node.object.type === 'Identifier' ? ctx.bindings.get(node.object.name) ?? [] : [node.object];
+      return objects.flatMap((obj) => (obj.type === 'ObjectExpression' ? obj.properties : [])
+        .filter((prop) => prop.type === 'ObjectProperty' && keyName(prop) === name)
+        .flatMap((prop) => next(prop.value)));
+    }
+    default:
+      return [];
+  }
+}
+
+/**
+ * Every problem in one printed `*Examples.jsx`: an inline style that sets color, type, radius or elevation.
+ *
+ * @returns {{ line: number, message: string }[]}
+ */
+export function checkExamplesSource(source) {
+  const parse = (parseCache ??= loadParser());
+  let ast;
+  try {
+    ast = parse(source, { sourceType: 'module', plugins: ['jsx'], errorRecovery: true });
+  } catch (error) {
+    return [{ line: error.loc?.line ?? 1, message: `printed example does not parse: ${error.message}` }];
+  }
+  const problems = (ast.errors ?? []).map((error) => ({ line: error.loc?.line ?? 1, message: `printed example does not parse: ${error.message}` }));
+  const ctx = { source, bindings: bindingsOf(ast) };
+  for (const node of walk(ast.program)) {
+    if (node.type !== 'JSXAttribute' || node.name.type !== 'JSXIdentifier' || node.name.name !== 'style') continue;
+    if (node.value?.type !== 'JSXExpressionContainer') continue;
+    const line = node.loc.start.line;
+    for (const [key, value] of styleEntries(ctx, node.value.expression)) {
+      if (NOT_LAYOUT_KEY(key, value)) problems.push({ line, message: `printed example style sets \`${key}\`; style may set layout on tokens only, so text takes a type class such as .body-default and color, radius and elevation come from the component` });
+    }
+  }
+  return problems;
+}
+
 /** Every docs page and story source under the design-system source, tracked and still on disk. */
 const sources = (repoRoot) => trackedSources(repoRoot, [SRC], /\.(mdx|jsx)$/).filter(({ path: file }) => !/\.test\.jsx$/.test(file));
 
@@ -185,6 +341,7 @@ const sources = (repoRoot) => trackedSources(repoRoot, [SRC], /\.(mdx|jsx)$/).fi
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const findings = [];
   for (const { path: file, text: source } of sources(repoRoot)) {
+    if (/Examples\.jsx$/.test(file)) for (const { line, message } of checkExamplesSource(source)) findings.push({ file, line, message });
     if (DEFINITIONS.has(file)) continue;
     if (!/\bDo(Dont)?\b|DoDontPair|DoDontCard|<Dont\b/.test(source)) continue;
     for (const { line, message } of checkSource(source, { file })) findings.push({ file, line, message });
@@ -195,7 +352,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 export const REMEDY =
   '  -> A Do or Don\'t figure is a live PLUS component or an illustration-kit drawing,\n'
   + '     with no inline style: arrange several parts with <FigureRow> or <FigureStack>\n'
-  + '     (storybook-docs/ds-docs-layout.jsx). Put one sentence under it as the caption.';
+  + '     (storybook-docs/ds-docs-layout.jsx). Put one sentence under it as the caption.\n'
+  + '     A printed *Examples.jsx style sets layout on tokens only: text takes a type class\n'
+  + '     (.body-default), never color, font, radius or shadow.';
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   let blocks = 0;

@@ -40,8 +40,6 @@ export const CODE = showCode(examplesSource, [
     'DetailsInModal',
     'OneFloatingPanel',
     'TwoFloatingPanels',
-    'BesideAiPanel',
-    'CoversAiPanel',
     'ReadingNoFooter',
     'ReadingNarrow',
     'ReadingWithFooter',
@@ -93,8 +91,24 @@ export const OneFloatingPanel = () => <Floating example={Example.OneFloatingPane
 /** Two Panels open at once, the second covering the first. */
 export const TwoFloatingPanels = () => <Floating example={Example.TwoFloatingPanels} />;
 
-/** The floating Panel sits beside the docked AI panel, both fully visible. */
-export const BesideAiPanel = () => <FloatStage><Example.BesideAiPanel /></FloatStage>;
+/** Where each Panel sits on the demo stage: the docked AI panel at the end, the floating one on its shadow. */
+const STAGE_END = { position: 'absolute', insetBlock: 0, insetInlineEnd: 0, display: 'flex', maxInlineSize: '100%' };
+const STAGE_FLOATING = { ...STAGE_END, boxShadow: 'var(--ds-shadow-overlay)' };
+
+/** The floating Panel sits beside the docked AI panel, both fully visible. A composition: the Frame has one Panel area, so this pair prints no code. */
+export const BesideAiPanel = () => (
+    <FloatStage>
+        <Example.SessionsBehind />
+        <div style={STAGE_END}><Example.AssistantPanel /></div>
+        <div style={{ ...STAGE_FLOATING, insetInlineEnd: 'var(--panel-width-default)' }}><Example.DetailsPanel /></div>
+    </FloatStage>
+);
 
 /** The floating Panel drawn over the docked AI panel, hiding part of it. */
-export const CoversAiPanel = () => <FloatStage><Example.CoversAiPanel /></FloatStage>;
+export const CoversAiPanel = () => (
+    <FloatStage>
+        <Example.SessionsBehind />
+        <div style={STAGE_END}><Example.AssistantPanel /></div>
+        <div style={{ ...STAGE_FLOATING, insetInlineEnd: 'var(--inline-3xl)' }}><Example.DetailsPanel /></div>
+    </FloatStage>
+);

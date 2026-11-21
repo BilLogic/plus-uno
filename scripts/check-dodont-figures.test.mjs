@@ -9,7 +9,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { captionText, checkSource, helperBody, isFoundationFile, isRunOn, run, summary } from './check-dodont-figures.mjs';
+import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, loadParser, run, summary } from './check-dodont-figures.mjs';
 
 const pair = (extra = '', doEx = '<Button label="Save" />', dontEx = '<Button label="OK" />') =>
   `<DoDontPair\n  doExample={${doEx}}\n  doCaption="Name the action."\n  dontExample={${dontEx}}\n  dontCaption="Say nothing about it."\n  ${extra}\n/>`;
@@ -97,6 +97,93 @@ test('helperBody reads the whole definition and nothing after it', () => {
   assert.ok(helperBody(src, 'AFigure').includes('<div>'));
   assert.ok(!helperBody(src, 'AFigure').includes('style'));
   assert.equal(helperBody(src, 'MissingFigure'), '');
+});
+
+const ex = (src) => checkExamplesSource(src).map((p) => p.message);
+
+test('printed examples: layout on tokens is silent, the green twin', () => {
+  assert.deepEqual(ex("export const A = () => <div style={{ display: 'flex', gap: 'var(--stack-sm)', alignItems: 'center' }}><p className=\"body-default\">x</p></div>;"), []);
+  assert.deepEqual(ex("const column = { display: 'grid', gap: 'var(--stack-md)' };\nexport const A = () => <div style={column} />;"), []);
+  assert.deepEqual(ex("export const A = () => <fieldset style={{ margin: 0, padding: 0, border: 0 }} />;"), []);
+});
+
+test('printed examples: color, type, radius and elevation fail, inline or through a named style', () => {
+  const bad = { color: "color: 'var(--ds-text)'", font: "font: 'var(--body-default)'", letterSpacing: "letterSpacing: 'x'", fontVariantNumeric: "fontVariantNumeric: 'tabular-nums'", borderRadius: "borderRadius: 'var(--radius-md)'", boxShadow: "boxShadow: 'var(--ds-shadow-overlay)'", background: "background: 'var(--ds-surface)'", border: "border: '1px solid var(--ds-border)'" };
+  for (const [key, decl] of Object.entries(bad)) {
+    assert.ok(ex(`export const A = () => <p style={{ margin: 0, ${decl} }} />;`).some((m) => m.includes(`\`${key}\``)), key);
+  }
+  assert.ok(ex("const subtle = { color: 'var(--ds-text-subtle)' };\nexport const A = () => <p style={{ ...subtle }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("const clip = { overflow: 'hidden', font: 'var(--body-sm)' };\nexport const A = () => <p style={clip} />;").some((m) => /`font`/.test(m)));
+});
+
+test('printed examples: a conditional style is read on both branches', () => {
+  assert.ok(ex("export const A = ({ ok }) => <p style={ok ? { color: 'red' } : {}} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = ({ ok }) => <p style={ok ? {} : { color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.deepEqual(ex("export const A = ({ ok }) => <p style={ok ? { gap: 'var(--stack-sm)' } : {}} />;"), []);
+});
+
+test('printed examples: a conditional spread is followed', () => {
+  assert.ok(ex("export const A = ({ ok }) => <p style={{ margin: 0, ...(ok ? { color: 'red' } : {}) }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = ({ ok }) => <p style={{ margin: 0, ...(ok && { font: 'var(--body-sm)' }) }} />;").some((m) => /`font`/.test(m)));
+});
+
+test('printed examples: a named conditional style is followed', () => {
+  assert.ok(ex("const tone = (ok) => (ok ? { color: 'red' } : {});\nconst look = ok ? { boxShadow: 'x' } : { gap: 0 };\nexport const A = () => <p style={look} />;").some((m) => /`boxShadow`/.test(m)));
+  assert.ok(ex("const quiet = { color: 'red' };\nconst loud = { gap: 0 };\nexport const A = ({ ok }) => <p style={ok ? quiet : loud} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a comment before a property does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style={{ margin: 0, /* tone */ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = () => <p style={{\n  // tone\n  color: 'red',\n}} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: whitespace around style = does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style = {{ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("export const A = () => <p\n  style=\n  {{ color: 'red' }} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a fixed computed key does not hide it', () => {
+  assert.ok(ex("export const A = () => <p style={{ ['color']: 'red' }} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex('export const A = () => <p style={{ [`color`]: "red" }} />;').some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: table layout keys are layout', () => {
+  assert.deepEqual(ex("export const A = () => <table style={{ borderSpacing: 0, borderCollapse: 'collapse' }} />;"), []);
+});
+
+test('printed examples: a hairline from a class may zero the other sides', () => {
+  assert.deepEqual(ex("export const A = () => <div className=\"border-outline-variant\" style={{ borderInline: 0, borderBlockEnd: 0 }} />;"), []);
+});
+
+test('printed examples: the line of a finding is the style attribute line', () => {
+  assert.deepEqual(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: 'red' }} />;").map((p) => p.line), [2]);
+});
+
+test('printed examples: the parser is @babel/parser, and its absence fails loudly', () => {
+  assert.equal(typeof loadParser(), 'function');
+  const missing = () => { throw new Error("Cannot find module '@babel/parser'"); };
+  assert.throws(() => loadParser(missing), /check:dodont-figures cannot load @babel\/parser: run `npm ci`.*Cannot find module/s);
+});
+
+test('printed examples: a shorthand property is read by its name', () => {
+  assert.ok(ex("const color = 'red';\nexport const A = () => <p style={{ color }} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a member style is followed, dotted or by a fixed key', () => {
+  assert.ok(ex("const s = { quiet: { color: 'red' } };\nexport const A = () => <p style={s.quiet} />;").some((m) => /`color`/.test(m)));
+  assert.ok(ex("const s = { quiet: { color: 'red' } };\nexport const A = () => <p style={s['quiet']} />;").some((m) => /`color`/.test(m)));
+});
+
+test('printed examples: a style returned by a call is followed', () => {
+  assert.ok(ex("function tone() { return { boxShadow: 'x' }; }\nexport const A = () => <p style={tone()} />;").some((m) => /`boxShadow`/.test(m)));
+});
+
+test('printed examples: a file that does not parse is a finding on its line', () => {
+  assert.ok(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: }} />;").some((p) => p.line === 2 && /does not parse/.test(p.message)));
+});
+
+test('printed examples: the real tree is clean', () => {
+  assert.deepEqual(run().filter((f) => /Examples\.jsx$/.test(f.file)), []);
 });
 
 test('a fixture root: only tracked pages are read, never a second copy of the tree', () => {

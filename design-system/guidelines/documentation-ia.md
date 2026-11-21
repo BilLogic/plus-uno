@@ -154,6 +154,8 @@ Every Do and Don't goes through `Do`, `Dont`, `DoDont` or `DoDontPair`, and the 
 
 `npm run check:dodont-figures` follows a `<XFigure />` helper to its definition in the same file and fails on a figure (or helper) with an inline style (except in a named `*Figure` helper on a Foundations page), an `<svg>`, an `<img>` or a hex color, on a missing or two-sentence caption, and on `stacked` with no reason.
 
+**Printed examples.** A page's `*Examples.jsx` is the code a consumer copies. Its inline `style` may set layout on tokens (flex, grid, gap, alignment, size, margin, padding) and must not set color, type, radius or elevation. Text takes the type utility class (`.body-default`, `.heading-sm`, `.metric-md`), which brings its letter spacing along; subtle text adds `.color-secondary`, and a hairline comes from a border class (`.border-outline-variant`) with the unwanted sides set to `0`. A figure that needs more than layout (a fade, a hand-positioned stage) is staged in the page's `*Cases.jsx` and prints no Show code. `check:dodont-figures` reads every `*Examples.jsx` and fails on a `style` that sets one of those, whether written inline or named in the same file.
+
 ## Spacing
 
 A docs page groups its content the way a PLUS page does, on the app's Page and Section token roles (Spacing foundation). The rules live in one file, `design-system/src/storybook-docs/docs-rhythm.css`, and apply to component, foundation and prose pages alike:

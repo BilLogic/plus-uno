@@ -95,7 +95,7 @@ Don't: A footer of buttons on a Panel that is only read.
 
 A floating Panel and the docked AI panel sit side by side. The AI panel is never covered. This pair is Planned.
 
-The docked AI panel here is a second Panel in the docked slot; its own placement beside a floating Panel is not built yet.
+The docked AI panel here is a second Panel in the docked slot; its own placement beside a floating Panel is not built yet. This pair is a composition, so it prints no code.
 
 Do: The floating Panel beside the docked AI panel, both fully visible.
 Don't: The floating Panel drawn over the AI panel, hiding part of it.

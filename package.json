@@ -149,6 +149,7 @@
   "author": "PLUS Design Team",
   "license": "ISC",
   "devDependencies": {
+    "@babel/parser": "^7.29.14",
     "@storybook/addon-a11y": "^10.6.7",
     "@storybook/addon-docs": "^10.6.7",
     "@storybook/addon-links": "^10.6.7",

@@ -20,6 +20,7 @@ import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.js
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
 import * as FullSizeCases from './FrameCases.jsx';
+import * as FrameExample from './FrameExamples.jsx';
 
 /**
  * Frame — the app frame: the Sidebar beside the Page (and the Panel). Open, the Sidebar's own toggle ends its logo row; closed, the
@@ -2911,3 +2912,38 @@ export const MultiStepFooterLevelAt1440 = { ...footerLevelAt(1440), name: 'Layou
 
 /** 1280: the multi-step footer's line sits level with the Sidebar account row's. */
 export const MultiStepFooterLevelAt1280 = { ...footerLevelAt(1280), name: 'Layout: Multi-step footer level at 1280' };
+
+/**
+ * The printed multi-step example (Show code on the Frame page) at a docked
+ * width: its footer's top line is the same width and color as the line above
+ * the Sidebar's account row, at the same y, and the footer is 52 under it.
+ */
+const exampleFooterLevelAt = (width) => ({
+    parameters: { frameWidth: width },
+    render: () => <div style={{ height: HEIGHT }}><FrameExample.MultiStepInnerSidebar /></div>,
+    play: async ({ canvasElement }) => atViewport(width, async () => {
+        const frame = canvasElement.querySelector('.plus-frame');
+        const account = await waitFor(() => {
+            const row = canvasElement.querySelector('.plus-sidebar-account');
+            expect(row, `the Sidebar docks at ${width}`).not.toBeNull();
+            return row;
+        });
+        const footer = within(canvasElement).getByRole('link', { name: 'Save and exit' }).closest('div[style*="--frame-footer-height"]');
+        const hairline = tokenLength(frame, '--border-width-default');
+        const line = getComputedStyle(footer);
+        const accountLine = getComputedStyle(account);
+        await expect(px(line.borderTopWidth), 'the footer draws a hairline on top').toBeCloseTo(hairline, 1);
+        await expect(line.borderTopStyle, 'a solid line').toBe('solid');
+        await expect(line.borderTopColor, 'the same color as the account row line').toBe(accountLine.borderTopColor);
+        for (const side of ['Right', 'Bottom', 'Left']) await expect(px(line[`border${side}Width`]), `no ${side.toLowerCase()} edge`).toBe(0);
+        await expect(rect(footer).top, 'the footer line is level with the account row line').toBeCloseTo(rect(account).top, 0);
+        await expect(rect(footer).height, 'the footer is 52 under its hairline').toBeCloseTo(tokenLength(frame, '--frame-footer-height') + hairline, 0);
+        await expect(rect(footer).bottom, 'the footer runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
+    }),
+});
+
+/** 1440: the printed multi-step example's footer line sits level with the Sidebar account row's. */
+export const MultiStepExampleFooterLevelAt1440 = { ...exampleFooterLevelAt(1440), name: 'Layout: Multi-step example footer level at 1440' };
+
+/** 1280: the printed multi-step example's footer line sits level with the Sidebar account row's. */
+export const MultiStepExampleFooterLevelAt1280 = { ...exampleFooterLevelAt(1280), name: 'Layout: Multi-step example footer level at 1280' };

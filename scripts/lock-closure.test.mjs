@@ -73,6 +73,11 @@ test('the parser the contrast checks read with closes over this lock', () => {
   for (const name of ['postcss', 'postcss-scss', 'postcss-selector-parser']) assert.ok(pins.has(name), name);
 });
 
+test('the JSX parser check:dodont-figures reads with closes over this lock', () => {
+  const pins = lockClosure(readLock(), ['@babel/parser']);
+  for (const name of ['@babel/parser', '@babel/types']) assert.ok(pins.has(name), name);
+});
+
 test('a nested closure keeps two versions of one name at their own paths, for npm ci', () => {
   const lock = {
     'node_modules/a': { version: '1.0.0', dependencies: { b: '*', c: '*' }, dev: true },

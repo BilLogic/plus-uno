@@ -65,7 +65,7 @@ export const ClippedCellNoText = () => <NotesTable note={<span style={clipStyle}
 
 const listStyle = { margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' };
 
-const StudentList = ({ count }) => (
+export const StudentList = ({ count }) => (
     <ul style={listStyle} aria-label="Students">
         {STUDENTS.slice(0, count).map(([name, grade]) => (
             <li key={name}>{name}, {grade}</li>
@@ -91,21 +91,3 @@ export const ShowMoreWithCount = () => {
         </Section>
     );
 };
-
-export const FadedList = () => (
-    <Section title="Students">
-        <div style={{ position: 'relative' }}>
-            <StudentList count={4} />
-            <div
-                aria-hidden="true"
-                style={{
-                    position: 'absolute',
-                    insetInline: 0,
-                    insetBlockEnd: 0,
-                    blockSize: 'calc(var(--control-lg) * 3)',
-                    backgroundImage: 'linear-gradient(to bottom, transparent, var(--ds-surface))',
-                }}
-            />
-        </div>
-    </Section>
-);

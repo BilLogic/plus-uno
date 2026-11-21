@@ -19,6 +19,8 @@ import { CODE as tableCode } from './Table/TableCases.jsx';
 
 // The Case guard names docs wrappers (SectionCase); a lowercase-led word like toLowerCase is consumer code.
 const DOCS_ONLY = /\b[A-Z]\w*Case\b|storybook-docs|section-header|view-bar|SectionActions|ViewPills|FormatSwitch|HeaderSearch|StudentsTable|ScreenStage|InAppFrame|sb-unstyled|HeadingLevelContext|\b(inline|titleAs|triggerType)=|\bisOpen\b(?!=\{(?!true\b))|\bshow=(?!\{(?!true\b)\w+\})|\bdefaultShow\b/; // `show={open}` and `isOpen={open}` are a Modal's and a PanelOverlay's own open state, consumer code
+/** A pair of hand-staged Panels (the Frame has one Panel area) prints no code, and says so. */
+const COMPOSITIONS = ['BesideAiPanel'];
 const ALLOWED = new Set(['react', '@/components', '@/templates']);
 
 const pages = [
@@ -58,6 +60,10 @@ describe.each(pages)('%s page printed code', (name, code) => {
         const pairs = mdx.split('<DoDontPair').slice(1).map((chunk) => chunk.split('\n/>')[0]);
         expect(pairs.length).toBeGreaterThan(0);
         for (const pair of pairs) {
+            if (COMPOSITIONS.some((example) => pair.includes(`doExample={<${example} />}`))) {
+                expect(pair).not.toMatch(/(?:do|dont)Code=/);
+                continue;
+            }
             expect(pair).toMatch(/doCode=\{CODE\.\w+\}/);
             expect(pair).toMatch(/dontCode=\{CODE\.\w+\}/);
             for (const [, key] of pair.matchAll(/(?:do|dont)Code=\{CODE\.(\w+)\}/g)) {
