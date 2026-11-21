@@ -88,7 +88,7 @@ spoken out loud.
 
 **Pattern pages take the same template.** A pattern in its own folder,
 `patterns/<Name>/<Name>.mdx`, has the same four faces, and its Harness shows
-the `index.md` the generator writes beside it. A docs-only pattern page with no
+the `design-system/agent-views/patterns/<Name>.md` the generator writes. A docs-only pattern page with no
 component of its own (Templates, Popups) has no generated file, so it shows
 Examples · Code · Usage. The flat reading pages directly under `patterns/` have no Usage spine and stay untabbed.
 
