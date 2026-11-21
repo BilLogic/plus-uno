@@ -3,50 +3,66 @@ import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import './Image.scss';
 
-export const IMAGE_SIZES = ['fixed', 'fluid'];
+export const IMAGE_FITS = ['natural', 'container'];
+
+/** Deprecated `size` values, mapped to their `fit`. Remove with `size` after one release. */
+const SIZE_TO_FIT = { fixed: 'natural', fluid: 'container' };
+
+/** @deprecated Use `IMAGE_FITS`. */
+export const IMAGE_SIZES = Object.keys(SIZE_TO_FIT);
 
 /**
- * Image: a decorative or meaningful bitmap, with a dark-mode variant swapped
- * in by the browser rather than by script.
+ * Image: a decorative or meaningful bitmap, with a dark variant that follows
+ * the app's color mode.
  */
 export const Image = ({
     src,
     srcDark,
     alt = '',
-    size = 'fluid',
+    fit,
+    size,
     testId,
     className,
     style,
     ...props
 }) => {
-    const image = (
+    const resolvedFit = fit ?? SIZE_TO_FIT[size] ?? size ?? 'container';
+    const render = (source, variant) => (
         <img
-            src={src}
+            key={variant}
+            src={source}
             alt={alt}
-            data-testid={testId}
-            className={clsx('plus-image', `plus-image--${size}`, className)}
+            data-testid={variant === 'light' || !srcDark ? testId : undefined}
+            className={clsx(
+                'plus-image',
+                `plus-image--${resolvedFit}`,
+                srcDark && `plus-image--${variant}`,
+                className,
+            )}
             style={style}
             {...props}
         />
     );
 
-    if (!srcDark) return image;
+    if (!srcDark) return render(src, 'light');
 
     return (
-        <picture>
-            <source media="(prefers-color-scheme: dark)" srcSet={srcDark} />
-            {image}
-        </picture>
+        <>
+            {render(src, 'light')}
+            {render(srcDark, 'dark')}
+        </>
     );
 };
 
 Image.propTypes = {
     src: PropTypes.string.isRequired,
-    /** Shown instead of `src` when the OS is in dark mode. */
+    /** Shown instead of `src` when the app's color mode is dark. */
     srcDark: PropTypes.string,
     /** `''` (the default) marks the image decorative. */
     alt: PropTypes.string,
-    /** `fixed` keeps its natural size; `fluid` (the default) scales to its container. */
+    /** `natural` keeps its natural size; `container` (the default) scales to its container. */
+    fit: PropTypes.oneOf(IMAGE_FITS),
+    /** @deprecated Use `fit`: `fixed` is `natural`, `fluid` is `container`. */
     size: PropTypes.oneOf(IMAGE_SIZES),
     testId: PropTypes.string,
     className: PropTypes.string,

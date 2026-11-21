@@ -44,7 +44,7 @@ authored half, counted rather than assumed.
 | [AvatarGroup](AvatarGroup/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Icon](Icon/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Illustration](Illustration/index.md) | 5 | ✅ | ✅ | ✅ |
-| [Image](Image/index.md) | 7 | ✅ | ✅ | ✅ |
+| [Image](Image/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Object](Object/index.md) | 4 | ✅ | ✅ | ✅ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
 

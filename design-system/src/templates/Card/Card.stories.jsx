@@ -9,6 +9,7 @@ import { CardJobs } from './CardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
+import sessionSummaryDark from '@/assets/images/kit/session-summary-dark.svg';
 import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
 
 const bodyCopy = (
@@ -357,6 +358,33 @@ const imageCard = (ratio) => (
 export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') };
 export const ImageStandard = { name: 'Image 4:3', render: () => imageCard('4:3') };
 export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') };
+
+/** An image with a dark variant shows exactly one picture in each color mode. */
+export const ImageDarkVariant = {
+    name: 'Image with a dark variant',
+    render: () => (
+        <div style={{ display: 'flex', gap: 'var(--inline-lg)' }}>
+            {['light', 'dark'].map((mode) => (
+                <div key={mode} data-color-mode={mode} data-testid={`card-${mode}`}>
+                    <Card
+                        image={<Image src={sessionSummaryLight} srcDark={sessionSummaryDark} alt="Session summary" />}
+                        imageRatio="16:9"
+                        title="Session summary"
+                        style={{ width: 'var(--card-min-width-md)' }}
+                    />
+                </div>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const shown = (mode) => [...canvasElement.querySelectorAll(`[data-testid="card-${mode}"] img`)]
+            .filter((img) => getComputedStyle(img).display !== 'none');
+        await waitFor(() => expect(shown('light')).toHaveLength(1));
+        expect(shown('light')[0]).toHaveClass('plus-image--light');
+        expect(shown('dark')).toHaveLength(1);
+        expect(shown('dark')[0]).toHaveClass('plus-image--dark');
+    },
+};
 
 /** The image height follows the card width for each ratio, rounded to a multiple of 4. The three widths are test geometry, not recommended sizes. */
 export const ImageRatioGrid = {

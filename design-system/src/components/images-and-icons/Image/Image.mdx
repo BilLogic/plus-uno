@@ -30,8 +30,7 @@ export const figmaMeta = {
 <Meta of={ImageStories} />
 
 <Title />
-A bitmap, with a dark-mode variant the browser swaps in on its own, with no
-script watching for the change.
+A bitmap, with a dark variant that follows the app's color mode.
 
 <DocsTabs of={ImageStories}>
 
@@ -48,7 +47,7 @@ script watching for the change.
 
 ## Overview
 
-<ComponentExample of={ImageStories.Sizes} title="Sizes" description={<>`fixed` keeps the image's natural size; `fluid` scales it to fill its container.</>} />
+<ComponentExample of={ImageStories.Fits} title="Fit" description={<>`natural` keeps the image's natural size; `container` scales it to fill its container.</>} />
 
 </div>
 
@@ -56,7 +55,7 @@ script watching for the change.
 
 ## Dark mode
 
-<ComponentExample of={ImageStories.DarkVariant} title="Dark variant" description={<>`srcDark` swaps in a `source` element the OS picks at the media-query level — no re-render, no flash.</>} />
+<ComponentExample of={ImageStories.DarkVariant} title="Dark variant" description={<>`srcDark` renders a second image that shows when the app's color mode is dark, or when it is auto and the system is dark. CSS picks which one shows, so there is no re-render and no flash.</>} />
 
 </div>
 
@@ -110,8 +109,8 @@ Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — espec
 
 ## Parts
 
-1. **Picture.** An `img`, wrapped in `<picture>` with a dark `<source>` when `srcDark` is set.
-2. **Size.** `fluid` fills its container's width and keeps the aspect ratio; `fixed` keeps its natural size.
+1. **Picture.** An `img`; with `srcDark` set, a second `img` for the dark variant.
+2. **Fit.** `container` fills its container's width and keeps the aspect ratio; `natural` keeps its natural size.
 
 ### States
 
@@ -122,7 +121,7 @@ Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — espec
 <tbody>
 <tr><td>Rest</td><td>The only state. An image is not a control.</td></tr>
 <tr><td>Hovered, pressed, focused, disabled</td><td>None. Wrap it in a link or button for a click.</td></tr>
-<tr><td>Dark mode</td><td>The browser swaps in <code>srcDark</code> when the system is dark, with no script.</td></tr>
+<tr><td>Dark mode</td><td><code>srcDark</code> shows when the app's color mode is dark, or auto on a dark system.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -133,8 +132,8 @@ Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — espec
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Fluid</td><td>Width 100% of the container, height auto.</td></tr>
-<tr><td>Fixed</td><td>Natural width and height; no max width.</td></tr>
+<tr><td>Container</td><td>Width 100% of the container, height auto.</td></tr>
+<tr><td>Natural</td><td>Natural width and height; no max width.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -146,9 +145,9 @@ Use `Image` for a bitmap — a photo, a screenshot or a raster graphic — espec
 
 ### Pass `srcDark` instead of swapping `src` yourself.
 
-The dark variant is a second `<source>` inside a `<picture>`, matched by
-`prefers-color-scheme`. The browser picks it before paint, so there is no
-flash of the light image on a dark system.
+The dark variant is a second image that CSS shows when the app's color mode
+is dark, or when it is auto and the system is dark. Both load up front, so
+there is no flash of the light image.
 
 <DoDontPair
     doExample={<Image src={sessionSummaryLight} srcDark={sessionSummaryDark} alt="" />}
@@ -172,13 +171,13 @@ already states.
 
 ### Size the container, not the image.
 
-Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
+Use `container` and let the container set the width, so one image works from phone to desktop. Reach for `natural` only for a picture that must stay at its natural size.
 
 <DoDontPair
     doExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" /></FigureStack>}
-    doCaption="Fluid, so the container sets the width."
-    dontExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" size="fixed" /></FigureStack>}
-    dontCaption="Fixed in a narrow container: the picture overflows it."
+    doCaption="Container, so the container sets the width."
+    dontExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" fit="natural" /></FigureStack>}
+    dontCaption="Natural in a narrow container: the picture overflows it."
 />
 
 </div>
@@ -207,8 +206,8 @@ Use `fluid` and let the container set the width, so one image works from phone t
   technology when a caption or heading nearby already says what it shows.
 - **Meaningful images need real alt text.** Describe what the image
   communicates, not what it depicts pixel for pixel.
-- **The dark swap has no accessibility impact.** It is a media query on the
-  `<picture>` element, not a state change a screen reader needs to track.
+- **The dark swap has no accessibility impact.** CSS hides the image that
+  does not apply, so a screen reader meets one image.
 
 </div>
 
