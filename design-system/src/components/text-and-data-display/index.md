@@ -2,7 +2,7 @@
 
 # Text and data display
 
-8 components. Each row links to the generated facts; the three columns after it are the
+9 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -13,6 +13,9 @@ authored half, counted rather than assumed.
   - For a name or short phrase inside a sentence, use `Code`.
 - **[DynamicTable](DynamicTable/index.md)** — Use `DynamicTable` for a table of sessions or records where people act on the data: sort a column, filter or search the rows, select some for a bulk action, or split a long result across numbered pages. It holds its own sort and page until the page passes `sortKey` or `page`.
   - For a fixed grid people only read or a nested hierarchy, use `Table`.
+- **[Facts](Facts/index.md)** — Use `Facts` to show a few facts about one thing, such as a school's name and the date it was created, when the reader only needs to read them.
+  - For a value the reader can select and copy from a field, use `TextField` with `isReadOnly`.
+  - For facts about many things in rows, use `Table`.
 - **[Heading](Heading/index.md)** — Use `Heading` for every heading in the product: a page title, a section header, a card title. Never style plain text to look like a heading: a sighted-only "heading" breaks navigation by heading for anyone using assistive technology.
   - For a page's top title row with breadcrumbs and actions, use `PageHeader`.
 - **[InlineEdit](InlineEdit/index.md)** — Use `InlineEdit` for a value that is read far more often than it is changed and that can be saved on its own: a title, a name or a short note on a record or a profile page.
@@ -31,13 +34,14 @@ authored half, counted rather than assumed.
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |
 | [CodeBlock](CodeBlock/index.md) | 7 | ✅ | ✅ | ✅ |
 | [DynamicTable](DynamicTable/index.md) | 37 | ✅ | ✅ | ✅ |
+| [Facts](Facts/index.md) | 2 | ✅ | ✕ | ✅ |
 | [Heading](Heading/index.md) | 6 | ✅ | ✅ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [StaticTable](StaticTable/index.md) | 15 | ✅ | ✅ | ✅ |
 | [TreeTable](TreeTable/index.md) | 12 | ✅ | ✅ | ✅ |
 | [VisuallyHidden](VisuallyHidden/index.md) | 3 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 8/8 (100%) · Accessibility 8/8 (100%)
+**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 8/9 (89%) · Accessibility 9/9 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

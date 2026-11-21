@@ -1,0 +1,27 @@
+/*
+ * Facts: the read-only description list. Rows are `display: contents` so every
+ * label and value joins one grid and the label column is as wide as the longest label.
+ */
+
+.plus-facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--stack-sm) var(--inline-lg);
+    font: var(--body-default);
+    letter-spacing: var(--body-default-tracking);
+    color: var(--ds-text);
+}
+
+.plus-facts__row {
+    display: contents;
+}
+
+.plus-facts__label {
+    color: var(--ds-text-subtle);
+}
+
+.plus-facts__value {
+    margin: 0;
+    overflow-wrap: anywhere;
+}

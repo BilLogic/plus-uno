@@ -80,7 +80,7 @@ Don't: The whole list loaded to page on the screen, when it is thousands of rows
 - Table: use when choosing between Static, Dynamic and Tree tables.
 - Section: use when placing search, filters and actions in the toolbar above the table; selected rows never change it.
 
-Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `Facts` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

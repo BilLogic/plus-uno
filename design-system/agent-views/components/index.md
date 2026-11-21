@@ -99,7 +99,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 |   | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame. |
 |   | [`Popup`](../../src/templates/Popup/Popup.mdx) | `import { Popup } from '@/components';` | A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu. |
 
-## UI components (94)
+## UI components (95)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiChat](../../src/components/ai/AiChat/index.md)
@@ -131,6 +131,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [DropdownMenu](../../src/components/forms-and-inputs/DropdownMenu/index.md)
 - [DynamicTable](../../src/components/text-and-data-display/DynamicTable/index.md)
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
+- [Facts](../../src/components/text-and-data-display/Facts/index.md)
 - [Fieldset](../../src/components/forms-and-inputs/Fieldset.md)
 - [FileItem](../../src/components/forms-and-inputs/FileItem/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload/index.md)
