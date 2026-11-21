@@ -20,6 +20,9 @@
     border-radius: var(--radius-control-md);
     background-color: transparent;
     color: var(--ds-text-subtle);
+    border: 0;
+    margin: 0;
+    font: inherit;
     text-align: left;
     text-decoration: none;
     cursor: pointer;
@@ -146,7 +149,7 @@
 }
 
 // The disabled text and icon colors; a disabled row is announced as such
-// (`aria-disabled`) and takes no tab stop.
+// (the native `disabled` attribute) and takes no tab stop.
 .plus-sidebar-tab--disabled {
     color: var(--ds-text-disabled);
     cursor: not-allowed;
