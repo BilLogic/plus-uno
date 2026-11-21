@@ -791,7 +791,7 @@ export const ByTemplateGrid = () => (
                 <div style={TEMPLATE_GRID_STYLE}>
                     <TemplateTile
                         title="Section"
-                        description="Default: heading, view bar, body"
+                        description="Default: heading, header rows, body"
                         tokens="no surface · no shadow"
                         ariaTitle="Section on the Default surface with no shadow"
                     >

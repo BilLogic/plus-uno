@@ -2,7 +2,7 @@
 
 # PopupSelect
 
-Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
+Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
 
 **Import:** `import { PopupSelect } from '@/components';`
 
@@ -23,7 +23,7 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 Use `PopupSelect` when one pick from one list immediately changes what the page shows, with no field and no Apply button:
 
 - **A view switch** under page tabs, such as "Status: Upcoming" (pass `label` and no `trigger`).
-- **One filter** in a section's view bar, such as Subject (pass a `FilterButton` as `trigger`).
+- **One filter** in a Section header, such as Subject (pass a `FilterButton` as `trigger`).
 
 ## Motion
 

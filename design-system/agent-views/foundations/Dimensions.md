@@ -75,7 +75,7 @@ Controls that share a row share a height. Fields (text, search, select) are one 
 
 | Row | Height | Field · Search · Select | Button | Tag |
 | --- | --- | --- | --- | --- |
-| Toolbar, Section header, view bar | `size-200` | compact | default | `size-125` |
+| Toolbar, Section header rows | `size-200` | compact | default | `size-125` |
 | Field with its own button (add, send) | `size-200` | compact | default | — |
 | Table row | `size-250` | compact when editing | compact 24 | `size-125` |
 | Form | 40 per field | default | footer default 32 | — |

@@ -42,7 +42,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 
 | Scenario | Template | Patterns | Components |
 | --- | --- | --- | --- |
-| An area page with one collection | Page · default, with a Section view bar alone | Filtering · Search · Common actions | `PageHeader`, `Tabs` (pill), `FilterButton`, `IconButton`, `Button`, `Table` |
+| An area page with one collection | Page · default, with a Section holding the views, Search and filters | Filtering · Search · Common actions | `PageHeader`, `Tabs` (pill), `FilterButton`, `IconButton`, `Button`, `Table` |
 | A home page with several Sections | Page · default, titled Sections, cards | Empty · Loading | `PageHeader`, `Card`, `Button` |
 | A record page, one level down | Page with a breadcrumb and page tabs | Navigation · Indicators | `Breadcrumb`, `PageHeader`, `StatusTag`, `Tabs`, `PopupSelect` |
 | Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |

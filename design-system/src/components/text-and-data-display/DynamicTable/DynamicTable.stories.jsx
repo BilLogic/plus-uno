@@ -240,7 +240,7 @@ export const EmptyNothingYet = {
         <HeadingLevelContext.Provider value={3}>
             <Section
                 title="Students"
-                actions={<Button text="Add student" appearance="primary" spacing="compact" onClick={() => {}} />}
+                actions={<Button text="Add student" appearance="primary" onClick={() => {}} />}
             >
                 <DynamicTable
                     head={head}
@@ -303,10 +303,10 @@ const FilteredDynamicTable = () => {
                             spacing="compact"
                             icon="magnifying-glass"
                             header="No students match these filters"
-                            description="Nothing matches Grade 5. Clear the filter to see every student."
+                            description="Nothing matches Grade 5. Reset filters to see every student."
                             primaryAction={(
                                 <Button
-                                    text="Clear filter"
+                                    text="Reset filters"
                                     appearance="default"
                                     spacing="compact"
                                     onClick={() => setFiltered(false)}
@@ -329,7 +329,7 @@ export const EmptyHiddenByFilter = {
         await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
         await expect(canvas.getByRole('button', { name: 'Grade: 5' })).toBeVisible();
-        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        const clear = within(box).getByRole('button', { name: 'Reset filters' });
         await expect(clear.className).not.toContain('primary');
         await userEvent.click(clear);
         await expect(canvas.getByRole('table')).toBeVisible();

@@ -149,7 +149,7 @@ export const Keyboard = {
 };
 
 /**
- * A filter in a section's view bar, with a trigger of its own. A trigger at
+ * A filter in a Section header, with a trigger of its own. A trigger at
  * the start of the bar opens `bottom-start`; one at the end opens `bottom-end`.
  */
 export const Placement = {

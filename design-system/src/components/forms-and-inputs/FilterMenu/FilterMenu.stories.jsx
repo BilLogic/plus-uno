@@ -75,7 +75,7 @@ export default {
     },
 };
 
-/** A view bar with the Filter icon at its end, and the sessions it filters under it. */
+/** A Section header with the Filter icon, and the sessions it filters under it. */
 const SessionsBar = ({ categories = SIDE_BY_SIDE, ...props }) => {
     const [applied, setApplied] = useState({});
     const shown = shownSessions(applied);

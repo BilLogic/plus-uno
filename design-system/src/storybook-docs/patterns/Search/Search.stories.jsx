@@ -9,7 +9,7 @@ import { BasicPage, BasicStudents, BodySearch, FocusedPage, FocusedStudents, PAN
 
 /**
  * Search: the pattern page's examples, run in the Storybook tests. Each is a
- * real SearchField, in the real Section's view bar or in a page body. Docs
+ * real SearchField, in the real Section's header or in a page body. Docs
  * pictures hold the state their heading names through props and args (no
  * plays); the test-only stories at the end press, type and Esc from a clean
  * start.
