@@ -52536,6 +52536,13 @@
 			"intent": "Vertical gap between closely related blocks on a Page, such as a header and its subtitle."
 		},
 		{
+			"name": "--page-text-line",
+			"tier": "component",
+			"group": "Ladder Components",
+			"value": "var(--type-line-height-150)",
+			"intent": "Line height the page body gives text that sets no text style of its own."
+		},
+		{
 			"name": "--palette-black-alpha-60",
 			"tier": "primitive",
 			"group": "Color Primitives (--palette-)",

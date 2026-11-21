@@ -1377,6 +1377,13 @@
           }
         },
         {
+          "name": "Page/text-line",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-text-line)"
+          }
+        },
+        {
           "name": "Inbox/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

@@ -426,6 +426,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'AI chat', new: '--ai-chat-fab-size', old: null, ref: 'var(--height-300)', use: 'Width and height of the floating button that opens the AI chat.' },
   { tier: 'components', group: 'Prompt input', new: '--prompt-input-min-height', old: null, ref: 'var(--height-250)', use: 'Shortest a PromptInput text area gets, one line plus its padding.' },
   { tier: 'components', group: 'Prompt input', new: '--prompt-input-line', old: null, ref: 'var(--type-line-height-125)', use: 'One line of PromptInput text; the text area grows to five of these.' },
+  { tier: 'components', group: 'Page text', new: '--page-text-line', old: null, ref: 'var(--type-line-height-150)', use: 'Line height the page body gives text that sets no text style of its own.' },
   { tier: 'components', group: 'Inbox', new: '--inbox-width', old: null, ref: 'calc(var(--width-2000) + var(--space-250))', note: '360px', use: 'Width of the Inbox Panel when it opens beside the Sidebar.' },
   { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
   { tier: 'components', group: 'Table', new: '--table-message-gap', old: null, ref: 'var(--space-0625)', use: 'Vertical gap between parts of a Table empty or error message row.' },
