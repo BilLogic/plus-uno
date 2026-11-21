@@ -9,7 +9,7 @@ import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, loadTypeScript, run, summary } from './check-dodont-figures.mjs';
+import { captionText, checkExamplesSource, checkSource, helperBody, isFoundationFile, isRunOn, loadParser, run, summary } from './check-dodont-figures.mjs';
 
 const pair = (extra = '', doEx = '<Button label="Save" />', dontEx = '<Button label="OK" />') =>
   `<DoDontPair\n  doExample={${doEx}}\n  doCaption="Name the action."\n  dontExample={${dontEx}}\n  dontCaption="Say nothing about it."\n  ${extra}\n/>`;
@@ -159,10 +159,9 @@ test('printed examples: the line of a finding is the style attribute line', () =
   assert.deepEqual(checkExamplesSource("const x = 1;\nexport const A = () => <p style={{ color: 'red' }} />;").map((p) => p.line), [2]);
 });
 
-test('printed examples: the parser is the TypeScript agents/uno-bot installs, and its absence fails loudly', () => {
-  assert.equal(typeof loadTypeScript().createSourceFile, 'function');
-  const nowhere = path.join(os.tmpdir(), 'dodont-no-typescript', 'package.json');
-  assert.throws(() => loadTypeScript(nowhere), /check:dodont-figures cannot load TypeScript.*agents\/uno-bot/s);
+test('printed examples: the parser is @babel/parser, and its absence fails loudly', () => {
+  assert.equal(typeof loadParser(), 'function');
+  assert.throws(() => loadParser('@babel/parser-not-installed'), /check:dodont-figures cannot load @babel\/parser-not-installed.*npm ci/s);
 });
 
 test('printed examples: a shorthand property is read by its name', () => {

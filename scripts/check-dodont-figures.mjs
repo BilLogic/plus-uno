@@ -44,9 +44,9 @@
  * `borderSpacing` and `borderCollapse` arrange a table's cells, so they are
  * layout; a border key set to `0` or `none` clears a side and passes.
  *
- * The parser is the TypeScript compiler agents/uno-bot installs, loaded from
- * that package so the check needs nothing the harness job does not already
- * install. Without it the check fails and says so; it never passes unread.
+ * The parser is `@babel/parser`, a root devDependency the harness job installs
+ * among its pinned packages. Without it the check fails and says so; it never
+ * passes unread.
  *
  * WHAT IT CANNOT SEE. Whether the two halves of a pair show the same
  * component, and whether a live figure is the right one: those are a reader's
@@ -54,7 +54,6 @@
  * defined in another file is not followed.
  */
 import { createRequire } from 'node:module';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { attrsOf, readElement } from './lib/docs-page.mjs';
@@ -205,64 +204,64 @@ const NOT_LAYOUT_KEY = (key, value) => {
   return NOT_LAYOUT.test(key);
 };
 
-/** The `agents/uno-bot` manifest whose installed TypeScript parses printed examples. */
-const TS_ANCHOR = path.join(REPO_ROOT, 'agents/uno-bot/package.json');
-
-let tsCache;
+const requireHere = createRequire(import.meta.url);
+const parserCache = new Map();
 /**
- * The TypeScript compiler resolved from `anchor`, or a thrown error that names
- * the fix: the check fails rather than pass a tree it could not read.
+ * `parse` from the root devDependency `@babel/parser`, or a thrown error that
+ * names the fix: the check fails rather than pass a tree it could not read.
  */
-export function loadTypeScript(anchor = TS_ANCHOR) {
-  if (anchor === TS_ANCHOR && tsCache) return tsCache;
-  let ts;
+export function loadParser(specifier = '@babel/parser') {
+  if (parserCache.has(specifier)) return parserCache.get(specifier);
+  let parse;
   try {
-    ts = createRequire(anchor)('typescript');
+    ({ parse } = requireHere(specifier));
   } catch (error) {
-    throw new Error(`check:dodont-figures cannot load TypeScript from ${path.relative(REPO_ROOT, anchor) || anchor}: run \`npm ci\` in agents/uno-bot. (${error.message.split('\n')[0]})`);
+    throw new Error(`check:dodont-figures cannot load ${specifier}: run \`npm ci\` at the repo root. (${error.message.split('\n')[0]})`);
   }
-  if (anchor === TS_ANCHOR) tsCache = ts;
-  return ts;
+  parserCache.set(specifier, parse);
+  return parse;
 }
 
 /** Every node under `node`, depth first. */
-function* walk(ts, node) {
-  if (!node) return;
+function* walk(node) {
+  if (!node || typeof node.type !== 'string') return;
   yield node;
-  const children = [];
-  ts.forEachChild(node, (child) => { children.push(child); });
-  for (const child of children) yield* walk(ts, child);
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key === 'leadingComments' || key === 'trailingComments' || key === 'innerComments' || key === 'extra') continue;
+    if (Array.isArray(value)) for (const child of value) yield* walk(child);
+    else if (value && typeof value.type === 'string') yield* walk(value);
+  }
 }
 
 /** Every `const|let|var name = init` and `function name` in the file, by name. */
-function bindingsOf(ts, sf) {
+function bindingsOf(ast) {
   const out = new Map();
   const add = (name, node) => out.set(name, [...(out.get(name) ?? []), node]);
-  for (const node of walk(ts, sf)) {
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) add(node.name.text, node.initializer);
-    if (ts.isFunctionDeclaration(node) && node.name) add(node.name.text, node);
+  for (const node of walk(ast)) {
+    if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init) add(node.id.name, node.init);
+    if (node.type === 'FunctionDeclaration' && node.id) add(node.id.name, node);
   }
   return out;
 }
 
 /** The expressions a function can return. */
-function returnsOf(ts, fn) {
+function returnsOf(fn) {
   if (!fn.body) return [];
-  if (!ts.isBlock(fn.body)) return [fn.body];
+  if (fn.body.type !== 'BlockStatement') return [fn.body];
   const out = [];
-  for (const node of walk(ts, fn.body)) if (ts.isReturnStatement(node) && node.expression) out.push(node.expression);
+  for (const node of walk(fn.body)) if (node.type === 'ReturnStatement' && node.argument) out.push(node.argument);
   return out;
 }
 
-/** A fixed string a key or index names (`color`, `'color'`, `` `color` ``), or null. */
-const fixedText = (ts, node) => (node && (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) ? node.text : null);
+/** A fixed string a key or index names (`'color'`, `` `color` ``), or null. */
+const fixedText = (node) => {
+  if (node?.type === 'StringLiteral') return node.value;
+  if (node?.type === 'TemplateLiteral' && node.expressions.length === 0) return node.quasis[0].value.cooked;
+  return null;
+};
 
 /** A style key's name; a computed key counts when it is a fixed string (`['color']`). */
-const keyName = (ts, name) => {
-  if (ts.isIdentifier(name)) return name.text;
-  if (ts.isComputedPropertyName(name)) return fixedText(ts, name.expression);
-  return fixedText(ts, name);
-};
+const keyName = ({ computed, key }) => (!computed && key.type === 'Identifier' ? key.name : fixedText(key));
 
 /**
  * The `[key, value source]` pairs a style expression can set: both branches of
@@ -270,49 +269,41 @@ const keyName = (ts, name) => {
  * bound in the same file are followed.
  */
 function styleEntries(ctx, node, seen = new Set()) {
-  const { ts, sf } = ctx;
   if (!node || seen.has(node)) return [];
   seen.add(node);
   const next = (n) => styleEntries(ctx, n, seen);
-  const K = ts.SyntaxKind;
-  switch (node.kind) {
-    case K.ObjectLiteralExpression:
+  switch (node.type) {
+    case 'ObjectExpression':
       return node.properties.flatMap((prop) => {
-        if (ts.isSpreadAssignment(prop)) return next(prop.expression);
-        if (ts.isShorthandPropertyAssignment(prop)) return [[prop.name.text, prop.name.text]];
-        if (!ts.isPropertyAssignment(prop)) return [];
-        const key = keyName(ts, prop.name);
-        return key ? [[key, prop.initializer.getText(sf)]] : [];
+        if (prop.type === 'SpreadElement') return next(prop.argument);
+        if (prop.type !== 'ObjectProperty') return [];
+        const key = keyName(prop);
+        return key ? [[key, ctx.source.slice(prop.value.start, prop.value.end)]] : [];
       });
-    case K.ConditionalExpression:
-      return [...next(node.whenTrue), ...next(node.whenFalse)];
-    case K.BinaryExpression: {
-      const op = node.operatorToken.kind;
-      if (op === K.AmpersandAmpersandToken) return next(node.right);
-      if (op === K.BarBarToken || op === K.QuestionQuestionToken) return [...next(node.left), ...next(node.right)];
-      return [];
-    }
-    case K.ParenthesizedExpression:
-    case K.AsExpression:
-    case K.SatisfiesExpression:
-    case K.NonNullExpression:
+    case 'ConditionalExpression':
+      return [...next(node.consequent), ...next(node.alternate)];
+    case 'LogicalExpression':
+      return node.operator === '&&' ? next(node.right) : [...next(node.left), ...next(node.right)];
+    case 'ParenthesizedExpression':
+    case 'TSAsExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSNonNullExpression':
       return next(node.expression);
-    case K.Identifier:
-      return (ctx.bindings.get(node.text) ?? []).flatMap(next);
-    case K.ArrowFunction:
-    case K.FunctionExpression:
-    case K.FunctionDeclaration:
-      return returnsOf(ts, node).flatMap(next);
-    case K.CallExpression:
-      return ts.isIdentifier(node.expression) ? next(node.expression) : [];
-    case K.PropertyAccessExpression:
-    case K.ElementAccessExpression: {
-      const name = ts.isPropertyAccessExpression(node) ? node.name.text : fixedText(ts, node.argumentExpression);
+    case 'Identifier':
+      return (ctx.bindings.get(node.name) ?? []).flatMap(next);
+    case 'ArrowFunctionExpression':
+    case 'FunctionExpression':
+    case 'FunctionDeclaration':
+      return returnsOf(node).flatMap(next);
+    case 'CallExpression':
+      return node.callee.type === 'Identifier' ? next(node.callee) : [];
+    case 'MemberExpression': {
+      const name = node.computed ? fixedText(node.property) : node.property.name;
       if (name === null) return [];
-      const objects = ts.isIdentifier(node.expression) ? ctx.bindings.get(node.expression.text) ?? [] : [node.expression];
-      return objects.flatMap((obj) => (ts.isObjectLiteralExpression(obj) ? obj.properties : [])
-        .filter((prop) => ts.isPropertyAssignment(prop) && keyName(ts, prop.name) === name)
-        .flatMap((prop) => next(prop.initializer)));
+      const objects = node.object.type === 'Identifier' ? ctx.bindings.get(node.object.name) ?? [] : [node.object];
+      return objects.flatMap((obj) => (obj.type === 'ObjectExpression' ? obj.properties : [])
+        .filter((prop) => prop.type === 'ObjectProperty' && keyName(prop) === name)
+        .flatMap((prop) => next(prop.value)));
     }
     default:
       return [];
@@ -325,19 +316,20 @@ function styleEntries(ctx, node, seen = new Set()) {
  * @returns {{ line: number, message: string }[]}
  */
 export function checkExamplesSource(source) {
-  const ts = loadTypeScript();
-  const sf = ts.createSourceFile('example.jsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JSX);
-  const lineOf = (pos) => sf.getLineAndCharacterOfPosition(pos).line + 1;
-  const problems = (sf.parseDiagnostics ?? []).map((d) => ({
-    line: lineOf(d.start ?? 0),
-    message: `printed example does not parse: ${ts.flattenDiagnosticMessageText(d.messageText, ' ')}`,
-  }));
-  const ctx = { ts, sf, bindings: bindingsOf(ts, sf) };
-  for (const node of walk(ts, sf)) {
-    if (!ts.isJsxAttribute(node) || !ts.isIdentifier(node.name) || node.name.text !== 'style') continue;
-    if (!node.initializer || !ts.isJsxExpression(node.initializer)) continue;
-    const line = lineOf(node.getStart(sf));
-    for (const [key, value] of styleEntries(ctx, node.initializer.expression)) {
+  const parse = loadParser();
+  let ast;
+  try {
+    ast = parse(source, { sourceType: 'module', plugins: ['jsx'], errorRecovery: true });
+  } catch (error) {
+    return [{ line: error.loc?.line ?? 1, message: `printed example does not parse: ${error.message}` }];
+  }
+  const problems = (ast.errors ?? []).map((error) => ({ line: error.loc?.line ?? 1, message: `printed example does not parse: ${error.message}` }));
+  const ctx = { source, bindings: bindingsOf(ast) };
+  for (const node of walk(ast.program)) {
+    if (node.type !== 'JSXAttribute' || node.name.type !== 'JSXIdentifier' || node.name.name !== 'style') continue;
+    if (node.value?.type !== 'JSXExpressionContainer') continue;
+    const line = node.loc.start.line;
+    for (const [key, value] of styleEntries(ctx, node.value.expression)) {
       if (NOT_LAYOUT_KEY(key, value)) problems.push({ line, message: `printed example style sets \`${key}\`; style may set layout on tokens only, so text takes a type class such as .body-default and color, radius and elevation come from the component` });
     }
   }
