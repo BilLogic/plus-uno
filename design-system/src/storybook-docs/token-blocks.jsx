@@ -2,6 +2,7 @@ import React from 'react';
 import { ColorPalette, ColorItem, Typeset } from '@storybook/addon-docs/blocks';
 import { TOKENS } from './docs-tokens.js';
 import { accentGroups, chartGroups, typeGroups } from './lib/token-data.mjs';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Foundations blocks fed from the generated token table. Rows come from
@@ -32,10 +33,10 @@ export const TypeScaleBlocks = () => (
     <>
         {typeGroups(TOKENS).map((g) => (
             <section key={g.title} style={{ marginBlock: 'var(--stack-lg)' }}>
-                <h4 style={{ font: 'var(--heading-xs)', letterSpacing: 'var(--heading-xs-tracking)', margin: 0, padding: 0 }}>
+                <h4 style={{ ...typeStyle('heading-xs'), letterSpacing: 'var(--heading-xs-tracking)', margin: 0, padding: 0 }}>
                     {g.title} · {g.family} {g.weight}
                 </h4>
-                <p style={{ font: 'var(--body-sm)', letterSpacing: 'var(--body-sm-tracking)', color: 'var(--ds-text-subtle)', margin: 0, padding: 0 }}>
+                <p style={{ ...typeStyle('body-sm'), letterSpacing: 'var(--body-sm-tracking)', color: 'var(--ds-text-subtle)', margin: 0, padding: 0 }}>
                     {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}${s.tracking ? ` ${s.tracking.replace('-', '\u2212')}` : ''}`).join(' · ')}
                 </p>
                 <Typeset

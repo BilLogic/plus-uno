@@ -53,6 +53,7 @@ import {
     updateScene,
 } from './illustrations/motion-transitions-place.jsx';
 import { SoundCell } from './motion-section.jsx';
+import { typeStyle } from './lib/type-style.js';
 
 const TIER_TITLES = {
     template: 'Templates',
@@ -375,11 +376,11 @@ export const MotionLibraryCard = ({
                             flexWrap: 'wrap',
                             alignItems: 'center',
                             gap: 'var(--inline-sm)',
-                            font: 'var(--body-sm)',
+                            ...typeStyle('body-sm'),
                             color: 'var(--ds-text-subtle)',
                         }}
                     >
-                        <strong style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>
+                        <strong style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text)' }}>
                             {activeEvent.event}
                         </strong>
                         <span aria-hidden="true">·</span>
@@ -404,7 +405,7 @@ export const MotionLibraryCard = ({
                         <p
                             style={{
                                 margin: 0,
-                                font: 'var(--body-sm)',
+                                ...typeStyle('body-sm'),
                                 color: 'var(--ds-text-subtle)',
                             }}
                         >
@@ -413,7 +414,7 @@ export const MotionLibraryCard = ({
                     )}
 
                     {activeEvent.sound && (
-                        <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                        <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                             <SoundCell sound={activeEvent.sound} />
                         </div>
                     )}
@@ -617,7 +618,7 @@ export const MotionLibrary = ({
                             gap: 'var(--stack-xl)',
                         }}
                     >
-                        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>
+                        <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>
                             {group.title}
                         </h3>
                         {renderCards(group.rows)}
@@ -651,7 +652,7 @@ export const MotionLibrary = ({
                     role="status"
                     aria-live="polite"
                     data-motion-library-count
-                    style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
+                    style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}
                 >
                     {`${filteredRows.length} of ${baseRows.length}`}
                 </span>

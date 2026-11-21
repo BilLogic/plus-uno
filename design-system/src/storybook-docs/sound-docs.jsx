@@ -5,6 +5,7 @@ import { Button, Toggle, playSound, unlockAudio, useSound } from '@/components';
 import { SOUND_SPEC } from '@/sound/spec.generated';
 import { C, RefTable } from './foundation-blocks.jsx';
 import { silentGroupsOf, soundCellsOf, soundSheetOf } from './lib/sound-sheet.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Foundations › Expression › Sound's live parts: a player per token, the one switch, and the
@@ -21,7 +22,7 @@ export const soundLabelOf = (name) => {
 const minus = (n) => String(n).replace('-', '−');
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-sm)' };
-const note = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const note = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 /**
  * Plays one generated token. It stays pressable with sound off and says why

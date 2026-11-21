@@ -70,6 +70,7 @@ import {
 } from '@/components';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
+import { typeStyle } from './lib/type-style.js';
 
 const NOOP = () => {};
 
@@ -377,7 +378,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                     padding: 'var(--card-pad)',
                     background: 'var(--ds-surface)',
                     borderRadius: 'var(--radius-lg)',
-                    font: 'var(--body-sm)',
+                    ...typeStyle('body-sm'),
                     color: 'var(--ds-text)',
                 }}
             >
@@ -510,7 +511,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                     borderRadius: 'var(--radius-lg)',
                     background: 'var(--ds-surface-overlay)',
                     boxShadow: 'var(--ds-shadow-overlay)',
-                    font: 'var(--body-sm)',
+                    ...typeStyle('body-sm'),
                     color: 'var(--ds-text)',
                 }}
             >

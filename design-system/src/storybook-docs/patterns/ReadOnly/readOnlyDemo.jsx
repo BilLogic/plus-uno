@@ -4,6 +4,7 @@ import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle }
 import { Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * The Read-only pattern's examples, drawn with the real fields in their
@@ -88,7 +89,7 @@ export const LongValue = () => (
 export const PlainText = ({ padded = true }) => (
     <div style={padded ? pad : undefined}>
         <Section title="Details" description="Lincoln Middle">
-            <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+            <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                 <dt style={{ color: 'var(--ds-text-subtle)' }}>School</dt>
                 <dd style={{ margin: 0 }}>Lincoln Middle School</dd>
                 <dt style={{ color: 'var(--ds-text-subtle)' }}>Created</dt>

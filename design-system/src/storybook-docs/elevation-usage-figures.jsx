@@ -16,6 +16,7 @@ import {
 import { Pointer } from '@/storybook-docs/illustrations/primitives-motion.jsx';
 import { PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Kit-scale stage for Do/Don't and Color/Accessibility illustrations: 1 kit unit = 2px,
@@ -471,7 +472,7 @@ export const UsageInMotion = () => {
     const pickY = 28 - t * 4;
     const scrollOffset = t * 20;
 
-    const captionStyle = { margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+    const captionStyle = { margin: 0, ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
     const cardWrap = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' };
     return (
         <ElevationPanel data-testid="usage-in-motion" data-reduced-motion={reduced ? 'true' : 'false'}>

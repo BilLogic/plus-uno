@@ -1,4 +1,5 @@
 import React from 'react';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * The PLUS framework, the strip that opens Foundations Overview: the problem,
@@ -38,13 +39,13 @@ export const PILLARS = [
     },
 ];
 
-const lede = { margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' };
+const lede = { margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' };
 
 const Pillar = ({ name, axis, promise }) => (
     <article style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', margin: 0 }}>
-        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>{axis}</span>
-        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{name}</h3>
-        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{promise}</p>
+        <span style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text-subtle)' }}>{axis}</span>
+        <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>{name}</h3>
+        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{promise}</p>
     </article>
 );
 
@@ -52,10 +53,10 @@ export const FrameworkPillars = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
             <p style={lede}>{PROBLEM}</p>
-            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{VILLAGE}</p>
+            <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{VILLAGE}</p>
             <p style={lede}>{PROMISE}</p>
         </div>
-        <p style={{ margin: 0, font: 'var(--body-lg)', color: 'var(--ds-text)' }}>
+        <p style={{ margin: 0, ...typeStyle('body-lg'), color: 'var(--ds-text)' }}>
             Our design strategy prompts productivity, learning, uplift and simplicity.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-2xl) var(--inline-xl)' }}>

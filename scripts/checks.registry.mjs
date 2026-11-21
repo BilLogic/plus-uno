@@ -658,6 +658,15 @@ export const CHECKS = [
     guards: 'the docs stylesheet `.storybook/storybook-overrides.css` using tokens for values the design system already tokenizes.',
   },
   {
+    name: 'check:docs-type-tracking',
+    script: 'node scripts/check-docs-type-tracking.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-docs-type-tracking.mjs',
+    floors: { MIN_SOURCES: 30 },
+    guards: 'no inline text-style `font` in docs or demo files without its letter spacing (`typeStyle` from storybook-docs/lib/type-style.js).',
+  },
+  {
     name: 'check:docs-dead-selectors',
     script: 'node scripts/check-docs-dead-selectors.mjs',
     pkg: 'root',

@@ -5,6 +5,7 @@ import { Button, ChangeTag, CountTag, DynamicTable, Heading, StatusTag } from '@
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import examplesSource from './IndicatorsExamples.jsx?raw';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * Interactive key cases for the Indicators pattern page, kept beside the
@@ -16,8 +17,8 @@ export const CODE = showCode(examplesSource, ['DangerOnMissed', 'SuccessOnMissed
 
 const frame = { padding: 'var(--page-pad)' };
 const line = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', flexWrap: 'wrap' };
-const text = { font: 'var(--body-default)', color: 'var(--ds-text)' };
-const subtle = { font: 'var(--body-default)', color: 'var(--ds-text-subtle)' };
+const text = { ...typeStyle('body-default'), color: 'var(--ds-text)' };
+const subtle = { ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' };
 
 const SESSIONS = [
     ['Thursday, 4:00 PM', 'Ana Ruiz', 'info', 'Scheduled'],
@@ -216,7 +217,7 @@ export const RollUpCase = () => {
     return (
         <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
             <div style={{ ...line, justifyContent: 'space-between' }}>
-                <span style={{ ...text, font: 'var(--heading-xs)' }}>Group: Fractions</span>
+                <span style={{ ...text, ...typeStyle('heading-xs') }}>Group: Fractions</span>
                 <StatusTag appearance={worst.appearance} data-testid="rollup-group-status">{worst.status}</StatusTag>
             </div>
             {children.map((row) => (

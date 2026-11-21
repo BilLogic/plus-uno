@@ -5,6 +5,7 @@ import { Frame } from '@/templates';
 import { StepStage } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
 import { ScreenStage } from './fit-stage.jsx';
+import { typeStyle } from './type-style.js';
 
 /**
  * The multi-step task, shared by the Frame, Form and Common actions pages: one
@@ -98,7 +99,7 @@ export const MultiStepTask = ({
                         }}
                     >
                         <div style={{ maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}>
-                            <h1 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</h1>
+                            <h1 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{title}</h1>
                             <StepStage step={at} axis="down" maxSteps={labels.length} labels={labels}>
                                 {(typeof children === 'function' ? children(at) : children) ?? <Skeleton preset="text" lines={4} />}
                             </StepStage>
