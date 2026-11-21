@@ -226,7 +226,7 @@ test('the live Library links shared template/component names to their own pages 
   assert.equal(find('component', 'Popup').href, '?path=/docs/components-overlays-and-layering-popup--docs#motion');
   assert.equal(find('template', 'Blanket').href, '?path=/docs/templates-modal--docs#blanket-motion');
   assert.equal(find('component', 'Sidebar').href, null);
-  assert.equal(find('pattern', 'Errors').href, null);
+  assert.equal(find('pattern', 'Errors').href, '?path=/docs/patterns-states-errors--docs#motion');
 });
 
 test('each Library row exposes unique transitions, families and sounds in event order', () => {
