@@ -401,6 +401,7 @@ export const DS_FACTS: BakedDsFacts = {
 "AreaStage",
 "Card",
 "DrillStack",
+"FRAME_LAYOUT",
 "Frame",
 "LoadRevealSlot",
 "LoadThenReveal",
@@ -444,6 +445,7 @@ export const DS_FACTS: BakedDsFacts = {
 "scrollToSpot",
 "useDrillStack",
 "useMotionReduced",
+"useOwnWidth",
 "usePanelControl",
 "usePanelManager",
 "useSidebarControl"
