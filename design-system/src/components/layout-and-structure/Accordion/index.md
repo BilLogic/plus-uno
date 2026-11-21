@@ -66,11 +66,8 @@ Separated reads as a list of records on the bare page. Inside a card or panel a 
 Do: Grouped inside a card: one box with dividers.
 Don't: Separated containers nested in a card.
 
-}
-    doCaption="Separated on the page, for a list of people."
-    dontExample=
-    dontCaption="Grouped on the bare page, where a list of people reads as one block."
-/>
+Do: Separated on the page, for a list of people.
+Don't: Grouped on the bare page, where a list of people reads as one block.
 
 ### Author items with either `items` or `children`; `children` wins. {#author-items-with-either-items-or-children-children-wins}
 

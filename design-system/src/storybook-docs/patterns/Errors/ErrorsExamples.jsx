@@ -73,11 +73,10 @@ export const FailureInModal = () => (
         title="Couldn't load sessions"
         footer={(
             <FooterActions>
-                <Button text="Close" />
                 <Button text="Try again" appearance="primary" />
             </FooterActions>
         )}
     >
-        <p style={{ margin: 0 }}>Check your connection and try again.</p>
+        <p className="body-default" style={{ margin: 0 }}>Check your connection and try again.</p>
     </Modal>
 );

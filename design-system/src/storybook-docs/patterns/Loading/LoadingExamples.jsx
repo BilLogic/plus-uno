@@ -34,6 +34,7 @@ export const SkeletonInShape = () => (
         <section aria-label="Students" aria-busy="true">
             <SkeletonRows />
         </section>
+        <span role="status" className="visually-hidden">Loading students…</span>
     </Section>
 );
 

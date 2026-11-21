@@ -68,7 +68,7 @@ const listStyle = { margin: 0, padding: 0, listStyle: 'none', display: 'flex', f
 export const StudentList = ({ count }) => (
     <ul style={listStyle} aria-label="Students">
         {STUDENTS.slice(0, count).map(([name, grade]) => (
-            <li key={name}>{name}, {grade}</li>
+            <li key={name} className="body-default">{name}, {grade}</li>
         ))}
     </ul>
 );

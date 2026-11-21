@@ -59,7 +59,7 @@ Four components carry every message. Each component page holds its appearances; 
 
 ## Banner tiers
 
-One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Frame and Page `banner` slots are Planned <PlannedTag />: today a Banner goes in the content, set where its tier says.
+One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Page `banner` slot ships; the Frame `banner` slot is Planned <PlannedTag />, so a Frame-tier Banner goes in the content for now, set where its tier says.
 
 <TypeGrid>
 <TypeCard of={NotificationsStories.TierFrameStory} to="#frame-tier-banner" title="Frame" stage={STAGE}>System news across the whole width, above the Sidebar and the page.</TypeCard>
@@ -99,7 +99,7 @@ One banner at a time, scrolling with its content. The Frame tier is system news 
 
 <ComponentExample of={NotificationsStories.KeyFlagOnPage} title="A Flag on the page" description="The person has moved on to another page; the Flag finds them at the top right." />
 
-<ComponentExample of={NotificationsStories.KeyInboxCaughtUp} title="All caught up in the Inbox" description="When every unread update has been cleared, the Unread tab renders a compact EmptyState saying You are all caught up. while All preserves the history." />
+<ComponentExample of={NotificationsStories.KeyInboxCaughtUp} title="All caught up in the Inbox" description='When every unread update has been cleared, the Unread tab renders a compact EmptyState saying "You are all caught up." while All preserves the history.' />
 
 </div>
 
@@ -189,7 +189,7 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 
 <RuleTag kind="automatic" />
 
-Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
+Default, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds.
 
