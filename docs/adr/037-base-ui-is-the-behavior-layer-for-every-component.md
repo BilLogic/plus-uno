@@ -40,7 +40,7 @@ Moved to Base UI by the same ruling: AiSources now sits on Collapsible.
 
 ## Amendment (2026-11-21): PopupSelect, InlineEdit and Carousel
 
-Bill approved reading these three from the design system audit on 2026-11-20. None has a Base UI part to move to, so each is a documented exception, not a drift.
+Bill approved reading these three from the design system audit on 2026-11-20. None has a Base UI part for its own interaction, so each is a documented exception, not a drift. Base UI does ship a plain `Button`, but these controls are native buttons or PLUS Button and IconButton, which do not use it. Adopting it is a decision for PLUS Button as a whole, not for these three.
 
 - **PopupSelect.** Its trigger, open and closed state, outside press and focus return already run on Base UI Popover, through Popup. What stays hand-written is the list: it is the shared `Listbox`, the one Select draws, with the same rows, keys and messages. A Base UI Combobox under PopupSelect alone would fork that list from Select's, so its keyboard (arrows, Enter, Escape, typing to filter) is the Select case above and moves with that rewrite, not before. Held by the `Keyboard` and `Searchable` stories.
 - **InlineEdit.** Base UI has no inline-edit part. Its Field and Input describe a control, not the swap from read view to edit view, Enter or leaving to confirm, Escape to cancel and focus back on the read view; and the edit view is the caller's own control, so there is nothing for a Base UI part to sit under. `handleKeyDown`, `handleBlur` and `keepFocus` in `InlineEdit.jsx` stay. Held by the `InlineEdit keyboard` block in `InlineEdit.test.jsx`.
