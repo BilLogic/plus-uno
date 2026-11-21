@@ -13,6 +13,7 @@
     --frame-sidebar-row-gap: var(--space-0125); /* two Sidebar rows sit 2 apart */
     --frame-sidebar-group-gap: var(--space-100); /* two Sidebar groups sit 16 apart */
     --frame-sidebar-row-radius: var(--radius-control-md); /* the rounding of a Sidebar row (8) */
+    --frame-footer-height: calc(var(--frame-sidebar-pad) + var(--stack-md) + var(--control-md)); /* 52: the account row under its divider, so the footer line sits level with it */
 
     /* Panel */
     --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */

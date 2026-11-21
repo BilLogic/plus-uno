@@ -2,7 +2,7 @@
 
 # FooterActions
 
-FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
+FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`, unless it sets its own spacing: the Frame footer of a multi-step task passes `spacing="default"` (32). A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
 
 **Import:** `import { FooterActions } from '@/components';`
 

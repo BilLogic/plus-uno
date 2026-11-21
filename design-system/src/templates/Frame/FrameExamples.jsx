@@ -11,16 +11,16 @@ import { Frame, Page } from '@/templates';
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 export const BarInOrder = () => (
-    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
-        <Button text="Back" />
-        <Button text="Next" appearance="primary" />
+    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
+        <Button text="Back" spacing="default" />
+        <Button text="Next" appearance="primary" spacing="default" />
     </FooterActions>
 );
 
 export const BarScrambled = () => (
-    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
-        <Button text="Cancel" />
-        <Button text="Next" appearance="primary" />
+    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
+        <Button text="Cancel" spacing="default" />
+        <Button text="Next" appearance="primary" spacing="default" />
     </FooterActions>
 );
 
@@ -44,14 +44,14 @@ export const MultiStepInnerSidebar = () => (
             />
         )}
     >
-        <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%', minBlockSize: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', blockSize: 'calc(100% + var(--page-pad))', minBlockSize: 0, marginBlockEnd: 'calc(-1 * var(--page-pad))' }}>
             <Page style={{ flex: '1 1 auto', minBlockSize: 0, overflowY: 'auto' }} header={<PageHeader title="Plan a tutoring term" />}>
                 <Skeleton preset="text" lines={4} />
             </Page>
-            <div style={{ flex: '0 0 auto', paddingInline: 'var(--page-pad)', borderBlockStart: 'var(--border-width-default) solid var(--ds-border)' }}>
-                <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
-                    <Button text="Back" />
-                    <Button text="Next" appearance="primary" />
+            <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', blockSize: 'var(--frame-footer-height)', paddingInline: 'var(--page-pad)', borderBlockStart: 'var(--border-width-default) solid var(--ds-border)' }}>
+                <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
+                    <Button text="Back" spacing="default" />
+                    <Button text="Next" appearance="primary" spacing="default" />
                 </FooterActions>
             </div>
         </div>

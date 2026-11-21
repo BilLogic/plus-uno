@@ -399,6 +399,13 @@
           }
         },
         {
+          "name": "Frame/footer-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-footer-height)"
+          }
+        },
+        {
           "name": "Panel/min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
