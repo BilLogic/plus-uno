@@ -27,4 +27,14 @@ Select, Cascader, TreeSelect and the Calendar keep a hand-written keyboard handl
 
 New field-anchored popups still start on Base UI; this amendment covers these four only.
 
+## Amendment (2026-11-20): three more exceptions
+
+Bill approved these from the design system audit. Each is a documented exception, not a drift.
+
+- **TreeTable.** Base UI ships no tree, so the row keyboard (`onKeyDown` in `TreeTable.jsx`: arrows to walk, expand and collapse) stays hand-written, the same ground as TreeSelect above. Held by `TreeTable.test.jsx`.
+- **TagInput's keyboard.** It runs on the shared `Listbox`, so it is the same case as Select above and moves with that rewrite, not before.
+- **Panel resize handle.** Base UI has no splitter, so the `separator` on the Panel's Page-facing edge keeps its own pointer and key handling. Held by the Panel stories.
+
+Moved to Base UI by the same ruling: AiSources now sits on Collapsible. Flag's hover and focus pause is not moved here: Base UI exposes no public hover or focus part, only Toast's own pause, which would replace Flag's stack rather than sit under it.
+
 — Claude (agent), Nov 2026, on Bill's approval to make Base UI the default behavior layer

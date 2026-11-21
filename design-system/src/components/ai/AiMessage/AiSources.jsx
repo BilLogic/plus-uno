@@ -1,5 +1,6 @@
-import React, { useId, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { Collapsible } from '@base-ui/react/collapsible';
 import Icon from '@/components/images-and-icons/Icon';
 import Link from '@/components/navigation/Link';
 import Button from '@/components/forms-and-inputs/Button';
@@ -23,24 +24,27 @@ const unique = (sources) => {
  * read first. The same address listed twice shows once.
  */
 export const AiSources = ({ sources = [], target, defaultOpen = false, className = '' }) => {
-    const [open, setOpen] = useState(defaultOpen);
-    const listId = useId();
     const list = unique(sources);
     if (list.length === 0) return null;
     return (
-        <div className={['plus-ai-sources', className].filter(Boolean).join(' ')}>
-            <Button
-                appearance="subtle"
-                spacing="compact"
-                className="plus-ai-sources__toggle"
-                aria-expanded={open}
-                aria-controls={listId}
-                iconAfter={<Icon name={open ? 'chevron-up' : 'chevron-down'} size={12} />}
-                onClick={() => setOpen((value) => !value)}
-                text={`Sources (${list.length})`}
+        <Collapsible.Root
+            defaultOpen={defaultOpen}
+            className={['plus-ai-sources', className].filter(Boolean).join(' ')}
+        >
+            <Collapsible.Trigger
+                render={(triggerProps, state) => (
+                    <Button
+                        {...triggerProps}
+                        appearance="subtle"
+                        spacing="compact"
+                        className="plus-ai-sources__toggle"
+                        iconAfter={<Icon name={state.open ? 'chevron-up' : 'chevron-down'} size={12} />}
+                        text={`Sources (${list.length})`}
+                    />
+                )}
             />
-            {open ? (
-                <ul id={listId} className="plus-ai-sources__list" aria-label="Sources">
+            <Collapsible.Panel>
+                <ul className="plus-ai-sources__list" aria-label="Sources">
                     {list.map((source) => (
                         <li key={source.href} className="plus-ai-sources__item">
                             <Link href={source.href} target={target} isOpenInNewWindow={!target && /^https?:/.test(source.href)}>{source.title}</Link>
@@ -48,8 +52,8 @@ export const AiSources = ({ sources = [], target, defaultOpen = false, className
                         </li>
                     ))}
                 </ul>
-            ) : null}
-        </div>
+            </Collapsible.Panel>
+        </Collapsible.Root>
     );
 };
 
