@@ -13,15 +13,18 @@ import { typeStyle } from './type-style.js';
  * stay pressable; steps past the answers are off), the Page holds the task's
  * name and the step's body, and the footer along the bottom holds Save and exit
  * as a link at the left edge, with Back and Next (Finish on the last step) in
- * tracks 3 and 4: FooterActions' filled buttons, 48 high.
+ * tracks 3 and 4: FooterActions' filled buttons at default spacing, 32 high,
+ * in a bar whose top line sits level with the Sidebar account row's.
  */
 
 /** The browser body's height on the docs page: docs geometry, in px. */
 export const WINDOW_HEIGHT = 440; // docs-literal
 /** The width the window lays out at on a docs page, wide enough that the Sidebar docks. */
 export const TASK_STAGE = 1100; // docs-literal: keeps the Frame at or above 1024 inside the window's border
-/** The page footer's height: 48px (--footer-height, one spacious button). */
+/** A Modal or Panel footer's height: 48px (--footer-height, one spacious button). */
 export const BAR_TOKEN = '--footer-height';
+/** The task's footer under its hairline: 52px (--frame-footer-height), so its line sits level with the Sidebar account row's. */
+export const TASK_BAR_TOKEN = '--frame-footer-height';
 
 export const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
 
@@ -85,7 +88,8 @@ export const MultiStepTask = ({
                     />
                 )}
             >
-                <div data-probe="task-page" style={{ display: 'flex', flexDirection: 'column', blockSize: '100%', minBlockSize: 0 }}>
+                {/* The footer runs to the Frame's foot over the surface's bottom pad, as the account row runs to the Sidebar's. */}
+                <div data-probe="task-page" style={{ display: 'flex', flexDirection: 'column', blockSize: 'calc(100% + var(--page-pad))', minBlockSize: 0, marginBlockEnd: 'calc(-1 * var(--page-pad))' }}>
                     <div
                         data-probe="task-body"
                         style={{
@@ -93,7 +97,7 @@ export const MultiStepTask = ({
                             minBlockSize: 0,
                             overflowY: 'auto',
                             padding: 'var(--page-pad)',
-                            // The footer is exactly 48 so its filled buttons fit; the hairline sits on the body's edge.
+                            // The hairline sits on the body's edge, so the footer below it keeps its line level with the account row's.
                             borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)',
                             boxSizing: 'border-box',
                         }}
@@ -112,7 +116,7 @@ export const MultiStepTask = ({
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            blockSize: `var(${BAR_TOKEN})`,
+                            blockSize: `var(${TASK_BAR_TOKEN})`,
                             flex: '0 0 auto',
                             boxSizing: 'border-box',
                             overflow: 'hidden',
@@ -123,10 +127,10 @@ export const MultiStepTask = ({
                         <FooterActions
                             data-probe="bar-column"
                             style={{ inlineSize: '100%', maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}
-                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
+                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
                         >
-                            <Button text="Back" isDisabled={at === 0} onClick={() => go(at - 1)} />
-                            <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => go(Math.min(at + 1, labels.length - 1))} />
+                            <Button text="Back" spacing="default" isDisabled={at === 0} onClick={() => go(at - 1)} />
+                            <Button text={last ? 'Finish' : 'Next'} appearance="primary" spacing="default" onClick={() => go(Math.min(at + 1, labels.length - 1))} />
                         </FooterActions>
                     </div>
                 </div>

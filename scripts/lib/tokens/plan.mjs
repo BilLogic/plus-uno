@@ -189,7 +189,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-md', old: '--size-control-md', ref: 'var(--size-200)', use: 'Height of a default control: 32px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
-  { tier: 'semantics', group: 'Size', new: '--footer-height', old: null, ref: 'var(--control-xl)', use: 'Height of a Modal, Panel or multi-step task footer: 48px, one spacious button with no padding of its own.' },
+  { tier: 'semantics', group: 'Size', new: '--footer-height', old: null, ref: 'var(--control-xl)', use: 'Height of a Modal or Panel footer: 48px, one spacious button with no padding of its own.' },
 
   // ─── Templates / Frame (with the Sidebar) ──────────────────────
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
@@ -197,6 +197,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-md)', note: 'the rounding of a Sidebar row (8)', use: 'Corner rounding of a Sidebar row.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-footer-height', old: null, ref: 'calc(var(--frame-sidebar-pad) + var(--stack-md) + var(--control-md))', note: '52: the account row under its divider, so the footer line sits level with it', use: 'Height of the Frame footer under its hairline: one 32-high button, its top line level with the Sidebar account row.' },
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },

@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
-import { BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
+import { BAR_TOKEN, TASK_BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -148,7 +148,7 @@ export const PlacementModalLeading = {
     },
 };
 
-/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, filled 48 buttons in a 48 footer. */
+/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, filled 32 buttons in the Frame footer. */
 export const PlacementMultiStep = {
     name: 'Placement: In a multi-step task',
     render: () => staged(<MultiStepBar />, TASK_STAGE),
@@ -166,10 +166,10 @@ export const PlacementMultiStep = {
         await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
-        await expect(rect(back).height, 'Back is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
-        await expect(rect(save).height, 'Save and exit is 48 high too').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+        await expect(rect(back).height, 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(rect(save).height, 'Save and exit is 32 high too').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(rect(save).top, 'one line: Save and exit and Back share a top').toBeCloseTo(rect(back).top, 0);
-        await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+        await expect(rect(bar).height, 'the bar is 52 high under its hairline').toBeCloseTo(tokenLength(canvasElement, TASK_BAR_TOKEN), 0);
         await userEvent.click(back);
         await waitFor(() => expect(back, 'Back disables on the first step').toBeDisabled());
         await userEvent.click(next);
