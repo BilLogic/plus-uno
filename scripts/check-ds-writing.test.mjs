@@ -243,7 +243,7 @@ test('gradeFindings: props-parity is an error on any page, so a new mismatch fai
 });
 
 test('the strict list holds the pages that pass both checks, enforced in the gate', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput', 'Table', 'Panel']);
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput', 'Table', 'Panel', 'Card']);
   assert.equal(ENFORCE_STRICT, true);
 });
 

@@ -53,7 +53,6 @@ Table reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For a few objects people scan one by one, use `Card`.
-- For rows that open into a record beside the table, use `Panel`.
 
 ## Best practices
 

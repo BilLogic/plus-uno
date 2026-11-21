@@ -43,21 +43,21 @@ Content picks the minimum width. Choose the narrowest card that holds the conten
 
 | Minimum width | When to use | Pad | Radius | Token |
 | --- | --- | --- | --- | --- |
-| 224 | One number or one line. | 16 | 16 | `--card-min-width-sm` |
-| 304 | A short list or a few lines. | 16 | 16 | `--card-min-width-md` |
-| 480 | A summary with several parts. | 16 | 16 | `--card-min-width-lg` |
+| `224` | One number or one line. | `--card-pad` | `--card-radius` | `--card-min-width-sm` |
+| `304` | A short list or a few lines. | `--card-pad` | `--card-radius` | `--card-min-width-md` |
+| `480` | A summary with several parts. | `--card-pad` | `--card-radius` | `--card-min-width-lg` |
 
-`minWidth` sets the minimum width; every width uses `--card-pad` (16) and `--card-radius` (16). The text sets the height, and a top image takes its `imageRatio` height from the card width, rounded to a multiple of 4. Set a height cap with `style`'s `maxHeight`; the card clips what passes it.
+`minWidth` sets the minimum width; every width uses `--card-pad` and `--card-radius`. The text sets the height, and a top image takes its `imageRatio` height from the card width, rounded to a multiple of 4. Set a height cap with `style`'s `maxHeight`; the card clips what passes it.
 
 ### Cards in a row
 
-In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. The count switches between viewport widths of 1224 and 1256 with the sidebar docked.
+In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with the `--grid-gutter` between cards. The count switches between viewport widths of 1224 and 1256 with the sidebar docked.
 
 | Mode | Content width | Min 224 | Min 304 | Min 480 |
 | --- | --- | --- | --- | --- |
-| Medium, 768 | 720 | 3 | 2 | 1 |
-| Large, 1024 | 736 | 3 | 2 | 1 |
-| X-Large, 1440 | 1152 | 4 | 3 | 2 |
+| Medium, `768` | `720` | `3` | `2` | `1` |
+| Large, `1024` | `736` | `3` | `2` | `1` |
+| X-Large, `1440` | `1152` | `4` | `3` | `2` |
 
 ## Motion
 

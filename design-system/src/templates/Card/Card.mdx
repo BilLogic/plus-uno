@@ -201,26 +201,26 @@ Content picks the minimum width. Choose the narrowest card that holds the conten
 <tr><th>Minimum width</th><th>When to use</th><th>Pad</th><th>Radius</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>224</td><td>One number or one line.</td><td>16</td><td>16</td><td><code>--card-min-width-sm</code></td></tr>
-<tr><td>304</td><td>A short list or a few lines.</td><td>16</td><td>16</td><td><code>--card-min-width-md</code></td></tr>
-<tr><td>480</td><td>A summary with several parts.</td><td>16</td><td>16</td><td><code>--card-min-width-lg</code></td></tr>
+<tr><td><code>224</code></td><td>One number or one line.</td><td><code>--card-pad</code></td><td><code>--card-radius</code></td><td><code>--card-min-width-sm</code></td></tr>
+<tr><td><code>304</code></td><td>A short list or a few lines.</td><td><code>--card-pad</code></td><td><code>--card-radius</code></td><td><code>--card-min-width-md</code></td></tr>
+<tr><td><code>480</code></td><td>A summary with several parts.</td><td><code>--card-pad</code></td><td><code>--card-radius</code></td><td><code>--card-min-width-lg</code></td></tr>
 </tbody>
 </DocsTable>
 
-`minWidth` sets the minimum width; every width uses `--card-pad` (16) and `--card-radius` (16). The text sets the height, and a top image takes its `imageRatio` height from the card width, rounded to a multiple of 4. Set a height cap with `style`'s `maxHeight`; the card clips what passes it.
+`minWidth` sets the minimum width; every width uses `--card-pad` and `--card-radius`. The text sets the height, and a top image takes its `imageRatio` height from the card width, rounded to a multiple of 4. Set a height cap with `style`'s `maxHeight`; the card clips what passes it.
 
 ### Cards in a row
 
-In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. The count switches between viewport widths of 1224 and 1256 with the sidebar docked.
+In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with the `--grid-gutter` between cards. The count switches between viewport widths of 1224 and 1256 with the sidebar docked.
 
 <DocsTable>
 <thead>
 <tr><th>Mode</th><th>Content width</th><th>Min 224</th><th>Min 304</th><th>Min 480</th></tr>
 </thead>
 <tbody>
-<tr><td>Medium, 768</td><td>720</td><td>3</td><td>2</td><td>1</td></tr>
-<tr><td>Large, 1024</td><td>736</td><td>3</td><td>2</td><td>1</td></tr>
-<tr><td>X-Large, 1440</td><td>1152</td><td>4</td><td>3</td><td>2</td></tr>
+<tr><td>Medium, <code>768</code></td><td><code>720</code></td><td><code>3</code></td><td><code>2</code></td><td><code>1</code></td></tr>
+<tr><td>Large, <code>1024</code></td><td><code>736</code></td><td><code>3</code></td><td><code>2</code></td><td><code>1</code></td></tr>
+<tr><td>X-Large, <code>1440</code></td><td><code>1152</code></td><td><code>4</code></td><td><code>3</code></td><td><code>2</code></td></tr>
 </tbody>
 </DocsTable>
 

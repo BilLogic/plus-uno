@@ -8,7 +8,7 @@
  */
 
 /** The pages held to every rule, by component name. */
-export const STRICT_PAGES = ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput', 'Table', 'Panel'];
+export const STRICT_PAGES = ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput', 'Table', 'Panel', 'Card'];
 
 /** The switch: true makes a strict page's finding fail `check:harness`. */
 export const ENFORCE_STRICT = true;
