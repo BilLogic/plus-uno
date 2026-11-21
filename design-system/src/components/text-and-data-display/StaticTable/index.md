@@ -59,7 +59,7 @@ Don't: Every cell wrapped, so rows grow uneven.
 - `CountTag`: use when showing a numeric count inside a cell.
 - Table: use when choosing between Static, Dynamic and Tree tables.
 
-Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `TreeTable` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

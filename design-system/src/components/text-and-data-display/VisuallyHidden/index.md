@@ -104,7 +104,7 @@ appear on focus.
 - `Tooltip`: use when pairing an icon-only control with a visible label on hover and focus.
 - `Spinner`: use when rendering a loading indicator, which already includes its own visually hidden label.
 
-Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable`
 
 ## Parts
 

@@ -62,7 +62,7 @@ Don't: A line number beside a single command.
 
 - `Code`: use when formatting a short identifier or command inline within prose.
 
-Same group: `Code` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
+Same group: `Code` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

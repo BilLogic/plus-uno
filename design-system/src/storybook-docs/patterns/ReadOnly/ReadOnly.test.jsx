@@ -31,6 +31,8 @@ describe('ReadOnly live cases and TypeCard links', () => {
         const { unmount } = render(<PlainValueCase />);
         expect(screen.queryAllByRole('textbox')).toHaveLength(0);
         expect(screen.getByText('Lincoln Middle School')).toBeVisible();
+        expect(screen.getByText('School').tagName).toBe('DT');
+        expect(screen.getByText('Lincoln Middle School').tagName).toBe('DD');
         unmount();
 
         render(<FieldForFixedValueCase />);
@@ -43,6 +45,8 @@ describe('ReadOnly live cases and TypeCard links', () => {
         expect(CODE.ReadableWithReason).toContain('isReadOnly caption="Set by your supervisor."');
         expect(CODE.FadedNoReason).toContain('const column');
         expect(CODE.PlainValue).toContain("import { Section } from '@/templates';");
+        expect(CODE.PlainValue).toContain('<Facts items=');
+        expect(CODE.PlainValue).not.toContain('<dl');
         for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 

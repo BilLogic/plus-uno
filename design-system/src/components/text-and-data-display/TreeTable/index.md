@@ -66,7 +66,7 @@ Don't: A link in the row, where a press means two things.
 - `DynamicTable`: use when sorting, selecting or paging flat rows on the same table shell.
 - Table: use when choosing between Static, Dynamic and Tree tables.
 
-Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · `StaticTable` · `VisuallyHidden`
 
 ## Parts
 

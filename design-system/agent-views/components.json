@@ -5373,6 +5373,47 @@
       ]
     },
     {
+      "name": "Facts",
+      "kind": "component",
+      "import": "import { Facts } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/Facts/Facts.jsx",
+      "summary": "A description list for read-only facts: each label sits beside its value in two aligned columns. Labels are subtle and values default, so a reader scans down the values. It is plain text, not a field: nothing in it takes focus.",
+      "props": [
+        {
+          "name": "items",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "The facts, in reading order. Each label is unique within the list.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra classes for placement, such as spacing.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "AlignsValues",
+        "NotAControl",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--inline-lg",
+        "--stack-sm"
+      ]
+    },
+    {
       "name": "Fieldset",
       "kind": "component",
       "import": "import { Fieldset } from '@/components';",
