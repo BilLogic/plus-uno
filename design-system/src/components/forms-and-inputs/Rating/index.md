@@ -50,14 +50,14 @@ A pre-filled rating biases the answer.
 Do: No rating yet, so the person gives their own.
 Don't: Four stars filled before the person has rated.
 
-### Show a given rating as disabled. {#show-a-given-rating-as-disabled}
+### Show a recorded rating as plain text. {#show-a-recorded-rating-as-plain-text}
 
-A rating that cannot change reads as a result.
+`Rating` has no read-only state, and `isDisabled` is for a rating that does not apply yet. A rating nobody can change is a result, so write it as text. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
-Do: A recorded rating, disabled.
-Don't: A recorded rating that still looks editable.
+Do: A recorded rating, written as text.
+Don't: Disabled dims a result people need to read.
 
-### It is always controlled. {#it-is-always-controlled}
+### Always control it. {#always-control-it}
 
 ```jsx
 // Incorrect: the component holds no state. Without an onChange the items are
@@ -68,7 +68,7 @@ Don't: A recorded rating that still looks editable.
 <Rating label="How was the session?" value={score} onChange={setScore} />
 ```
 
-### It submits its value under `name`. {#it-submits-its-value-under-name}
+### Set `name` to submit the value with a form. {#set-name-to-submit-the-value-with-a-form}
 
 A hidden input carries the score with its form, so `name` is how a server reads it.
 

@@ -18,9 +18,7 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 ## Usage
 
-The days are one tab stop (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
-
-Use `Calendar` directly only when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
+Use `Calendar` when a month grid must stay visible on the page without a field or popup around it, such as an embedded scheduling view.
 
 ## Motion
 
@@ -85,6 +83,7 @@ Six weeks render every month, including the days of neighboring months that fill
 
 ## Accessibility
 
+- **The days are one tab stop** (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
 - **Each day is a real, named button.** The accessible name is the day's full date, not just a number, so a screen reader announces an unambiguous date on every cell.
 - **State is marked, not just styled.** `aria-pressed` marks the picked day or a range's ends, `aria-current="date"` marks today, and `data-in-range` marks the days between. None of this relies on color alone.
 - **Out-of-range and out-of-month days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`.
@@ -128,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | Day size | `--calendar-day-sm` (24), `--calendar-day-md` (32), `--calendar-day-lg` (40). |
 | Day radius | `--radius-md`. |
 | Gaps | `--stack-md` between header, weekdays and days; `--stack-sm` between rows. |
-| Padding | `--space-025` top and bottom, `--pad-x-md` either side. |
+| Padding | `--pad-x-xs` top and bottom, `--pad-x-sm` either side. |
 
 ## Content guidelines
 

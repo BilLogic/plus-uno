@@ -197,7 +197,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
-| Height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Height | 40: `--control-lg`. Compact 32: `--control-md`. |
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Caret and clear | Caret `--ds-icon-subtle` at `--icon-sm`; field clear icon `--icon-sm` on a subtle `IconButton`; footer Clear compact subtle `Button` in `--dropdown-menu-pad` under a `--ds-border` top edge. |
@@ -205,7 +205,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Option | `--pad-y-md` `--pad-x-md`, `--body-default`; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected`. |
 | Select all mark | `--ds-background-input` with a `--ds-border-input` edge and `--radius-md`; checked `--ds-background-selected-bold`, `--ds-border-selected`, `--ds-icon-inverse`. |
-| Search hint | "Type to search" above a long list: `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` `--pad-x-md`. |
+| Search hint | "Type to search" above a long list: `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` top and bottom, `--pad-x-md` either side. |
 
 ## Content guidelines
 

@@ -67,14 +67,14 @@ Every cell is a control, so a six-by-five grid is thirty tab stops. Past that, a
 Do: A question above the grid that every row answers.
 Don't: The same grid with no question: nothing says what the scale measures.
 
-### Radio grid for one answer per row. {#radio-grid-for-one-answer-per-row}
+### Use radios for one answer per row. {#use-radios-for-one-answer-per-row}
 
 The control type tells people how many answers a row takes.
 
 Do: Radios, for one preferred time each day.
 Don't: Checkboxes for the same single-answer rows.
 
-### Checkbox grid for several answers. {#checkbox-grid-for-several-answers}
+### Use checkboxes for several answers per row. {#use-checkboxes-for-several-answers-per-row}
 
 Checkboxes signal that a row accepts more than one answer.
 
@@ -144,7 +144,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Do | Don't |
 | --- | --- |
 | Write column headers as the scale: "Rarely", "Sometimes", "Often". | Bare numbers with no meaning attached. |
-| Keep row labels short and parallel; they do not wrap. | A sentence per row. |
+| Keep row labels short and parallel. | A sentence per row. |
 | Phrase the question above the grid so every row answers it. | A different question in each row. |
 | Keep column headers short and the same length. | A header the person cannot read at a glance. |
 

@@ -51,13 +51,6 @@ The field carries the invalid state. Use `isInvalid` only when the form cannot g
 Do: The field shows the invalid state.
 Don't: A default field gives no sign of the problem.
 
-### Disable instead of hiding. {#disable-instead-of-hiding}
-
-A disabled field tells people the option exists but is unavailable.
-
-Do: Visible but disabled.
-Don't: An enabled field that cannot take input.
-
 ### Put help in the caption. {#put-help-in-the-caption}
 
 Do: Put help in the caption, where it stays after the person types.

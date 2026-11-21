@@ -50,14 +50,7 @@ The field carries the error state.
 Do: The field shows the error state.
 Don't: A default field gives no sign of the problem.
 
-### Disable instead of hiding. {#disable-instead-of-hiding}
-
-A disabled field tells people the option exists but is unavailable.
-
-Do: Visible but disabled.
-Don't: An enabled field that cannot take tags.
-
-### The caller owns the options, and stores what is created. {#the-caller-owns-the-options-and-stores-what-is-created}
+### Store the options and what people create. {#store-the-options-and-what-people-create}
 
 `options` is required. When the person creates a value, `onCreate` reports it
 once, with the color it was given. Store both on a new option, so the color
@@ -75,7 +68,7 @@ stays the same everywhere the tag appears.
 />
 ```
 
-### A value saved to a server holds a temporary id until it is confirmed. {#a-value-saved-to-a-server-holds-a-temporary-id-until-it-is-confirmed}
+### Return a promise from `onCreate` when a server stores the tag. {#return-a-promise-from-oncreate-when-a-server-stores-the-tag}
 
 Return a promise from `onCreate` that resolves to the stored id. Until it
 does, the tag is saving and its `value` is a temporary id starting `new-`. If
@@ -90,7 +83,7 @@ failure is announced.
 />
 ```
 
-### A controlled field needs a handler to offer a ×. {#a-controlled-field-needs-a-handler-to-offer-a}
+### Give a controlled field an `onChange` handler. {#give-a-controlled-field-an-onchange-handler}
 
 ```jsx
 // Incorrect — controlled with no handler, so no tag can be removed and none shows a ×.
@@ -215,14 +208,14 @@ On a row's handle and in its menu:
 | Part | Token |
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
-| Height | Starts at 40: `--height-250`. Compact 32: `--control-md`. Grows as tags wrap. |
+| Height | Starts at 40: `--control-lg`. Compact 32: `--control-md`. Grows as tags wrap. |
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Tags and entry | `--stack-md` between them; with focus, up to three rows of tags before the content scrolls. |
 | Entry text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
-| List hint | `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` `--pad-x-md`. |
+| List hint | `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` top and bottom, `--pad-x-md` either side. |
 | Row handle | `--ds-icon-subtle`. |
-| Option menu | `--option-menu-width` wide; the name field `--pad-x-xs` `--pad-x-sm`; a `--border-width-default` rule in `--ds-border` above the colors. |
+| Option menu | `--option-menu-width` wide; the name field `--pad-x-xs` top and bottom, `--pad-x-sm` either side; a `--border-width-default` rule in `--ds-border` above the colors. |
 
 The tags take Tag's own tokens.
 

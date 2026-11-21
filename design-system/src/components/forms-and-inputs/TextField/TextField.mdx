@@ -10,7 +10,7 @@ import {
     FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { TextField } from '@/components';
+import { Icon, TextField } from '@/components';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -206,11 +206,11 @@ Use `TextField` for single-line text entry: names, emails, search boxes and numb
 </thead>
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-width-default</code> edge in <code>--ds-border-input</code>.</td></tr>
-<tr><td>Height</td><td>40: <code>--height-250</code>. Compact 32: <code>--control-md</code>.</td></tr>
+<tr><td>Height</td><td>40: <code>--control-lg</code>. Compact 32: <code>--control-md</code>.</td></tr>
 <tr><td>Radius</td><td>10: <code>--radius-control-lg</code>. Compact 8: <code>--radius-control-md</code>.</td></tr>
 <tr><td>Side padding</td><td><code>--pad-x-md</code>; a Button in a slot sits <code>--pad-x-xs</code> from the edge.</td></tr>
 <tr><td>Slot button</td><td><code>--control-md</code> in the 40 field, <code>--control-sm</code> in the 32 field.</td></tr>
-<tr><td>Slots</td><td><code>--ds-text-subtle</code>, <code>--stack-sm</code> apart; <code>--radius-control-lg</code> between slot and control.</td></tr>
+<tr><td>Slots</td><td><code>--ds-text-subtle</code>, <code>--stack-sm</code> inside a slot; <code>--field-gap</code> between slot and control.</td></tr>
 <tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>Label and caption</td><td><code>--body-sm</code>; label <code>--ds-text</code>, caption <code>--ds-text-subtle</code>; the count <code>--ds-text-subtle</code>, over the limit <code>--ds-text-danger</code>.</td></tr>
 </tbody>
@@ -238,9 +238,9 @@ The label says what the field is, not what to do.
 A leading icon or a trailing action, not both crowding the text.
 
 <DoDontPair
-    doExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} /></FigureStack>}
+    doExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<Icon name="magnifying-glass" />} /></FigureStack>}
     doCaption="One element before the text."
-    dontExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} elemAfterInput={<i className="fa-solid fa-circle-info" aria-hidden="true" />} /></FigureStack>}
+    dontExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<Icon name="magnifying-glass" />} elemAfterInput={<Icon name="circle-info" />} /></FigureStack>}
     dontCaption="Elements on both sides squeeze the value."
 />
 

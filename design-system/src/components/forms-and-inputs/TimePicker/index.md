@@ -39,7 +39,7 @@ TimePicker reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### The field always reports a 12-hour value. {#the-field-always-reports-a-12-hour-value}
+### Read the 12-hour value `onChange` reports. {#read-the-12-hour-value-onchange-reports}
 
 `onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given, or `null` once the field is cleared. A 24-hour `value` is accepted and read as the same time, but what it hands back is always 12-hour.
 

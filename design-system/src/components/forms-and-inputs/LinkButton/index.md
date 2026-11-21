@@ -59,7 +59,7 @@ Don't: Stretched across a wide row.
 
 ### Align with the button group. {#align-with-the-button-group}
 
-Right-align in multi-step tasks and Modals; left-align on full-page forms and content-heavy screens.
+Right-align in multi-step tasks; left-align on full-page forms and content-heavy screens. A Modal footer follows `FooterActions`, which puts a link in the leading slot on the left.
 
 ### Let a `LinkButton` label longer than its room end in an ellipsis. {#let-a-linkbutton-label-longer-than-its-room-end-in-an-ellipsis}
 
@@ -104,7 +104,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ### States
 
-Hover, pressed and focus are the browser's own. A link button has no `ai`, disabled or loading state.
+A link button has no `ai`, disabled or loading state.
 
 | State | What changes |
 | --- | --- |

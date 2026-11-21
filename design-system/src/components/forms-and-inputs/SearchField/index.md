@@ -20,15 +20,11 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 ## Usage
 
-Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field (except in `focused` mode): the count sits in that header, and the no-matches message in its body.
+Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
 
-Pick the mode by where the answer lands:
+`SearchField` filters rows as you type through `onValueChange`.
 
-- `active` (default): filters rows as you type through `onValueChange`.
-- `basic` : runs on Enter through `onSearch`, for searches too heavy to run on every keystroke. It never calls `loadResults`.
-- `focused` : opens a panel under the field for jumping straight to a record from anywhere (`recent` searches on focus, matches grouped by type while typing, a "See all" row, and an optional `SearchFieldAction` child).
-
-`name` is the input's form key: a plain form submits the text under it (in `basic` mode Enter runs `onSearch` and does not submit the form).
+`name` is the input's form key: a plain form submits the text under it.
 
 `isCollapsible` starts the field as an icon button (`defaultOpen` starts it open). Default strings can be overridden via `clearLabel` ("Clear search"), `panelLabel` ("Suggestions"), `recentLabel` ("Recent searches"), `noMatchesLabel` ("No matches for") and `seeAllLabel` ("See all results for").
 
@@ -72,7 +68,6 @@ The clear action keeps its place at the end, and focusing the field reaches the 
 - **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
-- **In `focused` the input is the combobox.** Focus stays in it and the highlighted row is its `aria-activedescendant`; the panel is a named listbox.
 - **Loading is announced** through the spinner's status text.
 
 ## Related
@@ -106,9 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Key | What it does |
 | --- | --- |
 | Esc | Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. |
-| Enter | In `basic`, runs `onSearch`. In `focused`, chooses the row under the cursor, or runs `onSearch` when none is. |
-| Arrow down and up | In `focused`, move through the panel's rows and wrap. Inside the scope list, move and choose. |
-| Esc in the panel | Closes the panel and keeps the text. The next Esc clears. |
+| Arrow down and up | Inside the scope list, move and choose. |
 
 ### Tokens
 

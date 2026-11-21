@@ -108,7 +108,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ### States
 
-Hover, pressed and focus are the browser's own. A link icon button has no disabled or loading state.
+A link icon button has no disabled or loading state.
 
 | State | What changes |
 | --- | --- |

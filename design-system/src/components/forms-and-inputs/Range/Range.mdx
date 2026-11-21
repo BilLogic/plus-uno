@@ -38,7 +38,7 @@ A range lets a person choose a value within a minimum and a maximum by moving a 
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6622"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Range"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -57,7 +57,7 @@ A range lets a person choose a value within a minimum and a maximum by moving a 
 
 ## Size
 
-<ComponentExample of={RangeStories.Size} description="The handle and bar in px (8, 12 or 16); the track between them follows a step behind." />
+<ComponentExample of={RangeStories.Size} title="Sizes" description="The handle and bar in px (8, 12 or 16); the track between them follows a step behind." />
 
 </div>
 
@@ -249,7 +249,7 @@ If the slider needs explaining, put one line of helper text under it rather than
 ## Accessibility
 
 - **Label every slider.** `label` names the input; `showLabel={false}` visually hides the text while keeping the accessible name.
-- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `border.focused`, 2px off the handle; pointer focus draws none.
+- **Keyboard.** Arrow keys step by `step`; `Home` and `End` jump to `min` and `max`. Focus is a 2px ring on `--ds-border-focused`, 2px off the handle; pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
 
 </div>

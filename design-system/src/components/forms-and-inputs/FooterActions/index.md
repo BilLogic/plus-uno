@@ -39,19 +39,20 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 
 | Surface | Buttons | Story |
 | --- | --- | --- |
-| Page header | `default` 32; at most one `primary`, rightmost | Layout/PageHeader |
+| Page header | `default` 32; at most one `primary`, rightmost | PageHeader |
 | Card or section header | `subtle` `compact` text button and/or `subtle` icon button | Card, Section |
-| Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Patterns/Table |
+| Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Table template |
 | Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | Table template, DynamicTable |
-| Empty state | centered; `default` 32 on a page, `compact` 24 in a card | Messaging/EmptyState, Docs/Empty |
-| Banner and Flag | `subtle` `compact` text actions after the message | Messaging/Banner, Messaging/Flag |
-| Button group | related actions in a spaced row; items hug their labels | Navigation/ButtonGroup |
-| Inline with a field | same height as the field, `default` appearance | Docs/Forms |
+| Empty state | centered; `default` 32 on a page, `compact` 24 in a card | EmptyState, Empty |
+| Banner and Flag | `subtle` `compact` text actions after the message | Banner, Flag |
+| Button group | related actions in a spaced row; items hug their labels | Button group |
+| Inline with a field | same height as the field, `default` appearance | Forms |
 
 ## Alternatives
 
 - For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
-- For switching between views of the same content, use `SegmentedControl`. For a spaced row of related action buttons, use `ButtonGroup`.
+- For switching between views of the same content, use `SegmentedControl`.
+- For a spaced row of related action buttons, use `ButtonGroup`.
 
 ## Best practices
 

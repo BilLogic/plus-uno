@@ -129,7 +129,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`. |
-| Height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Height | 40: `--control-lg`. Compact 32: `--control-md`. |
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |

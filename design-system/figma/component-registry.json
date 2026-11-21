@@ -279,7 +279,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Checkbox",
         "source": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx",
         "storybookId": "components-forms-and-inputs-checkbox-checkbox--docs"
       },
@@ -326,7 +326,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/ChoiceGrid",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx",
         "storybookId": "components-forms-and-inputs-radio-choice-grid--docs",
         "props": {
@@ -1209,7 +1209,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Radio/Radio.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Radio",
         "source": "design-system/src/components/forms-and-inputs/Radio/Radio.jsx",
         "storybookId": "components-forms-and-inputs-radio-radio--docs"
       },
@@ -1233,7 +1233,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RadioGroup",
         "source": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx",
         "storybookId": "components-forms-and-inputs-radio-radio-group--docs"
       },
@@ -1257,7 +1257,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Range/Range.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Range",
         "source": "design-system/src/components/forms-and-inputs/Range/Range.jsx",
         "storybookId": "components-forms-and-inputs-range--docs"
       },
@@ -1281,7 +1281,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Rating/Rating.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Rating",
         "source": "design-system/src/components/forms-and-inputs/Rating/Rating.jsx",
         "storybookId": "components-forms-and-inputs-rating--docs"
       },
@@ -1751,7 +1751,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TagInput",
         "source": "design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx",
         "storybookId": "components-forms-and-inputs-tag-input--docs",
         "props": {
@@ -1950,7 +1950,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Toggle",
         "source": "design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx",
         "storybookId": "components-forms-and-inputs-toggle--docs"
       },
