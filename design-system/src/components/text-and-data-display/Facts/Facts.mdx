@@ -1,0 +1,165 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as FactsStories from './Facts.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FactsStories} />
+
+<Title />
+A list of read-only facts, each label beside its value. For a value someone can
+edit or copy from a field, use `TextField` with `isReadOnly`.
+
+<DocsTabs of={FactsStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Facts"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<ComponentExample of={FactsStories.Overview} description="Subtle labels in one column, default values in the next." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alignment
+
+<ComponentExample of={FactsStories.AlignsValues} description="The longest label sets the label column, so every value starts at the same edge." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={FactsStories.NotAControl} title="Focused and disabled" description="Tab skips the list and it is never dimmed, so it has no focus or disabled state." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FactsStories.Interactive}
+    description="Change the items in the table below."
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `Facts` to show a few facts about one thing, such as a school's name and
+the date it was created, when the reader only needs to read them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a value the reader can select and copy from a field, use `TextField` with `isReadOnly`.
+- For facts about many things in rows, use `Table`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **List.** A `dl` in two columns: the labels, then the values.
+2. **Label.** A `dt` in the subtle text ink.
+3. **Value.** A `dd` in the default text ink.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Subtle labels, default values.</td></tr>
+<tr><td>Hovered, pressed</td><td>Does not react.</td></tr>
+<tr><td>Focused</td><td>Not a control; Tab skips it.</td></tr>
+<tr><td>Disabled</td><td>Not applicable; never dimmed.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Typeface, size</td><td><code>--body-default</code></td></tr>
+<tr><td>Label ink</td><td><code>--ds-text-subtle</code></td></tr>
+<tr><td>Value ink</td><td><code>--ds-text</code></td></tr>
+<tr><td>Gap between rows, columns</td><td><code>--stack-sm</code>, <code>--inline-lg</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write labels as short nouns: School, Created.</td><td>Write labels as sentences or end them with a colon.</td></tr>
+<tr><td>Keep each label unique in the list.</td><td>Repeat a label to list several values; put them in one value.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Paired for assistive technology.** The `dl`, `dt` and `dd` elements tell screen readers which value belongs to which label.
+- **Contrast.** Both inks come from text tokens that pass on the surface in every color mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `TextField`: use with `isReadOnly` when the value is in a field.
+- `Table`: use for facts about many things in rows.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

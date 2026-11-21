@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField } from '@/components';
+import { Facts, TextField } from '@/components';
 import { Section } from '@/templates';
 
 /**
@@ -24,12 +24,10 @@ export const FadedNoReason = () => (
 
 export const PlainValue = () => (
     <Section title="Details" description="Lincoln Middle">
-        <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-            <dt style={{ color: 'var(--ds-text-subtle)' }}>School</dt>
-            <dd style={{ margin: 0 }}>Lincoln Middle School</dd>
-            <dt style={{ color: 'var(--ds-text-subtle)' }}>Created</dt>
-            <dd style={{ margin: 0 }}>Sep 3, 2026</dd>
-        </dl>
+        <Facts items={[
+            { label: 'School', value: 'Lincoln Middle School' },
+            { label: 'Created', value: 'Sep 3, 2026' },
+        ]} />
     </Section>
 );
 

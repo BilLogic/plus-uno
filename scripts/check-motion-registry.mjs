@@ -52,7 +52,7 @@ export const INDEX = 'design-system/agent-views/components/index.md';
 /** Components in the index that neither respond nor move. */
 export const STATIC = new Set([
   'AiIcon', 'Code', 'CodeBlock', 'DateTag', 'Fieldset', 'Heading', 'Icon', 'Illustration', 'Image',
-  'Logo', 'Object', 'VisuallyHidden',
+  'Logo', 'Object', 'VisuallyHidden', 'Facts',
   // The motion docs' "No motion" list (05-components.md): they never move.
   'Avatar', 'AvatarGroup', 'ButtonGroup', 'ChangeTag', 'Comment', 'CompetencyTag', 'CountTag', 'Dialog', 'EmptyState', 'FooterActions',
   'RichTextEditor', 'ScrollBar', 'StaticTable', 'StatusTag', 'Tag', 'TagGroup', 'Tile',
