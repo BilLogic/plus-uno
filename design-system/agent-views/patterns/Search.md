@@ -18,7 +18,7 @@ One kind ships: Active, narrowing the rows of the Section it sits in. There is n
 
 ## Active search
 
-The field starts the Section header's third row, compact, and collapses to an icon until it is needed. The results area under the header holds the count, the rows and the states; the header never moves.
+The field starts the Section header's third row, compact, and collapses to an icon until it is needed. The count ends the Search row; the results area under the header holds the rows and the states, and the header never moves.
 
 ## Focused search
 
@@ -74,7 +74,7 @@ Use Search when a person knows what a record is called, to narrow the Section th
 - The hidden label still names the field: the collapsed icon and the field share the placeholder's words.
 - The scope filter has its own name, "Search scope".
 - In focused, the input is the combobox: focus stays in it, the highlighted row is its active descendant and the panel is a named listbox.
-- The count in the results header is a polite live region, so "2 of 6 students" is announced as the rows narrow.
+- The count ending the Search row is a polite live region, so "2 of 6 students" is announced as the rows narrow.
 - Focus stays in the field when the results empty; it never jumps to the empty state.
 - Loading is announced through the Spinner's status text.
 
@@ -129,11 +129,11 @@ Don't: "Search…" names nothing, so the field and its collapsed icon say nothin
 
 The filter sits before the field with "All" first and selected, and each scope carries its count. A search over one kind of record has no scope filter.
 
-### Show the count in the results header, zero included. {#show-the-count-in-the-results-header-zero-included}
+### End the Search row with the count, zero included. {#end-the-search-row-with-the-count-zero-included}
 
 **Checked:** Review
 
-"2 of 6 students", "0 of 6 students". The count lives in the results header, in words, and updates as the rows narrow.
+"2 of 6 students", "0 of 6 students". The count ends the Search row, in words, and updates as the rows narrow.
 
 Do: The count in words: "2 of 6 students".
 Don't: "2 results": no total and no noun for a screen reader to announce.

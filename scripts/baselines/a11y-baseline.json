@@ -8,10 +8,10 @@
       "direction": "grow-only",
       "entries": {
         "storyFiles": {
-          "count": 220
+          "count": 221
         },
         "tests": {
-          "count": 2600
+          "count": 2647
         }
       }
     }

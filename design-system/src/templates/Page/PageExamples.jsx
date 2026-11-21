@@ -50,6 +50,12 @@ const SessionViews = () => (
     </Tabs>
 );
 
+const PastSessionViews = () => (
+    <Tabs appearance="pill" defaultActiveKey="past" aria-label="Views">
+        <Tabs.Tab eventKey="past">Past</Tabs.Tab>
+    </Tabs>
+);
+
 const StudentViews = () => (
     <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
         <Tabs.Tab eventKey="all">All students</Tabs.Tab>
@@ -91,9 +97,9 @@ export const HeaderIsTheH1 = () => (
 export const SectionsAsTitles = () => (
     <Page>
         <Section level="page" title="Students" views={<StudentViews />}>
-            <SessionsTable />
+            <StudentRoster />
         </Section>
-        <Section level="page" title="Sessions" views={<StudentViews />}>
+        <Section level="page" title="Sessions" views={<PastSessionViews />}>
             <SessionsTable status="past" />
         </Section>
     </Page>
