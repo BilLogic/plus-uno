@@ -4,6 +4,7 @@ import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { SPRING_PRIMITIVES, MOTION_SEMANTICS } from '../../../scripts/lib/tokens/plan.mjs';
 import { FoundationSection, FoundationSubsection } from '@/storybook-docs/foundation-page.jsx';
 import { TOKEN_COLLECTIONS, TOKENS } from '@/storybook-docs/docs-tokens.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * The token sections of one Foundations ▸ Tokens collection page: Primitives,
@@ -128,7 +129,7 @@ const groupByFamily = (tokens) => {
 
 const Family = ({ title, tokens, swatch }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-        <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>{title}</h4>
+        <h4 style={{ margin: 0, ...typeStyle('heading-sm'), color: 'var(--ds-text)' }}>{title}</h4>
         <TokenTable swatch={swatch} rows={tokens.map((t) => ({ token: t.name }))} />
     </div>
 );

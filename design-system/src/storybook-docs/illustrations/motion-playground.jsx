@@ -9,6 +9,7 @@ import { Blanket, Frame, Modal, PageHeader, Panel, Popup, Rect, Row, Rule } from
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { SPEEDS, SPEED_LABELS, measure, ratioOf, resisted, springFor, stepOf, unresisted } from './motion.jsx';
 import { PHYSICS_DEMOS } from './motion-physics.jsx';
+import { typeStyle } from '../lib/type-style.js';
 
 /**
  * The Playground page's figures (Foundations/Expression/Motion/Playground): a spring you
@@ -187,10 +188,10 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
             Reset
           </Button>
         </div>
-        <code style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+        <code style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
           {`{ stiffness: ${config.stiffness}, damping: ${config.damping}, mass: ${config.mass ?? 1} }`}
         </code>
-        <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+        <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
           {`90% at ${ms(m.t90)} · settled at ${ms(m.settle)} · overshoot ${(m.overshoot * 100).toFixed(1)}%`}
         </span>
       </div>
@@ -471,7 +472,7 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
           </Illustration>
         </div>
       </div>
-      <p id={describedBy} style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+      <p id={describedBy} style={{ margin: 0, ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
         Drag the edge left, or focus it and hold ArrowLeft; let go to release.
       </p>
     </section>

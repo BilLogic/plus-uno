@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * The Foundation docs scaffold: the chrome every Foundations page shares, so a
@@ -9,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 
 const SECTION_ATTR = 'data-foundation-section';
 
-const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' };
+const linkStyle = { ...typeStyle('body-default'), color: 'var(--ds-link)', textDecoration: 'underline' };
 
 /**
  * Kind label, title and one-line summary. The title is the page's one `h1`,
@@ -18,9 +19,9 @@ const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDe
  */
 export const FoundationHero = ({ title, summary, kind = 'Foundation' }) => (
     <header className="sb-docs-header">
-        <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>{kind}</span>
-        <h1 style={{ margin: 0, font: 'var(--heading-xl)', color: 'var(--ds-text)' }}>{title}</h1>
-        <div style={{ margin: 0, font: 'var(--body-lg)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
+        <span style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text-subtle)' }}>{kind}</span>
+        <h1 style={{ margin: 0, ...typeStyle('heading-xl'), color: 'var(--ds-text)' }}>{title}</h1>
+        <div style={{ margin: 0, ...typeStyle('body-lg'), color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
     </header>
 );
 
@@ -40,7 +41,7 @@ export const FoundationContents = () => {
     }, []);
     return (
         <nav aria-label="Contents">
-            <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
+            <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>
                 Contents
             </h2>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md) var(--inline-xl)' }}>
@@ -63,7 +64,7 @@ export const FoundationSection = ({ title, id = slug(title), children }) => (
         className="sb-docs-section"
         {...{ [SECTION_ATTR]: title }}
     >
-        <h2 style={{ margin: 0, font: 'var(--heading-lg)', color: 'var(--ds-text)' }}>{title}</h2>
+        <h2 style={{ margin: 0, ...typeStyle('heading-lg'), color: 'var(--ds-text)' }}>{title}</h2>
         {children}
     </section>
 );
@@ -71,7 +72,7 @@ export const FoundationSection = ({ title, id = slug(title), children }) => (
 /** A sub-heading inside a section. */
 export const FoundationSubsection = ({ title, children }) => (
     <div className="sb-docs-subsection">
-        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{title}</h3>
+        <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>{title}</h3>
         {children}
     </div>
 );
@@ -106,8 +107,8 @@ export const FoundationRelated = ({ items }) => (
                         textDecoration: 'none',
                     }}
                 >
-                    <span style={{ font: 'var(--heading-xs)' }}>{item.title}</span>
-                    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{item.description}</span>
+                    <span style={{ ...typeStyle('heading-xs') }}>{item.title}</span>
+                    <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{item.description}</span>
                 </a>
             </li>
         ))}
@@ -123,18 +124,18 @@ export const FoundationExample = ({ caption, children }) => (
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-sunken)',
                 color: 'var(--ds-text)',
-                font: 'var(--body-default)',
+                ...typeStyle('body-default'),
             }}
         >
             {children}
         </div>
-        {caption && <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
+        {caption && <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
 
 /** Prose with paragraph rhythm, for sections written as sentences. */
 export const FoundationProse = ({ children }) => (
-    <div className="sb-docs-measure" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+    <div className="sb-docs-measure" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
         {children}
     </div>
 );
@@ -166,13 +167,13 @@ export const TokenSwatches = ({ items, min = 'var(--card-min-width-sm)' }) => (
                         borderRadius: 'var(--radius-lg)',
                         background: `var(${item.token})`,
                         color: item.text ? `var(${item.text})` : 'var(--ds-text)',
-                        font: 'var(--body-default)',
+                        ...typeStyle('body-default'),
                         boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
                     }}
                 >
                     {item.sample ?? 'Aa'}
                 </span>
-                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' }}>
+                <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)', wordBreak: 'break-word' }}>
                     {item.label ?? item.token}
                 </span>
             </li>

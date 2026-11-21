@@ -11,6 +11,7 @@ import { Illustration } from './Illustration.jsx';
 import { HERO_HAIRLINE } from './paint.js';
 import { Trail, TapRing } from './primitives-motion.jsx';
 import { crossings, ghostless, ghostOf, pointsOf } from './trails.js';
+import { typeStyle } from '../lib/type-style.js';
 
 /**
  * The illustration kit's motion layer. A demo animates kit primitives on the
@@ -352,7 +353,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       // when a title wraps.
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
-      {scene.title ? <div style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>{scene.title}</div> : <div />}
+      {scene.title ? <div style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text)' }}>{scene.title}</div> : <div />}
       <div
         style={{
           borderRadius: 'var(--radius-lg)',
@@ -399,7 +400,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
             flexDirection: 'column',
             alignItems: 'flex-start',
             gap: 'var(--stack-sm)',
-            font: 'var(--body-sm)',
+            ...typeStyle('body-sm'),
             color: 'var(--ds-text-subtle)',
             marginBlockEnd: 'var(--stack-md)',
           }}
@@ -666,7 +667,7 @@ export const MotionDemo = ({
       {controls && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-xl)' }}>
           {title && (
-            <span id={titleId} style={{ flex: 1, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
+            <span id={titleId} style={{ flex: 1, ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>
               {title}
             </span>
           )}

@@ -9,6 +9,7 @@ import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../Forms/formHosts.jsx';
 import { ModalStage, LeadingCells, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
 import { FilterMenuLayer, PopupStage } from '../../../templates/Popup/popupDemo.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /** Room for the open filter menu in its stage: docs geometry, in px. */
 const POPUP_FOOTER_HEIGHT = 290; // docs-literal
@@ -37,7 +38,7 @@ export const STAGE = 1024; // docs-literal
 /** A page form's stage: wide enough for the Frame to dock its Sidebar. */
 export const PAGE_WIDTH = FORM_PAGE_WIDTH;
 
-const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
+const text = (copy) => <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{copy}</p>;
 
 /** Every appearance with the word it takes: one Primary, one AI, the rest in their places. */
 export const APPEARANCES = [
@@ -128,7 +129,7 @@ export const Copy = ({ held = false }) => {
     }, [copied, held]);
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)', padding: 'var(--page-pad)', paddingBlockStart: 'calc(var(--page-pad) * 2)' }}>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>plus.org/join/algebra-b</span>
+            <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)' }}>plus.org/join/algebra-b</span>
             <Tooltip text="Copied" placement="top" show={copied ? true : undefined}>
                 <IconButton icon="copy" label="Copy" appearance="subtle" isTooltipDisabled onClick={() => setCopied(true)} />
             </Tooltip>
@@ -161,7 +162,7 @@ export const EditRecord = ({ held = false }) => {
     return (
         // A held-open menu waits for the picture's element, so it mounts inside it and not on the page.
         <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? EDIT_RECORD_HEIGHT : undefined }}>
-            <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
+            <span style={{ ...typeStyle('heading-sm'), color: 'var(--ds-text)' }}>Ana Ruiz</span>
             <DropdownMenu
                 trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />}
                 placement="bottom-end"

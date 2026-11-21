@@ -2,6 +2,7 @@ import React from 'react';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { HAIRLINE, MONO_LABEL_FONT, PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { FIGURES } from './layout-figure-data.js';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * A Layout page figure: a construction drawing at 1 unit = 1px, painted only with
@@ -10,7 +11,7 @@ import { FIGURES } from './layout-figure-data.js';
  */
 const paint = (role) => (role ? PAINT[role] : 'none');
 const strokeStyle = (width) => (width === 1 ? HAIRLINE : { strokeWidth: `calc(var(--stroke-hairline) * ${width})` });
-const SANS_LABEL_FONT = { font: 'var(--body-sm)' };
+const SANS_LABEL_FONT = { ...typeStyle('body-sm') };
 
 const draw = (ops) => {
     const out = [];
@@ -131,7 +132,7 @@ export const CoreSizeMatrix = () => (
                 <div
                     key={px}
                     role="columnheader"
-                    style={{ textAlign: 'center', font: 'var(--body-sm)', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text-accent-magenta)' }}
+                    style={{ textAlign: 'center', ...typeStyle('body-sm'), fontFamily: 'var(--type-family-code)', color: 'var(--ds-text-accent-magenta)' }}
                 >
                     {px}
                     <span style={{ color: 'var(--ds-text-subtle)' }}> · {step}</span>
@@ -141,8 +142,8 @@ export const CoreSizeMatrix = () => (
         {MATRIX_ROWS.map((row) => (
             <div key={row.label} role="row" style={matrixGrid}>
                 <div role="rowheader" style={{ ...matrixCell, flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
-                    <span style={{ font: 'var(--body-sm)', fontWeight: 'var(--type-weight-semibold)' }}>{row.label}</span>
-                    {row.note && <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{row.note}</span>}
+                    <span style={{ ...typeStyle('body-sm'), fontWeight: 'var(--type-weight-semibold)' }}>{row.label}</span>
+                    {row.note && <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{row.note}</span>}
                 </div>
                 {row.cells.map((name, i) => (
                     <div key={SIZES[i][0]} role="cell" style={matrixCell}>

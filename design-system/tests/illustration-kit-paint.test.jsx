@@ -205,6 +205,6 @@ describe('Zone label cap is per figure', () => {
 describe('a real label draws inside the label role group', () => {
   it('ButtonShape text sits in a group that sets the label role', () => {
     const html = renderToStaticMarkup(<svg><primitives.ButtonShape x={4} y={4} w={100} label="Save" /></svg>);
-    expect(html).toMatch(/<g[^>]*data-fidelity="real"[^>]*style="font:var\(--heading-xs\)"[^>]*><rect.*<text[^>]*font-size:0\.5em/);
+    expect(html).toMatch(/<g[^>]*data-fidelity="real"[^>]*style="font:var\(--heading-xs\);letter-spacing:var\(--heading-xs-tracking\)"[^>]*><rect.*<text[^>]*font-size:0\.5em/);
   });
 });

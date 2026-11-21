@@ -26,6 +26,7 @@ import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreograph
 import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
 import { composeShadow, parseShadow, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
+import { typeStyle } from './lib/type-style.js';
 
 const PLATE = { w: 160, h: 90 };
 
@@ -62,7 +63,7 @@ export const ElevationPanel = React.forwardRef(({ children, style, ...rest }, re
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-background-neutral)',
             color: 'var(--ds-text)',
-            font: 'var(--body-default)',
+            ...typeStyle('body-default'),
             ...style,
         }}
         {...rest}
@@ -740,7 +741,7 @@ export const LayerDetailRow = ({ variant, children }) => (
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 'var(--stack-sm)',
-                font: 'var(--body-default)',
+                ...typeStyle('body-default'),
                 color: 'var(--ds-text)',
             }}
         >
@@ -767,10 +768,10 @@ const TemplateTile = ({ title, description, tokens, ariaTitle, children }) => (
             </Illustration>
         </div>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-            <strong style={{ font: 'var(--body-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
+            <strong style={{ ...typeStyle('body-default'), fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                 {title}
             </strong>
-            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{description}</span>
+            <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{description}</span>
             <code style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>{tokens}</code>
         </figcaption>
     </figure>
@@ -787,7 +788,7 @@ export const ByTemplateGrid = () => (
     <ElevationPanel data-testid="by-template-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Section</h4>
+                <h4 style={{ margin: 0, ...typeStyle('heading-sm'), color: 'var(--ds-text)' }}>Section</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
                     <TemplateTile
                         title="Section"
@@ -810,7 +811,7 @@ export const ByTemplateGrid = () => (
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Table</h4>
+                <h4 style={{ margin: 0, ...typeStyle('heading-sm'), color: 'var(--ds-text)' }}>Table</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
                     <TemplateTile
                         title="Table"
@@ -847,7 +848,7 @@ export const ByTemplateGrid = () => (
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Card</h4>
+                <h4 style={{ margin: 0, ...typeStyle('heading-sm'), color: 'var(--ds-text)' }}>Card</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
                     <TemplateTile
                         title="Sunken card"
@@ -999,7 +1000,7 @@ export const ShadowRampFigure = () => {
                             </div>
                         ))}
                     </div>
-                    <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>
+                    <span style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text-subtle)' }}>
                         {mode === 'light' ? 'Light' : 'Dark'}
                     </span>
                 </div>
@@ -1083,10 +1084,10 @@ export const ShadowTokensEquation = () => {
                         >
                             <EquationDisc shadow={part.boxShadow} title={`${part.title} shadow layer`} />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                                <strong style={{ font: 'var(--body-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
+                                <strong style={{ ...typeStyle('body-default'), fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                                     {part.title}
                                 </strong>
-                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{part.description}</span>
+                                <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{part.description}</span>
                                 <code style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>{part.code}</code>
                             </div>
                         </div>
@@ -1094,7 +1095,7 @@ export const ShadowTokensEquation = () => {
                             aria-hidden="true"
                             style={{
                                 alignSelf: 'center',
-                                font: 'var(--heading-lg)',
+                                ...typeStyle('heading-lg'),
                                 color: 'var(--ds-text-subtle)',
                             }}
                         >
@@ -1118,7 +1119,7 @@ export const ShadowTokensEquation = () => {
                         <strong style={{ font: 'var(--code-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                             --ds-shadow-blocking
                         </strong>
-                        <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                        <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                             One composite token, always used whole.
                         </span>
                         <code style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>edge, key, ambient</code>

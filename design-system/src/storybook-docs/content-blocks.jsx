@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Icon } from '@/components';
+import { typeStyle } from './lib/type-style.js';
 
 /**
  * Blocks the Content pages share: a line of product copy, a message drawn as its
@@ -10,7 +11,7 @@ import { Icon } from '@/components';
 
 /** One line of product copy, set as the reader sees it. */
 export const Say = ({ children }) => (
-    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{children}</span>
+    <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{children}</span>
 );
 
 /** A message drawn as its parts: an icon, a title, a body and an action. */
@@ -21,12 +22,12 @@ export const Sample = ({ icon = 'circle-info', title, children, action, secondar
                 <Icon name={icon} />
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</strong>
-                {children && <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>}
+                <strong style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{title}</strong>
+                {children && <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{children}</span>}
             </div>
         </div>
         {action && (
-            <div style={{ display: 'flex', gap: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-link)' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-link)' }}>
                 <span>{action}</span>
                 {secondary && <span>{secondary}</span>}
             </div>

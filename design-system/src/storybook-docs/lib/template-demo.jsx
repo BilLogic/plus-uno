@@ -1,6 +1,7 @@
 import React from 'react';
 import { Breadcrumb, Sidebar } from '@/components';
 import { Frame } from '@/templates';
+import { typeStyle } from './type-style.js';
 
 /**
  * Story chrome shared by the template stories: a demo caption, a dashed
@@ -15,7 +16,7 @@ export const DemoLabel = ({ children }) => (
         style={{
             display: 'block',
             marginBottom: 'var(--stack-md)',
-            font: 'var(--heading-xxs)',
+            ...typeStyle('heading-xxs'),
             textTransform: 'uppercase',
             color: 'var(--ds-text-subtle)',
         }}

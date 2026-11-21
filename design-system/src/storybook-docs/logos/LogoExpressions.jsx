@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Logo } from '@/components';
+import { typeStyle } from '../lib/type-style.js';
 
 // The brackets follow the Logo's own geometry: the logomark is `size` wide and
 // the wordmark starts a quarter-mark gap after it, so they take the size in px.
 const LOCKUP_SIZE = 64;
 
-const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const label = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 const tag = {
     alignSelf: 'flex-start',
-    font: 'var(--body-sm)',
+    ...typeStyle('body-sm'),
             fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
     color: 'var(--ds-text-inverse)',
     background: 'var(--ds-background-neutral-bold)',
@@ -40,7 +41,7 @@ const Bracket = ({ children, style }) => (
             justifyContent: 'center',
             borderBottom: 'var(--border-width-default) solid var(--ds-border-bold)',
             paddingBottom: 'var(--stack-sm)',
-            font: 'var(--body-sm)',
+            ...typeStyle('body-sm'),
             fontWeight: 600, // docs-literal: no weight token pairs with the body-sm style
             color: 'var(--ds-text)',
             ...style,
@@ -55,8 +56,8 @@ const Expression = ({ tagLetter, name, job, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div style={ground}>{children}</div>
         <span style={tag} aria-hidden="true">{tagLetter}</span>
-        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>{name}</h3>
-        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{job}</p>
+        <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>{name}</h3>
+        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{job}</p>
     </div>
 );
 Expression.propTypes = {
@@ -123,8 +124,8 @@ export const LogoExpressions = () => (
             <figcaption style={label}>The logomark, the wordmark and the lockup they make, each named once.</figcaption>
         </figure>
 
-        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>In the product</h3>
-        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
+        <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>In the product</h3>
+        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
         <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
             <Example title="Sidebar header ·" expression="Logomark">
                 <div style={{ ...pad, width: '35%', background: 'var(--ds-surface-sunken)' }}>

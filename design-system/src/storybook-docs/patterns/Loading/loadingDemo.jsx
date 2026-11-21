@@ -5,6 +5,7 @@ import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
 import { Section } from '@/templates';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { typeStyle } from '../../lib/type-style.js';
 
 /**
  * The Loading pattern's examples: what a view shows while PLUS fetches or
@@ -117,7 +118,7 @@ export const LoadingAction = ({ band = 'shape' }) => {
     return (
         <div style={stack}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxInlineSize: ACTION_WIDTH }}>
-                <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Lincoln Middle</p>
+                <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Lincoln Middle</p>
                 <div style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                     <Button text="Save session" appearance="primary" isLoading={band !== 'under' && !cancelled} onClick={noop} />
                     <Button text="Cancel" appearance="subtle" onClick={() => setCancelled(true)} />
@@ -141,7 +142,7 @@ export const LoadingPage = ({ band = 'shape', reduced }) => (
         )}
         {band === 'over' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Importing roster · 40 of 120 students</span>
+                <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Importing roster · 40 of 120 students</span>
                 <ProgressBar value={33} ariaLabel="Importing roster" />
             </div>
         )}
@@ -236,7 +237,7 @@ export const LoadingTimeline = ({ kind = 'list', seconds = 2.5, reduced }) => {
                         onChange={(next) => { setPlaying(false); setTime(next); }}
                     />
                 </div>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)', fontVariantNumeric: 'tabular-nums' }}>{time.toFixed(1)} s</span>
+                <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)', fontVariantNumeric: 'tabular-nums' }}>{time.toFixed(1)} s</span>
                 <StatusTag appearance={band === 'over' ? 'warning' : 'neutral'}>{BAND_WORDS[band]}</StatusTag>
             </div>
             <div data-probe="stage"><Shape band={band} reduced={reduced} /></div>
@@ -270,7 +271,7 @@ export const LoadingRevealDemo = () => {
             <Section title="Students" description="Lincoln Middle">
                 <LoadThenReveal loading={loading} skeleton={skeleton}>
                     <LoadRevealSlot>
-                        <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                        <p style={{ margin: 0, ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                             4 active students scheduled this week
                         </p>
                     </LoadRevealSlot>

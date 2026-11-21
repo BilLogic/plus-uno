@@ -25,6 +25,7 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FullBleedFooter } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
+import { typeStyle } from '../../storybook-docs/lib/type-style.js';
 
 /**
  * The Panel template's examples: the real Frame with its Panel area, filled the
@@ -57,7 +58,7 @@ export const SessionsBehind = ({ picked = 1 }) => (
     </Section>
 );
 
-const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
+const text = (copy) => <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{copy}</p>;
 
 /** A record's Section inside a Panel body: a small heading and its lines. */
 const Block = ({ title, children }) => (
