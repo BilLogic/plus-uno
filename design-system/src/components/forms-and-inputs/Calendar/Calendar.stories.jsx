@@ -177,6 +177,21 @@ export const Disabled = {
     },
 };
 
+/** A picked day outside the bounds takes the disabled fill, so its disabled text stays on a disabled surface. */
+export const SelectedOutOfBounds = {
+    tags: ['!dev', '!autodocs'],
+    render: () => <Calendar viewDate={october} onViewDateChange={none} selected="2026-10-05" minDate="2026-10-12" onPick={none} />,
+    play: async ({ canvasElement }) => {
+        const picked = day(canvasElement, /October 5, 2026/);
+        await expect(picked).toBeDisabled();
+        await expect(picked).toHaveClass('plus-calendar-day--selected');
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(picked).backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
+            await expect(getComputedStyle(picked).color, `${mode}: disabled text`).toBe(token('--ds-text-disabled'));
+        });
+    },
+};
+
 /** Hover takes the neutral subtle hovered step on an enabled day. */
 export const HoveredState = {
     parameters: { docs: { disable: true } },

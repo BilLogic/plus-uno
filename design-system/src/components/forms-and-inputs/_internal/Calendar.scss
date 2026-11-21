@@ -172,6 +172,12 @@
     &--disabled {
         color: var(--ds-text-disabled);
         cursor: not-allowed;
+
+        // A picked day that falls out of bounds keeps a fill, in the disabled
+        // role, so its disabled text never sits on the bold selected fill.
+        &.plus-calendar-day--selected {
+            background-color: var(--ds-background-disabled);
+        }
     }
 }
 

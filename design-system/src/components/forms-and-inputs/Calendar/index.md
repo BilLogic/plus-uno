@@ -10,7 +10,7 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size24, Size32, Size40, PickADay, ArrowKeys, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size24, Size32, Size40, PickADay, ArrowKeys, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, SelectedOutOfBounds, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 

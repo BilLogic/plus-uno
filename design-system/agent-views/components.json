@@ -1551,6 +1551,7 @@
         "Selected",
         "Range",
         "Disabled",
+        "SelectedOutOfBounds",
         "HoveredState",
         "KeyboardFocus",
         "Interactive"
