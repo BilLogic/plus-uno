@@ -31,6 +31,8 @@ export const SNAPSHOT_DIRS = [
 export const SNAPSHOT_FILES = [
   'docs/conventions/design-system-glossary.md',
 ];
+// Generated for the Figma sync. The lookup never reads it, and it is the largest file under `design-system/src`.
+export const SNAPSHOT_EXCLUDED = new Set(['design-system/src/tokens/color/figma-spec.json']);
 
 const IMPORT = /^\s*(?:import|export)[^'"\n;]*from\s*['"]([^'"]+)['"]|^\s*import\s*['"]([^'"]+)['"]/gm;
 
@@ -62,7 +64,7 @@ export function bakedFiles(root = REPO_ROOT) {
   const set = new Set();
   for (const entry of ENTRIES) importClosure(entry, root, set);
   for (const f of SNAPSHOT_FILES) if (fs.existsSync(path.join(root, f))) set.add(f);
-  for (const [dir, exts, names] of SNAPSHOT_DIRS) for (const f of files(dir, exts, names, root)) set.add(f);
+  for (const [dir, exts, names] of SNAPSHOT_DIRS) for (const f of files(dir, exts, names, root)) if (!SNAPSHOT_EXCLUDED.has(f)) set.add(f);
   return [...set].sort();
 }
 
