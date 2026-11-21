@@ -111,7 +111,7 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | Hovered | An enabled day takes `--ds-background-neutral-subtle-hovered`. A picked day keeps its fill. |
 | Pressed | No look of its own: pressing an enabled day picks it. |
 | Focused | The month buttons and the days draw a 2px ring in `--ds-border-focused`, 2px off the edge. |
-| Disabled | Faded to `--ds-opacity-disabled`; no focus, no `onPick`. |
+| Disabled | A day out of bounds takes `--ds-text-disabled`, never an opacity fade; no focus, no `onPick`. |
 | Today | A 1px `--ds-border-brand` edge and `--ds-text-brand` text. |
 | In range | `--ds-background-selected`. |
 | Selected | `--ds-background-selected-bold` with `--ds-text-inverse`, and `aria-pressed`. |

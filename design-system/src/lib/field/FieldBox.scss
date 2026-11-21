@@ -10,7 +10,8 @@
  * the surface, in `border.focused`: the ring is never drawn inset. Hover and
  * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
  * placeholder `text.subtlest`, helper text `text.subtle`, read-only
- * `background.neutral`. Figma draws its stroke inside the box, so the border
+ * `background.neutral`; disabled is `background.disabled`, `border.disabled`
+ * and `text.disabled`, never an opacity fade. Figma draws its stroke inside the box, so the border
  * is taken out of the padding here.
  *
  * A single-line field is 40 (`--control-lg`) at the default spacing and 32
@@ -233,9 +234,25 @@ textarea.plus-field__control {
 }
 
 .plus-field--disabled {
-    opacity: var(--ds-opacity-disabled);
-    color: var(--ds-text-subtle);
+    border-color: var(--ds-border-disabled);
+    background-color: var(--ds-background-disabled);
+    color: var(--ds-text-disabled);
     cursor: not-allowed;
+
+    // Disabled is a change of color, not an opacity fade: each part takes
+    // its own disabled token, so the box never dims as a whole.
+    .plus-field__leading,
+    .plus-field__trailing {
+        color: var(--ds-icon-disabled);
+    }
+
+    .plus-field-affix {
+        color: var(--ds-text-disabled);
+    }
+
+    .plus-field__control::placeholder {
+        color: var(--ds-text-disabled);
+    }
 }
 
 // ── Subtle: reads as plain text until hovered or edited ─────────────────────

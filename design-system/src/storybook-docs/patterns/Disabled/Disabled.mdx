@@ -55,7 +55,7 @@ Try these options in order; disable only when the earlier options do not fit.
 
 <ComponentExample of={DisabledStories.AnswerExplains} title="Enabled, and it explains" description="Pressing Save session marks what is missing rather than disabling the button. Enter a student's name and click Save session to save, or Cancel to reset." />
 
-<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field fades and leaves the tab order, and the caption stays at full contrast. Pick a school to enable Group." />
+<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field takes its disabled colors and leaves the tab order, and the caption stays at full contrast. Pick a school to enable Group." />
 
 <ComponentExample of={DisabledStories.KeyOptionCannotApply} title="An option that cannot apply" description="The option's description line carries the reason. The rest of the list is live." />
 
@@ -158,7 +158,7 @@ A disabled control gets no events and is absent on touch, so a tooltip would nev
     doCaption='The reason as the caption: "Choose a school first".'
     dontExample={<ReasonInTooltipCase />}
     dontCode={CODE.ReasonInTooltip}
-    dontCaption="The reason in a tooltip on a faded field: it never opens on touch."
+    dontCaption="The reason in a tooltip on a disabled field: it never opens on touch."
 />
 
 ### Hide what a role can never use.
@@ -173,7 +173,7 @@ An action a tutor can never take, such as deleting a school, is left out, not di
     doCaption="An action a tutor can never take is left out of the menu."
     dontExample={<DimmedInMenuCase />}
     dontCode={CODE.DimmedInMenu}
-    dontCaption='A faded "Delete school" that a tutor will never be able to press.'
+    dontCaption='A disabled "Delete school" that a tutor will never be able to press.'
 />
 
 ### Lock the Toolkit during onboarding and keep it visible.
@@ -186,7 +186,7 @@ Tutors see what training unlocks. The Sidebar item shows a lock and a line that 
 
 <RuleTag kind="automatic" />
 
-Disabled fades and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
+Disabled takes the disabled color tokens and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
 
 </div>
 
@@ -200,7 +200,7 @@ Disabled fades and leaves the tab order; read-only stays readable at full contra
 </thead>
 <tbody>
 <tr><td>Caption: "Choose a school first."</td><td>"Disabled", "Not available".</td></tr>
-<tr><td>Option description: "Ms. Ortiz has a session then."</td><td>A faded option with no line.</td></tr>
+<tr><td>Option description: "Ms. Ortiz has a session then."</td><td>A disabled option with no line.</td></tr>
 <tr><td>Warning message: "Add a school to this group to schedule sessions." with "Add school".</td><td>"Some actions are unavailable."</td></tr>
 <tr><td>Toolkit: "Complete your assigned training to unlock the Toolkit."</td><td>"Locked".</td></tr>
 </tbody>
@@ -214,7 +214,7 @@ Disabled fades and leaves the tab order; read-only stays readable at full contra
 
 - A disabled control leaves the tab order and gets no events; the reason beside it is ordinary text a screen reader reads with the field, tied through the caption.
 - The warning `SectionMessage` is announced when it appears.
-- Disabled controls fade; the caption keeps full contrast, so the reason stays readable.
+- Disabled controls take the disabled color tokens, never an opacity fade; the caption keeps full contrast, so the reason stays readable.
 
 </div>
 

@@ -226,8 +226,9 @@ FieldCaption.propTypes = {
 };
 
 /**
- * FieldFrame — label, field and caption stacked, with one disabled fade: the
- * box fades itself, and the stack fades only the label and caption around it.
+ * FieldFrame — label, field and caption stacked. Disabled is a change of
+ * color, not a fade: the box takes its own disabled colors, and the stack turns
+ * the label around it `text.disabled`; the caption keeps full contrast.
  *
  * The non-chrome half of the field split (A7): it wraps Base UI's `Field.Root`
  * for `data-invalid`/`data-dirty`/`data-touched`/`data-disabled`, controlled

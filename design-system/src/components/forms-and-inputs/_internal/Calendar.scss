@@ -168,8 +168,9 @@
         color: var(--ds-text-inverse);
     }
 
+    // A day out of bounds changes color; it does not fade.
     &--disabled {
-        opacity: var(--ds-opacity-disabled);
+        color: var(--ds-text-disabled);
         cursor: not-allowed;
     }
 }

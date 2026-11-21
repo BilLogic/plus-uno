@@ -113,7 +113,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Active format | The button takes `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`. |
 | Focused | A 2px ring in `--ds-border-focused` wraps the box while the writing area has focus. |
 | Read-only | `--ds-background-neutral` box, `--ds-text` text at full contrast, the writing area in the tab order, toolbar faded and inert. |
-| Disabled | `--ds-background-neutral` box and `--ds-text-subtle` text, the writing area out of the tab order, and the toolbar faded to `--ds-opacity-disabled` and inert. |
+| Disabled | The box takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and the label `--ds-text-disabled`. The writing area leaves the tab order, and the toolbar is inert, its buttons disabled. |
 | Invalid | Not drawn. Mark the surrounding field and explain the error beside it. |
 
 ### Tokens
@@ -168,7 +168,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rich-text-editor-max-width` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-disabled` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rich-text-editor-max-width` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

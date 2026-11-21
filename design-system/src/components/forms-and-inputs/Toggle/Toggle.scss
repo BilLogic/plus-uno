@@ -118,8 +118,8 @@
 
 .plus-toggle-disabled {
     .plus-toggle-label {
+        color: var(--ds-text-disabled);
         cursor: not-allowed;
-        opacity: var(--ds-opacity-disabled);
     }
 }
 

@@ -348,6 +348,11 @@ export const Disabled = {
         const el = radioOf(canvasElement, 'Not available');
         await expect(el).toHaveAttribute('data-disabled');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        // Disabled is a change of color, not a fade: the label turns `text.disabled`.
+        const label = canvasElement.querySelector('.plus-form-radio-label');
+        await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        const stack = el.closest('.plus-field-stack');
+        await expect([...stack.children].map((child) => getComputedStyle(child).opacity), 'nothing in the stack fades').toEqual([...stack.children].map(() => '1'));
     },
 };
 

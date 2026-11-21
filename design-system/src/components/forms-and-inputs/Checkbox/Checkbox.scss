@@ -124,6 +124,7 @@
 // label beside it needs its own, since the pointer cursor is set on the
 // label itself, not inherited from a disabled ancestor.
 .plus-field-stack--disabled .plus-form-checkbox-label {
+    color: var(--ds-text-disabled);
     cursor: not-allowed;
 }
 

@@ -87,7 +87,7 @@ Don't: Two separate fields.
 `isReadOnly` keeps the date focusable, selectable and at full contrast (`aria-readonly`); `isDisabled` removes the field from the tab order when it does not apply yet. Never swap one for the other, and never clip a read-only value; content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
-Don't: Disabled fades a value people need to read.
+Don't: Disabled dims a value people need to read.
 
 ### Let a `DatePicker` value wider than its field end in an ellipsis. {#let-a-datepicker-value-wider-than-its-field-end-in-an-ellipsis}
 
@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger` and the input sets `aria-invalid`. |
 | Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar (nor does a read-only filter trigger). The date can be read, selected and copied. |
-| Disabled | The box fades to `--ds-opacity-disabled`, hides the clear button, and leaves the tab order. |
+| Disabled | The box takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, hides the clear button, and leaves the tab order. |
 
 ### Tokens
 

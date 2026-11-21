@@ -158,7 +158,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--radius-full` · `--range-dot-size-12` · `--range-dot-size-16` · `--range-dot-size-8` · `--range-dot-size-default` · `--range-track-height-4` · `--range-track-height-6` · `--range-track-height-8` · `--stack-sm`
+`--body-default` · `--body-default-tracking` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--ds-text-disabled` · `--radius-full` · `--range-dot-size-12` · `--range-dot-size-16` · `--range-dot-size-8` · `--range-dot-size-default` · `--range-track-height-4` · `--range-track-height-6` · `--range-track-height-8` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/Range/Range.scss`. Override these through the token layer, never with a literal.
 

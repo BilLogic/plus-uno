@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Calendar from './Calendar';
 
 export default {
@@ -166,8 +167,13 @@ export const Disabled = {
         const inside = day(canvasElement, /October 14, 2026/);
         await expect(before).toBeDisabled();
         await expect(before).toHaveClass('plus-calendar-day--disabled');
-        await expect(parseFloat(getComputedStyle(before).opacity)).toBeLessThan(1);
         await expect(inside).toBeEnabled();
+        // A day out of bounds changes color; it does not fade.
+        await expect(getComputedStyle(before).opacity, 'no fade').toBe('1');
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(before).color, `${mode}: disabled day text`).toBe(token('--ds-text-disabled'));
+            await expect(getComputedStyle(inside).color, `${mode}: enabled day text`).toBe(token('--ds-text'));
+        });
     },
 };
 

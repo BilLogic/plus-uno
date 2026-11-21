@@ -53,6 +53,13 @@ Kinds.play = async ({ canvasElement }) => {
         await expect(Math.round(row.getBoundingClientRect().width)).toBe(Math.round(listWidth));
     }
     await expect(canvas.getByRole('option', { name: 'Create Music' })).toBeInTheDocument();
+
+    // A disabled row changes color; it does not fade.
+    const disabled = canvas.getByRole('option', { name: 'Physics' });
+    await expect(getComputedStyle(disabled).opacity, 'no fade').toBe('1');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(disabled).color, `${mode}: disabled row text`).toBe(token('--ds-text-disabled'));
+    });
 };
 
 /** A default row is 32 high and a compact row 24, matching the field each belongs to. */
