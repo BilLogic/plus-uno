@@ -47,3 +47,11 @@ Bill approved reading these three from the design system audit on 2026-11-20. No
 - **Carousel.** Base UI has no carousel, swipe or timer part. The arrow keys on the region, the swipe on the stage, the press on a neighbor and the autoplay clock with its holds (hover, keyboard focus, out of view, hidden tab) stay hand-written in `Carousel.jsx`. Its controls are IconButton and ProgressIndicator; the play button swaps its name between Pause and Play rather than reporting a pressed state, so it is a plain button and not a Base UI Toggle. Held by the `ArrowKeysMove`, `SwipeMoves`, `InactiveSlidesHidden` (the press on a neighbor), `HoverHolds` and `PauseStopsProgress` stories.
 
 — Claude (agent), Nov 2026, on Bill's approval to make Base UI the default behavior layer
+
+## Amendment (2026-11-21): FloatingChat, PromptInput and Sidebar tab keys
+
+Bill approved these from the full spec review on 2026-11-21. I read each handler against Base UI 1.9.0; none has a fitting part, so each is a documented exception, not a drift. No behavior changes.
+
+- **FloatingChat's Escape and focus on open** (`FloatingChat` in `AiChat.jsx`). The popup without a launcher button has no trigger to anchor a Base UI Popover or Dialog to, and Base UI's own Escape and focus handling would need that trigger and would move the popup out of the Page's layer stack, which is the patching the reopen signal names. The `onKeyDown` that closes on Escape and the effect that focuses the prompt input stay. Held by the `FloatingChatKeyboard` story in `AiChat.stories.jsx`.
+- **PromptInput's Enter to send** (`handleKeyDown` in `PromptInput.jsx`). Base UI has no composer or send part; its Field and Input describe a control, not submit-on-Enter with Shift+Enter for a new line and an IME composition guard. Held by the `EnterSends`, `ShiftEnterStartsALine` and composition stories in `PromptInput.stories.jsx`.
+- **Sidebar's Delete or Backspace closing a tab** (`onKeyDown` in `Sidebar.jsx`). Base UI has no closable-tab key: its Tabs part has no close affordance, and the open tabs are links with a Close button, not a tablist. The key, and focus moving to the next tab, else the one before, else the row, stay. Held by the `ClosingTabs` story in `Sidebar.stories.jsx`.

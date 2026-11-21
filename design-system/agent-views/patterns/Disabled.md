@@ -46,7 +46,7 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 | Do | Don't |
 | --- | --- |
 | Caption: "Choose a school first." | "Disabled", "Not available". |
-| Option description: "Ms. Ortiz has a session then." | A faded option with no line. |
+| Option description: "Ms. Ortiz has a session then." | A disabled option with no line. |
 | Warning message: "Add a school to this group to schedule sessions." with "Add school". | "Some actions are unavailable." |
 | Toolkit: "Complete your assigned training to unlock the Toolkit." | "Locked". |
 
@@ -54,7 +54,7 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 
 - A disabled control leaves the tab order and gets no events; the reason beside it is ordinary text a screen reader reads with the field, tied through the caption.
 - The warning `SectionMessage` is announced when it appears.
-- Disabled controls fade; the caption keeps full contrast, so the reason stays readable.
+- Disabled controls take the disabled color tokens, never an opacity fade; the caption keeps full contrast, so the reason stays readable.
 
 ## Related
 
@@ -105,7 +105,7 @@ The field caption or the option's description line. When the prerequisite blocks
 A disabled control gets no events and is absent on touch, so a tooltip would never open for the people who need it most. A disabled control keeps its default behavior and leaves the tab order.
 
 Do: The reason as the caption: "Choose a school first".
-Don't: The reason in a tooltip on a faded field: it never opens on touch.
+Don't: The reason in a tooltip on a disabled field: it never opens on touch.
 
 ### Hide what a role can never use. {#hide-what-a-role-can-never-use}
 
@@ -114,7 +114,7 @@ Don't: The reason in a tooltip on a faded field: it never opens on touch.
 An action a tutor can never take, such as deleting a school, is left out, not dimmed. A breadcrumb level the person cannot open is left out. Only a change of role brings it back.
 
 Do: An action a tutor can never take is left out of the menu.
-Don't: A faded "Delete school" that a tutor will never be able to press.
+Don't: A disabled "Delete school" that a tutor will never be able to press.
 
 ### Lock the Toolkit during onboarding and keep it visible. {#lock-the-toolkit-during-onboarding-and-keep-it-visible}
 
@@ -126,7 +126,7 @@ Tutors see what training unlocks. The Sidebar item shows a lock and a line that 
 
 **Checked:** Automatic
 
-Disabled fades and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
+Disabled takes the disabled color tokens and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
 
 ## In code
 

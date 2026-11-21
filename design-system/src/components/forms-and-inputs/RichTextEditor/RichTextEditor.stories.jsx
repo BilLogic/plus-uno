@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import RichTextEditor from './RichTextEditor';
 import { LONG_SENTENCE, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 
@@ -238,9 +239,18 @@ export const DisabledState = {
         await expect(area).toHaveAttribute('contenteditable', 'false');
         await expect(area).toHaveAttribute('aria-disabled', 'true');
         await expect(area.tabIndex).toBe(-1);
-        // The box takes the read-only fill; the writing area is clear on it.
-        await expect(getComputedStyle(area.closest('.plus-rich-text-editor-box')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
         await expect(within(canvasElement).getAllByRole('button').every((b) => b.disabled)).toBe(true);
+        // Disabled is a change of color, not a fade, in every color mode.
+        const box = area.closest('.plus-rich-text-editor-box');
+        const toolbar = canvasElement.querySelector('.plus-rich-text-editor-toolbar');
+        const label = canvasElement.querySelector('.plus-rich-text-editor-label');
+        await expect(getComputedStyle(toolbar).opacity, 'the toolbar does not fade').toBe('1');
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(box).backgroundColor, `${mode}: fill`).toBe(token('--ds-background-disabled'));
+            await expect(getComputedStyle(box).borderTopColor, `${mode}: border`).toBe(token('--ds-border-disabled'));
+            await expect(getComputedStyle(area).color, `${mode}: text`).toBe(token('--ds-text-disabled'));
+            await expect(getComputedStyle(label).color, `${mode}: label`).toBe(token('--ds-text-disabled'));
+        });
     },
 };
 

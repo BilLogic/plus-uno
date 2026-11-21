@@ -118,7 +118,7 @@ Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `Prompt
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own on the field; the send button takes its own pressed fill. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. |
-| Disabled | The field fades to `--ds-opacity-disabled`, and nothing sends. |
+| Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and nothing sends. |
 | Loading | Send becomes Stop, and a GenerativeBorder rings the field and sets `aria-busy`. Stop is never held back by `isDisabled`. |
 
 ### Tokens

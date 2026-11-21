@@ -111,8 +111,8 @@ States.play = async ({ canvasElement }) => {
     await expect(style('focus').outlineStyle).toBe('solid');
     await expect(px(style('focus').outlineWidth)).toBe(2);
     await expect(px(style('focus').outlineOffset)).toBe(2);
-    // The disabled box fades once, by the disabled opacity token (0.4, Atlassian's opacity.disabled).
-    await expect(Number(style('disabled').opacity)).toBeCloseTo(0.4, 2);
+    // Disabled is a change of color, not an opacity fade.
+    await expect(style('disabled').opacity, 'disabled is not faded').toBe('1');
 
     // Each state's colors are its tokens, in every color mode.
     const placeholder = getComputedStyle(within(canvasElement).getByRole('textbox', { name: 'default field' }), '::placeholder');
@@ -125,9 +125,46 @@ States.play = async ({ canvasElement }) => {
         await expect(style('hover').backgroundColor, `${mode}: hover fill`).toBe(token('--ds-background-input'));
         await expect(style('focus').outlineColor, `${mode}: ring`).toBe(token('--ds-border-focused'));
         await expect(style('read-only').backgroundColor, `${mode}: read-only fill`).toBe(token('--ds-background-neutral'));
+        await expect(style('disabled').backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
+        await expect(style('disabled').borderTopColor, `${mode}: disabled border`).toBe(token('--ds-border-disabled'));
+        await expect(style('disabled').color, `${mode}: disabled text`).toBe(token('--ds-text-disabled'));
+        // Read-only stays a value to read: its own edge and full-contrast text.
+        await expect(style('read-only').borderTopColor, `${mode}: read-only border`).toBe(token('--ds-border-input'));
+        await expect(style('read-only').color, `${mode}: read-only text`).toBe(token('--ds-text'));
         await expect(style('invalid').borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
         await expect(style('warning').borderTopColor, `${mode}: warning border`).toBe(token('--ds-border-warning'));
         await expect(style('valid').borderTopColor, `${mode}: valid border`).toBe(token('--ds-border-success'));
+    });
+};
+
+/**
+ * Disabled, part by part: the fill, border, text, slot icon and placeholder
+ * each take their disabled color token, and nothing fades.
+ */
+export const DisabledColors = () => (
+    <div style={row}>
+        <FieldBox disabled data-testid="filled" elemBefore={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}>
+            {control('disabled with a value', { disabled: true, defaultValue: 'Bill Guo' })}
+        </FieldBox>
+        <FieldBox disabled data-testid="empty">
+            {control('disabled and empty', { disabled: true })}
+        </FieldBox>
+    </div>
+);
+
+DisabledColors.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByTestId('filled');
+    const input = canvas.getByRole('textbox', { name: 'disabled with a value' });
+    const icon = box.querySelector('.plus-field__leading i');
+    const empty = canvas.getByRole('textbox', { name: 'disabled and empty' });
+    await expect(getComputedStyle(box).opacity, 'no fade').toBe('1');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box).backgroundColor, `${mode}: fill`).toBe(token('--ds-background-disabled'));
+        await expect(getComputedStyle(box).borderTopColor, `${mode}: border`).toBe(token('--ds-border-disabled'));
+        await expect(getComputedStyle(input).color, `${mode}: text`).toBe(token('--ds-text-disabled'));
+        await expect(getComputedStyle(icon).color, `${mode}: icon`).toBe(token('--ds-icon-disabled'));
+        await expect(getComputedStyle(empty, '::placeholder').color, `${mode}: placeholder`).toBe(token('--ds-text-disabled'));
     });
 };
 

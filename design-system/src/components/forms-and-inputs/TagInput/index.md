@@ -182,7 +182,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box; the tags wrap and the list opens. |
-| Disabled | The whole field fades to `--ds-opacity-disabled`; every tag is disabled, with no × and no entry. |
+| Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade; every tag is disabled, with no × and no entry. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Read-only | The `--ds-background-neutral` fill at full contrast, no hover, in the tab order with `aria-readonly`, with no × and no list. |
 

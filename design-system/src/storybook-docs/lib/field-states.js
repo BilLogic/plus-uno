@@ -41,10 +41,19 @@ export const expectFieldInvalid = async (host, box, name = 'field') => {
     await expect(getComputedStyle(box).borderTopColor, `${name} invalid border`).toBe(tokenColor(host, '--ds-border-danger'));
 };
 
-/** Disabled fades the box to the disabled opacity. */
+/**
+ * Disabled is a change of color, not a fade: the box takes `background.disabled`
+ * and `border.disabled`, its text `text.disabled`, and keeps full opacity.
+ */
 export const expectFieldDisabled = async (box, name = 'field') => {
+    box.style.transition = 'none';
+    const host = box.parentElement;
+    const style = getComputedStyle(box);
     await expect(box).toHaveClass('plus-field--disabled');
-    await expect(parseFloat(getComputedStyle(box).opacity), `${name} disabled opacity`).toBeLessThan(1);
+    await expect(style.opacity, `${name} disabled does not fade`).toBe('1');
+    await expect(style.backgroundColor, `${name} disabled fill`).toBe(tokenColor(host, '--ds-background-disabled'));
+    await expect(style.borderTopColor, `${name} disabled border`).toBe(tokenColor(host, '--ds-border-disabled'));
+    await expect(style.color, `${name} disabled text`).toBe(tokenColor(host, '--ds-text-disabled'));
 };
 
 /**
