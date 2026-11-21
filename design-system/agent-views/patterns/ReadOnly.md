@@ -57,6 +57,14 @@ Use Read-only for a value someone could change but this person cannot right now:
 - Overflow: use for everything else that may clip.
 - `TextField`, `TextArea`, `Select`, `DatePicker`, `TimePicker`, `Checkbox`, `RadioGroup`, `Toggle`: the components with `isReadOnly`.
 
+## Motion
+
+Read-only reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | No motion; the state is color. |
+
 ## Best practices
 
 ### Keep a read-only field in the tab order at full contrast. {#keep-a-read-only-field-in-the-tab-order-at-full-contrast}

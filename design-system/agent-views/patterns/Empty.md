@@ -80,6 +80,15 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 - Search: use for a search that matches nothing.
 - Section: use for the header rows that stay above a replaced table.
 
+## Motion
+
+Empty reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| appear | Go to another area | `--ds-motion-appearance-default` | Arrives with its page or section in the page's entrance; never animates on its own. |
+| filled | Swap content in place | `--ds-motion-appearance-fast` | The first item swaps the empty state for the list in place. |
+
 ## Best practices
 
 ### Show an `EmptyState` in any view that has no records. {#show-an-emptystate-in-any-view-that-has-no-records}
