@@ -51,6 +51,8 @@ FilterButton.propTypes = {
     text: PropTypes.string.isRequired,
     /** The count shown after the name. `0` shows; leave it out to hide it. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** The icon before the name, passed to Button: a Font Awesome name or a node. */
+    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** The chevron that says a menu opens. */
     hasChevronDown: PropTypes.bool,
     appearance: PropTypes.oneOf(FILTER_BUTTON_APPEARANCES),

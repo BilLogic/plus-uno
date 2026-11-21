@@ -12994,6 +12994,15 @@
 					"deprecated": null
 				},
 				{
+					"name": "iconBefore",
+					"type": "string or node",
+					"required": false,
+					"default": null,
+					"values": null,
+					"description": "The icon before the name, passed to Button: a Font Awesome name or a node.",
+					"deprecated": null
+				},
+				{
 					"name": "hasChevronDown",
 					"type": "bool",
 					"required": false,
@@ -13230,6 +13239,7 @@
 					"| `label` | string | — | The field the filter narrows, such as \"Status\". With it the button reads \"Status: Upcoming\": the label quiet, `text` the value in ink. |\n",
 					"| `text` | string (required) | — | The filter's name, or its value when `label` is set. |\n",
 					"| `trailingMetric` | number or string | — | The count shown after the name. `0` shows; leave it out to hide it. |\n",
+					"| `iconBefore` | string or node | — | The icon before the name, passed to Button: a Font Awesome name or a node. |\n",
 					"| `hasChevronDown` | bool | `true` | The chevron that says a menu opens. |\n",
 					"| `appearance` | enum | `'default'` | — |\n",
 					"| `spacing` | enum | — | `default` draws 32. `compact` draws 24. |\n",

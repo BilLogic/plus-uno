@@ -5967,6 +5967,15 @@
           "deprecated": null
         },
         {
+          "name": "iconBefore",
+          "type": "string or node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The icon before the name, passed to Button: a Font Awesome name or a node.",
+          "deprecated": null
+        },
+        {
           "name": "hasChevronDown",
           "type": "bool",
           "required": false,
