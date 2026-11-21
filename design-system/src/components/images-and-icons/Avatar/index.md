@@ -107,7 +107,7 @@ Same group: `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · 
 
 | Part | Token |
 | --- | --- |
-| Size | `--image-xxs` to `--image-lg` for 16 to 40; 96 and 128 are built from the large spacing primitives. |
+| Size | `--image-xxs` to `--image-lg` for 16 to 40; 96 and 128 are `--avatar-size-96` and `--avatar-size-128`. |
 | Ground and ink | `--ds-background-accent-blue-subtler` and `--ds-text-accent-blue` for blue, and the same pair for each other Tag color. |
 | Radius | `--radius-full` for a circle; a quarter of the size for a square, capped at `--radius-xxl`. |
 | Presence dot | `--ds-background-success-bold`, `-warning-bold`, `-danger-bold`, `-neutral-bold`; ring `--ds-surface`. |

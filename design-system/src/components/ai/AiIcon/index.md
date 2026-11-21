@@ -51,7 +51,7 @@ Don't: The sparkle on an action that is not AI.
 
 ## Related
 
-- Font Awesome Free glyph: use when the action is not an AI action.
+- `Icon`: use when the action is not an AI action.
 - `GenerativeBorder`: use when the AI is generating into a piece of content.
 
 Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`

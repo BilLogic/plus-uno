@@ -5259,7 +5259,7 @@
       "import": "import { EmptyState } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/EmptyState/EmptyState.jsx",
-      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
+      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
       "props": [
         {
           "name": "header",
@@ -5312,7 +5312,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "An optional second action: an outlined Button.",
+          "description": "An optional second action: a default Button.",
           "deprecated": null
         },
         {

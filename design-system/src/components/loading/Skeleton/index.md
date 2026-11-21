@@ -150,12 +150,12 @@ Same group: `ProgressBar` · `ProgressRing` · `Spinner`
 | Part | Token |
 | --- | --- |
 | Fill | `--ds-skeleton`. |
-| Shimmer | A band of `--skeleton-subtle`, 1.6s. |
-| Radius | `--radius-md` by default; `--radius-full` for a circle and the person tag; `--radius-sm` for count; or the token named by `radius`. |
-| Label presets | Heights from the label height roles, so a placeholder is the size of its label. Count is `--control-sm` wide; status-spacious takes `--radius-control-sm` (6) for its corner. |
-| Sizes | Spacing primitives: `--space-400` (64) for the default height, `--space-200` (32) for the circle, `--space-100` (16) for the text bar. |
+| Shimmer | A band of `--skeleton-subtle`, sweeping over `--ds-motion-loop-duration`. |
+| Radius | `--radius-md` by default and for count; `--radius-full` for a circle and the person tag; or the token named by `radius`. |
+| Label presets | Heights from the label height roles, so a placeholder is the size of its label. Count is `--control-sm` wide; status-spacious takes `--radius-control-md` for its corner. |
+| Sizes | `--skeleton-height` for the default height, `--skeleton-circle-size` for the circle, `--skeleton-text-height` for the text bar. |
 | Gap | `--stack-md` between lines and tags. |
-| Forced colors | A `--stroke-1` outline keeps the shape. |
+| Forced colors | A `--border-width-default` outline keeps the shape. |
 
 ## Content guidelines
 

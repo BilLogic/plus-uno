@@ -20,7 +20,7 @@ export const EMPTY_STATE_SPACINGS = ['default', 'compact'];
  * - **header** is a heading one level below the section that holds the
  *   EmptyState, so it joins the page's outline.
  * - **primaryAction** is one filled Button; **secondaryAction** an optional
- *   outlined one after it.
+ *   default Button after it.
  * - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a
  *   table body or a card on Heading/small 16 with a smaller picture.
  *
@@ -75,7 +75,7 @@ EmptyState.propTypes = {
     icon: PropTypes.string,
     /** The one action that fills the view: a filled Button. */
     primaryAction: PropTypes.node,
-    /** An optional second action: an outlined Button. */
+    /** An optional second action: a default Button. */
     secondaryAction: PropTypes.node,
     /** `default` for a view or panel; `compact` for a table body or a card. */
     spacing: PropTypes.oneOf(EMPTY_STATE_SPACINGS),

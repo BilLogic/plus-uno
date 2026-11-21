@@ -66,7 +66,7 @@ Same group: `Code` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · 
 
 ## Parts
 
-1. **Surface.** The code ground with a hairline edge and `--radius-md`.
+1. **Surface.** The code ground with a hairline edge and `--card-radius`.
 2. **Gutter.** Optional line numbers, skipped by screen readers.
 3. **Line.** One per line of text; a highlighted line has its own ground.
 4. **Region.** The scrolling block, focusable and named when it does not wrap.
@@ -84,11 +84,11 @@ Same group: `Code` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit` · 
 
 | Part | Token |
 | --- | --- |
-| Typeface | `--code-default` at `--type-size-0875`, line height `--type-line-height-125` |
+| Typeface | `--body-default` in `--type-family-code` |
 | Surface, ink | `--ds-background-code-default`, `--ds-text-code-default` |
 | Gutter | `--ds-background-code-gutter`, `--ds-text-code-gutter` |
 | Highlight | `--ds-background-code-highlight` |
-| Edge, radius | `--ds-border`, `--radius-md` |
+| Edge, radius | `--ds-border`, `--card-radius` |
 | Ring | `--ds-border-focused`, `--focus-ring-width` |
 
 ## Content guidelines

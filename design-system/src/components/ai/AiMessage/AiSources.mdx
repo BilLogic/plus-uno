@@ -71,6 +71,32 @@ Without `target`, external links open in a new window.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For the reply the sources belong to, use `AiMessage`, which draws sources under a finished answer for you.
+- For a single link in running text, use `Link`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Pass AiSources one entry per record an answer read.
+
+An answer built from sessions, students or reports lists each one with a
+`title`, an `href` and a `type`, so a person can open what the AI read. An
+answer that read nothing passes none, and nothing renders.
+
+### Title a source by its record, not its address.
+
+Write "Session notes, Oct 24" with the type "Session". A bare address tells a
+tutor nothing about what the answer drew on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - The list has the accessible name "Sources".
@@ -82,8 +108,8 @@ Without `target`, external links open in a new window.
 
 ## Related
 
-- <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a> for the reply the sources sit under.
-- <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs">AI feedback</a> for rating the answer.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>: use when you need the reply the sources sit under.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs">AI feedback</a>: use when a person should rate the answer.
 
 </div>
 

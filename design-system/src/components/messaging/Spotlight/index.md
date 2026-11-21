@@ -127,12 +127,12 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--popup-radius`, `--spotlight-pad` |
+| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--popup-radius`, `--spotlight-pad`, `--spotlight-gap` |
 | Text | `--ds-text-inverse`, `--heading-sm`, `--body-default`; step count `--body-sm` |
-| Dismiss | `--ds-icon-inverse`, `--ds-interaction-inverse-hovered`, `--ds-interaction-inverse-pressed`, `--radius-md` |
+| Dismiss | `CloseButton` |
 | Primary action | `--ds-surface-overlay`, `--ds-text` |
-| Secondary action | `--ds-text-inverse` text and `--border-width-default` edge |
-| Actions | `--radius-lg`, `--radius-lg`, `--radius-xxl`, `--inline-lg` between |
+| Secondary action | `--ds-text-inverse` text and `--border-width-default` edge; `--ds-interaction-inverse-hovered` and `-pressed` under the pointer |
+| Actions | `--inline-lg` between |
 | Media | `--radius-lg` |
 | Focus ring | `--ds-border-focused-inverse` |
 

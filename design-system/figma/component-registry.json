@@ -512,7 +512,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/DynamicTable",
         "source": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx",
         "storybookId": "components-text-and-data-display-dynamic-table--docs"
       },
@@ -1532,7 +1532,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/StaticTable",
         "source": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx",
         "storybookId": "components-text-and-data-display-static-table--docs",
         "props": {
@@ -2000,7 +2000,7 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/TreeTable",
         "source": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.jsx",
         "storybookId": "components-text-and-data-display-tree-table--docs"
       },

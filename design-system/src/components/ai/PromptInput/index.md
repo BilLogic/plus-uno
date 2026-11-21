@@ -126,7 +126,7 @@ Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `Prompt
 | Part | Token |
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-width-default` edge in `--ds-border-input`, `--radius-control-lg`. |
-| Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--prompt-input-line` × 5 plus `--space-0375` top and bottom, then scrolls. |
+| Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--prompt-input-line` × 5 plus `--pad-y-md` top and bottom, then scrolls. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Attachments | `--stack-md` between files and under the row. |

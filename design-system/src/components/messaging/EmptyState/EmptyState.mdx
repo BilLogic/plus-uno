@@ -180,8 +180,8 @@ of the form summarizes it. A failure in the background is a `Flag`.
 <tbody>
 <tr><td>Header</td><td><code>--heading-md</code> (default), <code>--heading-sm</code> (compact), <code>--ds-text</code></td></tr>
 <tr><td>Description</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-subtle</code></td></tr>
-<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--inline-md</code>, <code>--section-stack-sm</code>, <code>--stack-xl</code>, <code>--page-stack-sm</code>, <code>--page-stack-md</code>, <code>--page-stack-lg</code></td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code> at <code>--image-md</code>, <code>--icon-lg</code> (compact)</td></tr>
+<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--stack-md</code> (compact), <code>--stack-xl</code>, <code>--inline-md</code>, <code>--screen-pad-x</code></td></tr>
 <tr><td>Width</td><td><code>--section-min-width-main</code></td></tr>
 </tbody>
 </DocsTable>
@@ -205,13 +205,13 @@ Compact spacing is for a table body or a card.
 
 ### Lead with one filled action.
 
-The second action is outlined and never stands alone.
+The second action is a default Button and never stands alone.
 
 <DoDontPair
     doExample={<EmptyState icon="calendar-plus" header="No sessions this week" description="Book a session to fill this view." primaryAction={<Button text="Book a session" appearance="primary" />} />}
     doCaption="A filled action leads."
     dontExample={<EmptyState icon="calendar-plus" header="No sessions this week" description="Book a session to fill this view." primaryAction={<Button text="Book a session" />} />}
-    dontCaption="An outlined action with nothing to lead."
+    dontCaption="A default action with nothing to lead."
 />
 
 ### Invite with the next step.

@@ -106,7 +106,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | --- | --- |
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 | Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
-| Corner | `--radius-md`; spacious `--radius-lg`. |
+| Corner | `--radius-md`; spacious `--radius-control-md`. |
 | Neutral | `--ds-border` edge, `--ds-text-subtle` words. |
 | Warning | `--ds-border-warning-subtle` edge, `--ds-text-warning` words. |
 | Danger | `--ds-border-danger-subtle` edge, `--ds-text-danger` words. |

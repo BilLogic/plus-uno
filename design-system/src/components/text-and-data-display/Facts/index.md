@@ -39,7 +39,7 @@ A `Facts` list is plain text and takes no focus. For a value the reader edits or
 
 ## Related
 
-- `TextField`: use with `isReadOnly` when the reader needs to select and copy the value from a field.
+- `TextField`: use when the reader needs to select and copy the value from a field, with `isReadOnly`.
 - `Table`: use when the facts describe many things, one per row.
 
 Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
