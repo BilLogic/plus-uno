@@ -123,7 +123,7 @@ export const ErrorInSecondDialog = () => (
             title="Something went wrong"
             footer={<FooterActions><Button text="OK" appearance="primary" /></FooterActions>}
         >
-            <p style={{ margin: 0 }}>The session was not saved.</p>
+            <p className="body-default" style={{ margin: 0 }}>The session was not saved.</p>
         </Modal>
     </>
 );

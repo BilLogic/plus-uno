@@ -19,7 +19,7 @@ Four components carry every message. Each component page holds its appearances; 
 
 ## Banner tiers
 
-One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Frame and Page `banner` slots are Planned : today a Banner goes in the content, set where its tier says.
+One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Page `banner` slot ships; the Frame `banner` slot is Planned , so a Frame-tier Banner goes in the content for now, set where its tier says.
 
 - **Frame.** System news across the whole width, above the Sidebar and the page.
 - **Page.** Under the page header, about this page.
@@ -120,7 +120,7 @@ Don't: A decision in a Flag, which is gone before it is answered.
 
 **Checked:** Automatic
 
-Normal, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
+Default, information and success close after 8 s. Warning and error never close themselves and offer a next action. On a default, information or success Flag with an action, set `autohide={false}` when the person must act; warning and error ignore it. The × and the rest of the dismiss rule are on the Flag page.
 
 ### Show one Banner at a time, one line, at the tier it concerns, for as long as the condition holds. {#show-one-banner-at-a-time-one-line-at-the-tier-it-concerns-for-as-long-as-the-condition-holds}
 

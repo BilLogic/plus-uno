@@ -9,8 +9,8 @@ import examplesSource from './ErrorsExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Errors pattern page: each one is an
- * example from `ErrorsExamples.jsx`, staged here on a `CaseSurface` or over a
- * `CaseBlanket`, and Show code prints the example's own source.
+ * example from `ErrorsExamples.jsx`, staged here on a `CaseSurface` or a
+ * `FitStage` stand-in screen, and Show code prints the example's own source.
  */
 
 export const CODE = showCode(examplesSource, ['MessageOnField', 'BorderAndTooltip', 'FailureInSlot', 'FailureInModal']);
