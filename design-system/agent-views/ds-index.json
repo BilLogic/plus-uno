@@ -596,7 +596,7 @@
 					"\n",
 					"**Source:** `design-system/src/components/ai/AiChat/AiChat.jsx`\n",
 					"\n",
-					"**Stories:** `design-system/src/components/ai/AiChat/AiChat.stories.jsx` — Overview, Popup, PanelMode, Fullscreen, Interactive, SwitchingModes, ConversationFollowsTheMode, RemembersThePanel, RemembersFullscreenClosed, PopupIsFullScreenUnder768, PopupStaysAPopupAt768, HeaderControls, ModalLeavesThePopupOpen, TrustMarks, RepliesWithSources, DocsAgent, DocsAgentFallback\n",
+					"**Stories:** `design-system/src/components/ai/AiChat/AiChat.stories.jsx` — Overview, Popup, PanelMode, Fullscreen, Interactive, SwitchingModes, ConversationFollowsTheMode, RemembersThePanel, RemembersFullscreenClosed, PopupIsFullScreenUnder768, PopupStaysAPopupAt768, HeaderControls, ModalLeavesThePopupOpen, FloatingChatKeyboard, TrustMarks, RepliesWithSources, DocsAgent, DocsAgentFallback\n",
 					"\n",
 					"**Storybook page:** `design-system/src/components/ai/AiChat/AiChat.mdx`\n",
 					"\n",

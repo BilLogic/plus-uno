@@ -10,7 +10,7 @@ Also asked as: chat, assistant, chatbot, conversation.
 
 **Source:** `design-system/src/components/ai/AiChat/AiChat.jsx`
 
-**Stories:** `design-system/src/components/ai/AiChat/AiChat.stories.jsx` — Overview, Popup, PanelMode, Fullscreen, Interactive, SwitchingModes, ConversationFollowsTheMode, RemembersThePanel, RemembersFullscreenClosed, PopupIsFullScreenUnder768, PopupStaysAPopupAt768, HeaderControls, ModalLeavesThePopupOpen, TrustMarks, RepliesWithSources, DocsAgent, DocsAgentFallback
+**Stories:** `design-system/src/components/ai/AiChat/AiChat.stories.jsx` — Overview, Popup, PanelMode, Fullscreen, Interactive, SwitchingModes, ConversationFollowsTheMode, RemembersThePanel, RemembersFullscreenClosed, PopupIsFullScreenUnder768, PopupStaysAPopupAt768, HeaderControls, ModalLeavesThePopupOpen, FloatingChatKeyboard, TrustMarks, RepliesWithSources, DocsAgent, DocsAgentFallback
 
 **Storybook page:** `design-system/src/components/ai/AiChat/AiChat.mdx`
 
