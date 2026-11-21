@@ -95,6 +95,12 @@ describe('InlineEdit keyboard', () => {
         await waitFor(() => expect(onConfirm).toHaveBeenCalledWith('Ada'));
     });
 
+    it('keeps focus in the field when a button is pressed, so the press is not a blur', () => {
+        setup();
+        const confirm = screen.getByRole('button', { name: 'Confirm' });
+        expect(fireEvent.mouseDown(confirm)).toBe(false);
+    });
+
     it('stays open on blur with keepEditViewOpenOnBlur', async () => {
         const { onConfirm, input } = setup({ keepEditViewOpenOnBlur: true });
         fireEvent.blur(input, { relatedTarget: document.body });
