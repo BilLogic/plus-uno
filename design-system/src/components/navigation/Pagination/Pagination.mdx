@@ -31,6 +31,7 @@ export const figmaMeta = {
 <Meta of={PaginationStories} />
 
 <Title />
+Numbered page controls with Previous and Next, for moving through a long list split across pages.
 
 <DocsTabs of={PaginationStories}>
 
@@ -71,7 +72,7 @@ export const figmaMeta = {
 
 <ComponentExample of={PaginationStories.Focused} title="Focused" description="Shows the focus ring inside the segment so a neighbor never covers it." />
 
-<ComponentExample of={PaginationStories.Current} title="Current" description={<>The selected fill and ink in semibold; no hover step of its own.</>} />
+<ComponentExample of={PaginationStories.Current} title="Current" description={<>The selected fill and ink in medium weight; no hover step of its own.</>} />
 
 <ComponentExample of={PaginationStories.Disabled} title="Disabled" description={<>Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing.</>} />
 
@@ -153,7 +154,7 @@ whenever the window does not reach them.
 <tr><td>Hovered</td><td>The subtle neutral hovered fill.</td></tr>
 <tr><td>Pressed</td><td>The subtle neutral pressed fill.</td></tr>
 <tr><td>Focused</td><td>Shows the focus ring inside the segment; see <a href="?path=/docs/foundations-visual-border--docs">Border</a>.</td></tr>
-<tr><td>Current</td><td>The selected fill and ink, semibold; hover and press do not change it.</td></tr>
+<tr><td>Current</td><td>The selected fill and ink, medium weight; hover and press do not change it.</td></tr>
 <tr><td>Disabled</td><td>The disabled ground, ink and caret; the control keeps its tab stop with <code>aria-disabled</code>.</td></tr>
 </tbody>
 </DocsTable>
@@ -170,7 +171,7 @@ whenever the window does not reach them.
 <tr><td>Ink and ground</td><td><code>--ds-text-subtle</code>, <code>--ds-surface</code></td></tr>
 <tr><td>Pill edge</td><td><code>--ds-border</code>, <code>--border-width-default</code>, <code>--radius-full</code></td></tr>
 <tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
-<tr><td>Current page</td><td><code>--ds-background-selected</code>, <code>--ds-text-selected</code>, <code>--type-weight-semibold</code></td></tr>
+<tr><td>Current page</td><td><code>--ds-background-selected</code>, <code>--ds-text-selected</code>, <code>--type-weight-medium</code></td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code></td></tr>
 <tr><td>Caret</td><td><code>--icon-sm</code></td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>

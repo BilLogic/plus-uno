@@ -89,8 +89,9 @@ Don't: A div is not a control: it has no role and no keyboard behavior.
 
 ### Pair hover triggers with focus or click. {#pair-hover-triggers-with-focus-or-click}
 
-`triggerType="hover"` has no keyboard equivalent. Use `['hover', 'focus']` at
-least, and `click` when the content is more than a sentence — hover content that
+`triggerType="hover"` has no keyboard equivalent, and `focus` opens the popup
+the way hover does, so `['hover', 'focus']` is not enough. Add `click` — and
+rely on it when the content is more than a sentence — hover content that
 must be read is content that has to stay put while it is read.
 
 ### Keep the body short, and keep forms out. {#keep-the-body-short-and-keep-forms-out}

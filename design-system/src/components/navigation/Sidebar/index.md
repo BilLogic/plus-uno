@@ -100,7 +100,6 @@ Don't: Everything in the label, and the time is cut off.
 ## Related
 
 - Frame: use when docking, collapsing and floating the Sidebar beside the Page.
-- `SidebarTab`: use when configuring a single row inside a custom sidebar section.
 - `CountTag`: use when rendering a count on the trailing edge of a row.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
@@ -141,7 +140,7 @@ The Sidebar's width, 240, belongs to the Frame: see Frame.
 | Row text and icon | `--ds-text-subtle` and `--ds-icon-subtle`, at `--body-default`. |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `-pressed`. |
 | Selected | `--ds-background-selected` with hovered and pressed steps; `--ds-text-selected`, `--ds-icon-selected`. |
-| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-sm`. |
+| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-default`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
 | Account row | 8 above: `--stack-md`; 12 below and at the start: `--frame-sidebar-pad`; 16 at the end: `--pad-x-lg`. |
 | Account row divider | `--ds-border`. |

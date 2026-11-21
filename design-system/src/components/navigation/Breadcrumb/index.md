@@ -68,9 +68,8 @@ Breadcrumb reads these motion tokens and no literal duration or curve.
 ### Pass `href` alongside `onClick` on ancestor items. {#pass-href-alongside-onclick-on-ancestor-items}
 
 ```jsx
-// Incorrect — with no href the item is rendered active, which means it is an
-// li rather than a link. The click handler still fires for a mouse, and is
-// unreachable by keyboard.
+// Incorrect — with no href the item renders as a plain list item, not a link,
+// and its onClick is never attached: nothing happens on click.
 <Breadcrumb items={[
     { text: 'Cohorts', onClick: goToCohorts },
     { text: 'Autumn 2026', href: '/cohorts/a26' },

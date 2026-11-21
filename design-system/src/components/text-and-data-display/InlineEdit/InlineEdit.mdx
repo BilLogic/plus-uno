@@ -59,8 +59,6 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <ComponentExample of={InlineEditStories.OverflowEditing} title="Overflow: edit view" description="The edit view is the Text field: one line, no Tooltip, and focus reaches the whole value." />
 
-The `compact` boolean is now `spacing="compact"` (`default` or `compact`). Callers that passed `compact` change to `spacing="compact"`; the `compact` prop is no longer read.
-
 <ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
 
 </div>
@@ -175,7 +173,7 @@ profile page.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Read view height</td><td>40: <code>--height-250</code>. Compact 32: <code>--control-md</code>.</td></tr>
+<tr><td>Read view height</td><td>40: <code>--control-lg</code>. Compact 32: <code>--control-md</code>.</td></tr>
 <tr><td>Read view box</td><td><code>--radius-control-lg</code>, a <code>--border-width-default</code> transparent edge, <code>--pad-x-md</code> either side.</td></tr>
 <tr><td>Read view text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>Read view hovered</td><td><code>--ds-background-neutral-subtle-hovered</code>.</td></tr>

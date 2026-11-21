@@ -96,8 +96,9 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
 ## Accessibility
 
 - **Focus shows it.** The default trigger is `['hover', 'focus']`, so a keyboard
-  user tabbing to the control gets the tooltip. Overriding `trigger` to `'hover'`
-  alone removes that — do not.
+  user tabbing to the control gets the tooltip. Any other non-empty value leaves
+  hover and focus both active; an empty array or a falsy value turns the
+  tooltip off, for everyone.
 - **It is wired as a description.** The overlay renders with `role="tooltip"`,
   and the positioning layer adds `aria-describedby` on the trigger pointing at
   it. That is a description, which is why an `IconButton` still needs its own
@@ -106,9 +107,6 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
   it carry the only copy of anything.
 - **No Escape or focus stop.** There is no way to move focus into the tooltip,
   so its content must stay non-interactive.
-- **Pass `id` when a deterministic id is needed.** Without `id`, the overlay
-  generates an instance id from `Math.random` held in a ref — stable for the
-  life of the instance, but different between server and client.
 
 ### A tooltip describes; it does not name.
 

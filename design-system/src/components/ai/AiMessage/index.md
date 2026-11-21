@@ -122,7 +122,7 @@ Same group: `AiChat` · `AiIcon` · `GenerativeBorder` · `PromptInput` · `Prom
 | Between parts | `--stack-md`. |
 | Progress indicator | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
 | Caret and progress indicator motion | `--ds-motion-loop`, with its three marks offset by a quarter and a half cycle. |
-| Sources | Heading `--heading-xxs` in `--ds-text-subtle`; type `--body-sm` in `--ds-text-subtle`; rows `--stack-sm` apart. |
+| Sources | Toggle in `--ds-text-subtle`, pulled in by `--pad-x-sm` to align with the text; type `--body-sm` in `--ds-text-subtle`; rows `--stack-sm` apart. |
 | Feedback | Thanks `--body-sm` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
 
 ## Content guidelines

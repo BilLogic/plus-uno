@@ -86,7 +86,7 @@ Same group: `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `InlineEdit
 | Typeface, size | `--code-default` |
 | Fill | `--ds-background-neutral` |
 | Ink | `--ds-text-code-default` |
-| Padding, radius | `--space-025`, `--radius-md` |
+| Padding, radius | `--pad-x-xs`, `--radius-md` |
 
 ## Content guidelines
 

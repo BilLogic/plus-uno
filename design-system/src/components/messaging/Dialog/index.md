@@ -42,8 +42,8 @@ many columns of the screen grid plus the dialog pad.
 `Dialog` draws `--ds-surface-material-overlay` and a `--ds-border-material` edge with `--dialog-shadow` (`--ds-shadow-blocking`) in every width. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
-height hugs its content up to the cap (`--dialog-max-height`);
-`height="fill"` sits at that cap.
+height hugs its content up to the screen's height;
+`height="fill"` sits at that height.
 
 ## Alternatives
 
@@ -62,7 +62,6 @@ A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
 screen.
 
 Do: The narrowest step for a short question.
-
 Don't: The widest step around one sentence.
 
 ### Keep Close on a Dialog unless the person has to answer it. {#keep-close-on-a-dialog-unless-the-person-has-to-answer-it}
@@ -87,9 +86,8 @@ Don't: Dividers around a short body.
 `primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
 objects and the component renders the `FooterActions` pair.
 
-Do: Pass `primaryButton` or `footer` when the dialog asks for a decision.
-
-Don't: Leave a confirm dialog with no footer action.
+Do: A confirm dialog passes primaryButton for its decision.
+Don't: A confirm dialog with no footer action.
 
 ### Let a title longer than the Dialog wrap. {#let-a-title-longer-than-the-dialog-wrap}
 
@@ -124,7 +122,6 @@ Don't: Render a bare `Dialog` over page content on your own.
 
 - `Modal` template: use when the `Dialog` must sit on a Blanket with portal, focus trap, Escape and scroll lock.
 - `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.
-- Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 

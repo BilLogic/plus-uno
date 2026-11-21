@@ -147,7 +147,7 @@ Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 | Hovered | The subtle neutral hovered fill. |
 | Pressed | The subtle neutral pressed fill. |
 | Focused | Shows the focus ring inside the segment; see Border. |
-| Current | The selected fill and ink, semibold; hover and press do not change it. |
+| Current | The selected fill and ink, medium weight; hover and press do not change it. |
 | Disabled | The disabled ground, ink and caret; the control keeps its tab stop with `aria-disabled`. |
 
 ### Tokens
@@ -159,7 +159,7 @@ Same group: `Breadcrumb` · `Link` · `Sidebar` · `Tabs`
 | Ink and ground | `--ds-text-subtle`, `--ds-surface` |
 | Pill edge | `--ds-border`, `--border-width-default`, `--radius-full` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
-| Current page | `--ds-background-selected`, `--ds-text-selected`, `--type-weight-semibold` |
+| Current page | `--ds-background-selected`, `--ds-text-selected`, `--type-weight-medium` |
 | Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled` |
 | Caret | `--icon-sm` |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` |

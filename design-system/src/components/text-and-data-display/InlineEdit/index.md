@@ -124,7 +124,7 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `
 
 | Part | Token |
 | --- | --- |
-| Read view height | 40: `--height-250`. Compact 32: `--control-md`. |
+| Read view height | 40: `--control-lg`. Compact 32: `--control-md`. |
 | Read view box | `--radius-control-lg`, a `--border-width-default` transparent edge, `--pad-x-md` either side. |
 | Read view text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Read view hovered | `--ds-background-neutral-subtle-hovered`. |

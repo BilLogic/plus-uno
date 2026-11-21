@@ -158,7 +158,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 | Icon | `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning`, `--ds-icon-information` |
 | Title, body, link | `--heading-sm`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
 | Divider | `--ds-border`, `--border-width-default` |
-| Padding, gaps, corner | `--card-pad`, `--card-stack-sm`, `--stack-md`, `--card-radius` |
+| Padding, gaps, corner | `--card-pad`, `--card-inline-sm`, `--stack-md`, `--card-radius` |
 | Dismiss | `--control-md` |
 
 ## Content guidelines

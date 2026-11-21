@@ -90,6 +90,31 @@ the rating internally, starting from `defaultValue`, or pass `value` to control 
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For the reply being rated, use `AiMessage`, which draws feedback under a finished answer when you pass `onFeedback`.
+- For a free-form comment with no rating, use `TextArea`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Show AiFeedback only under a finished answer.
+
+A partial reply cannot be rated, so `AiFeedback` goes under an answer that has
+settled, never one still streaming.
+
+### Keep the AiFeedback comment optional.
+
+Thumbs down offers a comment and lets the person skip it. Never require the
+comment before the rating counts.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - The thumbs form a group named "Rate this answer". Its toggle buttons, "Good answer" and "Bad answer", report `aria-pressed`, true on the chosen one.
@@ -102,8 +127,8 @@ the rating internally, starting from `defaultValue`, or pass `value` to control 
 
 ## Related
 
-- <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a> for the reply being rated.
-- <a href="?path=/docs/ai-ui-components-ai-message-ai-sources--docs">AI sources</a> for what the answer read.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>: use when you need the reply being rated.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-sources--docs">AI sources</a>: use when a person should open what the answer read.
 
 </div>
 

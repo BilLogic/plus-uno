@@ -134,7 +134,7 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 
 | State | What changes |
 | --- | --- |
-| Rest | Surface ground, subtle text, chevron down. |
+| Rest | Surface ground, title in `--ds-text` (subtle when grouped), chevron down. |
 | Hovered | `--ds-background-neutral-subtle-hovered`. |
 | Pressed | `--ds-background-neutral-subtle-pressed`. |
 | Focused | Shows the focus ring with no fill change; see Border. |

@@ -116,9 +116,9 @@ Same group: `Accordion` · `Carousel` · `PageHeader`
 | --- | --- |
 | Thumb | `--ds-border`; `--ds-border-bold` on hover. |
 | Track and corner | Transparent. |
-| Width | `--space-0375`. |
+| Width | `--scroll-bar-size`. |
 | Corner | `--radius-md`. |
-| Height cap | twice `--size-1000` by default. |
+| Height cap | `--scroll-bar-max-height` by default. |
 
 ## Content guidelines
 
