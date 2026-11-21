@@ -143,6 +143,14 @@ Search, filters and actions sit in the Section header: `<Table title="Students" 
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a few objects people scan one by one, use `Card`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Head row.** Names the columns. Its rule is the bold border.
@@ -242,7 +250,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
     doCaption="A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected."
     dontExample={<RosterAsStatic />}
     dontCode={CODE.RosterAsStatic}
-    dontCaption="A roster people act on as a Static table; with no sort, selection or paging, a roster of 340 becomes one long scroll."
+    dontCaption="A roster people act on as a Static table; with no sort, selection or paging, a roster of hundreds becomes one long scroll."
 />
 
 ### Use a Tree table for a hierarchy.
@@ -293,10 +301,10 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 
 ## Related
 
-- <DocsLink id="templates-section">Section</DocsLink>: the header rows that sit above every table.
-- <DocsLink id="components-text-and-data-display-static-table">Static table</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">Dynamic table</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>: the three table components the template takes.
-- <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: the pager that fills the footer slot.
-- <DocsLink id="templates-card">Card</DocsLink>: a table never sits inside a card.
+- <DocsLink id="templates-section">Section</DocsLink>: use when the table needs the header rows that sit above it.
+- <DocsLink id="components-text-and-data-display-static-table">Static table</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">Dynamic table</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>: use when building the table yourself, one per type.
+- <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: use when the rows span pages and the footer slot needs a pager.
+- <DocsLink id="templates-card">Card</DocsLink>: use when showing a few objects people scan; a table never sits inside a card.
 
 </div>
 
