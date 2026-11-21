@@ -5,7 +5,8 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as SearchStories from './Search.stories.jsx';
 import { SCOPE, STAGE } from './searchDemo.jsx';
-import { ComponentExample, DocsInteractivePlayground, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { CODE, CountBareCase, CountInWordsCase, ScopeNamedCase, ScopeUnnamedCase } from './SearchCases.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
@@ -173,6 +174,15 @@ Active is the one kind that ships: the rows are in hand and narrow as the person
 
 "Search students". The label is hidden, so the placeholder is what a person reads and what names the collapsed icon.
 
+<DoDontPair
+    doExample={<ScopeNamedCase />}
+    doCode={CODE.ScopeNamed}
+    doCaption={'The placeholder names the scope: "Search students".'}
+    dontExample={<ScopeUnnamedCase />}
+    dontCode={CODE.ScopeUnnamed}
+    dontCaption={'"Search…" names nothing, so the field and its collapsed icon say nothing about what is searched.'}
+/>
+
 ### Add a scope filter when the search covers more than one kind of record.
 
 <RuleTag kind="review" />
@@ -184,6 +194,15 @@ The filter sits before the field with "All" first and selected, and each scope c
 <RuleTag kind="review" />
 
 "2 of 6 students", "0 of 6 students". The count lives in the results header, in words, and updates as the rows narrow.
+
+<DoDontPair
+    doExample={<CountInWordsCase />}
+    doCode={CODE.CountInWords}
+    doCaption={'The count in words: "2 of 6 students".'}
+    dontExample={<CountBareCase />}
+    dontCode={CODE.CountBare}
+    dontCaption={'"2 results": no total and no noun for a screen reader to announce.'}
+/>
 
 ### Answer no matches in the results body.
 
