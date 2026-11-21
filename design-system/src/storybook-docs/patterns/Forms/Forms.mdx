@@ -77,9 +77,9 @@ There is no Form component or template. A form is a `Fieldset` of fields inside 
 
 <ComponentExample of={FormsStories.ShownSubmitStaysEnabled} title="Submit stays enabled" description="The Primary is pressable with fields missing. After the press every missing field is marked and focus moves to the first." />
 
-<ComponentExample of={FormsStories.ShownBlockedSubmit} title="Blocked submit in a Modal" description="The Modal stays open, marks the field, says what to fix inline, scrolls the body to it and shakes once. Never a second dialog." />
+<ComponentExample of={FormsStories.ShownBlockedSubmit} title="Blocked submit in a Modal" description={<>The Modal stays open, marks the field and says what to fix inline. Scrolling the body to it and a single shake are Planned <PlannedTag />. Never a second dialog.</>} />
 
-<ComponentExample of={FormsStories.ServerRefuses} title="Rejected by the server" description="A danger SectionMessage at the top of the form, scrolled into view, plus the field errors it names. Nothing shakes." />
+<ComponentExample of={FormsStories.ServerRefuses} title="Rejected by the server" description={<>A danger SectionMessage at the top of the form, plus the field errors it names. Scrolling it into view is Planned <PlannedTag />. Nothing shakes.</>} />
 
 <ComponentExample of={FormsStories.ShownSending} title="Sending" description="After Save session is pressed the button swaps its label for a spinner in place and keeps its width. Only that button disables; Discard stays live." />
 
@@ -171,7 +171,7 @@ A disabled submit gives no direction and leaves the tab order. Pressing it marks
 
 <RuleTag kind="automatic" />
 
-Mark the field, say what to fix inline, scroll the body to it, and shake once <PlannedTag />. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>.
+Mark the field and say what to fix inline. Scrolling the body to it and a single shake are Planned <PlannedTag />. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: <a target="_top" href="./?path=/docs/patterns-states-errors--docs">Errors</a>.
 
 <DoDontPair
     doExample={<ErrorOnField />}
@@ -315,7 +315,7 @@ Editing a row opens a Panel so the person keeps the page in view. A Modal is for
 </thead>
 <tbody>
 <tr><td>Fields</td><td>`Fieldset`</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
-<tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
+<tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message; scrolling it into view is Planned <PlannedTag />.</td></tr>
 <tr><td>Choices</td><td>`RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong; pictured tiles for one big question per step.</td></tr>
 <tr><td>Settings rows</td><td>`SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag`</td><td>Divided rows under section headings with no card per row; flipping a toggle confirms via Flag.</td></tr>
 <tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-section--docs">Section</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>, <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a></td><td>A page (under its Section header, no Section around the fields), a Panel, a Modal, or the multi-step task on Frame. Each owns its footer.</td></tr>

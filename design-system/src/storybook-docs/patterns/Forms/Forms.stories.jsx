@@ -211,7 +211,7 @@ export const ShownSubmitStaysEnabled = {
     },
 };
 
-/** The Modal after a blocked press, at rest after its shake: open, the fields marked, one dialog. */
+/** The Modal after a blocked press, open, the fields marked, one dialog. */
 export const ShownBlockedSubmit = {
     name: 'Validation: Blocked submit in a Modal (shown)',
     render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={MARKED_HEIGHT} />),

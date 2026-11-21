@@ -53,7 +53,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.TierAreas} title="1 · Areas" description="Clicking an area item moves the selected fill and marks the current page." />
 
-<ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Temporary session items under Sessions, named by time and teacher; click to open or dismiss with the close button." />
+<ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Temporary session items under Sessions, named by time and tutor; click to open or dismiss with the close button." />
 
 <ComponentExample of={NavigationStories.TierViews} title="2 · Views" description="Pill views in a Section's header swap content in place as you switch tabs." />
 
@@ -207,7 +207,7 @@ The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. Ho
 <DoDontPair
     doExample={<OpenItemsDoCase />}
     doCode={CODE.OpenItemsByTimeAndWho}
-    doCaption="Each item names the session by its time and the teacher."
+    doCaption="Each item names the session by its time and the tutor."
     dontExample={<OpenItemsDontCase />}
     dontCode={CODE.OpenItemsCarryEverything}
     dontCaption="Each item carries everything, and the time it is found by is cut off."
@@ -232,7 +232,7 @@ The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. Ho
 <tbody>
 <tr><td>Views as short parallel nouns: "Upcoming", "Past".</td><td>"Show upcoming sessions", "History".</td></tr>
 <tr><td>Page tabs name views of one subject: "Overview", "Sessions", "Notes".</td><td>Counts or status in the tab label.</td></tr>
-<tr><td>The labeled filter trigger names the view: "Status: Upcoming".</td><td>A bare "Upcoming".</td></tr>
+<tr><td>The labeled view picker names the view: "Status: Upcoming".</td><td>A bare "Upcoming".</td></tr>
 <tr><td>Breadcrumb levels by the page's own title.</td><td>"Back", "Home" as a level.</td></tr>
 <tr><td>Open item: "4:00 PM · Ms. Ortiz".</td><td>"Session #1028".</td></tr>
 </tbody>
