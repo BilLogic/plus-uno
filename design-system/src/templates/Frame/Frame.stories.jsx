@@ -12,7 +12,7 @@ import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js'
 import { AreaStage, DrillStack, useDrillStack } from '@/lib/navigationMotion';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { BAR_TOKEN, MultiStepTask, MultiStepTaskType, TASK_STEPS, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
+import { MultiStepTask, MultiStepTaskType, TASK_BAR_TOKEN, TASK_STEPS, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -1657,12 +1657,12 @@ export const LayoutMultiStepTask = {
         await expect(row('Schedule'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close: Save and exit leaves').toBeNull();
 
-        // The footer: Save and exit as a link at the left edge, Back and Next in tracks 3 and 4, filled 48 buttons in a 48 bar.
+        // The footer: Save and exit as a link at the left edge, Back and Next in tracks 3 and 4, filled 32 buttons in a bar level with the account row.
         const tracks = footerTracks(column);
-        await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+        await expect(rect(bar).height, 'the footer is 52 high under its hairline').toBeCloseTo(tokenLength(canvasElement, TASK_BAR_TOKEN), 0);
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         for (const button of [save, back, next]) {
-            await expect(rect(button).height, 'each action is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+            await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
             await expect(rect(button).top, 'on one line').toBeCloseTo(rect(save).top, 0);
         }
         await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);
@@ -2868,3 +2868,34 @@ export const FullSizeMultiStepInnerSidebar = fullSizeStory(FullSizeCases.MultiSt
 export const FullSizeMultiStepStepsInPage = fullSizeStory(FullSizeCases.MultiStepStepsInPage, 1100, 'MultiStepStepsInPage');
 export const FullSizeBareColumn = fullSizeStory(FullSizeCases.BareColumn, 1100, 'BareColumn');
 export const FullSizeBareWithSidebar = fullSizeStory(FullSizeCases.BareWithSidebar, 1100, 'BareWithSidebar');
+
+/**
+ * The multi-step task at a docked width: the footer's top line (the hairline on
+ * the body's edge) sits at the same y as the line above the Sidebar's account row.
+ */
+const footerLevelAt = (width) => ({
+    parameters: { frameWidth: width },
+    render: () => <div style={{ height: HEIGHT }}><MultiStepTask count={5} start={0} /></div>,
+    play: async ({ canvasElement }) => atViewport(width, async () => {
+        const frame = canvasElement.querySelector('.plus-frame');
+        const account = await waitFor(() => {
+            const row = canvasElement.querySelector('.plus-sidebar-account');
+            expect(row, `the Sidebar docks at ${width}`).not.toBeNull();
+            return row;
+        });
+        const body = canvasElement.querySelector('[data-probe="task-body"]');
+        const bar = canvasElement.querySelector('[data-probe="bar"]');
+        const hairline = tokenLength(frame, '--border-width-default');
+        await expect(rect(bar).bottom, 'the footer runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
+        await expect(rect(body).bottom - hairline, 'the footer line is level with the account row line').toBeCloseTo(rect(account).top, 0);
+        for (const name of ['Back', 'Next']) {
+            await expect(rect(within(bar).getByRole('button', { name })).height, `${name} is 32 high`).toBeCloseTo(tokenLength(frame, '--control-md'), 0);
+        }
+    }),
+});
+
+/** 1440: the multi-step footer's line sits level with the Sidebar account row's. */
+export const MultiStepFooterLevelAt1440 = { ...footerLevelAt(1440), name: 'Layout: Multi-step footer level at 1440' };
+
+/** 1280: the multi-step footer's line sits level with the Sidebar account row's. */
+export const MultiStepFooterLevelAt1280 = { ...footerLevelAt(1280), name: 'Layout: Multi-step footer level at 1280' };

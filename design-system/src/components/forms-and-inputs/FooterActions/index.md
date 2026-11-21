@@ -2,7 +2,7 @@
 
 # FooterActions
 
-FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
+FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`, unless it sets its own spacing: the Frame footer of a multi-step task passes `spacing="default"` (32). A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
 
 **Import:** `import { FooterActions } from '@/components';`
 
@@ -30,6 +30,8 @@ What the footer finishes picks its layout, and this component is the answer for 
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
 7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel).
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
+
+**The Frame footer is the one exception.** `FooterActions` buttons are `48` high (`--footer-height`) in a `Modal` and a `Panel`. The Frame footer, including a multi-step task whose footer is the Frame footer, keeps `32` high buttons (`--control-md`) so its top line stays level with the divider above the Sidebar's account row. Do not raise them to `48` there.
 
 ### Hug or fill
 
@@ -124,6 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Height | 48: `--footer-height`. |
+| Height in the Frame footer | 32: `--control-md`, so the footer line stays level with the Sidebar account row. |
 | Track gap | `--inline-md` between the 4 equal tracks. |
 | Link leading action | `--ds-link` label and `--ds-icon-brand` icon with no fill, underlined on hover and `--ds-link-pressed` when pressed. Its start padding is `0`, so the text sits on the content edge. |
 | Danger-link leading action | `--ds-text-danger` label and `--ds-icon-danger` icon with no fill, underlined on hover and `--ds-text-danger-bolder` when pressed. |

@@ -121,7 +121,7 @@ A task with several steps runs in the Sidebar's inner mode on a default Frame. A
 1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar.
 2. **Steps.** Text-only rows, one noun each. The current step is marked, answered steps carry a tick, and steps past your answers are disabled with the reason in a tooltip.
 3. **Page.** The task's name as the page's one h1, then the step's body at reading width, 864, centered.
-4. **Footer**, fixed along the bottom and 48 high. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Both are FooterActions' filled buttons, 48 high, on the footer rule from <DocsLink id="patterns-common-actions">Common actions</DocsLink>. Back on the first step is disabled and needs no reason.
+4. **Footer**, fixed along the bottom, 52 high under its hairline (`--frame-footer-height`) so its top line sits level with the line above the Sidebar's account row. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Both are FooterActions' filled buttons at default spacing, 32 high (`--control-md`), not the 48 of a Modal or Panel footer, on the footer rule from <DocsLink id="patterns-common-actions">Common actions</DocsLink>. Back on the first step is disabled and needs no reason.
 
 <ComponentExample of={FrameStories.LayoutMultiStepTaskLeaves} title="Leaving" description="Save and exit keeps the answers and leaves. Back in the inner sidebar returns to the main Sidebar." />
 
@@ -227,7 +227,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 <tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width</code> sets the type: <code>default</code> caps it at 1232, <code>full</code> has no cap, <code>reading</code> caps it at 864.</td></tr>
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
-<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 48 high, with Save and exit, Back and Next. Today the page places the footer.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 52 high with 32-high buttons and its line level with the Sidebar account row, holding Save and exit, Back and Next. Today the page places the footer.</td></tr>
 <tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
 </tbody>
 </DocsTable>
