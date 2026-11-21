@@ -12,7 +12,7 @@ authored half, counted rather than assumed.
   - For a timed confirmation that something already happened, use `Flag`.
   - For a short note tied to one control or field, use `Popup` or `Tooltip`.
 - **[Dialog](Dialog/index.md)** — Use `Dialog` as the panel inside the Modal template, or when a docs illustration or mockup draws the dialog panel inline with no Blanket and no modal behavior. For a working overlay over the page (Blanket, portal, focus trap, Escape and scroll lock), use the `Modal` template from `@/templates`.
-  - For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/templates`).
+  - For a blocking overlay over the page, use `Modal` (`@/templates`), which adds the Blanket, focus trap, Escape and scroll lock.
   - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
   - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
   - For a small aside anchored to a control, use `Popup`.

@@ -124,7 +124,7 @@ Use `SettingRow` on settings and preference pages where each row adjusts one ind
 
 ## Alternatives
 
-- For fields edited and submitted together with a Save button, use stacked form fields inside `Fieldset` (see <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>).
+- For fields edited and submitted together with a Save button, use `Fieldset` with stacked form fields (see <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>).
 - For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.
 - For one value on a record page read far more often than edited, use `InlineEdit`.
 
@@ -277,10 +277,10 @@ The control keeps its size and place at the end of the row. See [Overflow](?path
 
 ## Related
 
-- `Toggle`: use as `control` when a setting turns on or off and applies immediately.
-- `Select`: use with `spacing="compact"` as `control` when a setting picks one option from a short list.
-- `StatusTag`: pass to `status` to show connection or feature state beside the setting name.
-- `Flag`: use in `FlagGroup` to confirm background saves on a settings page.
+- `Toggle`: use when a setting turns on or off and applies immediately; pass it as `control`.
+- `Select`: use when a setting picks one option from a short list; pass it as `control` with `spacing="compact"`.
+- `StatusTag`: use when connection or feature state shows beside the setting name; pass it to `status`.
+- `Flag`: use when a background save on a settings page needs confirming; place it in `FlagGroup`.
 
 </div>
 

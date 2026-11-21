@@ -105,6 +105,16 @@ Use `GenerativeBorder` only while the AI is generating into a piece of content, 
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a general wait, use `Spinner`.
+- For a wait where the layout is known, use `Skeleton`.
+- For a wait with measurable progress, use `ProgressBar`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Content.** The content being generated, unchanged by the border.
@@ -222,8 +232,8 @@ Set `isActive` to false when generation ends.
 
 ## Related
 
-- For the icons that start an AI action, use `AiIcon`.
-- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
+- `AiIcon`: use when an icon starts an AI action.
+- `Spinner`, `Skeleton` and `ProgressBar`: use when the wait is general, not the AI generating into content.
 
 </div>
 

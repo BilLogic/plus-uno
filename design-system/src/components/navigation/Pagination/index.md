@@ -28,7 +28,7 @@ tutors. It is fully controlled: `currentPage` and `totalPages` are required, and
 every click calls `onPageChange` with the target page. It holds no state.
 
 Reach for it to page through results too many for one screen: a table's rows,
-a search's matches, a long history.
+a search's matches, a long history. A continuously loading feed takes no pages, so it takes no `Pagination`.
 
 The window of numbers is computed for you. `max` (default `5`) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
@@ -46,7 +46,6 @@ Pagination reads these motion tokens and no literal duration or curve.
 
 - For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
 - For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
-- For a continuously loading feed, use infinite scroll rather than pages.
 
 ## Best practices
 
