@@ -8,6 +8,7 @@ import { BorderAndTooltipCase, CODE, FailureInModal, FailureInSlot, MessageOnFie
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta title="Patterns/States/Errors" tags={['manifest']} />
 
@@ -67,6 +68,14 @@ Give each failure one home near its cause. Key cases shows the two submit failur
 <ComponentExample of={ErrorsStories.PlacePageCondition} title="The whole page" />
 
 <ComponentExample of={ErrorsStories.PlaceMenu} title="A menu's options" description="Click Retry in the menu to load the options." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Errors" tier="pattern" />
 
 </div>
 

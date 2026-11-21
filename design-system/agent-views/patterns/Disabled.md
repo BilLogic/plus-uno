@@ -64,6 +64,14 @@ Use Disabled when something on the page cannot be used right now. Reach for it l
 - Navigation: use for the Sidebar's locked Toolkit.
 - `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `DropdownMenu`, `SectionMessage`: the components.
 
+## Motion
+
+Disabled reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | No motion; the state is color. |
+
 ## Best practices
 
 ### Keep actions enabled and explain what is missing when pressed. {#keep-actions-enabled-and-explain-what-is-missing-when-pressed}

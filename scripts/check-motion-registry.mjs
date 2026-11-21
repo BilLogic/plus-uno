@@ -21,6 +21,9 @@
  *   - Every Patterns page (a Storybook title under `Patterns/`, the Overview
  *     excluded) has a `tier: 'pattern'` row named by its page. No allow-list:
  *     a new Patterns page arrives with its row.
+ *   - Every `tier: 'pattern'` row is shown: its page renders a
+ *     `<MotionSection component="<row name>" tier="pattern" />`, so the rows in
+ *     the library sit in the page's Motion section too.
  *   - A `tier: 'component'` row for a component the index does not list fails;
  *     `pattern` and `template` rows skip that rule; an unknown tier fails.
  *
@@ -70,13 +73,19 @@ export function interactiveComponents(index) {
 const PATTERNS_DIR = 'design-system/src/storybook-docs/patterns';
 const NOT_PAGES = new Set(['Overview']);
 
+/** The page a `Patterns/...` title belongs to: `<Page>[/...]`, or `States/<Page>[/...]` for the States group. */
+const pageOfTitle = (title) => {
+  const parts = title.split('/');
+  return parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
+};
+
 /** Patterns pages by Storybook title (`Patterns/<Page>[/...]`, or `Patterns/States/<Page>[/...]` for the States group), the Overview excluded. */
 export function patternPages(repoRoot = REPO_ROOT) {
   const names = new Set();
   for (const { text } of trackedSources(repoRoot, [PATTERNS_DIR], /\.(mdx|stories\.jsx?)$/)) {
     for (const m of text.matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
       const parts = m[1].split('/');
-      const page = parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
+      const page = pageOfTitle(m[1]);
       // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
       if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
     }
@@ -91,6 +100,20 @@ const unregistered = (components, registry) => {
   return components.filter((c) => !rows.has(c));
 };
 
+/** Names of the pattern pages that render their own registry rows: `<MotionSection component="<Name>" tier="pattern" />` in the MDX titled for that page. */
+export function motionSectionPages(repoRoot = REPO_ROOT) {
+  const names = new Set();
+  for (const { text } of trackedSources(repoRoot, [PATTERNS_DIR], /\.mdx$/)) {
+    const title = text.match(/<Meta\s+title=["']Patterns\/([^"']+)["']/)?.[1];
+    if (!title) continue;
+    const page = pageOfTitle(title);
+    for (const m of text.matchAll(/<MotionSection\s+component=["']([^"']+)["']\s+tier=["']pattern["']/g)) {
+      if (m[1] === page) names.add(page);
+    }
+  }
+  return names;
+}
+
 const readIndex = (repoRoot) => text(INDEX, { root: repoRoot });
 
 export const REMEDY =
@@ -98,7 +121,7 @@ export const REMEDY =
   '     The allow-list only shrinks: `npm run check:motion-registry -- --update` after a row lands; never edit it by hand.';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
-export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY, patterns = patternPages(repoRoot) } = {}) {
+export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY, patterns = patternPages(repoRoot), motionSections = motionSectionPages(repoRoot) } = {}) {
   const components = interactiveComponents(index ?? readIndex(repoRoot));
   const findings = [];
   const valid = validTokens();
@@ -130,6 +153,11 @@ export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY, p
   for (const page of patterns) {
     if (!patternRows.has(page)) {
       findings.push({ message: `Patterns page "${page}" has no tier: 'pattern' row in the motion registry` });
+    }
+  }
+  for (const name of patternRows) {
+    if (!motionSections.has(name)) {
+      findings.push({ message: `Patterns page "${name}" has motion registry rows but no <MotionSection component="${name}" tier="pattern" /> under ## Motion` });
     }
   }
   const missing = unregistered(components, registry);

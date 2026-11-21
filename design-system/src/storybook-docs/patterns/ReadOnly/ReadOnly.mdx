@@ -8,6 +8,7 @@ import { CODE, FadedNoReasonCase, FieldForFixedValueCase, PlainValueCase, Readab
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta title="Patterns/States/Read-only" tags={['manifest']} />
 
@@ -61,6 +62,14 @@ The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled-
 <ComponentExample of={ReadOnlyStories.KeyLongValue} title="A long value" description={<>A read-only value is shown whole. A TextArea does not size itself to its value yet, so set its rows to show all of it. Growing to fit is Planned <PlannedTag />.</>} />
 
 <ComponentExample of={ReadOnlyStories.CasePlainText} title="Plain text" description="Static details sit in a definition list inside a details Section, with no input border or tab stop." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Read-only" tier="pattern" />
 
 </div>
 
