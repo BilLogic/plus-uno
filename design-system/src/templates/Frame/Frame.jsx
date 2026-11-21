@@ -49,8 +49,8 @@ const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body 
 /** A toggle that can take focus: on the page, and not inside a Sidebar that is leaving. */
 const canFocus = (el) => Boolean(el?.isConnected && !el.closest('[inert]'));
 
-/** The dismiss attempts Base UI reports for the Panel's dialog that the Frame acts on. */
-const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
+/** The dismiss attempts Base UI reports for the Panel's and the floating Sidebar's dialogs that the Frame acts on. */
+const DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
 
 /**
  * Frame template: the app frame, the Sidebar beside the Page (and the Panel).
@@ -69,7 +69,9 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay`
  *   and no Blanket.
  * - Hovering the left edge peeks a closed Sidebar. An outside press, Escape,
- *   or the pointer leaving closes the peek.
+ *   or the pointer leaving closes the peek. Floating, the Sidebar is a
+ *   non-modal Base UI `Dialog`: its dismissal and its focus return run there,
+ *   and Escape hands focus to the toggle that is left.
  * - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and
  *   opens a closed one; focus follows to the toggle that is left.
  * - Opening a modal closes a floating Sidebar and leaves a docked
@@ -133,6 +135,9 @@ const Frame = ({
     // Set by a toggle press or the shortcut: focus follows to the toggle that is left.
     const refocusToggle = useRef(false);
     const sidebarRef = useRef(null);
+    const sidebarHostRef = useRef(null);
+    // Set by an Escape that closes the floating Sidebar: Base UI hands focus to the toggle.
+    const sidebarReturnsFocus = useRef(false);
     const leaveTimer = useRef(null);
     const sidebarId = useId();
     const panelId = useId();
@@ -214,13 +219,14 @@ const Frame = ({
     }
     if (raised !== wasRaised) {
         raisedEnteringRef.current = raised && readyRef.current && !wasDocked;
+        if (raised) sidebarReturnsFocus.current = false;
         prevRaisedRef.current = raised;
     }
 
+    // The docked Sidebar stays mounted for its exit here; the floating one runs on
+    // Base UI's `Dialog`, which keeps it mounted until its exit finishes.
     const dockedRef = useRef(null);
-    const raisedRef = useRef(null);
     const dockedPresent = useOverlayPresence(docked, dockedRef);
-    const raisedPresent = useOverlayPresence(raised, raisedRef);
 
     /** The toggle that shows: the Page's when the Sidebar is closed, else the Sidebar's own. */
     const focusToggle = useCallback(() => {
@@ -305,8 +311,10 @@ const Frame = ({
     // Focus follows a toggle press or the shortcut to the toggle that is left.
     useEffect(() => {
         if (!refocusToggle.current) return;
-        refocusToggle.current = false;
         const visible = [closeRef.current, toggleRef.current].find(canFocus);
+        // A floating Sidebar mounts after this runs; its dialog takes focus to its toggle instead.
+        if (!visible && layout.sidebar === 'overlay') return;
+        refocusToggle.current = false;
         visible?.focus({ preventScroll: true });
     }, [layout.sidebar]);
 
@@ -343,27 +351,43 @@ const Frame = ({
         }
     }), [closeRaised]);
 
-    // A raised Sidebar closes on an outside press or Escape; the toggle and the Sidebar are inside.
-    useEffect(() => {
-        if (!raised) return undefined;
-        const onPointerDown = (e) => {
-            if (sidebarRef.current?.contains(e.target) || toggleRef.current?.contains(e.target)) return;
-            closeRaised();
-        };
-        const onKeyDown = (e) => {
-            // A control that handled its own Escape (a menu, a field) keeps it,
-            // and so does an open modal.
-            if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
-            refocusToggle.current = true;
-            closeRaised();
-        };
-        document.addEventListener('pointerdown', onPointerDown);
-        document.addEventListener('keydown', onKeyDown);
-        return () => {
-            document.removeEventListener('pointerdown', onPointerDown);
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [raised, closeRaised]);
+    /**
+     * A raised Sidebar is a non-modal Base UI `Dialog`, and the Frame keeps the
+     * rules: it closes on a press outside it or on Escape. A press on the
+     * Page's toggle (which toggles it itself) leaves it open, and so does an
+     * Escape that is an open modal's or that a control in the Sidebar (a menu,
+     * a field) already handled. Focus leaving it does not close it.
+     */
+    const sidebarKeepsOpen = (next, details) => {
+        if (next || !DISMISS_REASONS.has(details?.reason) || openOverlayCount() > 0) return true;
+        const event = details.event;
+        if (details.reason === 'escape-key') return Boolean(event?.defaultPrevented);
+        return Boolean(toggleRef.current?.contains(event?.target));
+    };
+    const handleSidebarOpenChange = (next, details) => {
+        if (sidebarKeepsOpen(next, details)) {
+            // An attempt the Frame ignores leaves the event alone for anything else listening.
+            details?.cancel?.();
+            details?.allowPropagation?.();
+            return;
+        }
+        sidebarReturnsFocus.current = details.reason === 'escape-key';
+        closeRaised();
+    };
+
+    // Opened by a toggle press or the shortcut, focus goes to the Sidebar's own toggle; a peek takes none.
+    const sidebarInitialFocus = useCallback(() => {
+        if (!refocusToggle.current) return false;
+        refocusToggle.current = false;
+        return canFocus(closeRef.current) ? closeRef.current : false;
+    }, []);
+
+    // Escape hands focus to the toggle that is left; any other close leaves it where it is.
+    const sidebarFinalFocus = useCallback(() => {
+        if (!sidebarReturnsFocus.current) return false;
+        sidebarReturnsFocus.current = false;
+        return [toggleRef.current, closeRef.current].find(canFocus) ?? false;
+    }, []);
 
     /* ------------------------------------------------------------- panel */
 
@@ -411,7 +435,7 @@ const Frame = ({
      */
     const panelKeepsOpen = (next, details) => {
         if (next || !panelDismissible) return true;
-        if (!PANEL_DISMISS_REASONS.has(details?.reason) || openOverlayCount() > 0) return true;
+        if (!DISMISS_REASONS.has(details?.reason) || openOverlayCount() > 0) return true;
         const event = details.event;
         if (details.reason === 'escape-key') return Boolean(event?.defaultPrevented);
         const target = event?.target;
@@ -546,27 +570,33 @@ const Frame = ({
 
     // A plain box: the `nav` inside the Sidebar is the navigation landmark. A leaving one is only
     // the exit's last frames: it is inert and hidden, and the live Sidebar owns the id and the ref.
-    const sidebarPanel = (isRaised, leaving, entering) => (
-        <div
-            ref={(el) => {
-                (isRaised ? raisedRef : dockedRef).current = el;
-                if (!leaving) sidebarRef.current = el;
-            }}
-            id={leaving ? undefined : sidebarId}
-            className={`plus-frame__sidebar plus-frame__sidebar--${isRaised ? 'raised' : 'docked'}`}
-            data-entering={!leaving && entering ? 'true' : undefined}
-            data-reduced={reduced ? 'true' : undefined}
-            data-leaving={leaving && readyRef.current ? 'true' : undefined}
-            hidden={leaving && (isRaised ? docked : !readyRef.current) ? true : undefined}
-            style={!isRaised && leaving && raised ? { visibility: 'hidden' } : undefined}
-            inert={panelModal || leaving}
-            aria-hidden={leaving ? true : undefined}
-            onPointerEnter={isRaised && !leaving ? cancelLeave : undefined}
-            onPointerLeave={isRaised && !leaving ? leave : undefined}
-        >
-            {sidebar}
-        </div>
-    );
+    // Floating, it is the popup of a non-modal Base UI `Dialog`, still with no role of its own.
+    const sidebarPanel = (isRaised, leaving, entering) => {
+        const Box = isRaised ? Dialog.Popup : 'div';
+        const dialogProps = isRaised ? { role: undefined, initialFocus: sidebarInitialFocus, finalFocus: sidebarFinalFocus } : {};
+        return (
+            <Box
+                {...dialogProps}
+                ref={(el) => {
+                    if (!isRaised) dockedRef.current = el;
+                    if (!leaving) sidebarRef.current = el;
+                }}
+                id={leaving ? undefined : sidebarId}
+                className={`plus-frame__sidebar plus-frame__sidebar--${isRaised ? 'raised' : 'docked'}`}
+                data-entering={!leaving && entering ? 'true' : undefined}
+                data-reduced={reduced ? 'true' : undefined}
+                data-leaving={leaving && readyRef.current ? 'true' : undefined}
+                hidden={leaving && (isRaised ? docked : !readyRef.current) ? true : undefined}
+                style={!isRaised && leaving && raised ? { visibility: 'hidden' } : undefined}
+                inert={panelModal || leaving}
+                aria-hidden={leaving ? true : undefined}
+                onPointerEnter={isRaised && !leaving ? cancelLeave : undefined}
+                onPointerLeave={isRaised && !leaving ? leave : undefined}
+            >
+                {sidebar}
+            </Box>
+        );
+    };
 
     const shortcut = 'Control+[ Meta+[';
 
@@ -622,7 +652,16 @@ const Frame = ({
                 {collapsed ? (
                     <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
                 ) : null}
-                {raisedPresent && hasSidebar ? sidebarPanel(true, !raised, raisedEnteringRef.current) : null}
+                {/* The floating Sidebar's place in the tree, so Tab moves from it into the Page. */}
+                {hasSidebar ? (
+                    <div ref={sidebarHostRef} className="plus-frame__sidebar-host">
+                        <Dialog.Root open={raised} onOpenChange={handleSidebarOpenChange} modal={false}>
+                            <Dialog.Portal container={sidebarHostRef} className="plus-frame__sidebar-host">
+                                {sidebarPanel(true, !raised, raisedEnteringRef.current)}
+                            </Dialog.Portal>
+                        </Dialog.Root>
+                    </div>
+                ) : null}
 
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />

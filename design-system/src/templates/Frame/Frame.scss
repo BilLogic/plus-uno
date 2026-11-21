@@ -333,3 +333,8 @@
 .plus-frame__panel-host {
     display: contents;
 }
+
+// The floating Sidebar's place and its portal node: they draw no box, so it floats over the Frame as before.
+.plus-frame__sidebar-host {
+    display: contents;
+}
