@@ -141,7 +141,6 @@ const buttonShape = PropTypes.shape({
     appearance: PropTypes.string,
     spacing: PropTypes.string,
     icon: PropTypes.string,
-    iconPosition: PropTypes.string,
 });
 
 const tabShape = PropTypes.shape({

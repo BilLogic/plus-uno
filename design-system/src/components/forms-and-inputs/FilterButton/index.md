@@ -150,6 +150,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `label` | string | — | The field the filter narrows, such as "Status". With it the button reads "Status: Upcoming": the label quiet, `text` the value in ink. |
 | `text` | string (required) | — | The filter's name, or its value when `label` is set. |
 | `trailingMetric` | number or string | — | The count shown after the name. `0` shows; leave it out to hide it. |
+| `iconBefore` | string or node | — | The icon before the name, passed to Button: a Font Awesome name or a node. |
 | `hasChevronDown` | bool | `true` | The chevron that says a menu opens. |
 | `appearance` | enum | `'default'` | — |
 | `spacing` | enum | — | `default` draws 32. `compact` draws 24. |
