@@ -3,8 +3,9 @@
  *
  * The non-chrome half of the field split (A7): the box (`FieldBox.scss`)
  * draws the height, border, fill and state; this file draws everything
- * around it. One disabled fade: the box fades itself, and the stack fades
- * only the label around it. The caption keeps full contrast because it says why.
+ * around it. Disabled is a change of color, not a fade: the box takes its own
+ * disabled colors, and the stack turns the label around it `text.disabled`.
+ * The caption keeps full contrast because it says why.
  */
 
 .plus-field-stack {
@@ -17,7 +18,16 @@
 // The caption stays at full contrast: when a field is disabled, the caption is
 // the visible reason, so it must stay readable.
 .plus-field-stack--disabled > :not(.plus-field):not(.plus-field-caption):not(.plus-field-caption-slot) {
-    opacity: var(--ds-opacity-disabled);
+    color: var(--ds-text-disabled);
+
+    .plus-field-label,
+    .plus-field-marker {
+        color: var(--ds-text-disabled);
+    }
+
+    .plus-field-info {
+        color: var(--ds-icon-disabled);
+    }
 }
 
 .plus-field-stack > .plus-field-caption-slot {

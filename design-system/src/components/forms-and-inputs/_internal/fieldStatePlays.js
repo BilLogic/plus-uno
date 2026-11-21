@@ -5,9 +5,9 @@
  * should resolve to, so a wrong mapping fails in the browser.
  */
 import { expect, waitFor } from 'storybook/test';
-import { px, probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { expectFieldReadOnly } from '@/storybook-docs/lib/field-states.js';
+import { expectFieldDisabled, expectFieldReadOnly } from '@/storybook-docs/lib/field-states.js';
 
 const boxOf = (control) => control.closest('.plus-field');
 
@@ -36,10 +36,16 @@ export const expectFocused = async (canvasElement, control) => {
     control.blur();
 };
 
+/** Disabled is a change of color, not an opacity fade: see `expectFieldDisabled`. */
 export const expectDisabled = async (canvasElement, control) => {
     const box = boxOf(control);
-    await expect(box).toHaveClass('plus-field--disabled');
-    await expect(getComputedStyle(box).opacity).toBe(probe(canvasElement, 'opacity', 'var(--ds-opacity-disabled)'));
+    await expectFieldDisabled(box);
+    // The label around it turns `text.disabled` too, at full opacity.
+    const label = box.closest('.plus-field-stack')?.querySelector('.plus-field-label');
+    if (label) {
+        await expect(getComputedStyle(label).color, 'disabled label').toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await expect(getComputedStyle(label.parentElement).opacity, 'the label does not fade').toBe('1');
+    }
 };
 
 export const expectInvalid = async (canvasElement, control) => {

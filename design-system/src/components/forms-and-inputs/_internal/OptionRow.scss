@@ -54,9 +54,36 @@
         outline-offset: calc(-1 * var(--focus-ring-width));
     }
 
+    // Disabled is a change of color, not an opacity fade: text, icons and
+    // the mark take their disabled tokens.
     &.is-disabled {
-        opacity: var(--ds-opacity-disabled);
+        color: var(--ds-text-disabled);
         cursor: not-allowed;
+
+        .plus-option-row-description,
+        .plus-option-row-elem-after {
+            color: var(--ds-text-disabled);
+        }
+
+        .plus-option-row-leading,
+        .plus-option-row-selected-mark,
+        .plus-option-row-toggle,
+        .plus-option-row-chevron {
+            color: var(--ds-icon-disabled);
+        }
+
+        .plus-option-row-check {
+            border-color: var(--ds-border-disabled);
+            background-color: var(--ds-background-disabled);
+
+            &.plus-option-row-check--checkbox i {
+                color: var(--ds-icon-disabled);
+            }
+
+            &.plus-option-row-check--radio.is-checked::before {
+                background-color: var(--ds-icon-disabled);
+            }
+        }
     }
 }
 

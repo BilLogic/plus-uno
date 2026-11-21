@@ -255,6 +255,10 @@ TrackColors.play = async ({ canvasElement }) => {
         for (const name of ['Auto-assign cover', 'Family recap']) {
             await expect(fill(control(name)), `${mode}: ${name} track`).toBe(token('--ds-background-disabled'));
             await expect(getComputedStyle(thumb(control(name))).backgroundColor, `${mode}: ${name} thumb`).toBe(token('--ds-icon-disabled'));
+            // The label changes color; it does not fade.
+            const label = canvas.getByText(name).closest('.plus-toggle-label');
+            await expect(getComputedStyle(label).color, `${mode}: ${name} label`).toBe(token('--ds-text-disabled'));
+            await expect(getComputedStyle(label).opacity, `${mode}: ${name} label does not fade`).toBe('1');
         }
     });
 };

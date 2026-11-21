@@ -84,7 +84,7 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 `isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
-Don't: Disabled fades a value people need to read.
+Don't: Disabled dims a value people need to read.
 
 ### Let a `TextArea` note longer than its rows wrap and scroll inside the field. {#let-a-textarea-note-longer-than-its-rows-wrap-and-scroll-inside-the-field}
 
@@ -126,7 +126,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The edge turns `--ds-border-focused`. A subtle text area takes `--ds-background-neutral-subtle-hovered`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
-| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Warning, success | The edge takes `--ds-border-warning` or `--ds-border-success`, with the message in the matching text color. |
 | Read-only | The `--ds-background-neutral` fill, full contrast, ignoring the pointer. The value can be read, selected and copied. |

@@ -88,8 +88,13 @@
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-toolbar {
-    opacity: var(--ds-opacity-disabled);
     pointer-events: none;
+}
+
+// Read-only dims its inert toolbar. Disabled does not fade: its buttons are
+// disabled and draw their own disabled colors.
+.plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar {
+    opacity: var(--ds-opacity-disabled);
 }
 
 /* ========== Writing area ========== */
@@ -118,9 +123,19 @@
     pointer-events: none;
 }
 
-.plus-rich-text-editor-readonly .plus-rich-text-editor-box,
-.plus-rich-text-editor-disabled .plus-rich-text-editor-box {
+.plus-rich-text-editor-readonly .plus-rich-text-editor-box {
     background-color: var(--ds-background-neutral);
+}
+
+// Disabled is a change of color, not a fade: the box, its edge and the
+// label take their disabled tokens.
+.plus-rich-text-editor-disabled .plus-rich-text-editor-box {
+    border-color: var(--ds-border-disabled);
+    background-color: var(--ds-background-disabled);
+}
+
+.plus-rich-text-editor-disabled .plus-rich-text-editor-label {
+    color: var(--ds-text-disabled);
 }
 
 // Read-only is a value to read, so its text keeps full contrast; disabled steps down.
@@ -130,5 +145,5 @@
 }
 
 .plus-rich-text-editor-disabled .plus-rich-text-editor-content {
-    color: var(--ds-text-subtle);
+    color: var(--ds-text-disabled);
 }

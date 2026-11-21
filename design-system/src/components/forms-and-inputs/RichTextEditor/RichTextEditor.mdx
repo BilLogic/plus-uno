@@ -65,7 +65,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows at full contrast on the neutral fill and cannot be edited. The toolbar is inactive." />
 
-<ComponentExample of={RichTextEditorStories.DisabledState} title="Disabled" description="The content and toolbar fade and leave the tab order." />
+<ComponentExample of={RichTextEditorStories.DisabledState} title="Disabled" description="The box, content and toolbar take their disabled colors and leave the tab order." />
 
 </div>
 
@@ -136,7 +136,7 @@ Use `RichTextEditor` when formatting such as emphasis, lists or links is part of
 <tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the box while the writing area has focus.</td></tr>
 <tr><td>Read-only</td><td><code>--ds-background-neutral</code> box, <code>--ds-text</code> text at full contrast, the writing area in the tab order, toolbar faded and inert.</td></tr>
-<tr><td>Disabled</td><td><code>--ds-background-neutral</code> box and <code>--ds-text-subtle</code> text, the writing area out of the tab order, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
+<tr><td>Disabled</td><td>The box takes <code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> border and <code>--ds-text-disabled</code> text, never an opacity fade, and the label <code>--ds-text-disabled</code>. The writing area leaves the tab order, and the toolbar is inert, its buttons disabled.</td></tr>
 <tr><td>Invalid</td><td>Not drawn. Mark the surrounding field and explain the error beside it.</td></tr>
 </tbody>
 </DocsTable>

@@ -131,7 +131,7 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
 `isReadOnly` keeps the value focusable, selectable and at full contrast (`aria-readonly`); `isDisabled` removes the field from the tab order when it does not apply yet. Say why in the caption. Never swap one for the other, and never clip a read-only value; content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: Read-only keeps the value readable, and the caption says why.
-Don't: Disabled fades a value people need to read.
+Don't: Disabled dims a value people need to read.
 
 ### Let a single `Select` value longer than the field end in an ellipsis with a Tooltip. {#let-a-single-select-value-longer-than-the-field-end-in-an-ellipsis-with-a-tooltip}
 
@@ -187,7 +187,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the list. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
-| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Valid | With `isValid`, the edge takes `--ds-border-success` and `successMessage` shows under the field. |
 | Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied. |

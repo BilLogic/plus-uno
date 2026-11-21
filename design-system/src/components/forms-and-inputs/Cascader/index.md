@@ -97,7 +97,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `CheckboxGr
 | Hovered | The edge turns `--ds-border-focused`. |
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the columns. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
-| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 
 ### Tokens

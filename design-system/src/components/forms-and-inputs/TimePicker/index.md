@@ -67,10 +67,10 @@ Every option in the list carries `AM` or `PM` (`9:30 AM` and `9:30 PM` are separ
 
 ### Show a set time as read-only, not disabled. {#show-a-set-time-as-read-only-not-disabled}
 
-`isReadOnly` shows a time the person may read but not change; `isDisabled` fades a field that does not apply right now and removes it from the tab order. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
+`isReadOnly` shows a time the person may read but not change; `isDisabled` dims a field that does not apply right now and removes it from the tab order. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 Do: A set time, read-only and easy to read.
-Don't: The same time disabled, faded as if it did not apply.
+Don't: The same time disabled, dimmed as if it did not apply.
 
 ### Let a `TimePicker` stay on one line in a narrow slot. {#let-a-timepicker-stay-on-one-line-in-a-narrow-slot}
 
@@ -103,7 +103,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger`. |
 | Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The chevron is not drawn and a press opens no list. |
-| Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Disabled | The box takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
 
 ### Tokens
 

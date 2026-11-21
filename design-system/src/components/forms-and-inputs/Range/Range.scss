@@ -39,6 +39,11 @@
     color: var(--ds-text);
     font: var(--body-default);
     letter-spacing: var(--body-default-tracking);
+
+    // Disabled is a change of color, not a fade.
+    .plus-field-stack--disabled & {
+        color: var(--ds-text-disabled);
+    }
 }
 
 .plus-form-range {
