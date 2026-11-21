@@ -34,6 +34,12 @@ PromptInput reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | Send becomes Stop at once while the AI writes. |
 
+## Alternatives
+
+- For a plain multi-line field with no AI behavior, use `TextArea`.
+- For one short prompt a person taps, use `Suggestion`.
+- For suggested prompts before anyone types, use `PromptStarters`.
+
 ## Best practices
 
 ### Let a long prompt grow to five lines, then scroll. {#let-a-long-prompt-grow-to-five-lines-then-scroll}
@@ -89,9 +95,10 @@ Don't: A disabled idle field blocks the next question.
 
 ## Related
 
-- For a plain multi-line field with no AI behavior, use `TextArea`.
-- For the border treatment shown while loading, see `GenerativeBorder`.
-- For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
+- `TextArea`: use when the field has no AI behavior.
+- `GenerativeBorder`: use when the border shows generation in progress.
+- `Suggestion`: use when one short prompt is tappable.
+- `PromptStarters`: use when an empty chat needs suggested prompts.
 
 Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptStarters` · `Suggestion`
 

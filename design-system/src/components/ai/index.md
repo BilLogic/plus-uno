@@ -8,12 +8,29 @@ authored half, counted rather than assumed.
 ## Which component to reach for
 
 - **[AiChat](AiChat/index.md)** — Use AI chat to ask about the current page. Choose a mode for the task.
+  - For one reply on its own, use `AiMessage`.
+  - For the field alone, use `PromptInput`.
+  - For suggested prompts before anyone types, use `PromptStarters`.
 - **[AiIcon](AiIcon/index.md)** — Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.
+  - For an action that is not an AI action, use `Icon`.
+  - For the border that shows generation in progress, use `GenerativeBorder`.
 - **[AiMessage](AiMessage/index.md)** — Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its status from the table below.
+  - For a whole conversation with its field, use `AiChat`.
+  - For the field that sends the message, use `PromptInput`.
 - **[GenerativeBorder](GenerativeBorder/index.md)** — Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
+  - For a general wait, use `Spinner`.
+  - For a wait where the layout is known, use `Skeleton`.
+  - For a wait with measurable progress, use `ProgressBar`.
 - **[PromptInput](PromptInput/index.md)** — Use `PromptInput` for AI chat or a feature that drafts from a free-text request. For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
+  - For a plain multi-line field with no AI behavior, use `TextArea`.
+  - For one short prompt a person taps, use `Suggestion`.
+  - For suggested prompts before anyone types, use `PromptStarters`.
 - **[PromptStarters](PromptStarters/index.md)** — Use `PromptStarters` before a person types into an empty chat, new reflection or blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
+  - For a single follow-up during a conversation, use `Suggestion`.
+  - For the field a selected starter fills, use `PromptInput`.
 - **[Suggestion](Suggestion/index.md)** — Use `Suggestion` when the system proposes a value and a person decides whether to take it: an AI-suggested focus area beside the ones already chosen, or a suggested question beside a chat box. Put it in the row where the accepted value will land, after the tags already there.
+  - For a value already in the field, use `Tag`.
+  - For an action that is not a proposed value, use `Button`.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|

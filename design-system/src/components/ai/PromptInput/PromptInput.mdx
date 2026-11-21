@@ -106,6 +106,16 @@ For a plain multiline field without send-on-Enter or loading behavior, use `Text
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For a plain multi-line field with no AI behavior, use `TextArea`.
+- For one short prompt a person taps, use `Suggestion`.
+- For suggested prompts before anyone types, use `PromptStarters`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Attachments** (optional). A row of staged files above the text.
@@ -242,10 +252,10 @@ A disabled field blocks follow-up questions.
 
 ## Related
 
-- For a plain multi-line field with no AI behavior, use `TextArea`.
-- For the border treatment shown while loading, see `GenerativeBorder`.
-- For a short, tappable prompt suggestion, use `Suggestion` or
-  `PromptStarters`.
+- `TextArea`: use when the field has no AI behavior.
+- `GenerativeBorder`: use when the border shows generation in progress.
+- `Suggestion`: use when one short prompt is tappable.
+- `PromptStarters`: use when an empty chat needs suggested prompts.
 
 </div>
 

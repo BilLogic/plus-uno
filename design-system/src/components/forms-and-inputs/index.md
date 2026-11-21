@@ -13,7 +13,7 @@ authored half, counted rather than assumed.
   - For a primary action joined to a menu of related variations, use `SplitButton`.
   - For a menu of actions behind one trigger, use `DropdownMenu`.
 - **[ButtonGroup](ButtonGroup/index.md)** — Use `ButtonGroup` for a short row of related actions that work on the same object. It spaces the buttons and names the row for assistive technology; it does not join them or track a selection.
-  - For switching how the same content is shown (Day / Week / Month, Table / Cards), use `SegmentedControl`.
+  - For switching how the same content is shown, use `SegmentedControl`.
   - For a single standalone action, use `Button`.
   - For one primary action joined to a menu of variations, use `SplitButton`.
   - For mutually exclusive form answers, use `RadioGroup`.
@@ -122,7 +122,7 @@ authored half, counted rather than assumed.
   - For narrowing a list by a category in a Section header, use `FilterButton`, `PopupSelect` or `FilterMenu`.
   - For general single-line text entry in a form, use `TextField`.
 - **[SegmentedControl](SegmentedControl/index.md)** — Use `SegmentedControl` to change how the same content is shown: Table or Cards, Day, Week or Month, Form or Code. The choice applies at once and there is no apply step. Exactly one segment is selected.
-  - For switching between sections of a page, each with its own content, use `Tabs`.
+  - For switching between sections of a page that each hold their own content, use `Tabs`.
   - For a row of related actions that each do something, use `ButtonGroup`.
   - For one answer in a form that is saved with the form, use `RadioGroup`.
   - For more than five choices, use `Select`.
@@ -134,7 +134,7 @@ authored half, counted rather than assumed.
   - For switching a view or setting one filter from a button, use `PopupSelect`.
   - For a menu of actions, use `DropdownMenu`.
 - **[SettingRow](SettingRow/index.md)** — Use `SettingRow` on settings and preference pages where each row adjusts one independent setting or external connection that takes effect immediately. Stack related rows directly under a section heading: adjacent `SettingRow` elements divide with a `1px` border at `--setting-row-pad-y` (`12px`) vertical padding, with no card per row.
-  - For fields edited and submitted together with a Save button, use stacked form fields inside `Fieldset` (see Forms).
+  - For fields edited and submitted together with a Save button, use `Fieldset` with stacked form fields (see Forms).
   - For an option inside a submitted form, use `Checkbox` rather than `Toggle` or `SettingRow`.
   - For one value on a record page read far more often than edited, use `InlineEdit`.
 - **[SplitButton](SplitButton/index.md)** — Use `SplitButton` when one action is clearly primary and a few related variations belong in an attached menu, such as "Send" with "Send and close" or "Save as draft".

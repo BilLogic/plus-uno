@@ -109,6 +109,16 @@ and the component index and names that fallback.
 
 <div className="sb-ds-doc-section">
 
+## Alternatives
+
+- For one reply on its own, use `AiMessage`.
+- For the field alone, use `PromptInput`.
+- For suggested prompts before anyone types, use `PromptStarters`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Parts
 
 1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
@@ -237,10 +247,10 @@ Full screen gives long answers room. A docked Panel squeezes them.
 
 ## Related
 
-- <a href="?path=/docs/templates-frame--docs">Frame</a> places the Panel the chat docks in.
-- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.
-- For one reply on its own, use `AiMessage`.
-- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
+- <a href="?path=/docs/templates-frame--docs">Frame</a>: use when the chat docks in a Panel beside the Page; the Panel never draws a Blanket and the Page stays in view.
+- `AiMessage`: use when one reply stands on its own.
+- `PromptInput`: use when only the field is needed.
+- `PromptStarters`: use when people need suggested prompts before they type.
 
 
 </div>

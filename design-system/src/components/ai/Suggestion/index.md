@@ -44,6 +44,11 @@ Suggestion reads these motion tokens and no literal duration or curve.
 | enter | Swap content in place | `--ds-motion-appearance-fast` | Fades in place. |
 | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Accepting folds it away; dismissing fades. |
 
+## Alternatives
+
+- For a value already in the field, use `Tag`.
+- For an action that is not a proposed value, use `Button`.
+
 ## Best practices
 
 ### Name the action. {#name-the-action}
@@ -94,7 +99,7 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 
 ## Related
 
-- For a value already in the field, use `Tag`, inside a `TagGroup`.
+- `Tag`, inside a `TagGroup`: use when the value is already in the field.
 
 Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters`
 

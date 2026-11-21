@@ -66,7 +66,7 @@ The label's text is read as the group's accessible name, and the date and time i
 
 ### Show the date and the time in one pattern. {#show-the-date-and-the-time-in-one-pattern}
 
-Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, "10/21/2026, 3:30 PM" and not "2026-10-21 15:30", so people do not have to reread it.
+Date comes first, followed by time with `AM` or `PM` (`MM/DD/YYYY, h:mm AM`). Write the moment in the same order wherever else it appears, in the field's own format and not as a year-first or 24-hour string, so people do not have to reread it.
 
 ### Always show AM or PM. {#always-show-am-or-pm}
 
