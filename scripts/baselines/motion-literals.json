@@ -3,9 +3,6 @@
   "sets": {
     "main": {
       "entries": {
-        "motion-literal design-system/src/components/forms-and-inputs/_internal/Listbox.scss": {
-          "count": 2
-        },
         "motion-literal design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx": {
           "count": 1
         }

@@ -14,6 +14,7 @@ import OptionRow from './OptionRow';
 import AnchoredListboxSurface from './AnchoredListboxSurface';
 import { normalizeOption } from './optionShape';
 import Icon from '../../images-and-icons/Icon';
+import { STAGGER } from '@/lib/listMotion';
 import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
@@ -290,7 +291,11 @@ const Listbox = ({
     let revealIndex = 0;
     const row = (option, extra = {}) => {
         const rowId = optionId(option);
-        const revealStyle = reveal ? { '--plus-listbox-reveal-index': revealIndex++ } : undefined;
+        const revealStyle = reveal ? {
+            '--plus-listbox-reveal-index': revealIndex++,
+            '--plus-listbox-reveal-gap': `${STAGGER.gap}ms`,
+            '--plus-listbox-reveal-cap': `${STAGGER.cap}ms`,
+        } : undefined;
         const selected = isSelected(option.value);
         const before = [];
         if (option.elemBefore) before.push(...React.Children.toArray(option.elemBefore));

@@ -7,28 +7,11 @@ import Icon from '@/components/images-and-icons/Icon';
 import Heading from '@/components/text-and-data-display/Heading';
 import ProgressIndicator from '@/components/status-indicators/ProgressIndicator';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
+import { useMotionReduced } from '@/lib/motionPreference';
 import './Carousel.scss';
 
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const IMAGE_PATH = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
 const SWIPE_DISTANCE = 48;
-
-// Reads the person's motion preference and follows it if it changes.
-const usePrefersReducedMotion = () => {
-    const [reduced, setReduced] = useState(() => (
-        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-            && window.matchMedia(REDUCED_MOTION_QUERY).matches
-    ));
-    useEffect(() => {
-        if (typeof window.matchMedia !== 'function') return undefined;
-        const query = window.matchMedia(REDUCED_MOTION_QUERY);
-        const onChange = (event) => setReduced(event.matches);
-        setReduced(query.matches);
-        query.addEventListener('change', onChange);
-        return () => query.removeEventListener('change', onChange);
-    }, []);
-    return reduced;
-};
 
 // Whether the last input on the page was a pointer, so focus that follows a
 // click is told apart from focus a keyboard moved there.
@@ -163,7 +146,7 @@ const Carousel = ({
 }) => {
     const count = slides.length;
     const rootRef = useRef(null);
-    const reduced = usePrefersReducedMotion();
+    const reduced = useMotionReduced();
 
     const autoplays = autoplay && !reduced && count > 1 && interval > 0;
     const isStatic = !autoplays;
