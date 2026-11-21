@@ -12938,6 +12938,7 @@
         "Anatomy",
         "Levels",
         "SearchInHeader",
+        "CountBesideSearch",
         "LoadingDefault",
         "LoadingSearchAndFilters",
         "LoadingFullHeader",

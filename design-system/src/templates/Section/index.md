@@ -16,7 +16,7 @@ Also asked as: page section, section header, block, region.
 
 **Source:** `design-system/src/templates/Section/Section.jsx`
 
-**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, SearchInHeader, LoadingDefault, LoadingSearchAndFilters, LoadingFullHeader, LoadingScaled, LoadingViews, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, TitleHidden, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, SearchInHeader, CountBesideSearch, LoadingDefault, LoadingSearchAndFilters, LoadingFullHeader, LoadingScaled, LoadingViews, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, TitleHidden, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/templates/Section/Section.mdx`
 

@@ -134,7 +134,7 @@ export const TierPage = () => (
 export const TierSection = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-            <Section title="All students" views={<ViewPills views={['All students']} />}>
+            <Section title="All students" isTitleHidden views={<ViewPills views={['All students']} />}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
                     <StudentsTable count={2} />
