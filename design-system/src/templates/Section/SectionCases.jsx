@@ -29,6 +29,8 @@ export const STORY_CODE = showCode(examplesSource, [
     'SearchableStudents',
     'LoadingSearchAndFilters',
     'LoadingViews',
+    'LoadingFullHeader',
+    'TitleHidden',
     'DetailExpand',
     'ListType',
     'ReflectionQueue',

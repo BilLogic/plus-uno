@@ -21,8 +21,11 @@ import './Section.scss';
  * HEADER. `default` is the title row: title, description and an actions slot.
  * `custom` swaps title and description for a free-form `header` slot, and the
  * title stays in the markup as its heading, visually hidden, so assistive tech
- * still has it. `isLoading` swaps the header for skeleton bars while the section
- * loads.
+ * still has it. `isTitleHidden` does the same for a default header: a page with
+ * one Section already has its page title, so the Section shows no title and
+ * starts at its header rows. `isLoading` draws a skeleton shape in place of each
+ * title, description, pill, action, field and switch, at its real size and
+ * position, so nothing shifts when the data arrives.
  *
  * ROWS. Under the title row a header can carry two more, all on one 32 line.
  * Row 2 holds the `views` at the start and the `format` switch at the end.
@@ -177,33 +180,112 @@ SectionHeaderRows.propTypes = {
     narrow: PropTypes.bool,
 };
 
-/** Title line height per rank, so the skeleton bar is as tall as the title it stands in for. */
-const TITLE_LINE = {
-    page: 'var(--type-line-height-175)',
-    section: 'var(--type-line-height-150)',
-    subsection: 'var(--type-line-height-125)',
+/** The Skeleton radius tokens a measured corner can map to, with the CSS each stands for. */
+const RADIUS_TOKENS = [
+    ['element-radius-md', 'var(--radius-md)'],
+    ['element-radius-lg', 'var(--radius-lg)'],
+    ['card-radius-md', 'var(--card-radius)'],
+    ['element-radius-full', 'var(--radius-full)'],
+];
+
+/** A radius token's resolved pixels, read off a probe so the var() chain resolves. */
+const radiusPx = (root, value) => {
+    const probe = document.createElement('span');
+    probe.style.cssText = `position:absolute;visibility:hidden;border-radius:${value}`;
+    root.appendChild(probe);
+    const r = parseFloat(getComputedStyle(probe).borderTopLeftRadius) || 0;
+    probe.remove();
+    return r;
 };
+
+/** Pixel rounding for measured shapes, so a sub-pixel layout does not re-render forever. */
+const px = (n) => Math.round(n * 10) / 10;
 
 /**
- * The header while the section loads: a bar for the title row (half width,
- * the title's height), one for the description, and one for the views or
- * filters row when there is one.
+ * The header while the section loads. The real header renders hidden (no
+ * paint, inert, out of the accessibility tree) so every control takes the
+ * place it will have; a skeleton shape then covers the title, the description
+ * and each pill, button, field and switch at its measured size. Nothing shifts
+ * when the data arrives, and no label shows.
  */
-const HeaderSkeleton = ({ rank, hasRows, hasDescription }) => (
-    <div className="plus-template-section-skeleton">
-        <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
-        {hasDescription && <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />}
-        {hasRows && (
-            <Skeleton className="plus-template-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
-        )}
-    </div>
-);
+const LoadingHeader = ({ children }) => {
+    const rootRef = useRef(null);
+    const [shapes, setShapes] = useState([]);
 
-HeaderSkeleton.propTypes = {
-    rank: PropTypes.oneOf(['page', 'section', 'subsection']).isRequired,
-    hasRows: PropTypes.bool,
-    hasDescription: PropTypes.bool,
+    const measure = () => {
+        const root = rootRef.current;
+        if (!root) return;
+        const origin = root.getBoundingClientRect();
+        // A scaled ancestor (a TypeCard preview) scales every screen rect; divide it out so shapes get local sizes.
+        const scale = root.offsetWidth ? origin.width / root.offsetWidth : 1;
+        const local = (n) => px(n / (scale || 1));
+        const tokens = RADIUS_TOKENS.map(([name, value]) => [name, radiusPx(root, value)]);
+        const radiusToken = (el) => {
+            const r = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+            if (!r) return undefined;
+            if (r >= 999) return 'element-radius-full';
+            return tokens.reduce((best, t) => (Math.abs(t[1] - r) < Math.abs(best[1] - r) ? t : best))[0];
+        };
+        const found = [];
+        const add = (el, rect = el.getBoundingClientRect()) => {
+            if (!rect.width || !rect.height) return;
+            found.push({
+                left: local(rect.left - origin.left),
+                top: local(rect.top - origin.top),
+                width: local(rect.width),
+                height: local(rect.height),
+                radius: radiusToken(el),
+            });
+        };
+        const title = root.querySelector('.plus-template-section-title');
+        if (title) {
+            // The placeholder is the title text's own size, not the heading block's.
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            const text = range.getBoundingClientRect?.();
+            add(title, text?.width ? text : title.getBoundingClientRect());
+        }
+        const description = root.querySelector('.plus-template-section-description');
+        if (description) add(description);
+        const whole = new Set(root.querySelectorAll('.plus-section-row__end > *, .plus-section-row__search > *'));
+        const controls = new Set(root.querySelectorAll('button, [role="tab"]'));
+        whole.forEach((el) => add(el));
+        controls.forEach((el) => {
+            if (el.closest('.plus-section-row__end, .plus-section-row__search, .plus-tabs-ghosts')) return;
+            add(el);
+        });
+        setShapes((prev) => (JSON.stringify(prev) === JSON.stringify(found) ? prev : found));
+    };
+    const measureRef = useRef(measure);
+    measureRef.current = measure;
+    useLayoutEffect(measure);
+    useEffect(() => {
+        const root = rootRef.current;
+        if (!root || typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(() => measureRef.current());
+        observer.observe(root);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={rootRef} className="plus-template-section-loading">
+            <div className="plus-template-section-loading__shell" aria-hidden="true" inert>{children}</div>
+            <div className="plus-template-section-loading__layer" aria-hidden="true">
+                {shapes.map((shape, i) => (
+                    <span
+                        key={i}
+                        className="plus-template-section-loading__shape"
+                        style={{ insetInlineStart: shape.left, insetBlockStart: shape.top }}
+                    >
+                        <Skeleton width={shape.width} height={shape.height} radius={shape.radius} />
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
 };
+
+LoadingHeader.propTypes = { children: PropTypes.node };
 
 /** Section: a span of the page grid under one heading, with its title row, views, search and filters. */
 const Section = ({
@@ -236,6 +318,7 @@ const Section = ({
     level: rankProp,
     spacing = 'default',
     named = false,
+    isTitleHidden = false,
     className = '',
     style,
     children,
@@ -261,52 +344,58 @@ const Section = ({
     const level = isPage ? 1 : parentLevel + 1;
     const Title = headingTag(level);
     const rank = isPage ? 'page' : level > 2 ? 'subsection' : 'section';
-    // In `custom` the title names the section without showing.
-    const titleHidden = custom;
+    // In `custom`, or with `isTitleHidden`, the title names the section without showing.
+    const titleHidden = custom || isTitleHidden;
 
     const titleId = useId();
     const labelled = named && Boolean(title);
-    const titleNode = title && (
-        <Title id={labelled ? titleId : undefined} className={`plus-template-section-title plus-template-section-title--${rank}`}>{title}</Title>
+    const titleEl = (withId) => title && (
+        <Title id={withId && labelled ? titleId : undefined} className={`plus-template-section-title plus-template-section-title--${rank}`}>{title}</Title>
     );
+    const titleNode = titleEl(true);
+    const hasTitleRow = custom || Boolean(actions) || (!titleHidden && Boolean(title || description)) || (isTitleHidden && Boolean(description));
 
-    const renderHeader = () => {
-        if (isLoading) {
-            return (
-                <div className={`plus-template-section-header plus-template-section-header--${type}`}>
-                    {titleNode && <div className="visually-hidden">{titleNode}</div>}
-                    <HeaderSkeleton rank={rank} hasRows={hasRows} hasDescription={Boolean(description)} />
-                </div>
-            );
-        }
-        return (
-            <div className={`plus-template-section-header plus-template-section-header--${type}`}>
-                {titleHidden && titleNode && <div className="visually-hidden">{titleNode}</div>}
+    const headerBody = (loading) => (
+        <>
+            {hasTitleRow && (
                 <div className="plus-template-section-title-row">
                     {custom ? (
                         <div className="plus-template-section-custom">{header}</div>
-                    ) : (
+                    ) : (title && !titleHidden) || description ? (
                         <div className="plus-template-section-heading">
-                            {titleNode}
+                            {!titleHidden && titleEl(!loading)}
                             {description && <p className="plus-template-section-description">{description}</p>}
                         </div>
-                    )}
+                    ) : null}
                     {actions && <div className="plus-template-section-actions">{actions}</div>}
                 </div>
-                {hasRows && (
-                    <SectionHeaderRows
-                        views={views}
-                        format={format}
-                        search={search}
-                        filters={filters}
-                        count={count}
-                        onClearAll={onClearAll}
-                        hasNoMatches={hasNoMatches}
-                        onMoreFilters={onMoreFilters}
-                        onOpenFilters={onOpenFilters}
-                        narrow={narrow}
-                    />
-                )}
+            )}
+            {hasRows && (
+                <SectionHeaderRows
+                    views={views}
+                    format={format}
+                    search={search}
+                    filters={filters}
+                    count={count}
+                    onClearAll={onClearAll}
+                    hasNoMatches={hasNoMatches}
+                    onMoreFilters={onMoreFilters}
+                    onOpenFilters={onOpenFilters}
+                    narrow={narrow}
+                />
+            )}
+        </>
+    );
+
+    const hasVisibleHeader = hasTitleRow || hasRows;
+
+    const renderHeader = () => {
+        // Nothing visible to draw: the title alone, visually hidden, so it adds no gap.
+        if (!hasVisibleHeader) return titleNode && <div className="visually-hidden">{titleNode}</div>;
+        return (
+            <div className={`plus-template-section-header plus-template-section-header--${type}`}>
+                {(titleHidden || isLoading) && titleNode && <div className="visually-hidden">{titleNode}</div>}
+                {isLoading ? <LoadingHeader>{headerBody(true)}</LoadingHeader> : headerBody(false)}
             </div>
         );
     };
@@ -482,7 +571,7 @@ Section.propTypes = {
     onMoreFilters: PropTypes.func,
     /** Runs when the Filter button of a narrow Section is pressed. */
     onOpenFilters: PropTypes.func,
-    /** Swaps the header for skeleton bars and marks the section busy */
+    /** Draws a skeleton shape at each header control's real size and position, with no text, and marks the section busy */
     isLoading: PropTypes.bool,
     /** Body layout: the content alone, content beside `side`, or stacked subsections */
     layout: PropTypes.oneOf(SECTION_LAYOUTS),
@@ -520,6 +609,10 @@ Section.propTypes = {
     level: PropTypes.oneOf(['page']),
     /** Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value */
     spacing: PropTypes.oneOf(SECTION_SPACINGS),
+    /** Hides the title visually and keeps it as the Section's heading and accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown.
+     * @ds-context Used in: Section.isTitleHidden (ds guide section)
+     */
+    isTitleHidden: PropTypes.bool,
     /** Makes the section a region named by its title, for a section that stands apart as a landmark */
     named: PropTypes.bool,
     className: PropTypes.string,

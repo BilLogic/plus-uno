@@ -19,7 +19,7 @@ export const TEMPLATE_INDEX = 'design-system/agent-views/_templates.json';
 /** Foundation owns these folders of the library; a component imports them, so it depends on the foundation. */
 const FOUNDATION_DIRS = ['tokens', 'styles', 'lib'];
 const EXTS = ['', '.jsx', '.js', '.mjs', '.scss', '.css', '/index.jsx', '/index.js'];
-const JS_IMPORT = /(^\s*(?:import|export)[^'"\n;]*?from\s*|^\s*import\s*|\bimport\()\s*(['"])([^'"\n]+)\2/gm;
+const JS_IMPORT = /(^\s*(?:import|export)[^'";]*?from\s*|^\s*import\s*|\bimport\()\s*(['"])([^'"\n]+)\2/gm;
 const SCSS_USE = /(@(?:use|forward|import)\s+|meta\.load-css\(\s*)(['"])([^'"\n]+)\2/g;
 /** Parts that are not the system's current, shippable source. */
 const NOT_SOURCE = /(\.stories\.|-node\.mjs$|\.test\.|\.mdx$|\.md$|(^|\/)\.storybook\/|(^|\/)storybook-docs\/|(^|\/)prototypes\/|(^|\/)(retired|deprecated|_retired|_deprecated|specs)\/)/;

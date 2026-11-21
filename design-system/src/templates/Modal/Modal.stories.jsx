@@ -16,6 +16,8 @@ import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import * as Demo from './modalDemo.jsx';
 import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
+import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
+import * as FullSizeCases from './ModalCases.jsx';
 
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
@@ -1273,3 +1275,13 @@ export const Overflow = {
         await expectNoSilentClip(modal);
     },
 };
+
+/** Full size: each screen-sized Do/Don't example of the Modal page, at its own width in a page view. The pair's "Open full size" link opens these. */
+export const FullSizeConfirmNarrow = fullSizeStory(FullSizeCases.ConfirmNarrow, 1024, 'ConfirmNarrow');
+export const FullSizeConfirmWide = fullSizeStory(FullSizeCases.ConfirmWide, 1024, 'ConfirmWide');
+export const FullSizeConfirmsInside = fullSizeStory(FullSizeCases.ConfirmsInside, 1024, 'ConfirmsInside');
+export const FullSizeModalOnModal = fullSizeStory(FullSizeCases.ModalOnModal, 1024, 'ModalOnModal');
+export const FullSizeFooterPinnedModal = fullSizeStory(FullSizeCases.FooterPinnedModal, 1024, 'FooterPinnedModal');
+export const FullSizeButtonInBodyModal = fullSizeStory(FullSizeCases.ButtonInBodyModal, 1024, 'ButtonInBodyModal');
+export const FullSizeStepsFooterModal = fullSizeStory(FullSizeCases.StepsFooterModal, 1024, 'StepsFooterModal');
+export const FullSizeTabsForStepsModal = fullSizeStory(FullSizeCases.TabsForStepsModal, 1024, 'TabsForStepsModal');

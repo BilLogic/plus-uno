@@ -16,7 +16,7 @@ Also asked as: page section, section header, block, region.
 
 **Source:** `design-system/src/templates/Section/Section.jsx`
 
-**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, SearchInHeader, LoadingDefault, LoadingSearchAndFilters, LoadingViews, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, SearchInHeader, LoadingDefault, LoadingSearchAndFilters, LoadingFullHeader, LoadingScaled, LoadingViews, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, TitleHidden, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/templates/Section/Section.mdx`
 
@@ -62,7 +62,7 @@ Don't: A Section whose heading repeats its only card's title: two headings for o
 
 **Checked:** Automatic
 
-The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. Actions that do not fit beside the heading drop under it, still at the end of the row. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's box and the first table row's box share one left edge; the pill's label and the first cell's text sit inside their boxes. Actions that do not fit beside the heading drop under it, still at the end of the row. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
 
 Do: The title row first, the header rows under it, sharing one left edge.
 Don't: The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go.
@@ -166,7 +166,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 ## Anatomy
 
-A Section with its header rows, a detail and a footer. The title, the first pill and the first column share one left edge.
+A Section with its header rows, a detail and a footer. The title, the first pill's box and the first table row's box share one left edge; the pill's label and the first cell's text sit inside their boxes.
 
 1. **Title row.** The h2, an optional one-line description, and the actions at the end: More and the labeled Primary.
 2. **Header rows** (optional). Row 2 holds the pill views at the start and the format switch at the end. Row 3 holds Search, then the filter triggers.
@@ -191,7 +191,8 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `title` · `description` · `actions` | The title row. |
 | `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch (the `format` slot holds a `SegmentedControl`), then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
 | `header` · `type` | With `type="custom"` the `header` slot replaces the title and description; `title` stays as the visually hidden heading. `type` is `default` or `custom`, and is read from the slots when left off. |
-| `isLoading` | Swaps the header for skeleton bars while the Section loads. |
+| `isLoading` | Draws a skeleton shape at each header control's real size and position, with no text, while the Section loads. The header keeps its height. |
+| `isTitleHidden` | Hides the title visually and keeps it as the heading and the Section's accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |
@@ -247,7 +248,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `hasNoMatches` | bool | `false` | True while the content is a No matches empty state, which offers its own "Reset filters": the header hides its button so one control remains. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
 | `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
-| `isLoading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |
+| `isLoading` | bool | `false` | Draws a skeleton shape at each header control's real size and position, with no text, and marks the section busy |
 | `layout` | enum | `'single'` | Body layout: the content alone, content beside `side`, or stacked subsections |
 | `side` | node | — | Side column of `layout="split"` |
 | `footer` | node | — | Footer, for "View all" or paging only; aligned to the end |
@@ -260,6 +261,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `onDetailOpenChange` | func | — | Called with the next open boolean when the inline detail expand toggles |
 | `level` | enum | — | `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down |
 | `spacing` | enum | `'default'` | Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value |
+| `isTitleHidden` | bool | `false` | Hides the title visually and keeps it as the Section's heading and accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown. |
 | `named` | bool | `false` | Makes the section a region named by its title, for a section that stands apart as a landmark |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
