@@ -26,6 +26,8 @@ Also asked as: surface.
 
 Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at 1232; full width is for a page that fills the window, such as chat, a board or a wide table; reading caps it at 864 for text people read through.
 
+A page whose one Section would repeat the page title hides the Section's title; see Section.
+
 ## Motion
 
 Page reads these motion tokens and no literal duration or curve.

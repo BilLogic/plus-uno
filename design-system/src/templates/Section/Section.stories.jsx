@@ -324,6 +324,33 @@ export const SearchInHeader = {
     },
 };
 
+/** A Search-only Section ends row 3 with the count, and a filtered one shows it only once a filter is applied. */
+export const CountBesideSearch = {
+    name: 'Count beside Search',
+    render: () => (
+        <div style={col}>
+            <Section title="Search only" search={<SearchField mode="active" spacing="compact" placeholder="Search students" value="" onValueChange={() => {}} />} count="6 students">
+                <p>Rows</p>
+            </Section>
+            <Section
+                title="Filtered, none applied"
+                search={<SearchField mode="active" spacing="compact" placeholder="Search sessions" value="" onValueChange={() => {}} />}
+                filters={[{ key: 'status', label: 'Status', text: 'All', onClick: () => {} }]}
+                count="9 sessions"
+            >
+                <p>Rows</p>
+            </Section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const status = canvas.getAllByRole('status');
+        await expect(status, 'only the Search-only Section shows a count').toHaveLength(1);
+        await expect(status[0]).toHaveTextContent('6 students');
+        await expect(canvas.queryByText('9 sessions'), 'a filtered Section with nothing applied shows no count').toBeNull();
+    },
+};
+
 /** Loading: skeleton bars in place of the header. */
 export const LoadingDefault = {
     name: 'Loading',

@@ -22,27 +22,15 @@ const Roster = ({ names }) => (
     />
 );
 
-const Count = ({ children }) => (
-    <span role="status" className="body-sm color-secondary">{children}</span>
-);
-
-const Results = ({ query, count }) => {
-    const names = matching(query);
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <Count>{count(names.length)}</Count>
-            <Roster names={names} />
-        </div>
-    );
-};
-
 const inWords = (shown) => `${shown} of ${STUDENTS.length} students`;
 
 const StudentsSection = ({ placeholder, initialQuery = '', count = inWords }) => {
     const [query, setQuery] = useState(initialQuery);
+    const names = matching(query);
     return (
         <Section
             title="Students"
+            count={count(names.length)}
             search={(
                 <SearchField
                     mode="active"
@@ -53,7 +41,7 @@ const StudentsSection = ({ placeholder, initialQuery = '', count = inWords }) =>
                 />
             )}
         >
-            <Results query={query} count={count} />
+            <Roster names={names} />
         </Section>
     );
 };

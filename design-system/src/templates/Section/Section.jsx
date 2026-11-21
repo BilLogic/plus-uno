@@ -160,6 +160,11 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
                             {onClearAll && !hasNoMatches && <Button text="Reset filters" appearance="subtle" onClick={onClearAll} />}
                         </div>
                     )}
+                    {Boolean(search) && !hasFilters && count != null && count !== false && (
+                        <div className="plus-section-row__applied">
+                            <span className="plus-section-row__count" role="status">{count}</span>
+                        </div>
+                    )}
                     {formatInRow3 && <div className="plus-section-row__end">{format}</div>}
                 </div>
             )}
