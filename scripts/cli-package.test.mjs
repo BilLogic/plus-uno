@@ -41,6 +41,11 @@ test('the README install lines read the constant', () => {
   }
 });
 
+test('the package leaves out the Figma color spec, which the lookup never reads', async () => {
+  const { bakedFiles } = await import('./build-cli-package.mjs');
+  assert.ok(!bakedFiles().includes('design-system/src/tokens/color/figma-spec.json'));
+});
+
 test('npm pack, install in a scratch project, `npx ds find Button` answers from the snapshot', { timeout: 300_000 }, () => {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'plus-uno-cli-'));
   try {
