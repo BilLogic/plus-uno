@@ -10,7 +10,6 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { PlannedTag } from '@/storybook-docs/lib/template-page.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={SearchFieldStories} />
@@ -159,9 +158,7 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 </thead>
 <tbody>
 <tr><td>Esc</td><td>Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon.</td></tr>
-<tr><td>Enter</td><td>In <code>basic</code>, runs <code>onSearch</code>. In <code>focused</code>, chooses the row under the cursor, or runs <code>onSearch</code> when none is.</td></tr>
-<tr><td>Arrow down and up</td><td>In <code>focused</code>, move through the panel's rows and wrap. Inside the scope list, move and choose.</td></tr>
-<tr><td>Esc in the panel</td><td>Closes the panel and keeps the text. The next Esc clears.</td></tr>
+<tr><td>Arrow down and up</td><td>Inside the scope list, move and choose.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -233,7 +230,6 @@ The clear action keeps its place at the end, and focusing the field reaches the 
 - **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
-- **In `focused` the input is the combobox.** Focus stays in it and the highlighted row is its `aria-activedescendant`; the panel is a named listbox.
 - **Loading is announced** through the spinner's status text.
 
 </div>

@@ -68,7 +68,6 @@ The clear action keeps its place at the end, and focusing the field reaches the 
 - **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
-- **In `focused` the input is the combobox.** Focus stays in it and the highlighted row is its `aria-activedescendant`; the panel is a named listbox.
 - **Loading is announced** through the spinner's status text.
 
 ## Related
@@ -102,9 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Key | What it does |
 | --- | --- |
 | Esc | Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. |
-| Enter | In `basic`, runs `onSearch`. In `focused`, chooses the row under the cursor, or runs `onSearch` when none is. |
-| Arrow down and up | In `focused`, move through the panel's rows and wrap. Inside the scope list, move and choose. |
-| Esc in the panel | Closes the panel and keeps the text. The next Esc clears. |
+| Arrow down and up | Inside the scope list, move and choose. |
 
 ### Tokens
 

@@ -196,7 +196,7 @@ A pre-filled rating biases the answer.
 `Rating` has no read-only state, and `isDisabled` is for a rating that does not apply yet. A rating nobody can change is a result, so write it as text. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 <DoDontPair
-    doExample={<span>Rated 4 out of 5.</span>}
+    doExample={<span className="body-default">Rated 4 out of 5.</span>}
     doCaption="A recorded rating, written as text."
     dontExample={<Rating label="How was the session?" value={4} isDisabled onChange={() => {}} />}
     dontCaption="Disabled dims a result people need to read."
