@@ -45236,6 +45236,7 @@
 			"AreaStage",
 			"Card",
 			"DrillStack",
+			"FRAME_LAYOUT",
 			"Frame",
 			"LoadRevealSlot",
 			"LoadThenReveal",
@@ -45279,6 +45280,7 @@
 			"scrollToSpot",
 			"useDrillStack",
 			"useMotionReduced",
+			"useOwnWidth",
 			"usePanelControl",
 			"usePanelManager",
 			"useSidebarControl"
