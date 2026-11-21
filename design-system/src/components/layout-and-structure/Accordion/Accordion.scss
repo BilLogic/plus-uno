@@ -79,20 +79,16 @@
         cursor: pointer;
 
         // --- ICON STYLING ---
-        // Chevron icon on the RIGHT side using ::after
-        &::after {
-            font-family: 'Font Awesome 7 Free';
-            font-weight: 700;
-            content: '\f078'; // fa-chevron-down
-            font-size: var(--icon-sm);
+        // The chevron is an Icon at the end of the trigger; it turns up when open.
+        .plus-accordion-chevron {
             color: var(--ds-text-subtle);
-            transform: rotate(0deg);
-            transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
             margin-left: auto; // Push to right
             flex-shrink: 0;
+            transform: rotate(0deg);
+            transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
         }
 
-        &[data-panel-open]::after {
+        &[data-panel-open] .plus-accordion-chevron {
             transform: rotate(-180deg);
         }
 

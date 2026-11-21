@@ -200,6 +200,7 @@ Tokens one component owns, named for it.
 --progress-ring-stroke  /* Stroke width of a ProgressRing track and fill. */
 --progress-tracker-connector-width  /* Width of the connecting line between steps in a horizontal ProgressTracker. */
 --progress-tracker-dot-size  /* Diameter of an unvisited step dot in a ProgressTracker. */
+--prompt-input-line  /* One line of PromptInput text; the text area grows to five of these. */
 --prompt-input-min-height  /* Shortest a PromptInput text area gets, one line plus its padding. */
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */

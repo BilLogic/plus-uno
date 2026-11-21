@@ -208,7 +208,7 @@ export const Styles = () => (
 );
 Styles.play = async ({ canvasElement }) => {
     const trigger = canvasElement.querySelector('.plus-accordion-trigger');
-    await expect(px(getComputedStyle(trigger, '::after').fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
+    await expect(px(getComputedStyle(trigger.querySelector('.plus-accordion-chevron')).fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
 };
 
 export const Behavior = () => (
