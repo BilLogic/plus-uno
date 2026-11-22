@@ -3,7 +3,7 @@ import { Button, TextField } from '@/components';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TagInput from './TagInput';
 import { MANY_TAGS, expectNoSilentClip, expectInsideWell, expectNoBlankLine } from '../../_internal/overflowPlays';
 
@@ -420,7 +420,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     await expect(tagsIn(canvas, 'Topics').getByText('Tutor coaching')).toBeInTheDocument();
 };
 
-/** Invalid: the danger border, and the message under the field names the problem. */
+/** Invalid: the danger border and icon, and the message under the field names the problem. */
 export const Invalid = () => (
     <div style={stack}>
         <TagInput
@@ -437,6 +437,7 @@ Invalid.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('combobox', { name: 'Topics' });
     await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expectInvalid(canvasElement, input);
     await expect(input).toHaveAccessibleDescription('Pick at least one topic');
     await expect(canvas.getByRole('alert')).toHaveTextContent('Pick at least one topic');
 

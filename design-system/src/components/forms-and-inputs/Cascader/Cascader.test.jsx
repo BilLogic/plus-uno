@@ -162,3 +162,16 @@ describe('Cascader', () => {
         });
     });
 });
+
+describe('Cascader, invalid icon', () => {
+    it('draws one decorative danger icon in the box when invalid, and none when valid', () => {
+        const { container, rerender } = render(<Harness />);
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+        rerender(<Harness isInvalid errorMessage="Pick a region" />);
+        const icons = container.querySelectorAll('.plus-field__invalid-icon');
+        expect(icons).toHaveLength(1);
+        expect(icons[0]).toHaveClass('fa-circle-exclamation');
+        expect(icons[0]).toHaveAttribute('aria-hidden', 'true');
+        expect(icons[0].closest('.plus-field__trailing')).not.toBeNull();
+    });
+});

@@ -109,7 +109,7 @@ from a list or adds, such as the topics a session covers.
 
 <ComponentExample of={TagInputStories.Focused} title="Focused" description="The focus ring around the box." />
 
-<ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge with the message under the field, which is announced." />
+<ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge and icon with the message under the field, which is announced." />
 
 <ComponentExample of={TagInputStories.ReadOnly} title="Read-only" description="The tags on the read-only fill, with no × and no list." />
 
@@ -194,7 +194,7 @@ Use `TagInput` when a field's value is a set of short labels the person picks fr
 <tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
 <tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box; the tags wrap and the list opens.</td></tr>
 <tr><td>Disabled</td><td>The field takes <code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> border and <code>--ds-text-disabled</code> text, never an opacity fade; every tag is disabled, with no × and no entry.</td></tr>
-<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code>, a danger icon (<code>--ds-icon-danger</code>) leads Trailing, and the message takes <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill at full contrast, no hover, in the tab order with <code>aria-readonly</code>, with no × and no list.</td></tr>
 </tbody>
 </DocsTable>

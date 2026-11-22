@@ -176,7 +176,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered edge holds while the pointer is down. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box; the tags wrap and the list opens. |
 | Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade; every tag is disabled, with no × and no entry. |
-| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Invalid | The edge takes `--ds-border-danger`, a danger icon (`--ds-icon-danger`) leads Trailing, and the message takes `--ds-text-danger`. |
 | Read-only | The `--ds-background-neutral` fill at full contrast, no hover, in the tab order with `aria-readonly`, with no × and no list. |
 
 ### Keyboard

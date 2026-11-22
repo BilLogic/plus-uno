@@ -8,7 +8,7 @@
  * `background.input`. Hover turns the border `border.focused`. Focus draws
  * the focus ring, 2px (`--focus-ring-width`) and 2px off the box onto
  * the surface, in `border.focused`: the ring is never drawn inset. Hover and
- * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
+ * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with a danger icon first in Trailing and `text.danger` in the caption,
  * placeholder `text.subtlest`, helper text `text.subtle`, read-only
  * `background.neutral`; disabled is `background.disabled`, `border.disabled`
  * and `text.disabled`, never an opacity fade. Figma draws its stroke inside the box, so the border
@@ -136,6 +136,12 @@
 
 .plus-field .plus-field__trailing:has(> .plus-btn:last-child) {
     margin-inline-end: calc(var(--pad-x-xs) - var(--pad-x-md));
+}
+
+// The danger icon of an invalid box keeps its square beside the caret, clear
+// button or steppers; its size and color come from the Icon's own tokens.
+.plus-field__invalid-icon {
+    flex: 0 0 auto;
 }
 
 // A text affix ("$", ".00", "https://") is quieter than the value.

@@ -582,3 +582,16 @@ describe('Select, loading options', () => {
         expect(onChange).toHaveBeenLastCalledWith('riverside');
     });
 });
+
+describe('Select, invalid icon', () => {
+    it('draws one decorative danger icon in the box when invalid, and none when valid', () => {
+        const { container, rerender } = render(<Select label="School" options={SCHOOLS} />);
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+        rerender(<Select label="School" options={SCHOOLS} isInvalid errorMessage="Pick a school" />);
+        const icons = container.querySelectorAll('.plus-field__invalid-icon');
+        expect(icons).toHaveLength(1);
+        expect(icons[0]).toHaveClass('fa-circle-exclamation');
+        expect(icons[0]).toHaveAttribute('aria-hidden', 'true');
+        expect(icons[0].closest('.plus-field__trailing')).not.toBeNull();
+    });
+});

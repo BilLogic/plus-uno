@@ -15,6 +15,7 @@ export const expectRest = async (canvasElement, control) => {
     const style = getComputedStyle(boxOf(control));
     await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-input'));
     await expect(style.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-input'));
+    await expect(boxOf(control).querySelector('.plus-field__invalid-icon'), 'a valid field draws no danger icon').toBeNull();
 };
 
 export const expectHovered = async (canvasElement, control) => {
@@ -51,6 +52,12 @@ export const expectDisabled = async (canvasElement, control) => {
 export const expectInvalid = async (canvasElement, control) => {
     await expect(control).toHaveAttribute('aria-invalid', 'true');
     await expect(getComputedStyle(boxOf(control)).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+    // The border is not the only sign: one decorative danger icon sits in Trailing.
+    const icons = boxOf(control).querySelectorAll('.plus-field__invalid-icon');
+    await expect(icons).toHaveLength(1);
+    await expect(icons[0]).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(icons[0]).color).toBe(tokenColor(canvasElement, '--ds-icon-danger'));
+    await expect(px(getComputedStyle(icons[0]).fontSize)).toBe(16);
 };
 
 /** Read-only, whole: see `expectFieldReadOnly`. */
