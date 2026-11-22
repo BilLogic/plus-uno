@@ -25,21 +25,35 @@ jobs:
           const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
           const components = await get(`/files/${DEFAULT_FILE_KEY}/components`);
           const versions = await get(`/files/${DEFAULT_FILE_KEY}/versions`);
-          let ids;
-          if (n === '1') {
-            const rows = rowsFrom(components);
-            const sets = [...new Set(rows.map((r) => r.containingFrame).filter(Boolean))].slice(0, 5);
-            ids = rows.filter((r) => sets.includes(r.containingFrame)).map((r) => r.nodeId);
-            fs.writeFileSync('cap/selection.json', JSON.stringify({ sets, ids }));
-          } else {
-            ids = JSON.parse(fs.readFileSync('cap/selection.json', 'utf8')).ids;
-          }
+          const rows = rowsFrom(components);
+          const bySet = new Map();
+          for (const r of rows) if (r.containingFrame) bySet.set(r.containingFrame, [...(bySet.get(r.containingFrame) ?? []), r.nodeId]);
           const nodes = { nodes: {} };
-          for (let i = 0; i < ids.length; i += 50) {
-            if (i > 0) await sleep(NODES_SPACING_MS);
-            const r = await get(`/files/${DEFAULT_FILE_KEY}/nodes?ids=${ids.slice(i, i + 50).join(',')}&geometry=paths`);
-            Object.assign(nodes.nodes, r.nodes);
+          let sel;
+          if (n === '1') {
+            const cands = [...bySet.entries()].filter(([, v]) => v.length >= 2 && v.length <= 8).slice(0, 14);
+            sel = [];
+            for (const [name, ids] of cands) {
+              if (sel.length === 5) break;
+              if (sel.length + 1 > 0 && (sel.length || nodes.__started)) await sleep(NODES_SPACING_MS);
+              nodes.__started = true;
+              const r = await get(`/files/${DEFAULT_FILE_KEY}/nodes?ids=${ids.join(',')}&geometry=paths`);
+              const size = JSON.stringify(r).length;
+              console.log(`set candidate ${name}: ${ids.length} ids, ${size} bytes`);
+              if (size > 250_000) continue;
+              sel.push({ name, ids });
+              Object.assign(nodes.nodes, r.nodes);
+            }
+            delete nodes.__started;
+            fs.writeFileSync('cap/selection.json', JSON.stringify(sel));
+          } else {
+            sel = JSON.parse(fs.readFileSync('cap/selection.json', 'utf8'));
+            for (const [i, { ids }] of sel.entries()) {
+              if (i > 0) await sleep(NODES_SPACING_MS);
+              Object.assign(nodes.nodes, (await get(`/files/${DEFAULT_FILE_KEY}/nodes?ids=${ids.join(',')}&geometry=paths`)).nodes);
+            }
           }
+          const ids = sel.flatMap((x) => x.ids);
           fs.writeFileSync(`cap/components-${n}.json`, JSON.stringify(components));
           fs.writeFileSync(`cap/versions-${n}.json`, JSON.stringify(versions));
           fs.writeFileSync(`cap/nodes-${n}.json`, JSON.stringify(nodes));
