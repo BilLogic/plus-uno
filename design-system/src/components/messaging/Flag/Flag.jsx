@@ -397,7 +397,7 @@ Flag.propTypes = {
     show: PropTypes.bool,
     /** Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. */
     onDismiss: PropTypes.func,
-    /** How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. */
+    /** How long it stays before closing itself, in ms. `FLAG_AUTO_CLOSE_MS` by default; keep it at that or more so a slow reader is not cut off. */
     delay: PropTypes.number,
     /** Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. */
     autohide: PropTypes.bool,

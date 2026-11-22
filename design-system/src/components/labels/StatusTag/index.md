@@ -134,7 +134,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 | Part | Token |
 | --- | --- |
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
-| Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
+| Padding and gap | `--pad-x-xs` on the leading edge, `--tag-pad-x-end-compact` on the trailing edge, `--tag-gap-compact` between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` leading, `--tag-pad-x-end` trailing, `--tag-gap` between icon and label. |
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
 | Neutral | `--ds-background-neutral`, `--ds-text`, edge `--ds-background-neutral-pressed`. |
 | Success, warning, danger | The same three for each: `--ds-background-success`, `--ds-text-success`, edge `--ds-background-success-pressed`. |

@@ -43,7 +43,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default flag, for passive news a person can clear. Closes itself after `delay` (default `8000`). Example: "Notes copied". Set `icon` to a status icon or an `Avatar`. |
+| Normal | The default flag, for passive news a person can clear. Closes itself after `delay` (default `FLAG_AUTO_CLOSE_MS`). Example: "Notes copied". Set `icon` to a status icon or an `Avatar`. |
 | Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
 | Success | Bold. A finished action. Times out. |
 | Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
@@ -75,14 +75,14 @@ Flag reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Match the appearance to the outcome. {#match-the-appearance-to-the-outcome}
+### Match the Flag appearance to the outcome. {#match-the-flag-appearance-to-the-outcome}
 
 Success for a finished action; error only when something failed.
 
 Do: Success appearance for a saved session.
 Don't: Error appearance on good news.
 
-### Let a long title or message wrap. {#let-a-long-title-or-message-wrap}
+### Let a long Flag title or message wrap. {#let-a-long-flag-title-or-message-wrap}
 
 A flag takes more lines and never ends in an ellipsis. Keep it short anyway, because a flag leaves on its own. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
@@ -93,7 +93,7 @@ A bold flag competes with the page; routine news stays quiet and can be cleared.
 Do: Default flag for routine news.
 Don't: Bold fill on a routine confirmation.
 
-### Say what happened and what to do next. {#say-what-happened-and-what-to-do-next}
+### Say in a Flag what happened and what to do next. {#say-in-a-flag-what-happened-and-what-to-do-next}
 
 A title names the event; the description gives the next step.
 
@@ -116,7 +116,7 @@ The user can dismiss a flag before reading it, and that takes the only copy
 with it. A rejected form submit stays on the form, in a danger `SectionMessage`
 at the top with an error on each field.
 
-### Turn off autohide for anything the user might need to re-read. {#turn-off-autohide-for-anything-the-user-might-need-to-re-read}
+### Turn off Flag autohide for anything the user might need to re-read. {#turn-off-flag-autohide-for-anything-the-user-might-need-to-re-read}
 
 With `autohide={false}`, or `delay={0}`, a default flag waits for its ×.
 
@@ -171,7 +171,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `InlineMessage` · `Notifica
 | Focused | Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill. |
 | Disabled | Not supported. |
 | Expanded | A bold flag shows its description and actions; collapsed, only the title. |
-| Autohide | Normal, information and success close after `delay` (default `8000`; keep any `delay` at 8000 or more); warning and error never close themselves. |
+| Autohide | Normal, information and success close after `delay` (default `FLAG_AUTO_CLOSE_MS`; keep any `delay` at that or longer); warning and error never close themselves. |
 | Dismissed | The flag leaves the stack. |
 
 ### Tokens
@@ -207,7 +207,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `InlineMessage` · `Notifica
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |
 | `onDismiss` | func | — | Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. |
-| `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. |
+| `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. `FLAG_AUTO_CLOSE_MS` by default; keep it at that or more so a slow reader is not cut off. |
 | `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. |
 | `timer` | bool | `false` | Draws a 4 px countdown bar as the flag's top cap, emptying over `delay`, and steps the corners from 12 to 4. For a timed action such as Undo: the first action undoes, `onDismiss` commits. The bar and the wait pause while the flag is hovered or focused. |
 | `className` | string | `''` | Extra class on the flag surface. |

@@ -149,7 +149,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after <code>delay</code> (default <code>8000</code>). Example: "Notes copied". Set <code>icon</code> to a status icon or an <code>Avatar</code>.</td></tr>
+<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after <code>delay</code> (default <code>FLAG_AUTO_CLOSE_MS</code>). Example: "Notes copied". Set <code>icon</code> to a status icon or an <code>Avatar</code>.</td></tr>
 <tr><td>Information</td><td>Bold. Something worth knowing, on the dark neutral fill. Times out.</td></tr>
 <tr><td>Success</td><td>Bold. A finished action. Times out.</td></tr>
 <tr><td>Warning</td><td>Bold. Something to check before going on. Never closes itself; offers a next action.</td></tr>
@@ -202,7 +202,7 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 <tr><td>Focused</td><td>Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
-<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>8000</code>; keep any <code>delay</code> at 8000 or more); warning and error never close themselves.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>FLAG_AUTO_CLOSE_MS</code>; keep any <code>delay</code> at that or longer); warning and error never close themselves.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
 </DocsTable>
@@ -230,7 +230,7 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 
 ## Best practices
 
-### Match the appearance to the outcome.
+### Match the Flag appearance to the outcome.
 
 Success for a finished action; error only when something failed.
 
@@ -241,7 +241,7 @@ Success for a finished action; error only when something failed.
     dontCaption="Error appearance on good news."
 />
 
-### Let a long title or message wrap.
+### Let a long Flag title or message wrap.
 
 A flag takes more lines and never ends in an ellipsis. Keep it short anyway, because a flag leaves on its own. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
@@ -256,7 +256,7 @@ A bold flag competes with the page; routine news stays quiet and can be cleared.
     dontCaption="Bold fill on a routine confirmation."
 />
 
-### Say what happened and what to do next.
+### Say in a Flag what happened and what to do next.
 
 A title names the event; the description gives the next step.
 
@@ -287,7 +287,7 @@ The user can dismiss a flag before reading it, and that takes the only copy
 with it. A rejected form submit stays on the form, in a danger `SectionMessage`
 at the top with an error on each field.
 
-### Turn off autohide for anything the user might need to re-read.
+### Turn off Flag autohide for anything the user might need to re-read.
 
 With `autohide={false}`, or `delay={0}`, a default flag waits for its ×.
 

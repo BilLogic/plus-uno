@@ -171,19 +171,19 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 
 ## Best practices
 
-### Use the popup for quick asks.
+### Open AiChat as a popup for quick asks.
 
 A popup keeps the page in view. For ongoing work it covers the page and loses context: move it to the Panel.
 
-### Use the Panel beside the page.
+### Open AiChat in the Panel beside the page.
 
 The Panel docks next to the work. For a quick ask it takes more room than the question needs.
 
-### Use full screen for long work.
+### Open AiChat full screen for long work.
 
 Full screen gives long answers room. A docked Panel squeezes them.
 
-### Mark every answer.
+### Mark every AiChat answer as AI.
 
 <DoDontPair
     doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
@@ -192,7 +192,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
     dontCaption="A reply in plain text reads as a person's."
 />
 
-### Say fallibility once.
+### Say once in AiChat that answers can be wrong.
 
 <DoDontPair
     doExample={<OneLineUnderDoFigure />}
@@ -201,7 +201,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
     dontCaption="The line repeated under every reply turns into noise."
 />
 
-### List the sources an answer drew on.
+### List the sources an AiChat answer drew on.
 
 <DoDontPair
     doExample={<div className="sb-unstyled"><AiMessage text="Ava attended 12 of 14 sessions this term." sources={[{ title: 'Attendance report', href: '#report-attendance', type: 'Report' }, { title: 'Ava Thompson', href: '#student-ava', type: 'Student' }]} /></div>}

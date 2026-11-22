@@ -5,6 +5,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import Spinner, { SPINNER_APPEARANCES, SPINNER_SIZES } from './Spinner';
+import { Ground } from '@/storybook-docs/lib/ground.jsx';
 
 export default {
     title: 'Components/Loading/Spinner',
@@ -55,9 +56,9 @@ export const Size24 = () => <Spinner size={24} />;
 export const Size48 = () => <Spinner size={48} />;
 
 export const Invert = () => (
-    <div style={{ padding: 'var(--pad-x-lg)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <Ground background="--ds-background-brand-bold">
         <Spinner appearance="invert" />
-    </div>
+    </Ground>
 );
 
 export const Interactive = {

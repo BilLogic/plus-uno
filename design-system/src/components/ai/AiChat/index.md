@@ -57,29 +57,29 @@ AiChat reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Use the popup for quick asks. {#use-the-popup-for-quick-asks}
+### Open AiChat as a popup for quick asks. {#open-aichat-as-a-popup-for-quick-asks}
 
 A popup keeps the page in view. For ongoing work it covers the page and loses context: move it to the Panel.
 
-### Use the Panel beside the page. {#use-the-panel-beside-the-page}
+### Open AiChat in the Panel beside the page. {#open-aichat-in-the-panel-beside-the-page}
 
 The Panel docks next to the work. For a quick ask it takes more room than the question needs.
 
-### Use full screen for long work. {#use-full-screen-for-long-work}
+### Open AiChat full screen for long work. {#open-aichat-full-screen-for-long-work}
 
 Full screen gives long answers room. A docked Panel squeezes them.
 
-### Mark every answer. {#mark-every-answer}
+### Mark every AiChat answer as AI. {#mark-every-aichat-answer-as-ai}
 
 Do: Each reply is an AI message, led by the AI icon.
 Don't: A reply in plain text reads as a person's.
 
-### Say fallibility once. {#say-fallibility-once}
+### Say once in AiChat that answers can be wrong. {#say-once-in-aichat-that-answers-can-be-wrong}
 
 Do: One line, under the prompt input.
 Don't: The line repeated under every reply turns into noise.
 
-### List the sources an answer drew on. {#list-the-sources-an-answer-drew-on}
+### List the sources an AiChat answer drew on. {#list-the-sources-an-aichat-answer-drew-on}
 
 Do: The records the answer read, listed under it.
 Don't: An answer from records with nothing to check it against.

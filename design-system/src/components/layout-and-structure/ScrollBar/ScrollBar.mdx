@@ -36,8 +36,8 @@ export const noteItems = [
 ];
 
 export const Notes = ({ count }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--pad-y-lg) var(--pad-x-md)' }}>
-        {noteItems.slice(0, count).map((note, i) => <p key={i} style={{ margin: 0 }}>{note}</p>)}
+    <div className="sb-ds-notes">
+        {noteItems.slice(0, count).map((note, i) => <p key={i}>{note}</p>)}
     </div>
 );
 export const smallCap = 'var(--height-750)';

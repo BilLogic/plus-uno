@@ -42,34 +42,34 @@ PromptInput reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Let a long prompt grow to five lines, then scroll. {#let-a-long-prompt-grow-to-five-lines-then-scroll}
+### Let a PromptInput grow to five lines, then scroll. {#let-a-promptinput-grow-to-five-lines-then-scroll}
 
 The field never grows past its maximum height and never scrolls sideways; the send button stays at the bottom. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
-### Keep the field visible while generating. {#keep-the-field-visible-while-generating}
+### Keep the PromptInput visible while generating. {#keep-the-promptinput-visible-while-generating}
 
 Pair `isLoading` with `onStop` to show progress while keeping the question visible and Stop reachable. Keep the field enabled.
 
 Do: The loading state shows progress inside the field.
 Don't: A field emptied while generating loses the question.
 
-### Show focus while typing. {#show-focus-while-typing}
+### Show focus on the PromptInput while typing. {#show-focus-on-the-promptinput-while-typing}
 
 Focus tells the user the field accepts input. The field draws its own focus ring; never remove it with custom styles.
 
-### Hint at what can be asked. {#hint-at-what-can-be-asked}
+### Hint in the PromptInput at what can be asked. {#hint-in-the-promptinput-at-what-can-be-asked}
 
 Do: The placeholder hints at what can be asked.
 Don't: The placeholder describes the control.
 
-### Leave the field enabled when idle. {#leave-the-field-enabled-when-idle}
+### Leave the PromptInput enabled when idle. {#leave-the-promptinput-enabled-when-idle}
 
 A disabled field blocks follow-up questions.
 
 Do: An idle field takes the next question.
 Don't: A disabled idle field blocks the next question.
 
-### Send only real text. {#send-only-real-text}
+### Send only real text from a PromptInput. {#send-only-real-text-from-a-promptinput}
 
 `onSubmit` never fires for an empty, disabled or loading field, or on Enter during IME composition.
 

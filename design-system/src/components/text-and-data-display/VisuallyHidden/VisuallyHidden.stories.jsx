@@ -62,7 +62,7 @@ const expectInTree = async (el, name) => {
 /* ------------------------------------------------------------------ default */
 
 export const Overview = () => (
-    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+    <p className="body-default" style={{ margin: 0 }}>
         Sessions completed: 12
         <VisuallyHidden>, this term</VisuallyHidden>
     </p>
@@ -163,7 +163,7 @@ RoleAndId.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------- playground */
 
 export const Interactive = (args) => (
-    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+    <p className="body-default" style={{ margin: 0 }}>
         Maya K., Grade 7
         <VisuallyHidden {...args} />
     </p>

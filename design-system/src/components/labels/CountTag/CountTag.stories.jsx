@@ -6,6 +6,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { Button, Icon } from '@/components';
 import CountTag, { COUNT_TAG_APPEARANCES } from './CountTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { Ground } from '@/storybook-docs/lib/ground.jsx';
 
 /**
  * `CountTag` — a number on its own, as a near-square countTag.
@@ -67,9 +68,9 @@ export const Appearances = () => (
         <CountTag value={12} />
         <CountTag value={13} isBold appearance="danger" />
         <Button appearance="primary" iconAfter={<CountTag value={14} isInverse />}>Review</Button>
-        <span style={{ background: 'var(--ds-background-neutral-bold)', padding: 'var(--pad-y-lg) var(--pad-x-sm)', borderRadius: 'var(--radius-control-sm)' }}>
+        <Ground background="--ds-background-neutral-bold" inset="md" inline>
             <CountTag value={15} isInverse />
-        </span>
+        </Ground>
         <CountTag isDot appearance="danger" label="New activity" />
     </div>
 );

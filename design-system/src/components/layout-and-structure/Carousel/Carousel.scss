@@ -47,7 +47,7 @@
     overflow: hidden;
     overflow: clip;
     container-type: inline-size;
-    padding-block: var(--page-stack-md) var(--section-stack-md);
+    padding-block: var(--stack-2xl) var(--stack-xl);
     touch-action: pan-y;
     mask-image: linear-gradient(
         90deg,
@@ -206,7 +206,7 @@
 .plus-carousel-caption {
     max-width: var(--content-max-width-reading);
     min-height: calc(2lh + var(--stack-sm));
-    margin: var(--section-stack-md) auto 0;
+    margin: var(--stack-xl) auto 0;
     text-align: center;
 }
 

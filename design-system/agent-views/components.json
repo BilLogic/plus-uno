@@ -2011,9 +2011,9 @@
         "--inline-2xl",
         "--inline-lg",
         "--inline-md",
-        "--page-stack-md",
-        "--section-stack-md",
-        "--stack-sm"
+        "--stack-2xl",
+        "--stack-sm",
+        "--stack-xl"
       ]
     },
     {
@@ -5365,11 +5365,11 @@
         "--icon-lg",
         "--image-md",
         "--inline-md",
-        "--page-stack-lg",
-        "--page-stack-md",
-        "--page-stack-sm",
+        "--pad-x-lg",
         "--screen-pad-x",
         "--section-min-width-main",
+        "--stack-2xl",
+        "--stack-3xl",
         "--stack-md",
         "--stack-sm",
         "--stack-xl"
@@ -6411,7 +6411,7 @@
           "required": false,
           "default": "FLAG_AUTO_CLOSE_MS",
           "values": null,
-          "description": "How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off.",
+          "description": "How long it stays before closing itself, in ms. `FLAG_AUTO_CLOSE_MS` by default; keep it at that or more so a slow reader is not cut off.",
           "deprecated": null
         },
         {

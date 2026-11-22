@@ -11,6 +11,7 @@ import {
     Calendar,
     Carousel,
     Cascader,
+    ChangeTag,
     Checkbox,
     CheckboxGroup,
     ChoiceGrid,
@@ -226,6 +227,10 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 onChange={NOOP}
             />
         </div>
+    ),
+
+    ChangeTag: ({ step }) => (
+        <ChangeTag value={step === 'landing' ? 12 : 8} goodDirection="up" comparison="vs last week" />
     ),
 
     Checkbox: ({ step }) => (

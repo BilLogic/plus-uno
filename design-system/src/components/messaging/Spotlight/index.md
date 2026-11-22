@@ -39,21 +39,21 @@ Spotlight reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Name the feature, then say what to do. {#name-the-feature-then-say-what-to-do}
+### Name the feature in a Spotlight, then say what to do. {#name-the-feature-in-a-spotlight-then-say-what-to-do}
 
 A headline names the thing; the body is one sentence.
 
 Do: Short headline, one-sentence body.
 Don't: A greeting and a paragraph.
 
-### Show a step count only in a tour. {#show-a-step-count-only-in-a-tour}
+### Show a Spotlight step count only in a tour. {#show-a-spotlight-step-count-only-in-a-tour}
 
 One step alone has nothing to count.
 
 Do: Step count in a multi-step tour.
 Don't: Step count on a single tip.
 
-### Keep the secondary action quieter than the primary. {#keep-the-secondary-action-quieter-than-the-primary}
+### Keep the secondary Spotlight action quieter than the primary. {#keep-the-secondary-spotlight-action-quieter-than-the-primary}
 
 The primary action leads as the filled action; the secondary is the outlined one.
 Either `SpotlightAction` can take `href` to navigate.
@@ -78,7 +78,7 @@ anchor comes from outside that tree.
 </SpotlightProvider>
 ```
 
-### Dismiss it once, and remember that it was seen. {#dismiss-it-once-and-remember-that-it-was-seen}
+### Dismiss a Spotlight once, and remember that it was seen. {#dismiss-a-spotlight-once-and-remember-that-it-was-seen}
 
 `isOpen` is yours to control. Store whatever "seen" state applies, such as a
 user preference or a session flag, so the same spotlight does not reopen on

@@ -10,7 +10,6 @@ import {
     ShortLineDont,
     TintMeaningDo,
     TintMeaningDont,
-    fieldRow,
 } from '@/storybook-docs/lib/inline-message-cases';
 /** The popup is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);

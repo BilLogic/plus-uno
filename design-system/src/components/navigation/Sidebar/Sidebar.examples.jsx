@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 
-import Sidebar from './Sidebar';
+import { Sidebar } from '@/components';
 
 /**
  * The do and don't examples on the Sidebar docs page: the real, live Sidebar,
  * cut down to the groups each rule is about. Each uses a distinct navigation
  * landmark label so multiple examples on one page remain unambiguous.
  */
-
-const Box = ({ children }) => (
-    <div className="plus-frame__sidebar plus-frame__sidebar--docked not-prose sb-unstyled">
-        {children}
-    </div>
-);
 
 const InteractiveSidebar = ({ activeId: initialActiveId, tabs: initialTabs, ...props }) => {
     const [activeId, setActiveId] = useState(initialActiveId);
@@ -35,20 +29,18 @@ const InteractiveSidebar = ({ activeId: initialActiveId, tabs: initialTabs, ...p
     };
 
     return (
-        <Box>
-            <Sidebar
-                storageKey={null}
-                onToggle={() => {}}
-                {...props}
-                activeId={activeId}
-                onSelect={(id) => setActiveId(id)}
-                onHome={() => setActiveId('home')}
-                tabs={tabs}
-                onSelectTab={(tab) => setActiveId(tab.id)}
-                onCloseTab={tabs ? handleCloseTab : undefined}
-                onCloseAllTabs={tabs ? handleCloseAllTabs : undefined}
-            />
-        </Box>
+        <Sidebar
+            storageKey={null}
+            onToggle={() => {}}
+            {...props}
+            activeId={activeId}
+            onSelect={(id) => setActiveId(id)}
+            onHome={() => setActiveId('home')}
+            tabs={tabs}
+            onSelectTab={(tab) => setActiveId(tab.id)}
+            onCloseTab={tabs ? handleCloseTab : undefined}
+            onCloseAllTabs={tabs ? handleCloseAllTabs : undefined}
+        />
     );
 };
 

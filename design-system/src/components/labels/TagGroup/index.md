@@ -67,8 +67,6 @@ Don't: A read-only group that looks editable.
 - **Suggestions stay reachable.** They are never behind `+n`, so a keyboard user reaches them on the row after `+n`.
 - **Disabled is announced per tag.** A selectable tag, a Suggestion and `+n` are native disabled buttons; every other tag is a plain span that carries visually hidden text and reads as "Science, disabled". Nothing in a disabled group takes focus.
 - **`+n` announces its count and menu state.** Its name starts with what it shows ("+3 more tags", "+1 more tag"). Enter or Space opens the menu, Tab reaches each interactive item inside, and Escape returns focus to `+n`. Selectable tags toggle in place (`aria-pressed`), links keep their `href`, and remove stays on the row.
-- **Suggestions stay on the row.** They are never folded into `+n`, so keyboard users reach them directly.
-- **Disabled is announced per item.** Interactive tags and `+n` become native disabled buttons; static tags append visually hidden ", disabled" text.
 
 ## Related
 

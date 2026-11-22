@@ -224,7 +224,7 @@ and opened from the keyboard it appears at once.
 
 ## Best practices
 
-### Let default dismissal work unless you drive `show` manually.
+### Let Popup dismissal work by default unless you drive `show` manually.
 
 ```jsx
 // A click away and Escape both close it — `rootClose` defaults to true for
@@ -237,7 +237,7 @@ and opened from the keyboard it appears at once.
        onToggle={setOpen}>…</Popup>
 ```
 
-### Pass a control or a string as `trigger`, never a `div`.
+### Pass a Popup a control or a string as `trigger`, never a `div`.
 
 ```jsx
 // Fine — a string trigger renders a real <button className="plus-popup-trigger">,
@@ -260,14 +260,14 @@ and opened from the keyboard it appears at once.
     dontCaption="A div is not a control: it has no role and no keyboard behavior."
 />
 
-### Pair hover triggers with focus or click.
+### Pair Popup hover triggers with focus or click.
 
 `triggerType="hover"` has no keyboard equivalent, and `focus` opens the popup
 the way hover does, so `['hover', 'focus']` is not enough. Add `click` — and
 rely on it when the content is more than a sentence — hover content that
 must be read is content that has to stay put while it is read.
 
-### Keep the body short, and keep forms out.
+### Keep the Popup body short, and keep forms out.
 
 <DoDontPair
     doExample={<DocsOverlayBoundary fit={false} containHeight><Popup show title="Session 12" trigger="Session details" placement="bottom">Ran 45 minutes over.</Popup></DocsOverlayBoundary>}
@@ -276,7 +276,7 @@ must be read is content that has to stay put while it is read.
     dontCaption="A question for a title and a paragraph for a body."
 />
 
-### Name the trigger for what it opens.
+### Name the Popup trigger for what it opens.
 
 <DoDontPair
     doExample={<Popup trigger="What is this?">A short definition.</Popup>}

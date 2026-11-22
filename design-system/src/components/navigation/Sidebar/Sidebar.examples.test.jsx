@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { LockDo, LockDont, NamesDo, NamesDont, TabLabelDo, TabLabelDont } from './Sidebar.examples.jsx';
+import { LockDo, LockDont, NamesDo, NamesDont, TabLabelDo, TabLabelDont } from '@/storybook-docs/lib/sidebar-cases.jsx';
 
 describe('Sidebar live examples', () => {
     it('renders all six do/dont examples without inert or hidden landmarks and with unique nav labels', () => {

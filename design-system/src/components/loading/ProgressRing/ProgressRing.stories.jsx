@@ -4,6 +4,7 @@ import { probe, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, within } from 'storybook/test';
 import ProgressRing, { PROGRESS_RING_APPEARANCES, PROGRESS_RING_SIZES } from './ProgressRing';
+import { Ground } from '@/storybook-docs/lib/ground.jsx';
 
 export default {
     title: 'Components/Loading/Progress ring',
@@ -65,9 +66,9 @@ export const Default = {
 
 export const Inverse = {
     render: () => (
-        <div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+        <Ground background="--ds-background-brand-bold" inset="md" inline>
             <ProgressRing value={64} appearance="inverse" label="Uploading session recording" />
-        </div>
+        </Ground>
     ),
     play: async ({ canvasElement }) => {
         const ring = within(canvasElement).getByRole('progressbar', { name: 'Uploading session recording' });
