@@ -20,9 +20,11 @@ Search field: find a record by typing. It is a TextField with a search icon befo
 
 ## Usage
 
-Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
+Use `SearchField` to find a record by typing. In `active` and `basic` modes, matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
 
-`SearchField` filters rows as you type through `onValueChange`.
+`mode` picks when the search runs. The default, `active`, filters rows as you type through `onValueChange`. `basic` runs `onSearch(text)` on Enter and nothing per keystroke, for a search too heavy to run on every keystroke; it never calls `loadResults`. `focused` opens a panel under the field, for jumping to a record from anywhere: matches are grouped by type and chosen through `onSelect`, and Enter or the See all row runs `onSearch` as a basic search.
+
+In `focused`, pass `recent` (a list of strings) for the searches shown on focus while the field is empty, and `results` (groups of `{ value, label, count?, items }`) for the matches; feed `results` from `onResults` or filter your own rows. A `SearchFieldAction` child, whose `onSelect` receives the text, adds one last row such as "Create student". Matches appear in the panel only in `focused` mode.
 
 `name` is the input's form key: a plain form submits the text under it.
 
@@ -69,6 +71,9 @@ The clear action keeps its place at the end, and focusing the field reaches the 
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
 - **Loading is announced** through the spinner's status text.
+- **Basic is a search box.** It keeps the search input's role and runs only on Enter.
+- **Focused is a combobox.** The input reports `aria-expanded`, `aria-controls` and the row under the cursor through `aria-activedescendant`; focus stays in the input while arrow keys move the cursor.
+- **The panel is a listbox of options,** named "Suggestions" unless `panelLabel` says otherwise. Group headings label the rows under them.
 
 ## Related
 
@@ -84,6 +89,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 2. **Field.** A text field, 40 at default spacing and 32 at compact.
 3. **Search icon.** Before the text; a spinner takes its place while results load.
 4. **Clear button.** After the text once it holds any.
+5. **Panel** (`focused` only). A list under the field: a Recent searches heading or type groups with counts, then a See all row and an optional action row.
 
 ### States
 
@@ -94,14 +100,17 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, for keyboard focus only. |
 | Filled | The clear button appears after the text. |
 | Loading | A spinner replaces the search icon. |
+| Panel open | A panel under the field, only in `focused` mode. Recent searches while empty; grouped matches, See all and the optional action row once text is typed. |
 | Disabled | The disabled fill and text: a change of color, not of opacity. |
 
 ### Keyboard
 
 | Key | What it does |
 | --- | --- |
-| Esc | Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. |
-| Arrow down and up | Inside the scope list, move and choose. |
+| Esc | Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. In `focused`, an open panel closes first and keeps the text; the next Esc clears. |
+| Enter | In `basic`, runs `onSearch` with the text. In `focused`, chooses the row under the cursor; with no row under the cursor, runs `onSearch` when there is text. |
+| Arrow down and up | Inside the scope list, move and choose. In `focused`, open the closed panel, then move through its rows and wrap at either end. |
+| Tab | In `focused`, leaves the field and closes the panel; the panel is not a tab stop. |
 
 ### Tokens
 

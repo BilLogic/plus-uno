@@ -118,7 +118,7 @@ authored half, counted rather than assumed.
   - For plain multi-line text with no formatting toolbar, use `TextArea`.
   - For single-line text, use `TextField`.
   - For a threaded discussion entry with an author and timestamp, use `Comment`.
-- **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
+- **[SearchField](SearchField/index.md)** — Use `SearchField` to find a record by typing. In `active` and `basic` modes, matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
   - For picking a value from a known option list, use `Select`.
   - For narrowing a list by a category in a Section header, use `FilterButton`, `PopupSelect` or `FilterMenu`.
   - For general single-line text entry in a form, use `TextField`.
