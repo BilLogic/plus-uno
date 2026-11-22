@@ -110,7 +110,7 @@ $status-state: (
     'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed)),
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
     'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed)),
-    'discovery': (var(--ds-background-competency-mastering-content), var(--ds-text-competency-mastering-content), var(--ds-background-competency-mastering-content-pressed)),
+    'discovery': (var(--ds-background-discovery), var(--ds-text-discovery), var(--ds-background-discovery-pressed)),
 );
 
 @each $name, $look in $status-state {
