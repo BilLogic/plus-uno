@@ -83,7 +83,7 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `
 
 | Part | Token |
 | --- | --- |
-| Selected row | `--ds-background-selected`, `--ds-background-selected-hovered`, `--ds-background-selected-pressed` |
+| Selected row | `--ds-background-selected` |
 | Highlighted row | `--ds-background-warning-bold` washed |
 | Disabled ink | `--ds-text-disabled` |
 | Error ink | `--ds-text-danger` |

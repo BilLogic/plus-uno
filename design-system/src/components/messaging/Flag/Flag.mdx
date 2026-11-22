@@ -149,7 +149,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after <code>delay</code> (default <code>FLAG_AUTO_CLOSE_MS</code>). Example: "Notes copied". Set <code>icon</code> to a status icon or an <code>Avatar</code>.</td></tr>
+<tr><td>Normal</td><td>The default flag, for passive news a person can clear. Closes itself after <code>delay</code> (default 8000 ms, <code>FLAG_AUTO_CLOSE_MS</code>). Example: "Notes copied". Set <code>icon</code> to a status icon or an <code>Avatar</code>.</td></tr>
 <tr><td>Information</td><td>Bold. Something worth knowing, on the dark neutral fill. Times out.</td></tr>
 <tr><td>Success</td><td>Bold. A finished action. Times out.</td></tr>
 <tr><td>Warning</td><td>Bold. Something to check before going on. Never closes itself; offers a next action.</td></tr>
@@ -202,7 +202,7 @@ A flag plays a sound as it lands: Error for an error flag, Notify for every othe
 <tr><td>Focused</td><td>Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill.</td></tr>
 <tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
-<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default <code>FLAG_AUTO_CLOSE_MS</code>; keep any <code>delay</code> at that or longer); warning and error never close themselves.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after <code>delay</code> (default 8000 ms, <code>FLAG_AUTO_CLOSE_MS</code>; keep any <code>delay</code> at that or longer); warning and error never close themselves.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
 </DocsTable>

@@ -43,7 +43,7 @@ opens its description and actions behind a chevron; its actions are buttons.
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default flag, for passive news a person can clear. Closes itself after `delay` (default `FLAG_AUTO_CLOSE_MS`). Example: "Notes copied". Set `icon` to a status icon or an `Avatar`. |
+| Normal | The default flag, for passive news a person can clear. Closes itself after `delay` (default 8000 ms, `FLAG_AUTO_CLOSE_MS`). Example: "Notes copied". Set `icon` to a status icon or an `Avatar`. |
 | Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
 | Success | Bold. A finished action. Times out. |
 | Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
@@ -171,7 +171,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `InlineMessage` · `Notifica
 | Focused | Dismiss, the toggle and each action show the focus ring; the ring is inverse on a bold fill. |
 | Disabled | Not supported. |
 | Expanded | A bold flag shows its description and actions; collapsed, only the title. |
-| Autohide | Normal, information and success close after `delay` (default `FLAG_AUTO_CLOSE_MS`; keep any `delay` at that or longer); warning and error never close themselves. |
+| Autohide | Normal, information and success close after `delay` (default 8000 ms, `FLAG_AUTO_CLOSE_MS`; keep any `delay` at that or longer); warning and error never close themselves. |
 | Dismissed | The flag leaves the stack. |
 
 ### Tokens

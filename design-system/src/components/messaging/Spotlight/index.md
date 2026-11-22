@@ -127,13 +127,14 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--popup-radius`, `--spotlight-pad`, `--spotlight-gap` |
+| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--popup-radius`, `--spotlight-pad`, `--spotlight-gap`, `--spotlight-screen-pad` (minimum clearance to the viewport edges; caps the width at the viewport minus twice this) |
 | Text | `--ds-text-inverse`, `--heading-sm`, `--body-default`; step count `--body-sm` |
 | Dismiss | `CloseButton` |
 | Primary action | `--ds-surface-overlay`, `--ds-text` |
 | Secondary action | `--ds-text-inverse` text and `--border-width-default` edge; `--ds-interaction-inverse-hovered` and `-pressed` under the pointer |
 | Actions | `--inline-lg` between |
-| Media | `--radius-lg` |
+| Media | `--radius-lg`, `--spotlight-media-height` (fixed height of the media area) |
+| Footer | `--spotlight-footer-stack` (vertical gap above the footer) |
 | Focus ring | `--ds-border-focused-inverse` |
 
 ## Content guidelines
