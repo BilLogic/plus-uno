@@ -16,6 +16,8 @@ Also asked as: delta tag, trend indicator.
 
 **Storybook page:** `design-system/src/components/labels/ChangeTag/ChangeTag.mdx`
 
+**Motion:** change `appearance.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+
 ## Usage
 
 Use `ChangeTag` beside a number to say how it moved since the last period: in
@@ -31,6 +33,14 @@ it, never from the arrow alone.
 | Up | More is better: sessions held, reflections completed. Up is success, down is danger. |
 | Down | Less is better: no-shows, absences, missed reflections. Down is success, up is danger. |
 | None | The change has no value judgment: hours tutored, students assigned. Neutral either way. |
+
+## Motion
+
+ChangeTag reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-default` | A new value fades in place while the tag's fill and ink move on the same easing; the first render does not animate. |
 
 ## Alternatives
 
@@ -97,7 +107,7 @@ Same group: `CompetencyTag` · `CountTag` · `DateTag` · `StatusTag` · `Tag` �
 | Part | Token |
 | --- | --- |
 | Height | `--label-height-sm` (16). |
-| Padding and gap | `--pad-x-xs` on both sides, 2 between arrow and value, `--inline-sm` before the comparison. |
+| Padding and gap | `--pad-x-xs` on both sides, `--tag-gap-compact` between arrow and value, `--inline-sm` before the comparison. |
 | Corner | `--radius-md`. |
 | Neutral | `--ds-background-neutral` fill, `--ds-text` words, `--ds-background-neutral-pressed` edge. |
 | Success | `--ds-background-success` fill, `--ds-text-success` words, `--ds-background-success-pressed` edge. |

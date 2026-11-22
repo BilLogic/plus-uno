@@ -167,7 +167,7 @@ status from the table below.
 
 ## Best practices
 
-### Stream the answer, then settle.
+### Stream the AiMessage answer, then settle.
 
 Keep progress visible rather than leaving a blank; follow the status sequence
 in Usage.
@@ -179,7 +179,7 @@ in Usage.
     dontCaption="Partial text shown as finished hides that it is still being written."
 />
 
-### List the sources whenever an answer draws on records.
+### List sources on an AiMessage whenever the answer draws on records.
 
 An answer built from sessions, students or reports passes them as `sources`,
 so a person can open what the AI read. A general answer that read nothing
@@ -192,7 +192,7 @@ shows no list.
     dontCaption="An answer from records with nothing to open."
 />
 
-### Offer feedback on every finished answer.
+### Offer feedback on every finished AiMessage.
 
 Pass `onFeedback` for every answer; feedback appears only at `complete`, so
 partial replies cannot be rated. See <a href="?path=/docs/ai-ui-components-ai-message-ai-feedback--docs&tab=plus-usage">AI feedback</a>

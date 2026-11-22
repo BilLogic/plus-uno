@@ -17,12 +17,12 @@
     color: var(--ds-text);
 
     &--default {
-        padding: var(--page-stack-lg) var(--screen-pad-x);
+        padding: calc(var(--stack-3xl) + var(--stack-md)) var(--screen-pad-x); /* 40 */
     }
 
     &--compact {
         gap: var(--stack-md);
-        padding: var(--page-stack-md) var(--page-stack-sm);
+        padding: var(--stack-2xl) var(--pad-x-lg);
     }
 
     &__image {

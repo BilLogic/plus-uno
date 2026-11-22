@@ -105,7 +105,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | Part | Token |
 | --- | --- |
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
-| Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
+| Padding and gap | `--pad-x-xs` on the leading edge, `--tag-pad-x-end-compact` on the trailing edge, `--tag-gap-compact` between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` leading, `--tag-pad-x-end` trailing, `--tag-gap` between icon and label. |
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
 | Neutral | `--ds-border` edge, `--ds-text-subtle` words. |
 | Warning | `--ds-border-warning-subtle` edge, `--ds-text-warning` words. |
@@ -116,7 +116,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | Do | Don't |
 | --- | --- |
 | Say it in the reader's terms: "Due tomorrow", "Mar 4". | Write a timestamp: "2026-03-04T09:00". |
-| Keep one date to a tag. Use two tags for a range. | Pack a range or a time zone into one tag. |
+| Keep one date to a tag. | Pack a range or a time zone into one tag. |
 | Let the app turn the tag warning or danger from the date. | Pick a color for emphasis. |
 
 ## Props

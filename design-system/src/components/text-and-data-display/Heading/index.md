@@ -91,7 +91,7 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `InlineEdit` �
 
 | Part | Token |
 | --- | --- |
-| Text style | `--heading-xxl` to `--heading-xxs`, with tracking for xxl, xl and lg |
+| Text style | `--heading-xxl` to `--heading-xxs`, each with its own tracking (`--heading-xxl-tracking` to `--heading-xxs-tracking`) |
 | Default ink | `--ds-text` |
 | Inverse ink | `--ds-text-inverse` |
 | Warning inverse ink | `--ds-text-warning-inverse` |

@@ -108,6 +108,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Cascader | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
+| ChangeTag | component | change | Update a value or state | `--ds-motion-appearance-default` |  |
 | Checkbox | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Checkbox | component | goal | Update a value or state | `--ds-motion-appearance-fast` | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 | CheckboxGroup | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

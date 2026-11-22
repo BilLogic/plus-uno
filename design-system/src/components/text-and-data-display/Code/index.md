@@ -37,14 +37,14 @@ A long inline span wraps awkwardly and loses its structure. A block keeps lines 
 Do: Several lines go in a code block.
 Don't: A whole instruction in inline code.
 
-### Do not use it for emphasis. {#do-not-use-it-for-emphasis}
+### Do not use Code for emphasis. {#do-not-use-code-for-emphasis}
 
 `Code` tells readers "this is literal text to type". Use bold or a button label for emphasis.
 
 Do: Bold for emphasis, in the reader's words.
 Don't: Inline code on a word that is not code.
 
-### Write it as the reader would type it. {#write-it-as-the-reader-would-type-it}
+### Write Code as the reader would type it. {#write-code-as-the-reader-would-type-it}
 
 Do: The exact name, with its brackets.
 Don't: A trailing period inside the span, which the reader may type.

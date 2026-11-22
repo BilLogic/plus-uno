@@ -13,7 +13,7 @@ import {
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const DemoSlide = ({ children }) => (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xs)' }}>
+    <div className="sb-ds-demo-slide">
         {children}
     </div>
 );
@@ -171,12 +171,12 @@ progress indicator. Autoplay is on by default (`interval` `5000`), and loops.
 </thead>
 <tbody>
 <tr><td>Card</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, corners <code>--card-radius</code>.</td></tr>
-<tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--inline-2xl</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
+<tr><td>Neighbors</td><td>Scaled by <code>--carousel-neighbor-scale</code> and faded under <code>--ds-surface</code> at <code>--carousel-neighbor-dim</code>, <code>--inline-2xl</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
 <tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-width-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: steps <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each step a <code>--control-sm</code> target.</td></tr>
 <tr><td>Motion</td><td>A move takes <code>--ds-motion-spatial-default</code>, fading on <code>--ds-motion-appearance-slow</code>. The caption fades out over <code>--ds-motion-appearance-fast</code> and fades in over <code>--ds-motion-appearance-default</code>, with no vertical travel.</td></tr>
 <tr><td>Caption</td><td><code>Heading</code> size sm; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
-<tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
+<tr><td>Spacing</td><td><code>--stack-xl</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
 </tbody>
 </DocsTable>
 

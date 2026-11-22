@@ -11,7 +11,7 @@ authored half, counted rather than assumed.
   - For progress through a sequence of steps, use `ProgressTracker`.
   - For moving between sibling views of the same subject, use `Tabs`.
   - For a persistent hierarchy the user browses rather than retraces, use `Sidebar`.
-- **[Link](Link/index.md)** — Use `Link` for navigation inside a sentence or a block of text — "see the session report," "read more." `Link`'s appearances are for inline text, not for a control that stands on its own.
+- **[Link](Link/index.md)** — Use `Link` for navigation inside a sentence or a block of text — "see the session report," "view the full report." `Link`'s appearances are for inline text, not for a control that stands on its own.
   - For a standalone navigation action styled like a button, use `LinkButton`.
   - For an action that triggers in-page behavior rather than navigating to a URL, use `Button`.
   - For a trail of links showing where a page sits in a hierarchy, use `Breadcrumb`.

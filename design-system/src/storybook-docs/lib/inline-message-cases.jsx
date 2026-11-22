@@ -2,13 +2,6 @@ import React, { useState } from 'react';
 import { InlineMessage } from '@/components';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
-export const fieldRow = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 'var(--inline-sm)',
-};
-
 /**
  * Shared live InlineMessage demo for the Best practices DoDontPair blocks on
  * `InlineMessage.mdx` and the `BestPracticesLive` story in `InlineMessage.stories.jsx`.
@@ -41,7 +34,7 @@ export const LiveInlineMessage = ({
 
     return (
         <DocsOverlayBoundary fit={false} containHeight>
-            <div style={fieldRow}>
+            <div className="sb-ds-field-row">
                 <span>{field}</span>
                 <InlineMessage
                     appearance={appearance}
@@ -89,7 +82,7 @@ export const ShortLineDont = () => (
 
 export const OnePerFieldDo = () => (
     <DocsOverlayBoundary fit={false} containHeight>
-        <div style={fieldRow}>
+        <div className="sb-ds-field-row">
             <span>Session length</span>
             <InlineMessage appearance="info" placement="bottom" label="About session length" title="Heads up">
                 This setting applies to new sessions only.
@@ -100,7 +93,7 @@ export const OnePerFieldDo = () => (
 
 export const OnePerFieldDont = () => (
     <DocsOverlayBoundary fit={false} containHeight>
-        <div style={fieldRow}>
+        <div className="sb-ds-field-row">
             <span>Session length</span>
             <InlineMessage appearance="info" placement="bottom" label="About session length" title="Heads up">
                 This setting applies to new sessions only.

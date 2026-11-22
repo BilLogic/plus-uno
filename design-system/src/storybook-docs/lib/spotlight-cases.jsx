@@ -62,7 +62,7 @@ export const LiveSpotlight = ({
         <DocsOverlayBoundary fit={false} containHeight>
             <SpotlightProvider>
                 <div
-                    style={{ display: 'flex', justifyContent: 'center' }}
+                    className="sb-ds-centered-row"
                     onPointerDownCapture={markInsideGesture}
                     onMouseDownCapture={markInsideGesture}
                     onClickCapture={markInsideGesture}

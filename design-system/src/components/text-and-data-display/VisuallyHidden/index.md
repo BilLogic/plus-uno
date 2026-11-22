@@ -35,21 +35,21 @@ square, clipped, out of the flow and kept in the accessibility tree. Existing ma
 
 ## Best practices
 
-### Name icon-only controls. {#name-icon-only-controls}
+### Name icon-only controls with VisuallyHidden. {#name-icon-only-controls-with-visuallyhidden}
 
 A control with no visible words still needs a name a screen reader can say.
 
 Do: Hidden text names the icon.
 Don't: An icon-only control left unnamed.
 
-### Add context the layout implies. {#add-context-the-layout-implies}
+### Add the context the layout implies with VisuallyHidden. {#add-the-context-the-layout-implies-with-visuallyhidden}
 
 Sighted readers see the heading above a link; others need the words.
 
 Do: Hidden words complete the link.
 Don't: “Read more” repeated with no object.
 
-### Do not repeat what is visible. {#do-not-repeat-what-is-visible}
+### Do not repeat what is visible in VisuallyHidden text. {#do-not-repeat-what-is-visible-in-visuallyhidden-text}
 
 Hidden text that duplicates visible text is read twice.
 
@@ -69,7 +69,7 @@ accessibility tree too, so nothing is announced.
 <VisuallyHidden>Delete session</VisuallyHidden>
 ```
 
-### Do not hide what a sighted person also needs. {#do-not-hide-what-a-sighted-person-also-needs}
+### Do not put in VisuallyHidden what a sighted person also needs. {#do-not-put-in-visuallyhidden-what-a-sighted-person-also-needs}
 
 An instruction that is invisible to people who can see is one they cannot
 find. Say it to everyone, and let the field point at it.
@@ -78,7 +78,7 @@ find. Say it to everyone, and let the field point at it.
 <TextField label="Password" caption="Passwords must be at least 12 characters." />
 ```
 
-### Keep it out of the focus order. {#keep-it-out-of-the-focus-order}
+### Keep VisuallyHidden out of the focus order. {#keep-visuallyhidden-out-of-the-focus-order}
 
 A hidden link or button can still be focused, and a keyboard user lands on
 something they cannot see. Hide text, not controls; a skip link needs to

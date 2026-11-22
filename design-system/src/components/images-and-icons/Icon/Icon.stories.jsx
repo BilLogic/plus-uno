@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
 import Icon, { ICON_COLORS, ICON_SIZES, ICON_STYLES } from './Icon';
+import { Ground } from '@/storybook-docs/lib/ground.jsx';
 
 /**
  * `Icon` -- one Font Awesome Free glyph, drawn from its name.
@@ -132,18 +133,10 @@ export const Colors = () => (
         {ICON_COLORS.map((role) => {
             const [ground, text] = INVERSE_GROUND[role] ?? [];
             return (
-                <div
-                    key={role}
-                    style={{
-                        ...cell,
-                        padding: 'var(--pad-y-sm) var(--pad-x-sm)',
-                        borderRadius: 'var(--radius-sm)',
-                        background: ground ? `var(${ground})` : undefined,
-                    }}
-                >
+                <Ground key={role} background={ground} text={text} inset="sm" style={cell}>
                     <Icon name="star" size={24} color={role} data-role={role} />
-                    <span style={{ ...caption, color: text ? `var(${text})` : caption.color }}>{role}</span>
-                </div>
+                    <span className="body-sm">{role}</span>
+                </Ground>
             );
         })}
     </div>
@@ -161,7 +154,7 @@ Colors.play = async ({ canvasElement }) => {
 /* ---------------------------------------------------------- inherits */
 
 export const Inherited = () => (
-    <span data-testid="text" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-lg)', color: 'var(--ds-text-danger)' }}>
+    <span data-testid="text" className="body-lg" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', color: 'var(--ds-text-danger)' }}>
         <Icon name="circle-exclamation" data-testid="glyph" />
         Payment failed
     </span>
@@ -181,7 +174,7 @@ Inherited.play = async ({ canvasElement }) => {
 export const Labeled = () => (
     <div style={row}>
         <Icon name="circle-check" size={16} color="success" label="Approved" />
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+        <span className="body-default" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
             <Icon name="calendar-days" size={16} color="subtle" data-testid="decorative" />
             Tuesday, 4 pm
         </span>

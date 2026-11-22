@@ -170,7 +170,7 @@ a command sequence, a config file.
 
 ## Best practices
 
-### Scroll commands, wrap prose.
+### Scroll commands in a CodeBlock, wrap prose.
 
 Scroll keeps line structure, which matters for shell commands and config, where a fold could read as a new line. Wrap suits prose-like output in a narrow column.
 
@@ -181,7 +181,7 @@ Scroll keeps line structure, which matters for shell commands and config, where 
     dontCaption="A command folded onto a second line reads like two commands."
 />
 
-### Name each block when there are several on a page.
+### Name each CodeBlock when there are several on a page.
 
 <DoDontPair
     doExample={<FigureStack width="medium"><CodeBlock text="npm install" label="Install command" /></FigureStack>}
@@ -190,7 +190,7 @@ Scroll keeps line structure, which matters for shell commands and config, where 
     dontCaption="Every block named Code snippet."
 />
 
-### State what a highlight points at in prose.
+### State in prose what a CodeBlock highlight points at.
 
 <DoDontPair
     doExample={<FigureStack width="medium"><p className="body-default">The second line sets the retries.</p><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></FigureStack>}
@@ -199,7 +199,7 @@ Scroll keeps line structure, which matters for shell commands and config, where 
     dontCaption="The fill is the only cue."
 />
 
-### Keep line numbers for code you discuss.
+### Keep CodeBlock line numbers for code you discuss.
 
 <DoDontPair
     doExample={<FigureStack width="medium"><CodeBlock text="npm run dev" showLineNumbers={false} /></FigureStack>}
