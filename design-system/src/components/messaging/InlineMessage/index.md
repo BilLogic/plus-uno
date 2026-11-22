@@ -51,7 +51,7 @@ InlineMessage reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Match the tint to the meaning. {#match-the-tint-to-the-meaning}
+### Match the InlineMessage tint to the meaning. {#match-the-inlinemessage-tint-to-the-meaning}
 
 Info for a neutral note; danger only when something failed. The icon is a
 second cue, not a style choice.
@@ -59,21 +59,21 @@ second cue, not a style choice.
 Do: Info for a neutral note.
 Don't: Danger for a neutral note.
 
-### Keep it to one short line. {#keep-it-to-one-short-line}
+### Keep an InlineMessage to one short line. {#keep-an-inlinemessage-to-one-short-line}
 
 It sits beside a field; long copy pushes the form around.
 
 Do: One short sentence.
 Don't: A paragraph beside a field.
 
-### Show one message per field. {#show-one-message-per-field}
+### Show one InlineMessage per field. {#show-one-inlinemessage-per-field}
 
 Two messages on one field leave no clear next step.
 
 Do: A single message.
 Don't: An info note and a warning together.
 
-### Write the label as the question the popup answers. {#write-the-label-as-the-question-the-popup-answers}
+### Write the InlineMessage label as the question its popup answers. {#write-the-inlinemessage-label-as-the-question-its-popup-answers}
 
 The trigger is an icon button with no text of its own, so `label` carries its
 accessible name and its tooltip. Write "Why this field is required", not

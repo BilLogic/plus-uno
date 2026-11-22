@@ -224,7 +224,7 @@ stripe: the fill and the icon carry the style.
 
 ## Best practices
 
-### Match the appearance to the meaning.
+### Match the SectionMessage appearance to the meaning.
 
 Warning for a caution; danger only when something failed.
 
@@ -235,7 +235,7 @@ Warning for a caution; danger only when something failed.
     dontCaption="Danger for a caution."
 />
 
-### Add a title only when the body needs a heading.
+### Add a SectionMessage title only when the body needs a heading.
 
 A short body speaks for itself.
 
@@ -246,11 +246,11 @@ A short body speaks for itself.
     dontCaption="A title that repeats the body."
 />
 
-### Let a long title or message wrap.
+### Let a long SectionMessage title or message wrap.
 
 A section message takes more lines and never ends in an ellipsis. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
-### Dismiss only what is optional.
+### Make a SectionMessage dismissible only when it is optional.
 
 A blocking message stays until the problem is fixed. `dismissible` is on by
 default, so turn it off when the message must stay.
@@ -262,7 +262,7 @@ default, so turn it off when the message must stay.
     dontCaption="A blocking error that can be dismissed."
 />
 
-### Replace the icon through `icon`, not the children.
+### Replace the SectionMessage icon through `icon`, not the children.
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
@@ -274,14 +274,14 @@ it. An icon in the children adds a second one, in the text.
     dontCaption="An icon in the children, beside the default one."
 />
 
-### Put field errors on the field.
+### Put field errors on the field, not in a SectionMessage.
 
 An error about one input belongs to that input's own error state, such as
 `TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
 A rejected submit is the exception: a danger section message at the top of the
 form says what was refused, and each field named still shows its own error.
 
-### Remount with a new `key` to show a dismissed message again.
+### Remount a SectionMessage with a new `key` to show it again once dismissed.
 
 The component keeps its own dismissed state, and `show` is not a prop. To bring
 a message back when it genuinely changes, remount it with a new `key`.

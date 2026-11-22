@@ -3,6 +3,7 @@ import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/lab
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ProgressBar, { PROGRESS_BAR_APPEARANCES } from './ProgressBar';
+import { Ground } from '@/storybook-docs/lib/ground.jsx';
 
 export default {
     title: 'Components/Loading/Progress bar',
@@ -49,9 +50,9 @@ export const Default = () => <ProgressBar value={60} appearance="default" />;
 export const Success = () => <ProgressBar value={100} appearance="success" />;
 
 export const Inverse = () => (
-    <div style={{ padding: 'var(--pad-x-lg)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <Ground background="--ds-background-brand-bold">
         <ProgressBar value={60} appearance="inverse" />
-    </div>
+    </Ground>
 );
 
 /** For a visible percent or description, put the text beside the bar — the bar's own 8px height has no room for it. */

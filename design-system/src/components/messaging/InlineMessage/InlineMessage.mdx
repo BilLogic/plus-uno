@@ -179,7 +179,7 @@ The popup surface is Popup's; see `Popup`.
 
 ## Best practices
 
-### Match the tint to the meaning.
+### Match the InlineMessage tint to the meaning.
 
 Info for a neutral note; danger only when something failed. The icon is a
 second cue, not a style choice.
@@ -191,7 +191,7 @@ second cue, not a style choice.
     dontCaption="Danger for a neutral note."
 />
 
-### Keep it to one short line.
+### Keep an InlineMessage to one short line.
 
 It sits beside a field; long copy pushes the form around.
 
@@ -202,7 +202,7 @@ It sits beside a field; long copy pushes the form around.
     dontCaption="A paragraph beside a field."
 />
 
-### Show one message per field.
+### Show one InlineMessage per field.
 
 Two messages on one field leave no clear next step.
 
@@ -213,7 +213,7 @@ Two messages on one field leave no clear next step.
     dontCaption="An info note and a warning together."
 />
 
-### Write the label as the question the popup answers.
+### Write the InlineMessage label as the question its popup answers.
 
 The trigger is an icon button with no text of its own, so `label` carries its
 accessible name and its tooltip. Write "Why this field is required", not

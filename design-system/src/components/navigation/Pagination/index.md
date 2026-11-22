@@ -53,7 +53,7 @@ Pagination reads these motion tokens and no literal duration or curve.
 
 ```jsx
 // Incorrect — nothing happens on click. The component never tracks a page of
-// its own, and without onPageChange each click is preventDefault and stop.
+// its own, and without onPageChange a click changes nothing.
 <Pagination currentPage={1} totalPages={12} />
 
 // Correct.

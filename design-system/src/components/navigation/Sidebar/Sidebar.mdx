@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SidebarStories from './Sidebar.stories.jsx';
-import { NamesDo, NamesDont, LockDo, LockDont, TabLabelDo, TabLabelDont } from './Sidebar.examples.jsx';
+import { NamesDo, NamesDont, LockDo, LockDont, TabLabelDo, TabLabelDont } from '@/storybook-docs/lib/sidebar-cases.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -96,6 +97,14 @@ The Sidebar, the app's navigation: the logo row, the groups with their section t
 <ComponentExample of={SidebarStories.OnboardingDone} title="Unlocked" description="Onboarding done: the lock becomes the caret and the Toolkit collapses like the other groups." />
 
 Hover and focus are the browser's own states and are described under Usage.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Sidebar" />
 
 </div>
 

@@ -21,7 +21,7 @@ Link: an inline navigation anchor.
 ## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
-session report," "read more." `Link`'s appearances are for inline text, not
+session report," "view the full report." `Link`'s appearances are for inline text, not
 for a control that stands on its own.
 
 ## Motion

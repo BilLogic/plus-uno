@@ -60,25 +60,25 @@ SectionMessage reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Match the appearance to the meaning. {#match-the-appearance-to-the-meaning}
+### Match the SectionMessage appearance to the meaning. {#match-the-sectionmessage-appearance-to-the-meaning}
 
 Warning for a caution; danger only when something failed.
 
 Do: Warning for a provisional schedule.
 Don't: Danger for a caution.
 
-### Add a title only when the body needs a heading. {#add-a-title-only-when-the-body-needs-a-heading}
+### Add a SectionMessage title only when the body needs a heading. {#add-a-sectionmessage-title-only-when-the-body-needs-a-heading}
 
 A short body speaks for itself.
 
 Do: A short body, no title.
 Don't: A title that repeats the body.
 
-### Let a long title or message wrap. {#let-a-long-title-or-message-wrap}
+### Let a long SectionMessage title or message wrap. {#let-a-long-sectionmessage-title-or-message-wrap}
 
 A section message takes more lines and never ends in an ellipsis. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
-### Dismiss only what is optional. {#dismiss-only-what-is-optional}
+### Make a SectionMessage dismissible only when it is optional. {#make-a-sectionmessage-dismissible-only-when-it-is-optional}
 
 A blocking message stays until the problem is fixed. `dismissible` is on by
 default, so turn it off when the message must stay.
@@ -86,7 +86,7 @@ default, so turn it off when the message must stay.
 Do: A blocking error cannot be dismissed.
 Don't: A blocking error that can be dismissed.
 
-### Replace the icon through `icon`, not the children. {#replace-the-icon-through-icon-not-the-children}
+### Replace the SectionMessage icon through `icon`, not the children. {#replace-the-sectionmessage-icon-through-icon-not-the-children}
 
 A Font Awesome Free solid name or a node replaces the default; `false` removes
 it. An icon in the children adds a second one, in the text.
@@ -94,14 +94,14 @@ it. An icon in the children adds a second one, in the text.
 Do: icon replaces the default icon.
 Don't: An icon in the children, beside the default one.
 
-### Put field errors on the field. {#put-field-errors-on-the-field}
+### Put field errors on the field, not in a SectionMessage. {#put-field-errors-on-the-field-not-in-a-sectionmessage}
 
 An error about one input belongs to that input's own error state, such as
 `TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
 A rejected submit is the exception: a danger section message at the top of the
 form says what was refused, and each field named still shows its own error.
 
-### Remount with a new `key` to show a dismissed message again. {#remount-with-a-new-key-to-show-a-dismissed-message-again}
+### Remount a SectionMessage with a new `key` to show it again once dismissed. {#remount-a-sectionmessage-with-a-new-key-to-show-it-again-once-dismissed}
 
 The component keeps its own dismissed state, and `show` is not a prop. To bring
 a message back when it genuinely changes, remount it with a new `key`.

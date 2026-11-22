@@ -29,7 +29,7 @@ lets more than one item stay open at once. Each item is its own container by
 default (`appearance="separated"`); use `appearance="grouped"` for one bordered box with
 dividers, and `flush` to drop that box when the accordion sits inside a card or panel.
 An item takes `elemBefore` (an avatar or icon) and `summary` (one line of subtle text
-under the title) for a list of people or records. Use an accordion for several long, independent sections where only one matters at a time.
+under the title) for a list of people or records.
 
 ## Motion
 

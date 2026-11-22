@@ -38,7 +38,7 @@ InlineEdit reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Keep the read view plain text. {#keep-the-read-view-plain-text}
+### Keep the InlineEdit read view plain text. {#keep-the-inlineedit-read-view-plain-text}
 
 The whole read view is one button. A link or a button inside it cannot be
 reached or pressed, so put those beside it.
@@ -46,35 +46,35 @@ reached or pressed, so put those beside it.
 Do: Plain text in the read view.
 Don't: A link inside the read view, which cannot be reached or pressed.
 
-### Confirm on Enter and on leaving. {#confirm-on-enter-and-on-leaving}
+### Confirm an InlineEdit on Enter and on leaving. {#confirm-an-inlineedit-on-enter-and-on-leaving}
 
 Both save; Escape cancels. The inline edit saves itself, so it needs no Save button of its own.
 
 Do: Enter or leaving the field saves the title.
 Don't: A separate Save step beside an inline edit.
 
-### Use compact spacing in dense lists. {#use-compact-spacing-in-dense-lists}
+### Use compact InlineEdit spacing in dense lists. {#use-compact-inlineedit-spacing-in-dense-lists}
 
 `spacing="compact"` draws both views at `--control-md`, to sit in a table cell or a dense row.
 
 Do: Compact rows in a dense list.
 Don't: The default height spreads a dense list out.
 
-### Let the parent hold the value. {#let-the-parent-hold-the-value}
+### Let the parent hold the InlineEdit value. {#let-the-parent-hold-the-inlineedit-value}
 
 `defaultValue` is what the edit view starts with each time it opens. Update it
 in `onConfirm`, or the next edit starts from the old value.
 
-### Say why a value was refused. {#say-why-a-value-was-refused}
+### Say why an InlineEdit value was refused. {#say-why-an-inlineedit-value-was-refused}
 
 Return the reason from `validate`, in the words a tutor would use. A refused
 value leaves the editor open, so the person can fix it without retyping.
 
-### Let a long read view end in an ellipsis with a Tooltip. {#let-a-long-read-view-end-in-an-ellipsis-with-a-tooltip}
+### Let a long InlineEdit read view end in an ellipsis with a Tooltip. {#let-a-long-inlineedit-read-view-end-in-an-ellipsis-with-a-tooltip}
 
 The Tooltip is on only while the text is clipped, and the read view keeps its height. The edit view follows the field it holds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
-### Leave the editor open for long text. {#leave-the-editor-open-for-long-text}
+### Leave the InlineEdit editor open for long text. {#leave-the-inlineedit-editor-open-for-long-text}
 
 Set `keepEditViewOpenOnBlur` where a stray click would publish an unfinished
 thought, and keep the buttons so there is a clear way out.

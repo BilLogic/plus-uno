@@ -539,3 +539,47 @@
 .sb-ds-flag-stage .plus-flag {
     max-inline-size: 100%;
 }
+
+/*
+ * Small parts of a Do or Don't figure on a component page: the words a screen
+ * reader says, a carousel slide, a list of notes, a field with its message,
+ * a centered row. Named here so the page's helper carries no inline style.
+ */
+.sbdocs .sb-ds-heard {
+    margin: var(--stack-lg) 0 0;
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}
+
+.sb-ds-demo-slide {
+    block-size: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ds-background-accent-blue-subtlest);
+    color: var(--ds-text-subtle);
+    font: var(--heading-xs);
+}
+
+.sb-ds-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+    padding: var(--pad-y-lg) var(--pad-x-md);
+}
+
+.sbdocs .sb-ds-notes > p {
+    margin: 0;
+}
+
+.sb-ds-field-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--inline-sm);
+}
+
+.sb-ds-centered-row {
+    display: flex;
+    justify-content: center;
+}

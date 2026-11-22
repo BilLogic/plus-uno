@@ -65,7 +65,7 @@ Stacked banners compete and push the page down.
 Do: A single announcement.
 Don't: A warning and a danger banner stacked.
 
-### Keep it to one line. {#keep-it-to-one-line}
+### Keep a Banner to one line. {#keep-a-banner-to-one-line}
 
 A banner is read at a glance; long copy belongs on the page.
 

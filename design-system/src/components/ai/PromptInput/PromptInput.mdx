@@ -163,11 +163,11 @@ For a plain multiline field without send-on-Enter or loading behavior, use `Text
 
 ## Best practices
 
-### Let a long prompt grow to five lines, then scroll.
+### Let a PromptInput grow to five lines, then scroll.
 
 The field never grows past its maximum height and never scrolls sideways; the send button stays at the bottom. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
-### Keep the field visible while generating.
+### Keep the PromptInput visible while generating.
 
 Pair `isLoading` with `onStop` to show progress while keeping the question visible and Stop reachable. Keep the field enabled.
 
@@ -178,11 +178,11 @@ Pair `isLoading` with `onStop` to show progress while keeping the question visib
     dontCaption="A field emptied while generating loses the question."
 />
 
-### Show focus while typing.
+### Show focus on the PromptInput while typing.
 
 Focus tells the user the field accepts input. The field draws its own focus ring; never remove it with custom styles.
 
-### Hint at what can be asked.
+### Hint in the PromptInput at what can be asked.
 
 <DoDontPair
     doExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" />}
@@ -191,7 +191,7 @@ Focus tells the user the field accepts input. The field draws its own focus ring
     dontCaption="The placeholder describes the control."
 />
 
-### Leave the field enabled when idle.
+### Leave the PromptInput enabled when idle.
 
 A disabled field blocks follow-up questions.
 
@@ -202,7 +202,7 @@ A disabled field blocks follow-up questions.
     dontCaption="A disabled idle field blocks the next question."
 />
 
-### Send only real text.
+### Send only real text from a PromptInput.
 
 `onSubmit` never fires for an empty, disabled or loading field, or on Enter during IME composition.
 
