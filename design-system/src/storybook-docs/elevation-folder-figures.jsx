@@ -23,7 +23,7 @@ import {
 } from '@/storybook-docs/illustrations/primitives.jsx';
 import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
-import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
+import { VIEW, projectPoint, rigTransform, stackLayout } from '@/storybook-docs/lib/iso-perspective.js';
 import { composeShadow, parseShadow, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 import { typeStyle } from './lib/type-style.js';
@@ -97,7 +97,7 @@ const useVarsOn = (ref, names) => {
 /* --------------------------------------------------- isometric plate stacks */
 
 const ISO_PAD = 14;
-const CLIMB = -turnPoint(0, 0, PLATE.w, 0).y;
+const ISO_END_PAD = 20;
 const TICK_Y = 64;
 const LABEL_W = 240;
 const NARROW_PX = 560;
@@ -164,6 +164,21 @@ const useNarrowStage = (ref) => {
     return narrow;
 };
 
+/** How many pixels one stage unit draws at, so the plates stay crisp vector art at any width. */
+const useStageScale = (ref, stageW) => {
+    const [scale, setScale] = useState(1);
+    useLayoutEffect(() => {
+        const node = ref.current;
+        if (!node || typeof ResizeObserver === 'undefined') return undefined;
+        const measure = (width) => { if (width > 0) setScale(width / stageW); };
+        measure(node.getBoundingClientRect().width);
+        const observer = new ResizeObserver(([entry]) => measure(entry.contentRect.width));
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [ref, stageW]);
+    return scale;
+};
+
 const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 }) => {
     const stageRef = useRef(null);
     const controlRefs = useRef({});
@@ -171,16 +186,23 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
     const narrow = useNarrowStage(stageRef);
     const [active, setActive] = useState(plates[plates.length - 1].id);
 
-    const stageW = ISO_PAD + PLATE.w * TURN.scaleX + 20;
-    const stageH = ISO_PAD + CLIMB + (plates.length - 1) * stepDy + PLATE.h + ISO_PAD;
-    const share = (stageW / (stageW + LABEL_W)) * 100;
-    const plateAt = (i) => ({ x: ISO_PAD, y: ISO_PAD + CLIMB + (plates.length - 1 - i) * stepDy });
-
-    const placed = plates.map((plate, i) => {
-        const at = plateAt(i);
-        return { ...plate, x: at.x, y: at.y, opacity: 1 - offsets[i] };
+    const figureRef = useRef(null);
+    const { lifts, width: stageW, height: stageH, origin } = stackLayout({
+        w: PLATE.w,
+        h: PLATE.h,
+        count: plates.length,
+        stepDy,
+        pad: ISO_PAD,
+        endPad: ISO_END_PAD,
     });
-    const point = (p, lx, ly) => turnPoint(p.x, p.y, lx, ly);
+    const scale = useStageScale(figureRef, stageW);
+    const share = (stageW / (stageW + LABEL_W)) * 100;
+    const placed = plates.map((plate, i) => ({ ...plate, lift: lifts[i], opacity: 1 - offsets[i] }));
+    /** A point on a plate, from its top-left corner, on the stage. */
+    const point = (lift, lx, ly) => {
+        const p = projectPoint(lx - PLATE.w / 2, ly - PLATE.h / 2, lift);
+        return { x: p.x + origin.x, y: p.y + origin.y };
+    };
 
     const selectPlate = (id, moveFocus = false) => {
         setActive(id);
@@ -189,22 +211,57 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
         }
     };
 
-    const svgFigure = (
-        <Illustration viewBox={`0 0 ${stageW} ${stageH}`} capped={false} title={ariaTitle}>
-            {placed.map((plate) => {
-                const on = plate.id === active;
-                const tick = point(plate, PLATE.w, TICK_Y);
-                return (
-                    <React.Fragment key={plate.id}>
-                        <g
+    const figure = (
+        <div
+            ref={figureRef}
+            role="img"
+            aria-label={ariaTitle}
+            style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: `${stageW} / ${stageH}`,
+                perspective: `${VIEW.perspective * scale}px`,
+                perspectiveOrigin: `${(origin.x / stageW) * 100}% ${(origin.y / stageH) * 100}%`,
+            }}
+        >
+            <div
+                data-rig=""
+                style={{
+                    position: 'absolute',
+                    insetInlineStart: `${(origin.x / stageW) * 100}%`,
+                    insetBlockStart: `${(origin.y / stageH) * 100}%`,
+                    width: 0,
+                    height: 0,
+                    transformStyle: 'preserve-3d',
+                    transform: rigTransform,
+                }}
+            >
+                {placed.map((plate) => {
+                    const on = plate.id === active;
+                    return (
+                        <div
+                            key={plate.id}
                             data-plate={plate.id}
                             data-active={on}
-                            opacity={plate.opacity}
-                            style={{ cursor: 'pointer' }}
                             onMouseEnter={() => setActive(plate.id)}
                             onClick={() => selectPlate(plate.id, true)}
+                            style={{
+                                position: 'absolute',
+                                left: `${(-PLATE.w / 2) * scale}px`,
+                                top: `${(-PLATE.h / 2) * scale}px`,
+                                width: `${PLATE.w * scale}px`,
+                                height: `${PLATE.h * scale}px`,
+                                transform: `translateZ(${plate.lift * scale}px)`,
+                                opacity: plate.opacity,
+                                cursor: 'pointer',
+                            }}
                         >
-                            <g data-turn="" transform={turnTransform(plate.x, plate.y)}>
+                            <svg
+                                viewBox={`0 0 ${PLATE.w} ${PLATE.h}`}
+                                aria-hidden="true"
+                                focusable="false"
+                                style={{ display: 'block', width: '100%', height: '100%', overflow: 'visible' }}
+                            >
                                 {plate.ground && (
                                     <rect
                                         x={0}
@@ -220,31 +277,44 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                                     stroke={on ? PAINT.accent : PAINT.frameDivider}
                                     dashed={Boolean(plate.dashed && !on)}
                                 />
-                            </g>
-                        </g>
-                        {!narrow && (
+                            </svg>
+                        </div>
+                    );
+                })}
+            </div>
+            {!narrow && (
+                <svg
+                    viewBox={`0 0 ${stageW} ${stageH}`}
+                    aria-hidden="true"
+                    focusable="false"
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+                >
+                    {placed.map((plate) => {
+                        const tick = point(plate.lift, PLATE.w, TICK_Y);
+                        return (
                             <line
+                                key={plate.id}
                                 data-tick={plate.id}
                                 x1={tick.x + 3}
                                 y1={tick.y}
                                 x2={stageW}
                                 y2={tick.y}
-                                stroke={on ? PAINT.accent : PAINT.frameDivider}
+                                stroke={plate.id === active ? PAINT.accent : PAINT.frameDivider}
                                 vectorEffect="non-scaling-stroke"
                                 opacity={plate.opacity}
                                 style={HAIRLINE}
                             />
-                        )}
-                    </React.Fragment>
-                );
-            })}
-        </Illustration>
+                        );
+                    })}
+                </svg>
+            )}
+        </div>
     );
 
     const labels = placed
-        .map((plate, i) => {
+        .map((plate) => {
             const on = plate.id === active;
-            const tickY = point(plateAt(i), PLATE.w, TICK_Y).y;
+            const tickY = point(plate.lift, PLATE.w, TICK_Y).y;
             return (
                 <li
                     key={plate.id}
@@ -301,7 +371,7 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
             <div data-testid={testId} data-layout={narrow ? 'list' : 'column'}>
                 {narrow ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-                        <div style={{ width: '100%' }}>{svgFigure}</div>
+                        <div style={{ width: '100%' }}>{figure}</div>
                         <ol aria-label={legendLabel} style={{ ...listStyle, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                             {labels}
                         </ol>
@@ -316,7 +386,7 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                         }}
                     >
                         <div style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: `${share}%` }}>
-                            {svgFigure}
+                            {figure}
                         </div>
                         <ol
                             aria-label={legendLabel}

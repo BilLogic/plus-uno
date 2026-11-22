@@ -828,13 +828,17 @@ export const OverviewLayers = {
             await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
         }
         // Plates stay fixed in geometry (no rising from below) as opacity settles to 1.
-        const initialTransforms = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform'));
+        const rig = figure.querySelector('[data-rig]');
+        await expect(rig.style.transform, 'the canvas angle').toBe('rotateX(58deg) rotateZ(-38deg)');
+        await expect(rig.style.transformStyle, 'plates share one 3D space').toBe('preserve-3d');
+        await expect(rig.parentElement.style.perspective, 'a real perspective').not.toBe('');
+        const initialTransforms = plates.map((p) => p.style.transform);
         await waitFor(() => {
             for (const plate of plates) {
-                expect(Number(plate.getAttribute('opacity'))).toBe(1);
+                expect(Number(plate.style.opacity)).toBe(1);
             }
         });
-        await expect(plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform'))).toEqual(initialTransforms);
+        await expect(plates.map((p) => p.style.transform)).toEqual(initialTransforms);
 
         // Legend controls are PLUS Buttons that show selection; pointer click on a plate and keyboard activation both select and focus the control.
         const buttons = [...figure.querySelectorAll('ol button.plus-btn')];
