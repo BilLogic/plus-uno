@@ -1,0 +1,55 @@
+name: TEMP capture figma 2815
+on:
+  push:
+    branches: [cli/t2815]
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture twice
+        env:
+          FIGMA_ACCESS_TOKEN: ${{ secrets.FIGMA_ACCESS_TOKEN }}
+        run: |
+          mkdir -p cap
+          cat > "$RUNNER_TEMP/capture.mjs" <<'JS'
+          import fs from 'node:fs';
+          const { figmaGet, waitBudget, rowsFrom, DEFAULT_FILE_KEY, NODES_SPACING_MS } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/snapshot-figma-components.mjs`);
+          const [n] = process.argv.slice(2);
+          const token = process.env.FIGMA_ACCESS_TOKEN;
+          const budget = waitBudget();
+          const get = (e) => figmaGet(e, token, { budget });
+          const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+          const components = await get(`/files/${DEFAULT_FILE_KEY}/components`);
+          const versions = await get(`/files/${DEFAULT_FILE_KEY}/versions`);
+          let ids;
+          if (n === '1') {
+            const rows = rowsFrom(components);
+            const sets = [...new Set(rows.map((r) => r.containingFrame).filter(Boolean))].slice(0, 5);
+            ids = rows.filter((r) => sets.includes(r.containingFrame)).map((r) => r.nodeId);
+            fs.writeFileSync('cap/selection.json', JSON.stringify({ sets, ids }));
+          } else {
+            ids = JSON.parse(fs.readFileSync('cap/selection.json', 'utf8')).ids;
+          }
+          const nodes = { nodes: {} };
+          for (let i = 0; i < ids.length; i += 50) {
+            if (i > 0) await sleep(NODES_SPACING_MS);
+            const r = await get(`/files/${DEFAULT_FILE_KEY}/nodes?ids=${ids.slice(i, i + 50).join(',')}&geometry=paths`);
+            Object.assign(nodes.nodes, r.nodes);
+          }
+          fs.writeFileSync(`cap/components-${n}.json`, JSON.stringify(components));
+          fs.writeFileSync(`cap/versions-${n}.json`, JSON.stringify(versions));
+          fs.writeFileSync(`cap/nodes-${n}.json`, JSON.stringify(nodes));
+          console.log(`capture ${n} done: ${ids.length} ids`);
+          JS
+          node "$RUNNER_TEMP/capture.mjs" 1
+          sleep 75
+          node "$RUNNER_TEMP/capture.mjs" 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: figma-captures
+          path: cap/
+          retention-days: 1
