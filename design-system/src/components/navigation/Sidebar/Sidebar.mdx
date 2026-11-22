@@ -139,8 +139,9 @@ inside it.
 
 A record with stages (a session) or a multi-step task swaps the Sidebar's
 content for an **inner sidebar**: pass `inner` (`areaLabel`, `rows`, and an
-optional `switcher`) and `onBack`. Only the content swaps; the logo row, the
-account row and the page stay where they are. A record without stages, such as
+optional `switcher`) and `onBack`. Only the content swaps; the logo row and
+the page stay where they are. The inner sidebar draws no account row, so Profile,
+Help Center, Sign out and the Inbox bell are reachable only through Back. A record without stages, such as
 a student, keeps the main Sidebar with a breadcrumb.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes
@@ -166,7 +167,7 @@ the URL: the caller handles `onSelect` and decides which groups a role sees.
 3. **Section title.** A full `--control-md` row in the subtlest text. On hover and focus the collapse angle shows after it.
 4. **Row.** An icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
 5. **Open tabs.** Records a person opened, such as a session or a student, under their row on a thread. Three show, then Show n more.
-6. **Account row.** The avatar, the name and the role, which open the account menu (Profile, Help Center, Sign out), and the bell with its unread count, which opens the Inbox beside the Sidebar, under a divider.
+6. **Account row.** The avatar, the name and the role, which open the account menu (Profile, Help Center, Sign out), and the bell with its unread count, which opens the Inbox beside the Sidebar, under a divider. The main Sidebar only; the inner sidebar has none.
 
 Every part sits on one grid: icon centers on x `32`, labels start on x `48`, trailing slots center on x `208`, and section titles start on x `20`.
 

@@ -205,7 +205,7 @@ Picking an item opens its page behind the Panel and marks it read. The Inbox sta
 2. **Tabs.** Unread, with its count, and All.
 3. **Items.** One `NotificationItem` per update, grouped by day. An unread item says "Unread" to a screen reader.
 
-The bell at the end of the Sidebar's account row, with its unread count, opens the Inbox. The Inbox opens beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
+The bell at the end of the main Sidebar's account row, with its unread count, opens the Inbox. The Inbox opens beside the Sidebar at `--inbox-width` (360) over the page, never covers the Sidebar, and closes on Escape, with focus back on the bell, on an outside click or on Close.
 
 ## Width behavior
 

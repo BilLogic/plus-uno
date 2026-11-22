@@ -197,7 +197,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-md)', note: 'the rounding of a Sidebar row (8)', use: 'Corner rounding of a Sidebar row.' },
-  { tier: 'templates', group: 'Frame', new: '--frame-footer-height', old: null, ref: 'calc(var(--frame-sidebar-pad) + var(--stack-md) + var(--control-md))', note: '52: the account row under its divider, so the footer line sits level with it', use: 'Height of the Frame footer under its hairline: one 32-high button, its top line level with the Sidebar account row.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-footer-height', old: null, ref: 'calc(var(--frame-sidebar-pad) + var(--stack-md) + var(--control-md))', note: '52: the multi-step footer under its hairline', use: 'Height of the Frame footer under its hairline: one 32-high button.' },
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
