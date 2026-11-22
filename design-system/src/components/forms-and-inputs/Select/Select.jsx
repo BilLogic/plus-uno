@@ -491,6 +491,7 @@ const Select = ({
                     disabled={disabled}
                     readOnly={isReadOnly}
                     {...tones.field}
+                    invalidIcon
                     elemAfter={trailing}
                     onClick={handleFieldClick}
                 >

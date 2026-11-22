@@ -273,7 +273,7 @@ export const FieldDisabled = {
 
 export const FieldInvalid = {
     render: () => <div style={wrap}><TextArea id="textarea-ex-invalid" label="Notes" placeholder="What did you cover?" isInvalid errorMessage="Add a note." /></div>,
-    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement), { withIcon: false }),
 };
 
 export const FieldReadOnly = {

@@ -488,3 +488,11 @@ describe('DatePicker, in a form', () => {
         expect(onSubmit).not.toHaveBeenCalled();
     });
 });
+
+describe('DatePicker, invalid', () => {
+    it('draws the danger border but no danger icon, which only the single-line fields carry', () => {
+        const { container } = render(<Dated text="Session date" isInvalid errorMessage="Pick a date." />);
+        expect(container.querySelector('.plus-field--invalid')).not.toBeNull();
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+    });
+});

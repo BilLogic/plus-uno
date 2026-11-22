@@ -10,7 +10,7 @@ const box = ({ elemAfter, ...props }) => render(
 
 describe('FieldBox, invalid icon', () => {
     it("draws a decorative danger icon first in Trailing, before the host's own parts", () => {
-        const container = box({ invalid: true, elemAfter: <i data-testid="caret" className="fa-solid fa-caret-down" /> });
+        const container = box({ invalid: true, invalidIcon: true, elemAfter: <i data-testid="caret" className="fa-solid fa-caret-down" /> });
         const trailing = container.querySelector('.plus-field__trailing');
         expect(trailing.children).toHaveLength(2);
         expect(trailing.firstElementChild).toHaveClass('plus-field__invalid-icon', 'fa-circle-exclamation');
@@ -19,12 +19,12 @@ describe('FieldBox, invalid icon', () => {
     });
 
     it('draws Trailing for the icon alone when the host has no trailing parts', () => {
-        const container = box({ invalid: true });
+        const container = box({ invalid: true, invalidIcon: true });
         expect(container.querySelectorAll('.plus-field__invalid-icon')).toHaveLength(1);
     });
 
-    it('draws none when valid, warning, or disabled', () => {
-        for (const props of [{}, { warning: true }, { valid: true }, { invalid: true, disabled: true }]) {
+    it('draws none unless the host opts in, or when valid, warning, or disabled', () => {
+        for (const props of [{ invalid: true }, { invalidIcon: true }, { invalidIcon: true, warning: true }, { invalidIcon: true, valid: true }, { invalid: true, invalidIcon: true, disabled: true }]) {
             expect(box(props).querySelector('.plus-field__invalid-icon')).toBeNull();
         }
     });

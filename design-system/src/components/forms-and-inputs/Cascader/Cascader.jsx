@@ -346,6 +346,7 @@ const Cascader = ({
                     state={isOpen ? 'focus' : undefined}
                     className="plus-cascader-field"
                     {...tones.field}
+                    invalidIcon
                     onClick={handleInputClick}
                     elemAfter={(
                         <Icon name="caret-down" className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />

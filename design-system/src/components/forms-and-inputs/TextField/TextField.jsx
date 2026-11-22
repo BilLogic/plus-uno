@@ -224,6 +224,7 @@ const TextField = ({
                 disabled={isDisabled}
                 readOnly={isReadOnly}
                 {...toneProps(tone).field}
+                invalidIcon
                 busy={edit.enabled && edit.saving}
                 elemBefore={renderFieldElem(elemBeforeInput)}
                 elemAfter={(after || steppers) ? <>{after}{steppers}</> : null}

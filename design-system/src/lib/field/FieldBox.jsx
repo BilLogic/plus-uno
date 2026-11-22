@@ -11,7 +11,7 @@ import './FieldBox.scss';
  * normally the control itself) and `elemAfter` (an icon, a caret, steppers,
  * "saving…").
  *
- * An invalid box also draws a danger icon, first in Trailing and before the
+ * An invalid box draws a danger icon when its host opts in with `invalidIcon`, first in Trailing and before the
  * host's own parts (clear, caret, steppers), so the border is not the only
  * sign. It is decorative: the host's control already carries `aria-invalid`
  * and the caption says why. A disabled box draws none. Drawing it here, the
@@ -32,6 +32,7 @@ const FieldBox = ({
     disabled = false,
     readOnly = false,
     invalid = false,
+    invalidIcon = false,
     valid = false,
     warning = false,
     busy = false,
@@ -74,7 +75,7 @@ const FieldBox = ({
         control.focus();
     };
 
-    const showInvalidIcon = invalid && !disabled;
+    const showInvalidIcon = invalidIcon && invalid && !disabled;
 
     return (
         <div
@@ -107,6 +108,8 @@ FieldBox.propTypes = {
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     invalid: PropTypes.bool,
+    /** Draws a danger icon first in Trailing while `invalid`. Only the single-line pickers and inputs opt in; Text area and Date picker do not. */
+    invalidIcon: PropTypes.bool,
     valid: PropTypes.bool,
     warning: PropTypes.bool,
     /** Something is happening in Trailing ("saving…"), so a subtle field keeps it on show. */
