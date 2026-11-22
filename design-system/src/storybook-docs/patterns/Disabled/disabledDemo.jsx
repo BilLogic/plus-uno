@@ -278,7 +278,7 @@ export const LockedToolkitDemo = () => {
     return (
         <DocsOverlayBoundary fit={false} containHeight>
             <div style={pad}>
-                {/* Sidebar.examples.jsx defines `Box` unexported, so mirror its docked Frame sidebar wrapper here. */}
+                {/* sidebar-cases.jsx stages the examples in a docked Frame sidebar wrapper; mirror it here. */}
                 <div className="plus-frame__sidebar plus-frame__sidebar--docked not-prose sb-unstyled">
                     <Sidebar
                         label="Toolkit during onboarding"

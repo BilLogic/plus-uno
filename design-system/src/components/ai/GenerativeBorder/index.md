@@ -35,28 +35,28 @@ GenerativeBorder reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Animate one thing at a time. {#animate-one-thing-at-a-time}
+### Animate one GenerativeBorder at a time. {#animate-one-generativeborder-at-a-time}
 
 One moving border keeps attention on the content being generated.
 
 Do: One active border.
 Don't: Every border active.
 
-### Match the radius to the pattern. {#match-the-radius-to-the-pattern}
+### Match the GenerativeBorder radius to the pattern. {#match-the-generativeborder-radius-to-the-pattern}
 
 The border traces the content's corners; a pill around a rectangular card looks detached.
 
 Do: Radius that matches the content.
 Don't: A pill around a rectangle.
 
-### Stop animating when the work ends. {#stop-animating-when-the-work-ends}
+### Stop animating the GenerativeBorder when the work ends. {#stop-animating-the-generativeborder-when-the-work-ends}
 
 Set `isActive` to false when generation ends.
 
 Do: Inactive once done.
 Don't: Still animating after completion.
 
-### Use one ring per piece of content. {#use-one-ring-per-piece-of-content}
+### Use one GenerativeBorder ring per piece of content. {#use-one-generativeborder-ring-per-piece-of-content}
 
 Do: One ring around the content being generated.
 Don't: Two rings nested around the same content.

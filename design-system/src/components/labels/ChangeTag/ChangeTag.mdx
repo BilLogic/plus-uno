@@ -11,6 +11,7 @@ import {
     FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={ChangeTagStories} />
 
@@ -70,6 +71,14 @@ tone follows which way is good, and the change is spoken in words.
 <ComponentExample of={ChangeTagStories.Focused} title="Focused" description="Not in the tab order." />
 
 <ComponentExample of={ChangeTagStories.Disabled} title="Disabled" description="Never dimmed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="ChangeTag" />
 
 </div>
 
@@ -157,7 +166,7 @@ it, never from the arrow alone.
 </thead>
 <tbody>
 <tr><td>Height</td><td><code>--label-height-sm</code> (16).</td></tr>
-<tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on both sides, 2 between arrow and value, <code>--inline-sm</code> before the comparison.</td></tr>
+<tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on both sides, <code>--tag-gap-compact</code> between arrow and value, <code>--inline-sm</code> before the comparison.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
 <tr><td>Neutral</td><td><code>--ds-background-neutral</code> fill, <code>--ds-text</code> words, <code>--ds-background-neutral-pressed</code> edge.</td></tr>
 <tr><td>Success</td><td><code>--ds-background-success</code> fill, <code>--ds-text-success</code> words, <code>--ds-background-success-pressed</code> edge.</td></tr>

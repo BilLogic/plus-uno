@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const treeHead = { cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] };
 export const treeItems = [{ id: 'a', cells: [{ content: 'Lincoln Middle' }, { content: 'School' }], children: [{ id: 'a1', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] }, { id: 'a2', cells: [{ content: 'Grade 8 · Math' }, { content: 'Class' }] }] }];
@@ -87,6 +88,14 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 <ComponentExample of={TreeTableStories.Rest} title="Rest" description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>} />
 
 <ComponentExample of={TreeTableStories.Focused} title="Focused" description="The focused row draws the focus ring inset on the row, never a fill." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="TreeTable" />
 
 </div>
 

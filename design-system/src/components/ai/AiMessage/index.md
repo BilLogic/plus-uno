@@ -45,7 +45,7 @@ AiMessage reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Stream the answer, then settle. {#stream-the-answer-then-settle}
+### Stream the AiMessage answer, then settle. {#stream-the-aimessage-answer-then-settle}
 
 Keep progress visible rather than leaving a blank; follow the status sequence
 in Usage.
@@ -53,7 +53,7 @@ in Usage.
 Do: The typing indicator, then the streaming state, shows the answer arriving.
 Don't: Partial text shown as finished hides that it is still being written.
 
-### List the sources whenever an answer draws on records. {#list-the-sources-whenever-an-answer-draws-on-records}
+### List sources on an AiMessage whenever the answer draws on records. {#list-sources-on-an-aimessage-whenever-the-answer-draws-on-records}
 
 An answer built from sessions, students or reports passes them as `sources`,
 so a person can open what the AI read. A general answer that read nothing
@@ -62,7 +62,7 @@ shows no list.
 Do: The records the answer read, listed under it.
 Don't: An answer from records with nothing to open.
 
-### Offer feedback on every finished answer. {#offer-feedback-on-every-finished-answer}
+### Offer feedback on every finished AiMessage. {#offer-feedback-on-every-finished-aimessage}
 
 Pass `onFeedback` for every answer; feedback appears only at `complete`, so
 partial replies cannot be rated. See AI feedback

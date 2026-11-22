@@ -56,7 +56,7 @@ Don't: Both the default name and the visible kind, so it reads twice.
 
 ### Keep the glyph at its kind and put status in `StatusTag`. {#keep-the-glyph-at-its-kind-and-put-status-in-statustag}
 
-Each kind has one glyph and color. Do not swap the glyph to indicate workflow state; pair it with `StatusTag`.
+Each kind has one glyph, all in the subtle icon color. Do not swap the glyph to indicate workflow state; pair it with `StatusTag`.
 
 Do: The kind stays a Task; the status goes in a Status tag.
 Don't: A second glyph to hint at a status.

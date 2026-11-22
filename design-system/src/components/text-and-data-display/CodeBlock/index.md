@@ -23,24 +23,24 @@ a command sequence, a config file.
 
 ## Best practices
 
-### Scroll commands, wrap prose. {#scroll-commands-wrap-prose}
+### Scroll commands in a CodeBlock, wrap prose. {#scroll-commands-in-a-codeblock-wrap-prose}
 
 Scroll keeps line structure, which matters for shell commands and config, where a fold could read as a new line. Wrap suits prose-like output in a narrow column.
 
 Do: A command scrolls, so one line stays one line.
 Don't: A command folded onto a second line reads like two commands.
 
-### Name each block when there are several on a page. {#name-each-block-when-there-are-several-on-a-page}
+### Name each CodeBlock when there are several on a page. {#name-each-codeblock-when-there-are-several-on-a-page}
 
 Do: Each region says what it holds: Install command.
 Don't: Every block named Code snippet.
 
-### State what a highlight points at in prose. {#state-what-a-highlight-points-at-in-prose}
+### State in prose what a CodeBlock highlight points at. {#state-in-prose-what-a-codeblock-highlight-points-at}
 
 Do: The sentence says which line to read, and the highlight supports it.
 Don't: The fill is the only cue.
 
-### Keep line numbers for code you discuss. {#keep-line-numbers-for-code-you-discuss}
+### Keep CodeBlock line numbers for code you discuss. {#keep-codeblock-line-numbers-for-code-you-discuss}
 
 Do: A one-line command with no gutter.
 Don't: A line number beside a single command.

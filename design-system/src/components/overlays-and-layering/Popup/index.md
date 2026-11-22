@@ -55,7 +55,7 @@ Popup reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Let default dismissal work unless you drive `show` manually. {#let-default-dismissal-work-unless-you-drive-show-manually}
+### Let Popup dismissal work by default unless you drive `show` manually. {#let-popup-dismissal-work-by-default-unless-you-drive-show-manually}
 
 ```jsx
 // A click away and Escape both close it — `rootClose` defaults to true for
@@ -68,7 +68,7 @@ Popup reads these motion tokens and no literal duration or curve.
        onToggle={setOpen}>…</Popup>
 ```
 
-### Pass a control or a string as `trigger`, never a `div`. {#pass-a-control-or-a-string-as-trigger-never-a-div}
+### Pass a Popup a control or a string as `trigger`, never a `div`. {#pass-a-popup-a-control-or-a-string-as-trigger-never-a-div}
 
 ```jsx
 // Fine — a string trigger renders a real <button className="plus-popup-trigger">,
@@ -87,19 +87,19 @@ Popup reads these motion tokens and no literal duration or curve.
 Do: A string trigger becomes a real button, named by its own text.
 Don't: A div is not a control: it has no role and no keyboard behavior.
 
-### Pair hover triggers with focus or click. {#pair-hover-triggers-with-focus-or-click}
+### Pair Popup hover triggers with focus or click. {#pair-popup-hover-triggers-with-focus-or-click}
 
 `triggerType="hover"` has no keyboard equivalent, and `focus` opens the popup
 the way hover does, so `['hover', 'focus']` is not enough. Add `click` — and
 rely on it when the content is more than a sentence — hover content that
 must be read is content that has to stay put while it is read.
 
-### Keep the body short, and keep forms out. {#keep-the-body-short-and-keep-forms-out}
+### Keep the Popup body short, and keep forms out. {#keep-the-popup-body-short-and-keep-forms-out}
 
 Do: A short noun phrase for the title and one sentence for the body.
 Don't: A question for a title and a paragraph for a body.
 
-### Name the trigger for what it opens. {#name-the-trigger-for-what-it-opens}
+### Name the Popup trigger for what it opens. {#name-the-popup-trigger-for-what-it-opens}
 
 Do: Says what is behind it.
 Don't: Says nothing about what opens, and reads as nothing in a list of links.

@@ -673,6 +673,13 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'ChangeTag',
+    tier: 'component',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'A new value fades in place while the tag\'s fill and ink move on the same easing; the first render does not animate.' },
+    },
+  },
+  {
     name: 'PromptStarters',
     tier: 'component',
     events: {

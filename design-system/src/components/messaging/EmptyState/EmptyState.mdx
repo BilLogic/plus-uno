@@ -181,7 +181,7 @@ of the form summarizes it. A failure in the background is a `Flag`.
 <tr><td>Header</td><td><code>--heading-md</code> (default), <code>--heading-sm</code> (compact), <code>--ds-text</code></td></tr>
 <tr><td>Description</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
 <tr><td>Icon</td><td><code>--ds-icon-subtle</code> at <code>--image-md</code>, <code>--icon-lg</code> (compact)</td></tr>
-<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--stack-md</code> (compact), <code>--stack-xl</code>, <code>--inline-md</code>, <code>--screen-pad-x</code></td></tr>
+<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--stack-md</code> (compact), <code>--stack-xl</code>, <code>--inline-md</code>; padding is <code>--stack-3xl</code> plus <code>--stack-md</code> above and below and <code>--screen-pad-x</code> to the sides, or <code>--stack-2xl</code> and <code>--pad-x-lg</code> when compact</td></tr>
 <tr><td>Width</td><td><code>--section-min-width-main</code></td></tr>
 </tbody>
 </DocsTable>
@@ -192,7 +192,7 @@ of the form summarizes it. A failure in the background is a `Flag`.
 
 ## Best practices
 
-### Use default spacing for a whole view.
+### Use default spacing on an EmptyState that fills a whole view.
 
 Compact spacing is for a table body or a card.
 
@@ -203,7 +203,7 @@ Compact spacing is for a table body or a card.
     dontCaption="Compact spacing leaves a full view cramped."
 />
 
-### Lead with one filled action.
+### Lead an EmptyState with one filled action.
 
 The second action is a default Button and never stands alone.
 
@@ -214,7 +214,7 @@ The second action is a default Button and never stands alone.
     dontCaption="A default action with nothing to lead."
 />
 
-### Invite with the next step.
+### Make an EmptyState invite the next step.
 
 Say what goes here and what to do, in a warm voice. Never apologize.
 
@@ -225,7 +225,7 @@ Say what goes here and what to do, in a warm voice. Never apologize.
     dontCaption="A cold label with no way forward."
 />
 
-### Show a load failure in the slot, with Try again.
+### Show a load failure in the EmptyState slot, with Try again.
 
 State what failed and offer the retry. Never leave the view blank or send the
 person to a message above it.
@@ -237,7 +237,7 @@ person to a message above it.
     dontCaption="An empty-view invitation when the load failed."
 />
 
-### Replace a Table with it, never stack it under one.
+### Replace a Table with an EmptyState, never stack it under one.
 
 Pass `EmptyState` to `DynamicTable`'s `emptyView` (or the Table template's `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty Static table.
 

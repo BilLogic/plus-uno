@@ -43,7 +43,7 @@ Don't: The whole prompt as the label.
 
 ### Offer a few. {#offer-a-few}
 
-Three to five starters fit a row and can be read at a glance.
+A few starters fit a row and can be read at a glance. The row wraps, so a long list buries the best ones.
 
 Do: A few starters to choose from.
 Don't: So many starters the row becomes a wall.

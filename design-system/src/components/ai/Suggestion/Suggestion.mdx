@@ -209,7 +209,7 @@ that is not a proposed value.
 
 ## Best practices
 
-### Name the action.
+### Name the action a Suggestion takes.
 
 Name an insert suggestion for its value. Start a prompt label with a short verb
 and pass the full request as `text`.
@@ -221,7 +221,7 @@ and pass the full request as `text`.
     dontCaption="A sentence in the tag."
 />
 
-### Pick insert or prompt by outcome.
+### Pick a Suggestion's insert or prompt behavior by outcome.
 
 Insert changes the content in place; prompt starts a conversation.
 
@@ -232,7 +232,7 @@ Insert changes the content in place; prompt starts a conversation.
     dontCaption="Prompt for an in-place edit."
 />
 
-### Show an unavailable action as disabled.
+### Show an unavailable Suggestion as disabled.
 
 Keep unavailable suggestions visible and disabled. `isDisabled` disables one;
 a disabled field or `TagGroup` disables all through `TagContext`, shared with Tag.
@@ -244,7 +244,7 @@ a disabled field or `TagGroup` disables all through `TagContext`, shared with Ta
     dontCaption="Active with nothing to do."
 />
 
-### Let the field decide what happens next.
+### Let the field decide what a Suggestion does next.
 
 `onAccept` returns the value (insert) or text (prompt). The field adds a Tag,
 sends a message or fills the text box, then removes the suggestion; the suggestion

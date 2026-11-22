@@ -51,7 +51,7 @@ Suggestion reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Name the action. {#name-the-action}
+### Name the action a Suggestion takes. {#name-the-action-a-suggestion-takes}
 
 Name an insert suggestion for its value. Start a prompt label with a short verb
 and pass the full request as `text`.
@@ -59,14 +59,14 @@ and pass the full request as `text`.
 Do: A short verb.
 Don't: A sentence in the tag.
 
-### Pick insert or prompt by outcome. {#pick-insert-or-prompt-by-outcome}
+### Pick a Suggestion's insert or prompt behavior by outcome. {#pick-a-suggestion-s-insert-or-prompt-behavior-by-outcome}
 
 Insert changes the content in place; prompt starts a conversation.
 
 Do: Insert for an in-place edit.
 Don't: Prompt for an in-place edit.
 
-### Show an unavailable action as disabled. {#show-an-unavailable-action-as-disabled}
+### Show an unavailable Suggestion as disabled. {#show-an-unavailable-suggestion-as-disabled}
 
 Keep unavailable suggestions visible and disabled. `isDisabled` disables one;
 a disabled field or `TagGroup` disables all through `TagContext`, shared with Tag.
@@ -74,7 +74,7 @@ a disabled field or `TagGroup` disables all through `TagContext`, shared with Ta
 Do: Disabled when unavailable.
 Don't: Active with nothing to do.
 
-### Let the field decide what happens next. {#let-the-field-decide-what-happens-next}
+### Let the field decide what a Suggestion does next. {#let-the-field-decide-what-a-suggestion-does-next}
 
 `onAccept` returns the value (insert) or text (prompt). The field adds a Tag,
 sends a message or fills the text box, then removes the suggestion; the suggestion

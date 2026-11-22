@@ -53,28 +53,28 @@ of the form summarizes it. A failure in the background is a `Flag`.
 
 ## Best practices
 
-### Use default spacing for a whole view. {#use-default-spacing-for-a-whole-view}
+### Use default spacing on an EmptyState that fills a whole view. {#use-default-spacing-on-an-emptystate-that-fills-a-whole-view}
 
 Compact spacing is for a table body or a card.
 
 Do: Default spacing fills a view or panel.
 Don't: Compact spacing leaves a full view cramped.
 
-### Lead with one filled action. {#lead-with-one-filled-action}
+### Lead an EmptyState with one filled action. {#lead-an-emptystate-with-one-filled-action}
 
 The second action is a default Button and never stands alone.
 
 Do: A filled action leads.
 Don't: A default action with nothing to lead.
 
-### Invite with the next step. {#invite-with-the-next-step}
+### Make an EmptyState invite the next step. {#make-an-emptystate-invite-the-next-step}
 
 Say what goes here and what to do, in a warm voice. Never apologize.
 
 Do: What goes here and what to do.
 Don't: A cold label with no way forward.
 
-### Show a load failure in the slot, with Try again. {#show-a-load-failure-in-the-slot-with-try-again}
+### Show a load failure in the EmptyState slot, with Try again. {#show-a-load-failure-in-the-emptystate-slot-with-try-again}
 
 State what failed and offer the retry. Never leave the view blank or send the
 person to a message above it.
@@ -82,7 +82,7 @@ person to a message above it.
 Do: What failed, with Try again.
 Don't: An empty-view invitation when the load failed.
 
-### Replace a Table with it, never stack it under one. {#replace-a-table-with-it-never-stack-it-under-one}
+### Replace a Table with an EmptyState, never stack it under one. {#replace-a-table-with-an-emptystate-never-stack-it-under-one}
 
 Pass `EmptyState` to `DynamicTable`'s `emptyView` (or the Table template's `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty Static table.
 
@@ -132,7 +132,7 @@ Same group: `Banner` · `Dialog` · `Flag` · `InlineMessage` · `NotificationIt
 | Header | `--heading-md` (default), `--heading-sm` (compact), `--ds-text` |
 | Description | `--body-default`, `--ds-text-subtle` |
 | Icon | `--ds-icon-subtle` at `--image-md`, `--icon-lg` (compact) |
-| Spacing | `--stack-sm`, `--stack-md` (compact), `--stack-xl`, `--inline-md`, `--screen-pad-x` |
+| Spacing | `--stack-sm`, `--stack-md` (compact), `--stack-xl`, `--inline-md`; padding is `--stack-3xl` plus `--stack-md` above and below and `--screen-pad-x` to the sides, or `--stack-2xl` and `--pad-x-lg` when compact |
 | Width | `--section-min-width-main` |
 
 ## Content guidelines
@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--icon-lg` · `--image-md` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--stack-md` · `--stack-sm` · `--stack-xl`
+`--body-default` · `--body-default-tracking` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--icon-lg` · `--image-md` · `--inline-md` · `--pad-x-lg` · `--screen-pad-x` · `--section-min-width-main` · `--stack-2xl` · `--stack-3xl` · `--stack-md` · `--stack-sm` · `--stack-xl`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 
