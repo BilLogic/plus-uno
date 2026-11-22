@@ -31,7 +31,7 @@ What the footer finishes picks its layout, and this component is the answer for 
 7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel).
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
 
-**The Frame footer is the one exception.** `FooterActions` buttons are `48` high (`--footer-height`) in a `Modal` and a `Panel`. The Frame footer, including a multi-step task whose footer is the Frame footer, keeps `32` high buttons (`--control-md`) so its top line stays level with the divider above the Sidebar's account row. Do not raise them to `48` there.
+**The Frame footer is the one exception.** `FooterActions` buttons are `48` high (`--footer-height`) in a `Modal` and a `Panel`. The Frame footer, including a multi-step task whose footer is the Frame footer, keeps `32` high buttons (`--control-md`). Do not raise them to `48` there.
 
 ### Hug or fill
 
@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Height | 48: `--footer-height`. |
-| Height in the Frame footer | 32: `--control-md`, so the footer line stays level with the Sidebar account row. |
+| Height in the Frame footer | 32: `--control-md`. |
 | Track gap | `--inline-md` between the 4 equal tracks. |
 | Link leading action | `--ds-link` label and `--ds-icon-brand` icon with no fill, underlined on hover and `--ds-link-pressed` when pressed. Its start padding is `0`, so the text sits on the content edge. |
 | Danger-link leading action | `--ds-text-danger` label and `--ds-icon-danger` icon with no fill, underlined on hover and `--ds-text-danger-bolder` when pressed. |

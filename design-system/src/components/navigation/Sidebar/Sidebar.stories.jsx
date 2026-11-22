@@ -925,6 +925,21 @@ export const InnerSidebar = {
     },
 };
 
+/** The inner sidebar draws no account row or divider; Back brings the row back, and focus lands on the open row as before. */
+export const InnerNoAccountRow = {
+    render: (args) => <InnerSession {...args} />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-sidebar-account'), 'no account row in the inner sidebar').toBeNull();
+        await expect(within(canvasElement).queryByRole('button', { name: /account menu/ }), 'no account menu').toBeNull();
+        await expect(within(canvasElement).queryByRole('button', { name: /^Inbox/ }), 'no Inbox bell').toBeNull();
+        await userEvent.click(backButton(canvasElement));
+        await waitFor(() => expect(canvasElement.querySelector('.plus-sidebar-account'), 'Back restores the account row').not.toBeNull());
+        await expect(within(canvasElement).getByRole('button', { name: /account menu/ })).toBeVisible();
+        await settled(canvasElement);
+        await expect(selectedRows(canvasElement)[0], 'focus returns to the open row').toHaveFocus();
+    },
+};
+
 /** Rows round 8: a 32 row, height over 4, `--frame-sidebar-row-radius` on `--radius-control-md`. */
 export const RowsRoundEight = {
     play: async ({ canvasElement }) => {

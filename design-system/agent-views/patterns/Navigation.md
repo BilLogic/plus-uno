@@ -131,7 +131,7 @@ Expand the row, then Section detail, then the Details Panel, then a Modal, then 
 
 **Checked:** Automatic
 
-The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. How the steps, the page and the footer sit is on Frame.
+The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. The inner sidebar has no account row, so Profile, Help Center, Sign out and the Inbox bell wait behind Back. How the steps, the page and the footer sit is on Frame.
 
 ### Name an open item by when and who. {#name-an-open-item-by-when-and-who}
 
