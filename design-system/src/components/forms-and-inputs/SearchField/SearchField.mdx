@@ -44,6 +44,16 @@ what is searched.
 
 <div className="sb-ds-doc-section">
 
+## Mode
+
+<ComponentExample of={SearchFieldStories.Basic} title="Basic" description="Runs onSearch on Enter and does nothing per keystroke; it never calls loadResults." />
+
+<ComponentExample of={SearchFieldStories.Focused} title="Focused" description="A panel opens under the field: recent searches on focus, matches grouped by type with counts while typing, a See all row, and an optional action row." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Spacing
 
 <ComponentExample of={SearchFieldStories.Spacing} title="Default and compact" description="Default draws 40; compact draws 32, for bars." />
@@ -105,9 +115,11 @@ what is searched.
 
 ## Usage
 
-Use `SearchField` to find a record by typing. Matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
+Use `SearchField` to find a record by typing. In `active` and `basic` modes, matches appear in the table or list being searched, never under the field: the count sits in that header, and the no-matches message in its body.
 
-`SearchField` filters rows as you type through `onValueChange`.
+`mode` picks when the search runs. The default, `active`, filters rows as you type through `onValueChange`. `basic` runs `onSearch(text)` on Enter and nothing per keystroke, for a search too heavy to run on every keystroke; it never calls `loadResults`. `focused` opens a panel under the field, for jumping to a record from anywhere: matches are grouped by type and chosen through `onSelect`, and Enter or the See all row runs `onSearch` as a basic search.
+
+In `focused`, pass `recent` (a list of strings) for the searches shown on focus while the field is empty, and `results` (groups of `{ value, label, count?, items }`) for the matches; feed `results` from `onResults` or filter your own rows. A `SearchFieldAction` child, whose `onSelect` receives the text, adds one last row such as "Create student". Matches appear in the panel only in `focused` mode.
 
 `name` is the input's form key: a plain form submits the text under it.
 
@@ -133,6 +145,7 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 2. **Field.** A text field, 40 at default spacing and 32 at compact.
 3. **Search icon.** Before the text; a spinner takes its place while results load.
 4. **Clear button.** After the text once it holds any.
+5. **Panel** (`focused` only). A list under the field: a Recent searches heading or type groups with counts, then a See all row and an optional action row.
 
 ### States
 
@@ -146,6 +159,7 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, for keyboard focus only.</td></tr>
 <tr><td>Filled</td><td>The clear button appears after the text.</td></tr>
 <tr><td>Loading</td><td>A spinner replaces the search icon.</td></tr>
+<tr><td>Panel open</td><td>A panel under the field, only in <code>focused</code> mode. Recent searches while empty; grouped matches, See all and the optional action row once text is typed.</td></tr>
 <tr><td>Disabled</td><td>The disabled fill and text: a change of color, not of opacity.</td></tr>
 </tbody>
 </DocsTable>
@@ -157,8 +171,10 @@ Use `SearchField` to find a record by typing. Matches appear in the table or lis
 <tr><th>Key</th><th>What it does</th></tr>
 </thead>
 <tbody>
-<tr><td>Esc</td><td>Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon.</td></tr>
-<tr><td>Arrow down and up</td><td>Inside the scope list, move and choose.</td></tr>
+<tr><td>Esc</td><td>Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. In <code>focused</code>, an open panel closes first and keeps the text; the next Esc clears.</td></tr>
+<tr><td>Enter</td><td>In <code>basic</code>, runs <code>onSearch</code> with the text. In <code>focused</code>, chooses the row under the cursor; with no row under the cursor, runs <code>onSearch</code> when there is text.</td></tr>
+<tr><td>Arrow down and up</td><td>Inside the scope list, move and choose. In <code>focused</code>, open the closed panel, then move through its rows and wrap at either end.</td></tr>
+<tr><td>Tab</td><td>In <code>focused</code>, leaves the field and closes the panel; the panel is not a tab stop.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -231,6 +247,9 @@ The clear action keeps its place at the end, and focusing the field reaches the 
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
 - **Loading is announced** through the spinner's status text.
+- **Basic is a search box.** It keeps the search input's role and runs only on Enter.
+- **Focused is a combobox.** The input reports `aria-expanded`, `aria-controls` and the row under the cursor through `aria-activedescendant`; focus stays in the input while arrow keys move the cursor.
+- **The panel is a listbox of options,** named "Suggestions" unless `panelLabel` says otherwise. Group headings label the rows under them.
 
 </div>
 

@@ -233,7 +233,7 @@ export const CollapsibleScopes = {
 
 const loadSpy = fn(async () => ({ results: [], total: 0 }));
 
-/** Planned. Basic runs the search on Enter; only Active ships. */
+/** Basic runs the search on Enter and does no work per keystroke. */
 export const Basic = {
     render: () => {
         const [searched, setSearched] = useState([]);
@@ -302,7 +302,7 @@ const FocusedDemo = (args) => {
     );
 };
 
-/** Planned. Focused opens a panel under the field; only Active ships. */
+/** Focused opens a panel under the field: recent searches, grouped matches, See all. */
 export const Focused = {
     render: (args) => <FocusedDemo {...args} />,
     play: async ({ canvasElement }) => {
