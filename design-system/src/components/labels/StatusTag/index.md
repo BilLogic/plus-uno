@@ -138,7 +138,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
 | Neutral | `--ds-background-neutral`, `--ds-text`, edge `--ds-background-neutral-pressed`. |
 | Success, warning, danger | The same three for each: `--ds-background-success`, `--ds-text-success`, edge `--ds-background-success-pressed`. |
-| Info and discovery | `--ds-background-information` and `--ds-background-competency-mastering-content`, with their text and pressed steps. |
+| Info and discovery | `--ds-background-information` and `--ds-background-discovery`, with their text and pressed steps. |
 
 ## Content guidelines
 
@@ -178,7 +178,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-competency-mastering-content` · `--ds-background-competency-mastering-content-pressed` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-competency-mastering-content` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-discovery` · `--ds-background-discovery-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-discovery` · `--ds-text-information` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
 
