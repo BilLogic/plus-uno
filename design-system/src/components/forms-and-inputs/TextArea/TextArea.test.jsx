@@ -349,3 +349,11 @@ describe('TextArea, subtle (edit in place)', () => {
         expect(onSave).not.toHaveBeenCalled();
     });
 });
+
+describe('TextArea, invalid', () => {
+    it('draws the danger border but no danger icon, which only the single-line fields carry', () => {
+        const { container } = render(<TextArea label="Notes" isInvalid errorMessage="Add a note." />);
+        expect(container.querySelector('.plus-field--invalid')).not.toBeNull();
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+    });
+});

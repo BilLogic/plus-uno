@@ -751,6 +751,7 @@ const TagInput = ({
                     disabled={isDisabled}
                     readOnly={isReadOnly}
                     {...toneProps(tone).field}
+                    invalidIcon
                     className="plus-tag-input__field"
                 >
                     <div

@@ -440,3 +440,16 @@ describe('TextField, subtle (edit in place)', () => {
         expect(onSave).not.toHaveBeenCalled();
     });
 });
+
+describe('TextField, invalid icon', () => {
+    it('draws one decorative danger icon in the box when invalid, and none when valid', () => {
+        const { container, rerender } = render(<TextField label="Email" />);
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+        rerender(<TextField label="Email" isInvalid errorMessage="Enter an email." />);
+        const icons = container.querySelectorAll('.plus-field__invalid-icon');
+        expect(icons).toHaveLength(1);
+        expect(icons[0]).toHaveClass('fa-circle-exclamation');
+        expect(icons[0]).toHaveAttribute('aria-hidden', 'true');
+        expect(icons[0].closest('.plus-field__trailing')).not.toBeNull();
+    });
+});

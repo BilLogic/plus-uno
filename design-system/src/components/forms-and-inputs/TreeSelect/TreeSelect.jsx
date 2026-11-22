@@ -473,6 +473,7 @@ const TreeSelect = ({
                     state={isOpen ? 'focus' : undefined}
                     className="plus-tree-select-field"
                     {...tones.field}
+                    invalidIcon
                     onClick={handleInputClick}
                     elemAfter={(
                         <Icon name="caret-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from '@/components/images-and-icons/Icon';
 import './FieldBox.scss';
 
 /**
@@ -9,6 +10,13 @@ import './FieldBox.scss';
  * Text area) decides only what goes in its three slots: `elemBefore` (an icon, an affix, an addon), the content (`children`,
  * normally the control itself) and `elemAfter` (an icon, a caret, steppers,
  * "saving…").
+ *
+ * An invalid box draws a danger icon when its host opts in with `invalidIcon`, first in Trailing and before the
+ * host's own parts (clear, caret, steppers), so the border is not the only
+ * sign. It is decorative: the host's control already carries `aria-invalid`
+ * and the caption says why. A disabled box draws none. Drawing it here, the
+ * one box every field shares, is what keeps a field built from another
+ * (Inline editable text field, the rename field in Tag input) from drawing it twice.
  *
  * Hover and focus are live states, drawn from the pointer and from
  * `:focus-within`, so a host never tracks them. `state` exists only to draw
@@ -24,6 +32,7 @@ const FieldBox = ({
     disabled = false,
     readOnly = false,
     invalid = false,
+    invalidIcon = false,
     valid = false,
     warning = false,
     busy = false,
@@ -66,6 +75,8 @@ const FieldBox = ({
         control.focus();
     };
 
+    const showInvalidIcon = invalidIcon && invalid && !disabled;
+
     return (
         <div
             className={classes}
@@ -79,7 +90,12 @@ const FieldBox = ({
         >
             {elemBefore && <span className="plus-field__leading">{elemBefore}</span>}
             <span className="plus-field__content">{children}</span>
-            {elemAfter && <span className="plus-field__trailing">{elemAfter}</span>}
+            {(elemAfter || showInvalidIcon) && (
+                <span className="plus-field__trailing">
+                    {showInvalidIcon && <Icon name="circle-exclamation" iconStyle="solid" size={16} color="danger" className="plus-field__invalid-icon" />}
+                    {elemAfter}
+                </span>
+            )}
         </div>
     );
 };
@@ -92,6 +108,8 @@ FieldBox.propTypes = {
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     invalid: PropTypes.bool,
+    /** Draws a danger icon first in Trailing while `invalid`. Only the single-line pickers and inputs opt in; Text area and Date picker do not. */
+    invalidIcon: PropTypes.bool,
     valid: PropTypes.bool,
     warning: PropTypes.bool,
     /** Something is happening in Trailing ("saving…"), so a subtle field keeps it on show. */

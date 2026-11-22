@@ -57,7 +57,7 @@ Don't: An empty field after a choice cannot confirm it.
 
 ### Mark a failed pick on the field. {#mark-a-failed-pick-on-the-field}
 
-With `isInvalid`, the field draws the danger border and `errorMessage` replaces the caption.
+With `isInvalid`, the field draws the danger border and icon, and `errorMessage` replaces the caption.
 
 Do: A failed pick draws the danger border, so the error is seen at the field.
 Don't: A failed pick still draws the normal border, so nothing marks the error.
@@ -122,7 +122,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the tree. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
 | Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
-| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Invalid | The edge takes `--ds-border-danger`, a danger icon (`--ds-icon-danger`) leads Trailing, and the message takes `--ds-text-danger`. |
 
 ### Tokens
 

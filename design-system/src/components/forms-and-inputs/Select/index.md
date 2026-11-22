@@ -188,7 +188,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the list. |
 | Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
 | Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
-| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Invalid | The edge takes `--ds-border-danger`, a danger icon (`--ds-icon-danger`) leads Trailing, and the message takes `--ds-text-danger`. |
 | Valid | With `isValid`, the edge takes `--ds-border-success` and `successMessage` shows under the field. |
 | Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied. |
 
