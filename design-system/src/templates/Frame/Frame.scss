@@ -45,9 +45,9 @@
 }
 
 // Docked, the sidebar ends in a 1px line on its Page-facing edge, the same
-// `--ds-border` as the divider above its account row. Where increased
-// contrast draws the page's edge, that ring lies on the same pixel: one line,
-// never two.
+// `--ds-border` as the divider above the main Sidebar's account row. Where
+// increased contrast draws the page's edge, that ring lies on the same pixel:
+// one line, never two.
 .plus-frame__sidebar--docked {
     position: relative;
     z-index: var(--layer-frame-docked-edge);

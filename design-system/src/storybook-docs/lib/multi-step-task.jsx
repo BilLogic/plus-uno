@@ -14,7 +14,7 @@ import { typeStyle } from './type-style.js';
  * name and the step's body, and the footer along the bottom holds Save and exit
  * as a link at the left edge, with Back and Next (Finish on the last step) in
  * tracks 3 and 4: FooterActions' filled buttons at default spacing, 32 high,
- * in a bar whose top line sits level with the Sidebar account row's.
+ * in a 52 bar under its hairline.
  */
 
 /** The browser body's height on the docs page: docs geometry, in px. */
@@ -23,7 +23,7 @@ export const WINDOW_HEIGHT = 440; // docs-literal
 export const TASK_STAGE = 1100; // docs-literal: keeps the Frame at or above 1024 inside the window's border
 /** A Modal or Panel footer's height: 48px (--footer-height, one spacious button). */
 export const BAR_TOKEN = '--footer-height';
-/** The task's footer under its hairline: 52px (--frame-footer-height), so its line sits level with the Sidebar account row's. */
+/** The task's footer under its hairline: 52px (--frame-footer-height) */
 export const TASK_BAR_TOKEN = '--frame-footer-height';
 
 export const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
@@ -88,7 +88,7 @@ export const MultiStepTask = ({
                     />
                 )}
             >
-                {/* The footer runs to the Frame's foot over the surface's bottom pad, as the account row runs to the Sidebar's. */}
+                {/* The footer runs to the Frame's foot over the surface's bottom pad. */}
                 <div data-probe="task-page" style={{ display: 'flex', flexDirection: 'column', blockSize: 'calc(100% + var(--page-pad))', minBlockSize: 0, marginBlockEnd: 'calc(-1 * var(--page-pad))' }}>
                     <div
                         data-probe="task-body"
@@ -97,7 +97,7 @@ export const MultiStepTask = ({
                             minBlockSize: 0,
                             overflowY: 'auto',
                             padding: 'var(--page-pad)',
-                            // The hairline sits on the body's edge, so the footer below it keeps its line level with the account row's.
+                            // The hairline sits on the body's edge, so the footer below it starts at the hairline.
                             borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)',
                             boxSizing: 'border-box',
                         }}

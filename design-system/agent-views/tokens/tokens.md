@@ -85,7 +85,7 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --card-text  /* Primary text color inside a Card. */
 --card-text-subtle  /* Secondary description text color inside a Card. */
 --card-title-font-lg  /* Title font of a Card with a half-width side image. */
---frame-footer-height  /* Height of the Frame footer under its hairline: one 32-high button, its top line level with the Sidebar account row. */
+--frame-footer-height  /* Height of the Frame footer under its hairline: one 32-high button. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */

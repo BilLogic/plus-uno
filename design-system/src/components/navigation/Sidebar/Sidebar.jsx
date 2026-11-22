@@ -100,8 +100,10 @@ const writeCollapsed = (key, value) => {
  * - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner
  *   sidebar: one full-width Back button (`onBack`) with the area name centered,
  *   an optional full-width context dropdown (`inner.switcher`), then text-only
- *   rows (`inner.rows`: a record's stages, or a task's steps). The container,
- *   logo row and account row stay still; only the content swaps. The old
+ *   rows (`inner.rows`: a record's stages, or a task's steps). The container
+ *   and logo row stay still; only the content swaps. The inner view draws no
+ *   account row or divider, so Profile, Help Center, Sign out and the Inbox bell
+ *   are reachable only through Back. The old
  *   content leaves at once and the new enters as one block, sliding 12 on
  *   `spatial.fast` from the end going in and from the start going back, and
  *   fading on `appearance.fast`, with no overshoot. Reduced motion keeps only
@@ -109,6 +111,7 @@ const writeCollapsed = (key, value) => {
  *   row (`tabs`) under its area.
  * - **Account row**: `SidebarAccount`, under a divider: the account menu (Profile,
  *   Help Center, Sign out) and, at the end, the Inbox bell with its unread count.
+ *   The main Sidebar only; the inner sidebar draws none.
  *
  * Content is data. Nothing here changes the URL.
  */
@@ -836,7 +839,7 @@ const Sidebar = ({
                     {inner ? renderInner() : resolvedGroups.map(renderGroup)}
                 </div>
             </nav>
-            {account ? (
+            {account && !inner ? (
                 <SidebarAccount
                     name={account.name}
                     preferredName={account.preferredName}

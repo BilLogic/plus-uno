@@ -149,7 +149,7 @@ Don't: The buttons at the far end of the page, away from the fields, with the Pr
 
 **Checked:** Automatic
 
-FooterActions divides the footer into four equal tracks: filled buttons 48 high (`--footer-height`), Primary in the last track. One button takes the right half. A side action leads as a link and takes no track. A Panel's editing footer and a multi-step task's footer use the same component. A multi-step task's footer is the Frame footer, so its buttons stay 32 high and its line sits level with the account row beside it.
+FooterActions divides the footer into four equal tracks: filled buttons 48 high (`--footer-height`), Primary in the last track. One button takes the right half. A side action leads as a link and takes no track. A Panel's editing footer and a multi-step task's footer use the same component. A multi-step task's footer is the Frame footer, so its buttons stay 32 high.
 
 Do: Two buttons filling the footer's four tracks.
 Don't: Small buttons in a group, with spare footer around them instead of filling the tracks.

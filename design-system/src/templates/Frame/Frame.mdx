@@ -41,7 +41,7 @@ export const colorTokens = [
     ['--ds-surface-sunken', 'The frame\'s fill.'],
     ['--ds-surface', 'The page\'s fill.'],
     ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
-    ['--ds-border', 'The 1px line on the Page-facing edge of a docked Sidebar, the same as the divider above its account row. Where the Page\'s edge is drawn, it lies on the same pixel, so one line shows.'],
+    ['--ds-border', 'The 1px line on the Page-facing edge of a docked Sidebar, the same as the divider above the main Sidebar\'s account row. Where the Page\'s edge is drawn, it lies on the same pixel, so one line shows.'],
     ['--ds-surface-material-overlay', 'The fill of an overlay or peeking Panel, and of a floating Sidebar (a peek, or opened under 1024): translucent, no blur, solid under reduced transparency and increased contrast. A docked Sidebar stays on the sunken fill.'],
     ['--ds-border-material', 'The 1px edge of a floating Sidebar or Panel. Forced colors keep it.'],
     ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
@@ -118,10 +118,10 @@ A task with several steps runs in the Sidebar's inner mode on a default Frame. A
 
 <ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit is a link at the left edge; Back and Next sit in the right half of the footer, as FooterActions' filled buttons." />
 
-1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar.
+1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar. The inner sidebar has no account row, so Profile, Help Center, Sign out and the Inbox bell wait behind Back.
 2. **Steps.** Text-only rows, one noun each. The current step is marked, answered steps carry a tick, and steps past your answers are disabled with the reason in a tooltip.
 3. **Page.** The task's name as the page's one h1, then the step's body at reading width, 864, centered.
-4. **Footer**, fixed along the bottom, 52 high under its hairline (`--frame-footer-height`) so its top line sits level with the line above the Sidebar's account row. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Both are FooterActions' filled buttons at default spacing, 32 high (`--control-md`), not the 48 of a Modal or Panel footer, on the footer rule from <DocsLink id="patterns-common-actions">Common actions</DocsLink>. Back on the first step is disabled and needs no reason.
+4. **Footer**, fixed along the bottom, 52 high under its hairline (`--frame-footer-height`). Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Both are FooterActions' filled buttons at default spacing, 32 high (`--control-md`), not the 48 of a Modal or Panel footer, on the footer rule from <DocsLink id="patterns-common-actions">Common actions</DocsLink>. Back on the first step is disabled and needs no reason.
 
 <ComponentExample of={FrameStories.LayoutMultiStepTaskLeaves} title="Leaving" description="Save and exit keeps the answers and leaves. Back in the inner sidebar returns to the main Sidebar." />
 
@@ -227,7 +227,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 <tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width</code> sets the Page type: <code>default</code> caps it at 1232, <code>full</code> has no cap, <code>reading</code> caps it at 864.</td></tr>
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
-<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 52 high with 32-high buttons and its line level with the Sidebar account row, holding Save and exit, Back and Next. Today the page places the footer.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 52 high with 32-high buttons holding Save and exit, Back and Next. Today the page places the footer.</td></tr>
 <tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
 </tbody>
 </DocsTable>
