@@ -1029,3 +1029,59 @@ test('the verdict CLI writes a PR body naming changed components, writes a repor
   assert.doesNotMatch(body, /B \/ b/);
   assert.equal(fs.existsSync(reportPath), false, 'stale report file is removed when PR body fits inline');
 });
+
+/*
+ * Real recorded REST captures (#2815). `scripts/fixtures/figma-snapshot-real/`
+ * holds two captures of the published Core library, taken 75 s apart by the
+ * script's own `figmaGet` (same endpoints, same 12 s node pacing, same 429
+ * handling) from a temporary GitHub Actions workflow with the repo's
+ * FIGMA_ACCESS_TOKEN, with no publish between them (the newest version id is
+ * the same in both). Trimmed identically, offline:
+ *   - `/components` keeps only the components of five sets (Page, AI message,
+ *     the deprecated Jumbotron, AI sources, AI feedback): 19 of the library's
+ *     components, every field as recorded.
+ *   - `/nodes?geometry=paths` was fetched for those 19 nodes only, kept whole.
+ *   - `/versions` is whole. Only personal or expiring fields were replaced with
+ *     fixed placeholders: each `user` (handle, img_url, id; `/components` carries its creator too) and every
+ *     `thumbnail_url` (signed, expiring CDN links), in `/versions` and
+ *     `/components`. The script reads none of them besides `user.handle`.
+ * Everything else, volatile values included, is as Figma answered. The
+ * handwritten fixtures above stay as the unit cases.
+ */
+const realDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'figma-snapshot-real');
+const realCapture = (n) => {
+  const read = (name) => JSON.parse(fs.readFileSync(path.join(realDir, `${name}-${n}.json`), 'utf8'));
+  return { componentsResponse: read('components'), versionsResponse: read('versions'), nodesResponse: read('nodes') };
+};
+
+test('two real captures of the unchanged Core library come from one version and hash identically', async () => {
+  const a = realCapture(1);
+  const b = realCapture(2);
+
+  // Same published library: the newest version is the same in both captures.
+  assert.equal(a.versionsResponse.versions[0].id, b.versionsResponse.versions[0].id);
+  assert.deepEqual(versionsFrom(a.versionsResponse), versionsFrom(b.versionsResponse));
+
+  const rowsA = rowsFrom(a.componentsResponse);
+  const rowsB = rowsFrom(b.componentsResponse);
+  assert.ok(rowsA.length >= 15, 'the sample holds the five sets');
+  assert.ok(setsIn(rowsA) >= 5);
+  assert.deepEqual(rowsB, rowsA);
+
+  const hashesFor = (rest, rows) =>
+    fetchNodeHashes(rows, DEFAULT_FILE_KEY, 'tok', async () => rest.nodesResponse, 0);
+  const hashA = await hashesFor(a, rowsA);
+  const hashB = await hashesFor(b, rowsB);
+  assert.deepEqual(hashA.failed, []);
+  assert.deepEqual(hashB.failed, []);
+  assert.equal(Object.keys(hashA.hashes).length, rowsA.length);
+  assert.deepEqual(hashB.hashes, hashA.hashes);
+
+  const now = new Date('2026-11-22T00:00:00Z');
+  const snap = (rest, rows, hashes) =>
+    snapshotFrom({ rows, versions: versionsFrom(rest.versionsResponse), nodeHashes: hashes, fileKey: DEFAULT_FILE_KEY, now });
+  assert.equal(
+    refreshVerdict(snap(a, rowsA, hashA.hashes), snap(b, rowsB, hashB.hashes), { now, maxAgeDays: 180 }).verdict,
+    'unchanged',
+  );
+});
