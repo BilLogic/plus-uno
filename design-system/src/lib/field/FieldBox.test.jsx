@@ -28,4 +28,10 @@ describe('FieldBox, invalid icon', () => {
             expect(box(props).querySelector('.plus-field__invalid-icon')).toBeNull();
         }
     });
+
+    it('draws none on a read-only field, which keeps its danger edge', () => {
+        const container = box({ invalid: true, invalidIcon: true, readOnly: true });
+        expect(container.querySelector('.plus-field__invalid-icon')).toBeNull();
+        expect(container.querySelector('.plus-field')).toHaveClass('plus-field--invalid', 'plus-field--readonly');
+    });
 });
