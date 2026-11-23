@@ -17,6 +17,8 @@ import './FieldBox.scss';
  * and the caption says why. A disabled box draws none. Drawing it here, the
  * one box every field shares, is what keeps a field built from another
  * (Inline editable text field, the rename field in Tag input) from drawing it twice.
+ * A read-only box keeps its danger edge but draws no icon, because its value
+ * cannot be corrected in place.
  *
  * Hover and focus are live states, drawn from the pointer and from
  * `:focus-within`, so a host never tracks them. `state` exists only to draw
@@ -75,7 +77,7 @@ const FieldBox = ({
         control.focus();
     };
 
-    const showInvalidIcon = invalidIcon && invalid && !disabled;
+    const showInvalidIcon = invalidIcon && invalid && !disabled && !readOnly;
 
     return (
         <div

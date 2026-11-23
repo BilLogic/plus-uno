@@ -159,7 +159,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Disabled | The field takes `--ds-background-disabled` fill, `--ds-border-disabled` border and `--ds-text-disabled` text, never an opacity fade, and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger`, a danger icon (`--ds-icon-danger`) leads Trailing, and the message takes `--ds-text-danger`. |
 | Warning, success | The edge takes `--ds-border-warning` or `--ds-border-success`, with the message in the matching text color. |
-| Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The value can be read, selected and copied; number steppers are not drawn. |
+| Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The value can be read, selected and copied; number steppers are not drawn. An invalid read-only field keeps its danger edge and message but draws no danger icon. |
 
 ### Tokens
 
