@@ -13156,7 +13156,7 @@
         "--ds-text",
         "--heading-sm",
         "--heading-sm-tracking",
-        "--icon-lg",
+        "--icon-md",
         "--stack-md",
         "--type-weight-medium"
       ]
