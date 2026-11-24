@@ -251,6 +251,8 @@ const SearchField = ({
             }
         }
         if (event.key !== 'Escape') return;
+        // Nothing to clear or close: the key stays with the page.
+        if (!hasText && !isCollapsible) return;
         // The browser's own Esc on a search input would clear without telling us.
         event.preventDefault();
         if (hasText) {

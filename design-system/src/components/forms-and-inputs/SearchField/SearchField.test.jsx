@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import SearchField, { SearchFieldAction } from './SearchField';
@@ -106,6 +106,12 @@ describe('SearchField, active', () => {
         expect(search()).toHaveFocus();
         await user.keyboard('{Escape}');
         expect(search()).toBeInTheDocument();
+    });
+
+    it('leaves Escape to the page when an empty field has nothing to clear or close', () => {
+        render(<SearchField placeholder="Search students" />);
+        const notPrevented = fireEvent.keyDown(search(), { key: 'Escape' });
+        expect(notPrevented).toBe(true);
     });
 
     it('does not submit the page\'s form on Escape, and Enter in a form still submits it', async () => {
