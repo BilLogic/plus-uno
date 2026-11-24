@@ -57,6 +57,8 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 <Canvas of={IconsStories.Sizes} />
 
+The swatches sit in a 48 preview frame for display; the icon's own box is its size, and the hit area comes from the control around it.
+
 <RefTable
     head={['Size (px)', 'Figma token', 'Code', 'Use']}
     rows={[
@@ -73,6 +75,17 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a <DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, which sets its size, radius and fill together.
 
 <Canvas of={IconsStories.LargerMeansTile} />
+
+</FoundationSection>
+
+<FoundationSection title="Tile or bare icon">
+
+An icon's box is the square of its size: 12, 16 or 24. That box only sets how big the glyph draws. A container around it — a button, a field, a list row or a Tile — sets the padding, the background and the hit area. A clickable icon's hit area always comes from its control, never from the glyph.
+
+- **Bare icon:** use when the glyph sits inline with text or inside a control such as a button, field, menu or list row, with no background of its own.
+- **Tile:** use when the glyph stands for a thing (a file kind, a tool or a category), needs a colored ground, or needs to read larger than 24, as in empty states. Tile colors mark categories, never statuses, so a status icon (error, queued, success) stays bare even in a slot where Tiles sit.
+
+There is no 20 icon. Icon sizes are 12, 16 and 24 only. Tile sizes are a separate scale, and `Tile` picks the glyph size for each.
 
 </FoundationSection>
 

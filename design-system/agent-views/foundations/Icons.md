@@ -31,6 +31,8 @@ A label states what the icon does and names it for screen readers. Leave an icon
 
 Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
 
+The swatches sit in a 48 preview frame for display; the icon's own box is its size, and the hit area comes from the control around it.
+
 | Size (px) | Figma token | Code | Use |
 | --- | --- | --- | --- |
 | 12 | `Size/Icon/sm` | `--icon-sm` | Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |
@@ -40,6 +42,15 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 ## Above 24, use a Tile
 
 24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a Tile, which sets its size, radius and fill together.
+
+## Tile or bare icon
+
+An icon's box is the square of its size: 12, 16 or 24. That box only sets how big the glyph draws. A container around it — a button, a field, a list row or a Tile — sets the padding, the background and the hit area. A clickable icon's hit area always comes from its control, never from the glyph.
+
+- **Bare icon:** use when the glyph sits inline with text or inside a control such as a button, field, menu or list row, with no background of its own.
+- **Tile:** use when the glyph stands for a thing (a file kind, a tool or a category), needs a colored ground, or needs to read larger than 24, as in empty states. Tile colors mark categories, never statuses, so a status icon (error, queued, success) stays bare even in a slot where Tiles sit.
+
+There is no 20 icon. Icon sizes are 12, 16 and 24 only. Tile sizes are a separate scale, and `Tile` picks the glyph size for each.
 
 ## Font Awesome Free and color tokens
 
