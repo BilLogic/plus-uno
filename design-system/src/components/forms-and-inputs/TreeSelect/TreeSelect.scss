@@ -24,7 +24,7 @@
 
 .plus-tree-select-arrow {
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-    @include no-travel;
+    @include no-travel('.plus-tree-select-arrow.plus-tree-select-arrow-open');
 
     &.plus-tree-select-arrow-open {
         transform: rotate(180deg);

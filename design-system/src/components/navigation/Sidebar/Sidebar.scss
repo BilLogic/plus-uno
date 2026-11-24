@@ -271,7 +271,7 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        @include no-travel;
+        @include no-travel('.plus-template-sidebar__title--shut .plus-template-sidebar__caret i');
     }
 }
 
@@ -446,7 +446,7 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        @include no-travel;
+        @include no-travel('.plus-template-sidebar__parent--shut .plus-template-sidebar__twist i');
     }
 }
 

@@ -202,6 +202,11 @@
     }
 }
 
+// The in-app reduced flag sits on the listbox surface itself.
+.plus-listbox[data-reduced='true'] .plus-listbox-reveal {
+    animation-delay: initial;
+}
+
 @keyframes plus-listbox-reveal {
     from {
         opacity: 0;

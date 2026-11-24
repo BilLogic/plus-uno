@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import postcss from 'postcss';
+import * as sass from 'sass';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -22,8 +24,10 @@ describe('reduced motion', () => {
         }
     });
 
-    it('Section leaves its detail trigger and chevron to the token layer', () => {
-        expect(read('templates/Section/Section.scss')).not.toMatch(/prefers-reduced-motion/);
+    it('Section keeps no reduced-motion block of its own; its chevron uses the shared no-travel mixin', () => {
+        const css = read('templates/Section/Section.scss');
+        expect(css).not.toMatch(/prefers-reduced-motion/);
+        expect(css).toMatch(/@include no-travel\(/);
     });
 
     it('Frame fades its Sidebar and Panel under reduced motion instead of cutting', () => {
@@ -57,6 +61,7 @@ describe('reduced motion', () => {
     it('SearchField grows with a fade under reduced motion', () => {
         const [block] = reducedBlocks(read('components/forms-and-inputs/SearchField/SearchField.scss'));
         expect(block).toMatch(/--grow\s*\{\s*animation:\s*plus-overlay-fade/);
+        expect(block).toMatch(/--closed\.plus-search-field--shrink\s*\{\s*animation:\s*plus-overlay-fade/);
     });
 
     it('Listbox reveal keeps its fade and drops only the stagger', () => {
@@ -66,23 +71,54 @@ describe('reduced motion', () => {
         expect(body).not.toMatch(/animation:\s*none/);
     });
 
-    it.each([
+    const TRAVELERS = [
         'components/forms-and-inputs/Toggle/Toggle.scss',
-        'components/forms-and-inputs/Checkbox/Checkbox.scss',
-        'components/forms-and-inputs/Radio/Radio.scss',
         'components/forms-and-inputs/Cascader/Cascader.scss',
         'components/forms-and-inputs/TreeSelect/TreeSelect.scss',
         'components/layout-and-structure/Accordion/Accordion.scss',
         'components/navigation/Sidebar/Sidebar.scss',
         'templates/Section/Section.scss',
-    ])('%s does not animate transform under reduced motion', (path) => {
-        expect(read(path)).toMatch(/@include (no-travel|scale-reveal-as-fade)/);
+    ];
+    const isReduced = (node) => node.type === 'atrule' && node.name === 'media' && /prefers-reduced-motion:\s*reduce/.test(node.params);
+    const moves = (rule) => rule.nodes.some((d) => d.type === 'decl' && d.prop === 'transition' && /\btransform\b/.test(d.value));
+    const stills = (rule) => rule.nodes.some((d) => d.type === 'decl' && d.prop === 'transition-property' && !/\btransform\b/.test(d.value));
+
+    it.each(TRAVELERS)('%s: every selector that transitions transform has a reduced-motion rule that does not', (path) => {
+        const { css } = sass.compile(join(SRC, path), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true });
+        const root = postcss.parse(css);
+        const traveling = [];
+        const still = new Set();
+        root.walkRules((rule) => {
+            if (rule.parent && isReduced(rule.parent)) {
+                if (stills(rule)) rule.selectors.forEach((sel) => still.add(sel));
+            } else if (moves(rule)) {
+                traveling.push(...rule.selectors);
+            }
+        });
+        expect(traveling.length).toBeGreaterThan(0);
+        expect(traveling.filter((sel) => !still.has(sel))).toEqual([]);
     });
 
-    it('the shared mixin drops transform from the transition and keeps the rest', () => {
+    it('Sidebar has a reduced-motion rule for both the caret and the twist', () => {
+        const { css } = sass.compile(join(SRC, 'components/navigation/Sidebar/Sidebar.scss'), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true });
+        expect(css).toMatch(/__caret i \{[^}]*transition-property:\s*none/);
+        expect(css).toMatch(/__twist i \{[^}]*transition-property:\s*none/);
+    });
+
+    it('a reduced-motion toggle state fades by swapping between two identical keyframes', () => {
         const css = read('styles/_reduced-motion.scss');
-        expect(css).toMatch(/prefers-reduced-motion: reduce[^{]*\{\s*transition-property:\s*\$keep/);
-        expect(css).not.toMatch(/transition-property:[^;]*transform/);
+        const frames = [...css.matchAll(/@keyframes\s+(\S+)\s*\{([^}]*\}[^}]*)\}/g)];
+        expect(frames).toHaveLength(2);
+        expect(frames[0][2]).toBe(frames[1][2]);
+        expect(css).toMatch(/--ds-motion-appearance-fast-duration/);
+        expect(css).not.toMatch(/\$keep/);
+    });
+
+    it.each([
+        'components/forms-and-inputs/Checkbox/Checkbox.scss',
+        'components/forms-and-inputs/Radio/Radio.scss',
+    ])('%s fades its mark in at the final size', (path) => {
+        expect(read(path)).toMatch(/@include scale-reveal-as-fade/);
     });
 
     it.each([

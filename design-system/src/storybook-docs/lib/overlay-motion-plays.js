@@ -54,7 +54,7 @@ export const selectMotionPlay = (reduced = false) => async ({ canvasElement }) =
     await userEvent.click(field);
     const list = await within(canvasElement.ownerDocument.body).findByRole('listbox');
     const surface = list.closest('.plus-listbox');
-    if (reduced) await expect(getComputedStyle(surface).animationName).toBe('none');
+    if (reduced) await expect(getComputedStyle(surface).animationName).toBe('plus-overlay-fade');
     await expectMenuExit(surface, () => fireEvent.keyDown(field, { key: 'Escape' }), reduced);
     await expect(field).toHaveAttribute('aria-expanded', 'false');
 };

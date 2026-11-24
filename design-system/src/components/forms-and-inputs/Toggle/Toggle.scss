@@ -93,7 +93,7 @@
     border-radius: var(--radius-full);
     background-color: var(--ds-icon-inverse);
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-    @include no-travel;
+    @include no-travel('.plus-toggle[data-checked] .plus-toggle-thumb');
     display: block;
     pointer-events: none;
 

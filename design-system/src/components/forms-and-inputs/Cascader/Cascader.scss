@@ -24,7 +24,7 @@
 
 .plus-cascader-arrow {
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-    @include no-travel;
+    @include no-travel('.plus-cascader-arrow.plus-cascader-arrow-open');
 
     &.plus-cascader-arrow-open {
         transform: rotate(180deg);

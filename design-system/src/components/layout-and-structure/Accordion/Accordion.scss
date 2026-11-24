@@ -87,7 +87,7 @@
             flex-shrink: 0;
             transform: rotate(0deg);
             transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-            @include no-travel;
+            @include no-travel('.plus-accordion .plus-accordion-trigger[data-panel-open] .plus-accordion-chevron');
         }
 
         &[data-panel-open] .plus-accordion-chevron {
