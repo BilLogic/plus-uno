@@ -174,6 +174,10 @@ const SegmentedControl = ({
 
     useEffect(() => () => { animRef.current?.stop?.(); }, []);
 
+    useLayoutEffect(() => {
+        if (!reduced && indicatorRef.current) delete indicatorRef.current.dataset.fade;
+    }, [reduced]);
+
     const renderSegment = (option) => {
         const glyph = option.icon
             ? <span className="plus-segmented-control__icon">{typeof option.icon === 'string' ? <Icon name={option.icon} /> : option.icon}</span>

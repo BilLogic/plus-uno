@@ -187,9 +187,13 @@ const Carousel = ({
         if (next === indexRef.current) return;
         indexRef.current = next;
         setIndex(next);
-        setFade((current) => (current === 'on' ? 'off' : 'on'));
+        if (reduced) setFade((current) => (current === 'on' ? 'off' : 'on'));
         onSlideChangeRef.current?.(next);
-    }, [count, paint, wraps]);
+    }, [count, paint, reduced, wraps]);
+
+    useEffect(() => {
+        if (!reduced) setFade(undefined);
+    }, [reduced]);
 
     // The clock: one frame loop writing a single progress value the ring and
     // the current dot both read. It holds, and resumes where it held.
@@ -274,7 +278,8 @@ const Carousel = ({
     const onPointerCancel = () => { swipeRef.current = null; };
 
     const [captionIndex, captionPhase] = useCaptionSwap(index, !reduced, rootRef);
-    const caption = slides[captionIndex];
+    // Reduced motion has no fade-out to wait for, so the new text fades in from the first frame.
+    const caption = slides[reduced ? index : captionIndex];
     const hasCaption = slides.some((item) => item.title || item.description);
     const captionTag = headingTag(useHeadingLevel() + 1);
 

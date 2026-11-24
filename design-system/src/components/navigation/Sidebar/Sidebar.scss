@@ -437,6 +437,10 @@ button.plus-template-sidebar__title {
 .plus-template-sidebar__tab-close {
     position: absolute;
     top: $inset-24;
+}
+
+.plus-template-sidebar__close-all,
+.plus-template-sidebar__tab-close {
     display: none;
 }
 
