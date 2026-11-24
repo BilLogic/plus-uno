@@ -198,7 +198,7 @@
     animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * var(--plus-listbox-reveal-gap)), var(--plus-listbox-reveal-cap));
 
     @media (prefers-reduced-motion: reduce) {
-        animation-delay: 0s;
+        animation-delay: initial;
     }
 }
 

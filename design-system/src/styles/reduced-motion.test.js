@@ -62,7 +62,7 @@ describe('reduced motion', () => {
     it('Listbox reveal keeps its fade and drops only the stagger', () => {
         const [block] = reducedBlocks(read('components/forms-and-inputs/_internal/Listbox.scss'));
         const body = block.slice(0, block.indexOf('}'));
-        expect(body).toMatch(/animation-delay:\s*0s/);
+        expect(body).toMatch(/animation-delay:\s*initial/);
         expect(body).not.toMatch(/animation:\s*none/);
     });
 
