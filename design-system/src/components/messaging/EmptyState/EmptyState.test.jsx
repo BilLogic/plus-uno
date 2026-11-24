@@ -38,6 +38,14 @@ describe('EmptyState', () => {
         expect(container.querySelector('.plus-empty-state__image img')).not.toBeNull();
     });
 
+    it('frames the icon in a Tile 40 on default spacing and keeps a bare icon when compact', () => {
+        const { container, rerender } = render(<EmptyState header="A" icon="user-group" />);
+        expect(container.querySelector('.plus-tile--40 .fa-user-group')).not.toBeNull();
+        rerender(<EmptyState header="A" icon="user-group" spacing="compact" />);
+        expect(container.querySelector('.plus-tile')).toBeNull();
+        expect(container.querySelector('.plus-empty-state__icon.fa-user-group')).toHaveAttribute('aria-hidden', 'true');
+    });
+
     it('carries the spacing class and falls back to default', () => {
         const { container, rerender } = render(<EmptyState header="A" spacing="compact" />);
         expect(container.firstChild).toHaveClass('plus-empty-state--compact');

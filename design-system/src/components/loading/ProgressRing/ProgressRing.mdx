@@ -71,11 +71,9 @@ will not fit.
 
 ## Size and layout
 
-<ComponentExample of={ProgressRingStories.Size16} title="16" description="Pairs with compact inline text or a 16 icon slot." />
+<ComponentExample of={ProgressRingStories.Size16} title="16" description="The default. Pairs with compact inline text or a 16 icon slot." />
 
-<ComponentExample of={ProgressRingStories.Size20} title="20" description="The default, sized for a row's leading 20 slot such as an uploading file row." />
-
-<ComponentExample of={ProgressRingStories.Size24} title="24" description="Pairs with a 24 icon slot." />
+<ComponentExample of={ProgressRingStories.Size24} title="24" description="Pairs with a 24 icon slot, such as the lead of an uploading file row." />
 
 <ComponentExample of={ProgressRingStories.WithInlineText} title="With inline text" description="The ring carries no text inside its center; put the status and percent beside it." />
 
@@ -85,7 +83,7 @@ will not fit.
 
 ## State
 
-<ComponentExample of={ProgressRingStories.Rest} title="Rest" description="A determinate 20 ring at 64%." />
+<ComponentExample of={ProgressRingStories.Rest} title="Rest" description="A determinate 16 ring at 64%." />
 
 <ComponentExample of={ProgressRingStories.Hovered} title="Hovered" description="No change: the ring has no hover layer." />
 
@@ -186,7 +184,7 @@ would crowd the view. A ring is never indeterminate.
 </thead>
 <tbody>
 <tr><td>Stroke width</td><td><code>--progress-ring-stroke</code> across all sizes.</td></tr>
-<tr><td>Size</td><td><code>--icon-md</code> for <code>16</code>, <code>--image-xs</code> for <code>20</code>, <code>--icon-lg</code> for <code>24</code>.</td></tr>
+<tr><td>Size</td><td><code>--icon-md</code> for <code>16</code>, <code>--icon-lg</code> for <code>24</code>.</td></tr>
 <tr><td>Default</td><td>Track <code>--ds-background-neutral</code>, fill <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Inverse</td><td>Track <code>--ds-background-inverse-subtle</code>, fill <code>--ds-icon-inverse</code>.</td></tr>
 </tbody>
@@ -213,7 +211,7 @@ left.
 
 ### Pair `ProgressRing` with visible percent text when exact progress matters.
 
-At `PROGRESS_RING_SIZES` diameters (`16`, `20`, `24`), the center of the ring
+At `PROGRESS_RING_SIZES` diameters (`16`, `24`), the center of the ring
 cannot hold text; put the percent beside it on the row's meta line.
 
 <DoDontPair
@@ -225,14 +223,14 @@ cannot hold text; put the percent beside it on the row's meta line.
 
 ### Match `size` from `PROGRESS_RING_SIZES` to the icon slot it replaces.
 
-Use `size={20}` in a row's leading slot so swapping between a status icon and
-an active upload never shifts the row, and `size={16}` beside compact text.
+Use `size={24}` in a row's leading slot so the ring matches a 24 icon, and
+`size={16}` beside compact text or a 16 icon.
 
 <DoDontPair
-    doExample={<FigureRow><ProgressRing value={40} size={20} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
+    doExample={<FigureRow><ProgressRing value={40} size={24} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
     doCaption="A ring sized to match the row's leading icon slot."
     dontExample={<FigureRow><ProgressRing value={40} size={16} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
-    dontCaption="An undersized ring that shifts when replaced by the row's icon."
+    dontCaption="An undersized ring that looks lost beside a larger icon slot."
 />
 
 ### Use `appearance="inverse"` on bold surfaces.

@@ -2,7 +2,7 @@
 
 # AiIcon
 
-An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.
+An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.
 
 **Import:** `import { AiIcon } from '@/components';`
 
@@ -73,7 +73,7 @@ Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 
 | Part | Token |
 | --- | --- |
-| Fill | `currentColor`, starting at `--ds-icon`. |
+| Fill | `currentColor`, the color around the icon; set it to `--ds-icon` for a standalone icon. |
 | Size | A square box of exactly its size: `--icon-sm` (12), `--icon-md` (16) and `--icon-lg` (24). |
 
 ## Content guidelines
@@ -103,7 +103,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon` · `--icon-lg` · `--icon-md` · `--icon-sm`
+`--icon-lg` · `--icon-md` · `--icon-sm`
 
 From `design-system/src/components/ai/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
 

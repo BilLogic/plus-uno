@@ -12,6 +12,16 @@ const wrap = { maxWidth: '640px' /* demo frame */ };
 const narrowWrap = { maxWidth: '320px' /* demo frame */ };
 const rowOf = (canvasElement) => canvasElement.querySelector('.plus-file-item');
 const heightOf = (el) => Math.round(el.getBoundingClientRect().height);
+const leadOf = (canvasElement) => canvasElement.querySelector('.plus-file-item__start');
+
+/** The lead is a 32 slot; a kind of item fills it with a Tile 32, a status stays bare and centered in it. */
+const expectLead = async (canvasElement, { tile }) => {
+    const lead = leadOf(canvasElement);
+    const box = lead.getBoundingClientRect();
+    await expect(Math.round(box.width), 'lead slot is 32 wide').toBe(32);
+    await expect(Math.round(box.height), 'lead slot is 32 tall').toBe(32);
+    await expect(Boolean(lead.querySelector('.plus-tile--32')), tile ? 'a kind of item sits in a Tile 32' : 'a status is never in a Tile').toBe(tile);
+};
 
 export default {
     title: 'Components/Forms and inputs/File upload/File item',
@@ -151,6 +161,7 @@ export const Queued = {
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
         await expect(canvas.getByText('Waiting')).toBeInTheDocument();
         await expect(canvasElement.querySelector('.fa-clock')).toBeInTheDocument();
+        await expectLead(canvasElement, { tile: false });
         await userEvent.click(canvas.getByRole('button', { name: 'Cancel chat_transcript.txt' }));
         await expect(canvas.getByText('Waiting · Canceled')).toBeInTheDocument();
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
@@ -191,6 +202,8 @@ export const Uploading40 = {
         const canvas = within(canvasElement);
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
         await expect(canvas.getByRole('progressbar', { name: 'Uploading zoom_0.mp4' })).toHaveAttribute('aria-valuenow', '40');
+        await expectLead(canvasElement, { tile: false });
+        await expect(Math.round(canvas.getByRole('progressbar').getBoundingClientRect().width), 'ring is 24').toBe(24);
         await expect(canvas.getByText('Uploading · 40%')).toBeInTheDocument();
     },
 };
@@ -235,6 +248,7 @@ export const DoneRemove = {
         const canvas = within(canvasElement);
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
         await expect(canvasElement.querySelector('.fa-file-pdf')).toBeInTheDocument();
+        await expectLead(canvasElement, { tile: true });
         await expect(canvas.getByRole('link', { name: 'session_notes.pdf' })).toHaveAttribute('href', '#session-notes');
         await expect(canvas.getByRole('button', { name: 'Remove session_notes.pdf' })).toBeEnabled();
     },
@@ -359,6 +373,7 @@ export const FolderDone = {
         const canvas = within(canvasElement);
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
         await expect(canvasElement.querySelector('.fa-folder')).toBeInTheDocument();
+        await expectLead(canvasElement, { tile: true });
         await expect(canvas.getByText('6 files · 142 MB')).toBeInTheDocument();
     },
 };
@@ -402,6 +417,7 @@ export const Disabled = {
         const row = rowOf(canvasElement);
         await expect(heightOf(row)).toBe(56);
         await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expectLead(canvasElement, { tile: true });
         await expect(canvas.queryAllByRole('button')).toHaveLength(0);
         await expect(canvas.queryByRole('link')).toBeNull();
     },

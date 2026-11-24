@@ -387,6 +387,7 @@
         "--body-sm",
         "--body-sm-tracking",
         "--content-max-width-reading",
+        "--ds-icon",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -411,7 +412,7 @@
       "import": "import { AiIcon } from '@/components';",
       "group": "ai",
       "source": "design-system/src/components/ai/AiIcon/AiIcon.jsx",
-      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
+      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
           "name": "name",
@@ -480,7 +481,6 @@
         "Rest"
       ],
       "tokens": [
-        "--ds-icon",
         "--icon-lg",
         "--icon-md",
         "--icon-sm"
@@ -621,6 +621,7 @@
         "--body-sm-tracking",
         "--code-default",
         "--ds-background-neutral",
+        "--ds-icon",
         "--ds-motion-loop",
         "--ds-motion-loop-duration",
         "--ds-text",
@@ -5259,7 +5260,7 @@
       "import": "import { EmptyState } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/EmptyState/EmptyState.jsx",
-      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
+      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in: in a Tile on `default` spacing, bare at 24 on `compact`. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
       "props": [
         {
           "name": "header",
@@ -5363,7 +5364,6 @@
         "--heading-sm",
         "--heading-sm-tracking",
         "--icon-lg",
-        "--image-md",
         "--inline-md",
         "--pad-x-lg",
         "--screen-pad-x",
@@ -5536,7 +5536,7 @@
       "import": "import { FileItem } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FileItem/FileItem.jsx",
-      "summary": "`FileItem` — one 56px row representing a file or a folder in a `FileUpload` list or as a standalone attachment on a note, comment or message. Anatomy (`start`, `label`, `description`, `end`) is structured for reuse: a 20px lead status/type indicator, middle-truncated name with a full-name tooltip, one status/meta line, and at most one removal control (preceded by Retry on `error`).",
+      "summary": "`FileItem` — one 56px row representing a file or a folder in a `FileUpload` list or as a standalone attachment on a note, comment or message. Anatomy (`start`, `label`, `description`, `end`) is structured for reuse: a 32px lead slot holding a Tile for the kind of item, or a bare status icon or ring, middle-truncated name with a full-name tooltip, one status/meta line, and at most one removal control (preceded by Retry on `error`).",
       "props": [
         {
           "name": "name",
@@ -5717,7 +5717,7 @@
         "--ds-text-disabled",
         "--ds-text-subtle",
         "--file-item-height",
-        "--image-xs",
+        "--image-md",
         "--inline-lg",
         "--inline-md",
         "--inline-sm",
@@ -10560,13 +10560,12 @@
           "name": "size",
           "type": "enum",
           "required": false,
-          "default": "20",
+          "default": "16",
           "values": [
             "16",
-            "20",
             "24"
           ],
-          "description": "Diameter in pixels: 16, 20 or 24",
+          "description": "Diameter in pixels: 16 or 24",
           "deprecated": null
         },
         {
@@ -10619,7 +10618,6 @@
         "Values",
         "Sizes",
         "Size16",
-        "Size20",
         "Size24",
         "WithInlineText",
         "OutOfRangeValuesAreClamped",
@@ -10639,7 +10637,6 @@
         "--ds-motion-spatial-fast-duration",
         "--icon-lg",
         "--icon-md",
-        "--image-xs",
         "--progress-ring-stroke"
       ]
     },
@@ -13159,7 +13156,7 @@
         "--ds-text",
         "--heading-sm",
         "--heading-sm-tracking",
-        "--icon-lg",
+        "--icon-md",
         "--stack-md",
         "--type-weight-medium"
       ]

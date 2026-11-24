@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import Icon from '@/components/images-and-icons/Icon';
+import Tile from '@/components/images-and-icons/Tile';
 import ProgressRing from '@/components/loading/ProgressRing';
 import Link from '@/components/navigation/Link';
 import Popup from '@/components/overlays-and-layering/Popup';
@@ -127,7 +128,7 @@ export function splitMiddleName(rawName, kind = 'file') {
  * list or as a standalone attachment on a note, comment or message.
  *
  * Anatomy (`start`, `label`, `description`, `end`) is structured for reuse:
- * a 20px lead status/type indicator, middle-truncated name with a full-name
+ * a 32px lead slot holding a Tile for the kind of item, or a bare status icon or ring, middle-truncated name with a full-name
  * tooltip, one status/meta line, and at most one removal control (preceded by
  * Retry on `error`).
  */
@@ -164,7 +165,8 @@ const FileItem = ({
         ? Math.round(Math.min(Math.max(numericProgress, 0), 100))
         : 0;
 
-    // Lead slot (20px)
+    // Lead slot: a 32 square. A kind of item sits in a Tile 32; a status stays bare
+    // and centered in the slot, since a status is never a Tile.
     let leadNode;
     if (resolvedStatus === 'queued') {
         leadNode = <Icon name="clock" size={16} color={disabled ? 'disabled' : 'subtlest'} />;
@@ -172,22 +174,16 @@ const FileItem = ({
         leadNode = (
             <ProgressRing
                 value={clampedProgress}
-                size={20}
+                size={24}
                 label={`Uploading ${name}`}
             />
         );
     } else if (resolvedStatus === 'error') {
         leadNode = <Icon name="circle-exclamation" size={16} color={disabled ? 'disabled' : 'danger'} />;
     } else if (resolvedKind === 'folder') {
-        leadNode = <Icon name="folder" size={16} color={disabled ? 'disabled' : 'subtle'} />;
+        leadNode = <Tile icon="folder" size={32} />;
     } else {
-        leadNode = (
-            <Icon
-                name={resolveTypeIcon(fileType, name)}
-                size={16}
-                color={disabled ? 'disabled' : 'subtle'}
-            />
-        );
+        leadNode = <Tile icon={resolveTypeIcon(fileType, name)} size={32} />;
     }
 
     // Meta line
