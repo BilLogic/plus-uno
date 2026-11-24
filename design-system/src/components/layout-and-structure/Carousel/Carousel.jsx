@@ -158,6 +158,8 @@ const Carousel = ({
     const [index, setIndex] = useState(() => Math.min(Math.max(defaultIndex, 0), Math.max(count - 1, 0)));
     const indexRef = useRef(index);
     indexRef.current = index;
+    // Flips on each step so the reduced-motion fade restarts, a wrap included.
+    const [fade, setFade] = useState(undefined);
 
     const [paused, setPaused] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -185,6 +187,7 @@ const Carousel = ({
         if (next === indexRef.current) return;
         indexRef.current = next;
         setIndex(next);
+        setFade((current) => (current === 'on' ? 'off' : 'on'));
         onSlideChangeRef.current?.(next);
     }, [count, paint, wraps]);
 
@@ -307,7 +310,7 @@ const Carousel = ({
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerCancel}
             >
-                <div className="plus-carousel-track" style={{ '--carousel-aspect': aspectRatio }}>
+                <div className="plus-carousel-track" data-fade={reduced ? fade : undefined} style={{ '--carousel-aspect': aspectRatio }}>
                     {slides.map((item, k) => {
                         const active = k === index;
                         const offset = offsetOf(k, index, count, ringWraps);
@@ -391,7 +394,7 @@ const Carousel = ({
 
             {hasCaption && (
                 <div className="plus-carousel-caption" aria-live={isStatic || paused ? 'polite' : 'off'}>
-                    <div className={`plus-carousel-caption-inner plus-carousel-caption-inner--${captionPhase}`}>
+                    <div className={`plus-carousel-caption-inner plus-carousel-caption-inner--${captionPhase}`} data-fade={reduced ? fade : undefined}>
                         {caption?.title && <Heading as={captionTag} size="sm">{caption.title}</Heading>}
                         {caption?.description && <p className="plus-carousel-caption-description">{caption.description}</p>}
                     </div>

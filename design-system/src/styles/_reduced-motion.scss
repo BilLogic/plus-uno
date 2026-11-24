@@ -22,6 +22,19 @@
     }
 }
 
+// For a change only script can see, such as a measured indicator or a new slide.
+// Script flips `data-fade` between `off` and `on` on each change, only while
+// motion is reduced, so the fade restarts and a first render does not run it.
+@mixin fade-on-change {
+    &[data-fade=off] {
+        animation: plus-reduced-fade-off var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+
+    &[data-fade=on] {
+        animation: plus-reduced-fade-on var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+}
+
 // A scale-in mark (the Checkbox tick, the Radio dot) shows by fading at its
 // final size instead of growing: hidden until one of `$shown` matches, then opaque.
 @mixin scale-reveal-as-fade($shown...) {

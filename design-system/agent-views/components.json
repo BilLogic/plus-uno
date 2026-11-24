@@ -13170,7 +13170,7 @@
       "import": "import { SegmentedControl } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SegmentedControl/SegmentedControl.jsx",
-      "summary": "Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it jumps. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.",
+      "summary": "Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it fades in there. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.",
       "props": [
         {
           "name": "label",

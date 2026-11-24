@@ -271,8 +271,7 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        // Its button is hidden until hover or focus, so a fade would replay on every reveal.
-        @include no-travel;
+        @include no-travel('.plus-template-sidebar__title--shut .plus-template-sidebar__caret i');
     }
 }
 
@@ -441,14 +440,17 @@ button.plus-template-sidebar__title {
     display: none;
 }
 
+// Hidden by visibility, not display: showing a display: none element would
+// replay the chevron's reduced-motion fade on every hover.
 .plus-template-sidebar__twist {
+    display: inline-flex;
+    visibility: hidden;
     inset-inline-start: calc(2 * var(--pad-x-xs));
 
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        // Its button is hidden until hover or focus, so a fade would replay on every reveal.
-        @include no-travel;
+        @include no-travel('.plus-template-sidebar__parent--shut .plus-template-sidebar__twist i');
     }
 }
 
@@ -468,7 +470,13 @@ button.plus-template-sidebar__title {
 @include plus-state(
     (hovered: (display: inline-flex)),
     $ring: false,
-    $hovered-selector: '.plus-template-sidebar__parent:hover > .plus-template-sidebar__twist, .plus-template-sidebar__parent:focus-within > .plus-template-sidebar__twist, .plus-template-sidebar__parent:hover > .plus-template-sidebar__close-all, .plus-template-sidebar__parent:focus-within > .plus-template-sidebar__close-all'
+    $hovered-selector: '.plus-template-sidebar__parent:hover > .plus-template-sidebar__close-all, .plus-template-sidebar__parent:focus-within > .plus-template-sidebar__close-all'
+);
+
+@include plus-state(
+    (hovered: (visibility: visible)),
+    $ring: false,
+    $hovered-selector: '.plus-template-sidebar__parent:hover > .plus-template-sidebar__twist, .plus-template-sidebar__parent:focus-within > .plus-template-sidebar__twist'
 );
 
 @include plus-state(

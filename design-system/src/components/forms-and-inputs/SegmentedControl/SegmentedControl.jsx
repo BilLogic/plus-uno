@@ -26,7 +26,7 @@ const MAX_ICON_ONLY_SEGMENTS = 6;
  * buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move
  * between segments; Space or Enter selects. One raised indicator sits under
  * the selected segment at rest and glides to the new one on a spatial spring;
- * under reduced motion it jumps. It is measured, so it follows the track and
+ * under reduced motion it fades in there. It is measured, so it follows the track and
  * the segments when the container resizes, the fonts load or the options change.
  *
  * @param {object} props
@@ -122,6 +122,9 @@ const SegmentedControl = ({
             animRef.current?.stop?.();
             animRef.current = null;
             paint(target);
+            if (from && glide && reducedRef.current) {
+                indicatorRef.current.dataset.fade = indicatorRef.current.dataset.fade === 'on' ? 'off' : 'on';
+            }
             return;
         }
         animRef.current?.stop?.();

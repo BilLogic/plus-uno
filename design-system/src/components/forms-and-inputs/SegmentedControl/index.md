@@ -2,7 +2,7 @@
 
 # SegmentedControl
 
-Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it jumps. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.
+Segmented control: switches how the same content is shown (Table / Cards, Day / Week / Month, Form / Code). Exactly one segment is selected and the view changes at once, with no apply step. Built on Base UI's ToggleGroup, single and required: a group of toggle buttons with `aria-pressed`, not a radiogroup or a tablist. Arrow keys move between segments; Space or Enter selects. One raised indicator sits under the selected segment at rest and glides to the new one on a spatial spring; under reduced motion it fades in there. It is measured, so it follows the track and the segments when the container resizes, the fonts load or the options change.
 
 **Import:** `import { SegmentedControl } from '@/components';`
 
@@ -79,7 +79,7 @@ The segments share the width equally instead of hugging their labels. Labels tha
 - **Keyboard.** Tab enters the control on the selected segment. Arrow keys move focus between segments and wrap at the ends. Space or Enter selects the focused segment.
 - **One always selected.** Pressing the selected segment keeps it selected.
 - **Icon-only.** The `label` is the accessible name, and the Tooltip shows on hover and on keyboard focus.
-- **Reduced motion.** The indicator jumps to the new segment with no slide.
+- **Reduced motion.** The indicator fades in under the new segment with no slide.
 
 ## Related
 
