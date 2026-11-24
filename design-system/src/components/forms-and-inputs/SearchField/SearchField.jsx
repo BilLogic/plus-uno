@@ -258,7 +258,7 @@ const SearchField = ({
         if (hasText) {
             event.stopPropagation();
             clear();
-        } else if (isCollapsible) {
+        } else {
             event.stopPropagation();
             close();
         }
