@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import postcss from 'postcss';
+import * as sass from 'sass';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -9,6 +11,7 @@ import { describe, expect, it } from 'vitest';
  */
 const SRC = join(__dirname, '..');
 const read = (path) => readFileSync(join(SRC, path), 'utf8');
+const compile = (path) => sass.compile(join(SRC, path), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true }).css;
 const reducedBlocks = (css) => css.split('@media (prefers-reduced-motion: reduce)').slice(1);
 
 describe('reduced motion', () => {
@@ -22,8 +25,10 @@ describe('reduced motion', () => {
         }
     });
 
-    it('Section leaves its detail trigger and chevron to the token layer', () => {
-        expect(read('templates/Section/Section.scss')).not.toMatch(/prefers-reduced-motion/);
+    it('Section keeps no reduced-motion block of its own; its chevron uses the shared no-travel mixin', () => {
+        const css = read('templates/Section/Section.scss');
+        expect(css).not.toMatch(/prefers-reduced-motion/);
+        expect(css).toMatch(/@include no-travel\(/);
     });
 
     it('Frame fades its Sidebar and Panel under reduced motion instead of cutting', () => {
@@ -41,11 +46,102 @@ describe('reduced motion', () => {
         'components/labels/Tag/Tag.scss',
         'components/ai/GenerativeBorder/GenerativeBorder.scss',
         'components/ai/AiMessage/AiMessage.scss',
-        'components/forms-and-inputs/_internal/Listbox.scss',
-        'components/forms-and-inputs/SearchField/SearchField.scss',
     ])('%s stops its loop in its own reduced-motion block', (path) => {
         const blocks = reducedBlocks(read(path));
         expect(blocks.some((block) => /animation:\s*none/.test(block.slice(0, 400)))).toBe(true);
+    });
+
+    it('overlays fade under the in-app reduced flag, in and out, never cut', () => {
+        const css = read('styles/_overlay-motion.scss');
+        const block = css.slice(css.indexOf("&[data-reduced='true']"));
+        expect(block.slice(0, 200)).toMatch(/animation:\s*\$fade-enter/);
+        expect(block.slice(0, 300)).toMatch(/data-leaving\][^{]*\{\s*animation:\s*\$fade-exit/);
+        expect(css).not.toMatch(/data-reduced='true'\]\s*\{\s*animation:\s*none/);
+    });
+
+    it('SearchField grows and closes with different reduced-motion animations so each restarts', () => {
+        const root = postcss.parse(compile('components/forms-and-inputs/SearchField/SearchField.scss'));
+        const nameFor = (selector) => {
+            let name;
+            root.walkAtRules('media', (media) => {
+                if (!/prefers-reduced-motion:\s*reduce/.test(media.params)) return;
+                media.walkRules((rule) => {
+                    if (!rule.selectors.includes(selector)) return;
+                    rule.walkDecls('animation', (decl) => { name = decl.value.split(/\s+/)[0]; });
+                });
+            });
+            return name;
+        };
+        const grow = nameFor('.plus-search-field--open.plus-search-field--grow');
+        const shrink = nameFor('.plus-search-field--closed.plus-search-field--shrink');
+        expect(grow).toBe('plus-reduced-fade-on');
+        expect(shrink).toBe('plus-reduced-fade-off');
+        expect(grow).not.toBe(shrink);
+    });
+
+    it('Listbox reveal keeps its fade and drops only the stagger', () => {
+        const [block] = reducedBlocks(read('components/forms-and-inputs/_internal/Listbox.scss'));
+        const body = block.slice(0, block.indexOf('}'));
+        expect(body).toMatch(/animation-delay:\s*initial/);
+        expect(body).not.toMatch(/animation:\s*none/);
+    });
+
+    const TRAVELERS = [
+        'components/forms-and-inputs/Toggle/Toggle.scss',
+        'components/forms-and-inputs/Cascader/Cascader.scss',
+        'components/forms-and-inputs/TreeSelect/TreeSelect.scss',
+        'components/layout-and-structure/Accordion/Accordion.scss',
+        'components/navigation/Sidebar/Sidebar.scss',
+        'templates/Section/Section.scss',
+    ];
+    const isReduced = (node) => node.type === 'atrule' && node.name === 'media' && /prefers-reduced-motion:\s*reduce/.test(node.params);
+    const moves = (rule) => rule.nodes.some((d) => d.type === 'decl' && d.prop === 'transition' && /\btransform\b/.test(d.value));
+    const stills = (rule) => rule.nodes.some((d) => d.type === 'decl' && d.prop === 'transition-property' && !/\btransform\b/.test(d.value));
+
+    it.each(TRAVELERS)('%s: every selector that transitions transform has a reduced-motion rule that does not', (path) => {
+        const css = compile(path);
+        const root = postcss.parse(css);
+        const traveling = [];
+        const still = new Set();
+        root.walkRules((rule) => {
+            if (rule.parent && isReduced(rule.parent)) {
+                if (stills(rule)) rule.selectors.forEach((sel) => still.add(sel));
+            } else if (moves(rule)) {
+                traveling.push(...rule.selectors);
+            }
+        });
+        expect(traveling.length).toBeGreaterThan(0);
+        expect(traveling.filter((sel) => !still.has(sel))).toEqual([]);
+    });
+
+    it('Sidebar caret and twist stop the transform without an animation', () => {
+        const root = postcss.parse(compile('components/navigation/Sidebar/Sidebar.scss'));
+        for (const part of ['caret', 'twist']) {
+            const decls = [];
+            root.walkAtRules('media', (media) => {
+                if (!/prefers-reduced-motion:\s*reduce/.test(media.params)) return;
+                media.walkRules((rule) => {
+                    if (rule.selectors.some((sel) => sel.endsWith(`__${part} i`))) decls.push(...rule.nodes.map((d) => d.prop));
+                });
+            });
+            expect(decls).toContain('transition-property');
+            expect(decls).not.toContain('animation');
+        }
+    });
+
+    it('a reduced-motion toggle state fades by swapping between two identical keyframes', () => {
+        const css = read('styles/_reduced-motion.scss');
+        const frames = [...css.matchAll(/@keyframes\s+(\S+)\s*\{([^}]*\}[^}]*)\}/g)];
+        expect(frames).toHaveLength(2);
+        expect(frames[0][2]).toBe(frames[1][2]);
+        expect(css).toMatch(/--ds-motion-appearance-fast-duration/);
+    });
+
+    it.each([
+        'components/forms-and-inputs/Checkbox/Checkbox.scss',
+        'components/forms-and-inputs/Radio/Radio.scss',
+    ])('%s fades its mark in at the final size', (path) => {
+        expect(read(path)).toMatch(/@include scale-reveal-as-fade/);
     });
 
     it.each([

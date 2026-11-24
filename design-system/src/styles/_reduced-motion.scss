@@ -1,0 +1,39 @@
+// Reduced motion for a state that would otherwise turn, slide or scale an
+// element. The transform no longer transitions: the element is already in its
+// final place and runs a short opacity fade on the appearance.fast tokens.
+// `$on` is the full selector of the on state (open, checked, shut). The two
+// keyframes are identical on purpose: the animation name changes with the
+// state, so the fade restarts on every change. Leave `$on` out to stop the
+// transform and run no animation at all.
+@keyframes plus-reduced-fade-off { from { opacity: 0; } to { opacity: 1; } }
+@keyframes plus-reduced-fade-on { from { opacity: 0; } to { opacity: 1; } }
+
+@mixin no-travel($on: null) {
+    @media (prefers-reduced-motion: reduce) {
+        transition-property: none;
+
+        @if $on {
+            animation: plus-reduced-fade-off var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+            @at-root #{$on} {
+                animation-name: plus-reduced-fade-on;
+            }
+        }
+    }
+}
+
+// A scale-in mark (the Checkbox tick, the Radio dot) shows by fading at its
+// final size instead of growing: hidden until one of `$shown` matches, then opaque.
+@mixin scale-reveal-as-fade($shown...) {
+    @media (prefers-reduced-motion: reduce) {
+        transform: none;
+        opacity: 0;
+        transition-property: opacity;
+
+        @each $selector in $shown {
+            #{$selector} & {
+                opacity: 1;
+            }
+        }
+    }
+}

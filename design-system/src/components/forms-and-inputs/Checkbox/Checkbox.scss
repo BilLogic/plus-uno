@@ -6,6 +6,7 @@
  * Lagoon fill, so the red edge never competes with the mark.
  */
 @use '../../../styles/state' as *;
+@use '../../../styles/reduced-motion' as *;
 @use '../_internal/choice-soft';
 @use '../_internal/choice-tile';
 
@@ -97,6 +98,7 @@
     background-color: var(--ds-icon-inverse);
     transform: scale(0);
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+    @include scale-reveal-as-fade('.plus-form-checkbox[data-checked]', '.plus-form-checkbox[data-indeterminate]');
     // The checkmark, drawn with a clip-path so no icon font or SVG asset is
     // needed; the dash below replaces it while indeterminate.
     clip-path: polygon(26% 43%, 14% 57%, 49% 85%, 90% 26%, 75% 16%, 46% 59%);

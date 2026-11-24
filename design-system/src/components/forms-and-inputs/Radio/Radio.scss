@@ -4,6 +4,7 @@
  * in a 24 row with the label. `isInvalid` marks the unselected radio only.
  */
 @use '../../../styles/state' as *;
+@use '../../../styles/reduced-motion' as *;
 @use '../_internal/choice-soft';
 @use '../_internal/choice-tile';
 
@@ -97,6 +98,7 @@
     background-color: var(--ds-icon-inverse);
     transform: scale(0);
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+    @include scale-reveal-as-fade('.plus-form-radio[data-checked]');
 
     .plus-form-radio[data-checked] & {
         transform: scale(1);

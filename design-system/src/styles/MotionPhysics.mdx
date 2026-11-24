@@ -237,7 +237,7 @@ One token, written for each target it ships to (`damping = 2 × ratio × √(sti
 
 <FoundationSection title="In code">
 
-CSS reads a semantic token as a `linear()` easing plus its settle time. Components bind `--ds-motion-*` semantics only, never a `--motion-spring-*` primitive, and reduced motion is handled once, in the token layer.
+CSS reads a semantic token as a `linear()` easing plus its settle time. Components bind `--ds-motion-*` semantics only, never a `--motion-spring-*` primitive, and reduced motion is handled in two places: the token layer maps every spatial timing to the appearance fast fade, and a component rule stops any transform that would still travel, so overlays and state changes fade in place under both settings.
 
 ```css
 transition: transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default);

@@ -398,7 +398,7 @@ const spotlightMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     });
     if (reduced) {
         await expect(popup).toHaveAttribute('data-reduced', 'true');
-        await expect(getComputedStyle(popup).animationName).toBe('none');
+        await expect(getComputedStyle(popup).animationName).toBe('plus-overlay-fade');
     } else {
         await expect(getComputedStyle(popup).animationName).toContain('plus-overlay-scale-in');
     }

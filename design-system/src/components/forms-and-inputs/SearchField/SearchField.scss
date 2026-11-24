@@ -3,7 +3,10 @@
 // Opening grows the field from the icon's width, its end edge fixed, so it
 // opens to the left; closing narrows an outline back into the icon. Both run
 // on the fast spatial and appearance motion tokens. Under reduced motion the
-// duration is 0: it opens and closes at once.
+// field fades in at its final width; on close the old field unmounts, so the
+// collapsed icon button fades in.
+@use '../../../styles/reduced-motion';
+
 .plus-search-field {
     position: relative;
     display: flex;
@@ -87,8 +90,18 @@
     }
 }
 
+// Reduced motion: the field appears at its final width with a fade; the
+// shrink's outline ghost has nothing to travel, so it is left out; the
+// collapsed field fades in as the icon button.
 @media (prefers-reduced-motion: reduce) {
-    .plus-search-field--open.plus-search-field--grow,
+    .plus-search-field--open.plus-search-field--grow {
+        animation: plus-reduced-fade-on var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+
+    .plus-search-field--closed.plus-search-field--shrink {
+        animation: plus-reduced-fade-off var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+
     .plus-search-field--closed.plus-search-field--shrink::before {
         animation: none;
     }

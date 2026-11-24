@@ -4,6 +4,7 @@
  * draw themselves, and AnchoredListboxSurface places the panel; this file
  * turns the caret.
  */
+@use '../../../styles/reduced-motion' as *;
 
 .plus-tree-select-wrapper {
     position: relative;
@@ -23,6 +24,7 @@
 
 .plus-tree-select-arrow {
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+    @include no-travel('.plus-tree-select-arrow.plus-tree-select-arrow-open');
 
     &.plus-tree-select-arrow-open {
         transform: rotate(180deg);

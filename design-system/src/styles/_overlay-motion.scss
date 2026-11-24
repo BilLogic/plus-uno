@@ -23,8 +23,13 @@
     &[data-leaving='hand'] {
         animation: $fade-exit;
     }
-    // In-app reduced motion: no animation. The OS preference below keeps the fade.
-    &[data-reduced='true'] { animation: none; }
+    // In-app reduced motion: the same fade as the OS preference below, in place.
+    &[data-reduced='true'] {
+        animation: $fade-enter;
+        &[data-ending-style], &[data-leaving] {
+            animation: $fade-exit;
+        }
+    }
     @media (prefers-reduced-motion: reduce) {
         animation: $fade-enter;
         &[data-ending-style], &[data-leaving] {
