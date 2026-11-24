@@ -114,19 +114,37 @@ describe('reduced motion', () => {
         expect(traveling.filter((sel) => !still.has(sel))).toEqual([]);
     });
 
-    it('Sidebar caret and twist stop the transform without an animation', () => {
+    it('Sidebar caret and twist fade on toggle, and the twist hides by visibility so a reveal does not replay it', () => {
         const root = postcss.parse(compile('components/navigation/Sidebar/Sidebar.scss'));
-        for (const part of ['caret', 'twist']) {
-            const decls = [];
+        const reducedName = (selector) => {
+            let name;
             root.walkAtRules('media', (media) => {
                 if (!/prefers-reduced-motion:\s*reduce/.test(media.params)) return;
                 media.walkRules((rule) => {
-                    if (rule.selectors.some((sel) => sel.endsWith(`__${part} i`))) decls.push(...rule.nodes.map((d) => d.prop));
+                    if (!rule.selectors.includes(selector)) return;
+                    rule.walkDecls(/^animation(-name)?$/, (decl) => { name = decl.value.split(/\s+/)[0]; });
                 });
             });
-            expect(decls).toContain('transition-property');
-            expect(decls).not.toContain('animation');
-        }
+            return name;
+        };
+        expect(reducedName('.plus-template-sidebar__caret i')).toBe('plus-reduced-fade-off');
+        expect(reducedName('.plus-template-sidebar__title--shut .plus-template-sidebar__caret i')).toBe('plus-reduced-fade-on');
+        expect(reducedName('.plus-template-sidebar__twist i')).toBe('plus-reduced-fade-off');
+        expect(reducedName('.plus-template-sidebar__parent--shut .plus-template-sidebar__twist i')).toBe('plus-reduced-fade-on');
+        const hidden = [];
+        root.walkRules((rule) => { if (rule.selector === '.plus-template-sidebar__twist') rule.walkDecls((d) => hidden.push(`${d.prop}:${d.value}`)); });
+        expect(hidden).toContain('visibility:hidden');
+        expect(hidden).toContain('display:inline-flex');
+    });
+
+    it.each([
+        ['components/forms-and-inputs/SegmentedControl/SegmentedControl.scss', '.plus-segmented-control__indicator'],
+        ['components/layout-and-structure/Carousel/Carousel.scss', '.plus-carousel-track'],
+        ['components/layout-and-structure/Carousel/Carousel.scss', '.plus-carousel-caption-inner'],
+    ])('%s fades %s by its data-fade value', (path, selector) => {
+        const css = compile(path);
+        expect(css).toContain(`${selector}[data-fade=off]`);
+        expect(css).toContain(`${selector}[data-fade=on]`);
     });
 
     it('a reduced-motion toggle state fades by swapping between two identical keyframes', () => {

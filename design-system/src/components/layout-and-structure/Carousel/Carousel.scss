@@ -1,4 +1,5 @@
 @use '../../../styles/state' as *;
+@use '../../../styles/reduced-motion' as *;
 
 /*
  * Carousel
@@ -247,12 +248,19 @@
 }
 
 // --- REDUCED MOTION ---
-// The same flat row, with every move and swap in one step.
+// The same flat row. Slides and caption take their new place at once and fade in.
 .plus-carousel--reduced {
     .plus-carousel-slide,
-    .plus-carousel-card::after,
-    .plus-carousel-caption-inner,
-    .plus-progress-indicator__dot {
+    .plus-carousel-caption-inner {
         transition: none;
+    }
+
+    .plus-carousel-track,
+    .plus-carousel-caption-inner {
+        @include fade-on-change;
+    }
+
+    .plus-progress-indicator__dot {
+        transition-property: background-color;
     }
 }

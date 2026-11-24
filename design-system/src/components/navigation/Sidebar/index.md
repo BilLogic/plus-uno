@@ -97,6 +97,7 @@ Don't: Everything in the label, and the time is cut off.
 - The account button is named by the person's name and role, then "account menu".
 - In the inner sidebar, focus lands on Back when it opens and returns to the open row when Back closes it. Back, then the context Select, then each row are reached with Tab; Enter picks a row.
 - The swap slides 12 and fades. With reduced motion it only fades.
+- Chevrons turn with their section. With reduced motion they fade at the new angle.
 
 ## Related
 

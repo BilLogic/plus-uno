@@ -89,7 +89,7 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
   carousel is paused or does not autoplay, and silent while it plays, so it
   never talks over a screen reader on its own.
 - **Reduced motion is respected.** When the viewer asks for less motion, the
-  carousel does not autoplay, shows arrows and moves in one step.
+  carousel does not autoplay, shows arrows and fades each slide in place.
 
 ## Related
 
