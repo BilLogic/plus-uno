@@ -108,7 +108,7 @@ export const usePageView = (mode = 'always') => {
         const overflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
         const onKey = (event) => {
-            if (event.key === 'Escape') setFullScreen(false);
+            if (event.key === 'Escape' && !event.defaultPrevented) setFullScreen(false);
         };
         document.addEventListener('keydown', onKey);
         layer?.querySelector('[data-page-view-exit]')?.focus();

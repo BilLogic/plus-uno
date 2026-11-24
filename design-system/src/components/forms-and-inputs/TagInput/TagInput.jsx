@@ -604,6 +604,8 @@ const TagInput = ({
                     <ReorderGrip
                         ref={gripRef}
                         drag={gripDrag(index)}
+                        // Safari focuses a button on press only with an explicit tabindex; without focus, the list closes.
+                        tabIndex={0}
                         appearance="subtle"
                         spacing="compact"
                         icon="grip-vertical"
