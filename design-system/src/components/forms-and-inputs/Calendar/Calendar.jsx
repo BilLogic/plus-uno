@@ -8,7 +8,7 @@ import InternalCalendar from '../_internal/Calendar';
  * behind a field's popup. It is the same component the pickers use.
  *
  * - **Grid:** always six weeks, 42 cells, so the panel never changes height.
- *   Days of the months either side are drawn and can't be picked.
+ *   Cells outside the month stay empty.
  * - **Days:** each is a button named with its full date. `aria-pressed` marks
  *   the picked day, or both ends of a range; `data-in-range` marks the days
  *   between; `aria-current="date"` marks today.

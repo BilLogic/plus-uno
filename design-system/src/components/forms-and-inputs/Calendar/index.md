@@ -2,7 +2,7 @@
 
 # Calendar
 
-Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
+Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Cells outside the month stay empty. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
 
 **Import:** `import { Calendar } from '@/components';`
 
@@ -79,7 +79,7 @@ const [viewDate, setViewDate] = useState(new Date());
 
 ### Keep the grid at six weeks. {#keep-the-grid-at-six-weeks}
 
-Six weeks render every month, including the days of neighboring months that fill the remaining cells. This keeps the panel's height constant as someone pages through months, at the cost of occasionally showing a mostly empty week.
+Six weeks render every month, and the cells before the first day and after the last stay empty. Days of other months are not drawn, so the month on show reads as one block. The panel's height stays constant as someone pages through months, at the cost of an empty last week in some months.
 
 ## Accessibility
 
@@ -98,9 +98,9 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 
 ## Parts
 
-1. **Header.** The month and year in full, with Previous month and Next month buttons.
-2. **Weekday row.** Seven short day names.
-3. **Day cells.** Forty-two buttons in six weeks. Days of neighboring months fill the spare cells.
+1. **Header.** The month and year in full, centered, with Previous month over the first column and Next month over the last.
+2. **Weekday row.** One letter per day (S M T W T F S); each column header is named with the full day.
+3. **Day cells.** Forty-two cells in six weeks: a button for each day of the month, and empty cells before and after it.
 
 ### States
 
@@ -111,10 +111,10 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | Pressed | No look of its own: pressing an enabled day picks it. |
 | Focused | The month buttons and the days draw a 2px ring in `--ds-border-focused`, 2px off the edge. |
 | Disabled | A day out of bounds takes `--ds-text-disabled`, never an opacity fade; no focus, no `onPick`. |
-| Today | A 1px `--ds-border-brand` edge and `--ds-text-brand` text. |
+| Today | `--ds-text-brand` text at semibold weight, with no edge or fill. The picked day's fill wins when today is picked. |
 | In range | `--ds-background-selected`. |
 | Selected | `--ds-background-selected-bold` with `--ds-text-inverse`, and `aria-pressed`. |
-| Outside the month | `--ds-text-subtle`; not pickable. |
+| Outside the month | An empty cell. |
 
 ### Tokens
 
@@ -122,7 +122,7 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | --- | --- |
 | Month | `--heading-xs` in `--ds-text`. |
 | Month buttons | Compact `IconButton` (`--control-sm` square), `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
-| Weekday names | `--body-sm` in `--ds-text-subtle`. |
+| Weekday letters | `--body-sm` in `--ds-text-subtle`, centered in each day column. |
 | Day text | `--body-default` in `--ds-text`. |
 | Day size | `--calendar-day-sm` (24), `--calendar-day-md` (32), `--calendar-day-lg` (40). |
 | Day radius | `--radius-md`. |

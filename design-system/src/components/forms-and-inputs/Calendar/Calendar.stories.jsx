@@ -135,7 +135,9 @@ export const Default = {
     render: () => <Calendar viewDate={october} onViewDateChange={none} onPick={none} />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByText('October 2026')).toBeVisible();
-        await expect(canvasElement.querySelectorAll('.plus-calendar-day')).toHaveLength(42);
+        // Six weeks of cells; only October's 31 days are buttons, the rest stay empty.
+        await expect(canvasElement.querySelectorAll('[role="gridcell"]')).toHaveLength(42);
+        await expect(canvasElement.querySelectorAll('.plus-calendar-day')).toHaveLength(31);
     },
 };
 

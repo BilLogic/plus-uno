@@ -287,7 +287,6 @@ CalendarColors.play = async ({ canvasElement }) => {
     const picked = canvas.getByRole('button', { name: /March 9, 2020/ });
     const between = canvas.getByRole('button', { name: /March 11, 2020/ });
     const plain = canvas.getByRole('button', { name: /March 20, 2020/ });
-    const outside = canvasElement.querySelector('.plus-calendar-day--outside');
     const month = canvasElement.querySelector('.plus-calendar-month');
     await expect(picked).toHaveClass('plus-calendar-day--selected');
     await expect(between).toHaveClass('plus-calendar-day--in-range');
@@ -296,7 +295,6 @@ CalendarColors.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(picked).color, `${mode}: picked day text`).toBe(token('--ds-text-inverse'));
         await expect(getComputedStyle(between).backgroundColor, `${mode}: in-range day`).toBe(token('--ds-background-selected'));
         await expect(getComputedStyle(plain).color, `${mode}: day text`).toBe(token('--ds-text'));
-        await expect(getComputedStyle(outside).color, `${mode}: outside day`).toBe(token('--ds-text-subtle'));
         await expect(getComputedStyle(month).color, `${mode}: month`).toBe(token('--ds-text'));
     });
 };
@@ -386,7 +384,7 @@ PickRange.play = async ({ canvasElement }) => {
     const input = within(canvasElement).getByRole('combobox');
     await userEvent.click(input);
     const dialog = await within(canvasElement.ownerDocument.body).findByRole('dialog');
-    const days = () => [...dialog.querySelectorAll('.plus-calendar-day:not(.plus-calendar-day--outside)')];
+    const days = () => [...dialog.querySelectorAll('.plus-calendar-day')];
     await userEvent.click(days()[9]);
     await userEvent.click(days()[13]);
     await waitFor(() => expect(input.value).toContain(' – '));

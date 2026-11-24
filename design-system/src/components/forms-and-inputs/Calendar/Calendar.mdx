@@ -59,7 +59,7 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 ## Behavior
 
-<ComponentExample of={CalendarStories.Default} title="Six weeks" description="Always 42 cells, so the panel never changes height; days outside the month are drawn but cannot be picked." />
+<ComponentExample of={CalendarStories.Default} title="Six weeks" description="Always 42 cells, so the panel never changes height; cells outside the month stay empty." />
 
 <ComponentExample of={CalendarStories.PickADay} title="Pick a day" description="Pressing a day picks it and marks it with aria-pressed." />
 
@@ -127,9 +127,9 @@ Use `Calendar` when a month grid must stay visible on the page without a field o
 
 ## Parts
 
-1. **Header.** The month and year in full, with Previous month and Next month buttons.
-2. **Weekday row.** Seven short day names.
-3. **Day cells.** Forty-two buttons in six weeks. Days of neighboring months fill the spare cells.
+1. **Header.** The month and year in full, centered, with Previous month over the first column and Next month over the last.
+2. **Weekday row.** One letter per day (S M T W T F S); each column header is named with the full day.
+3. **Day cells.** Forty-two cells in six weeks: a button for each day of the month, and empty cells before and after it.
 
 ### States
 
@@ -143,10 +143,10 @@ Use `Calendar` when a month grid must stay visible on the page without a field o
 <tr><td>Pressed</td><td>No look of its own: pressing an enabled day picks it.</td></tr>
 <tr><td>Focused</td><td>The month buttons and the days draw a 2px ring in <code>--ds-border-focused</code>, 2px off the edge.</td></tr>
 <tr><td>Disabled</td><td>A day out of bounds takes <code>--ds-text-disabled</code>, never an opacity fade; no focus, no <code>onPick</code>.</td></tr>
-<tr><td>Today</td><td>A 1px <code>--ds-border-brand</code> edge and <code>--ds-text-brand</code> text.</td></tr>
+<tr><td>Today</td><td><code>--ds-text-brand</code> text at semibold weight, with no edge or fill. The picked day's fill wins when today is picked.</td></tr>
 <tr><td>In range</td><td><code>--ds-background-selected</code>.</td></tr>
 <tr><td>Selected</td><td><code>--ds-background-selected-bold</code> with <code>--ds-text-inverse</code>, and <code>aria-pressed</code>.</td></tr>
-<tr><td>Outside the month</td><td><code>--ds-text-subtle</code>; not pickable.</td></tr>
+<tr><td>Outside the month</td><td>An empty cell.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -159,7 +159,7 @@ Use `Calendar` when a month grid must stay visible on the page without a field o
 <tbody>
 <tr><td>Month</td><td><code>--heading-xs</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>Month buttons</td><td>Compact <code>IconButton</code> (<code>--control-sm</code> square), <code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
-<tr><td>Weekday names</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Weekday letters</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>, centered in each day column.</td></tr>
 <tr><td>Day text</td><td><code>--body-default</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>Day size</td><td><code>--calendar-day-sm</code> (24), <code>--calendar-day-md</code> (32), <code>--calendar-day-lg</code> (40).</td></tr>
 <tr><td>Day radius</td><td><code>--radius-md</code>.</td></tr>
@@ -228,7 +228,7 @@ const [viewDate, setViewDate] = useState(new Date());
 
 ### Keep the grid at six weeks.
 
-Six weeks render every month, including the days of neighboring months that fill the remaining cells. This keeps the panel's height constant as someone pages through months, at the cost of occasionally showing a mostly empty week.
+Six weeks render every month, and the cells before the first day and after the last stay empty. Days of other months are not drawn, so the month on show reads as one block. The panel's height stays constant as someone pages through months, at the cost of an empty last week in some months.
 
 </div>
 
