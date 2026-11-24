@@ -21,6 +21,26 @@ describe('FileItem', () => {
         expect(onRemove).toHaveBeenCalledTimes(1);
     });
 
+    it('puts a kind of item in a Tile 32 and keeps a status bare in the lead slot', () => {
+        const { container, rerender } = render(<FileItem name="notes.pdf" status="done" />);
+        expect(container.querySelector('.plus-file-item__start .plus-tile--32 .fa-file-pdf')).not.toBeNull();
+
+        rerender(<FileItem name="Week 4" kind="folder" status="done" />);
+        expect(container.querySelector('.plus-file-item__start .plus-tile--32 .fa-folder')).not.toBeNull();
+
+        rerender(<FileItem name="notes.pdf" status="queued" />);
+        expect(container.querySelector('.plus-tile')).toBeNull();
+        expect(container.querySelector('.plus-file-item__start .fa-clock')).not.toBeNull();
+
+        rerender(<FileItem name="notes.pdf" status="error" />);
+        expect(container.querySelector('.plus-tile')).toBeNull();
+        expect(container.querySelector('.plus-file-item__start .fa-circle-exclamation')).not.toBeNull();
+
+        rerender(<FileItem name="notes.pdf" status="uploading" progress={10} />);
+        expect(container.querySelector('.plus-tile')).toBeNull();
+        expect(screen.getByRole('progressbar')).toHaveAttribute('data-size', '24');
+    });
+
     it('renders uploading status with ProgressRing, "Uploading · <n>%" meta, and Cancel X', () => {
         const onRemove = vi.fn();
         render(
