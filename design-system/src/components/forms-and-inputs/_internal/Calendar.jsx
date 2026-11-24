@@ -6,14 +6,19 @@ import { formatMonthYear, outOfBounds, parseDate, sameDay, formatIso } from './d
 import { IconButton } from '../IconButton/IconButton';
 import './Calendar.scss';
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// One letter per column, as the month grid shows them; the full name is the
+// column header's accessible name.
+const WEEKDAYS = [
+    ['S', 'Sunday'], ['M', 'Monday'], ['T', 'Tuesday'], ['W', 'Wednesday'],
+    ['T', 'Thursday'], ['F', 'Friday'], ['S', 'Saturday'],
+];
 
 /**
  * Calendar — the month grid (Figma `_Calendar`), the one calendar DatePicker
  * and DateTimePicker both open. It is a part: not exported from the barrel.
  *
  * - **Grid:** always six weeks, 42 cells, so the panel never changes height.
- *   Days of the months either side are drawn and can't be picked.
+ *   Cells outside the month stay empty.
  * - **Days:** each is a button named with its full date. `aria-pressed` marks
  *   the picked day, or both ends of a range; `data-in-range` marks the days
  *   between; `aria-current="date"` marks today.
@@ -59,7 +64,6 @@ const Calendar = ({
     }, [monthKey]);
     const firstWeekday = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const lastOfPrevious = new Date(year, month, 0).getDate();
     const today = new Date();
     const [focusDate, setFocusDate] = useState(null);
     const pendingFocus = useRef(false);
@@ -121,11 +125,7 @@ const Calendar = ({
         <div key={key} role="gridcell" className="plus-calendar-cell" {...props}>{node}</div>
     );
     for (let i = firstWeekday - 1; i >= 0; i -= 1) {
-        cells.push(cell(
-            `prev-${i}`,
-            <span data-column={cells.length % 7} className="plus-calendar-day plus-calendar-day--outside">{lastOfPrevious - i}</span>,
-            { 'aria-disabled': true },
-        ));
+        cells.push(cell(`prev-${i}`, null));
     }
     for (let day = 1; day <= daysInMonth; day += 1) {
         const date = new Date(year, month, day);
@@ -172,11 +172,7 @@ const Calendar = ({
         ));
     }
     for (let day = 1; cells.length < 42; day += 1) {
-        cells.push(cell(
-            `next-${day}`,
-            <span data-column={cells.length % 7} className="plus-calendar-day plus-calendar-day--outside">{day}</span>,
-            { 'aria-disabled': true },
-        ));
+        cells.push(cell(`next-${day}`, null));
     }
     const weeks = Array.from({ length: 6 }, (_, week) => (
         <div key={week} role="row" className="plus-calendar-week">{cells.slice(week * 7, week * 7 + 7)}</div>
@@ -199,7 +195,7 @@ const Calendar = ({
             </div>
             <div role="grid" aria-labelledby={monthId} className="plus-calendar-grid">
                 <div role="row" className="plus-calendar-weekdays">
-                    {WEEKDAYS.map((day) => <div key={day} role="columnheader" className="plus-calendar-weekday">{day}</div>)}
+                    {WEEKDAYS.map(([letter, name]) => <div key={name} role="columnheader" aria-label={name} className="plus-calendar-weekday">{letter}</div>)}
                 </div>
                 <SlideViews activeKey={monthKey} keys={slideKeys} size="panel">
                     <div className="plus-calendar-days">{weeks}</div>
