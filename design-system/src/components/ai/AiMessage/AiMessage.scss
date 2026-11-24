@@ -18,6 +18,7 @@
 
     &__icon {
         flex: none;
+        color: var(--ds-icon);
         margin-block-start: calc((1lh - var(--icon-md)) / 2);
     }
 

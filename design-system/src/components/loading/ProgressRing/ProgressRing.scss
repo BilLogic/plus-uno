@@ -6,15 +6,15 @@
  * or colored ground: `--ds-background-inverse-subtle` for the track and
  * `--ds-icon-inverse` for the fill.
  *
- * THE GEOMETRY. 2px stroke (`--progress-ring-stroke`) across all three sizes
- * (16 on `--icon-md`, 20 on `--image-xs`, 24 on `--icon-lg`). The SVG turns
+ * THE GEOMETRY. 2px stroke (`--progress-ring-stroke`) across both sizes
+ * (16 on `--icon-md`, 24 on `--icon-lg`), the two icon sizes a ring stands in for. The SVG turns
  * -90deg so the circle's 3 o'clock origin moves to 12 o'clock and the dash
  * fills clockwise. At 0% the round cap is hidden so a zero-length dash leaves
  * no dot on the track.
  */
 
 .plus-progress-ring {
-    --_progress-ring-size: var(--image-xs);
+    --_progress-ring-size: var(--icon-md);
 
     display: inline-flex;
     flex: none;
@@ -23,10 +23,6 @@
     width: var(--_progress-ring-size);
     height: var(--_progress-ring-size);
     vertical-align: middle;
-}
-
-.plus-progress-ring[data-size='16'] {
-    --_progress-ring-size: var(--icon-md);
 }
 
 .plus-progress-ring[data-size='24'] {

@@ -19,7 +19,7 @@ export default {
         size: {
             control: 'select',
             options: PROGRESS_RING_SIZES,
-            description: 'Diameter in pixels: 16, 20 or 24',
+            description: 'Diameter in pixels: 16 or 24',
             table: { category: 'Design' },
         },
         appearance: {
@@ -139,7 +139,7 @@ export const Sizes = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const scale = { 16: '--icon-md', 20: '--image-xs', 24: '--icon-lg' };
+        const scale = { 16: '--icon-md', 24: '--icon-lg' };
         for (const el of canvasElement.querySelectorAll('.plus-progress-ring')) {
             const size = Number(el.dataset.size);
             const rect = el.getBoundingClientRect();
@@ -153,8 +153,6 @@ export const Sizes = {
 };
 
 export const Size16 = () => <ProgressRing value={64} size={16} label="Uploading session recording" />;
-
-export const Size20 = () => <ProgressRing value={64} size={20} label="Uploading session recording" />;
 
 export const Size24 = () => <ProgressRing value={64} size={24} label="Uploading session recording" />;
 
@@ -193,7 +191,7 @@ export const OutOfRangeValuesAreClamped = {
 export const Interactive = {
     args: {
         value: 64,
-        size: 20,
+        size: 16,
         appearance: 'default',
         label: 'Uploading session recording',
     },
@@ -201,7 +199,7 @@ export const Interactive = {
     play: async ({ canvasElement }) => {
         const ring = within(canvasElement).getByRole('progressbar', { name: 'Uploading session recording' });
         await expect(ring).toHaveAttribute('aria-valuenow', '64');
-        await expect(ring).toHaveAttribute('data-size', '20');
+        await expect(ring).toHaveAttribute('data-size', '16');
     },
 };
 
@@ -216,7 +214,7 @@ export const Rest = {
     play: async ({ canvasElement }) => {
         const ring = within(canvasElement).getByRole('progressbar', { name: 'Uploading session recording' });
         await expect(ring).toHaveAttribute('aria-valuenow', '64');
-        await expect(ring).toHaveAttribute('data-size', '20');
+        await expect(ring).toHaveAttribute('data-size', '16');
     },
 };
 

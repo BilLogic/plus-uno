@@ -8,7 +8,7 @@
 
 **Source:** `design-system/src/components/loading/ProgressRing/ProgressRing.jsx`
 
-**Stories:** `design-system/src/components/loading/ProgressRing/ProgressRing.stories.jsx` — Overview, Default, Inverse, Zero, Partial, Complete, Values, Sizes, Size16, Size20, Size24, WithInlineText, OutOfRangeValuesAreClamped, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
+**Stories:** `design-system/src/components/loading/ProgressRing/ProgressRing.stories.jsx` — Overview, Default, Inverse, Zero, Partial, Complete, Values, Sizes, Size16, Size24, WithInlineText, OutOfRangeValuesAreClamped, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
 
 **Storybook page:** `design-system/src/components/loading/ProgressRing/ProgressRing.mdx`
 
@@ -54,7 +54,7 @@ Don't: A fixed ProgressRing faking an unknown wait.
 
 ### Pair `ProgressRing` with visible percent text when exact progress matters. {#pair-progressring-with-visible-percent-text-when-exact-progress-matters}
 
-At `PROGRESS_RING_SIZES` diameters (`16`, `20`, `24`), the center of the ring
+At `PROGRESS_RING_SIZES` diameters (`16`, `24`), the center of the ring
 cannot hold text; put the percent beside it on the row's meta line.
 
 Do: The percent sits beside the ring.
@@ -62,11 +62,11 @@ Don't: A bare ring with no surrounding context.
 
 ### Match `size` from `PROGRESS_RING_SIZES` to the icon slot it replaces. {#match-size-from-progressringsizes-to-the-icon-slot-it-replaces}
 
-Use `size={20}` in a row's leading slot so swapping between a status icon and
-an active upload never shifts the row, and `size={16}` beside compact text.
+Use `size={24}` in a row's leading slot so the ring matches a 24 icon, and
+`size={16}` beside compact text or a 16 icon.
 
 Do: A ring sized to match the row's leading icon slot.
-Don't: An undersized ring that shifts when replaced by the row's icon.
+Don't: An undersized ring that looks lost beside a larger icon slot.
 
 ### Use `appearance="inverse"` on bold surfaces. {#use-appearance-inverse-on-bold-surfaces}
 
@@ -121,7 +121,7 @@ Same group: `ProgressBar` · `Skeleton` · `Spinner`
 | Part | Token |
 | --- | --- |
 | Stroke width | `--progress-ring-stroke` across all sizes. |
-| Size | `--icon-md` for `16`, `--image-xs` for `20`, `--icon-lg` for `24`. |
+| Size | `--icon-md` for `16`, `--icon-lg` for `24`. |
 | Default | Track `--ds-background-neutral`, fill `--ds-background-brand-bold`. |
 | Inverse | Track `--ds-background-inverse-subtle`, fill `--ds-icon-inverse`. |
 
@@ -137,7 +137,7 @@ Same group: `ProgressBar` · `Skeleton` · `Spinner`
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | number (required) | — | Percent complete, from 0 to 100 |
-| `size` | enum | `20` | Diameter in pixels: 16, 20 or 24 |
+| `size` | enum | `16` | Diameter in pixels: 16 or 24 |
 | `label` | string (required) | — | Accessible name describing what the ring measures |
 | `appearance` | enum | `'default'` | default draws a brand fill on a neutral track; inverse reads on a bold background |
 | `className` | string | `''` | Extra class names on the root element. |
@@ -145,7 +145,7 @@ Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
 ## Variants
 
-**`size`** — `16` · `20` · `24`
+**`size`** — `16` · `24`
 
 **`appearance`** — `default` · `inverse`
 
@@ -153,7 +153,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral` · `--ds-icon-inverse` · `--ds-motion-linear` · `--ds-motion-spatial-fast-duration` · `--icon-lg` · `--icon-md` · `--image-xs` · `--progress-ring-stroke`
+`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral` · `--ds-icon-inverse` · `--ds-motion-linear` · `--ds-motion-spatial-fast-duration` · `--icon-lg` · `--icon-md` · `--progress-ring-stroke`
 
 From `design-system/src/components/loading/ProgressRing/ProgressRing.scss`. Override these through the token layer, never with a literal.
 

@@ -49,19 +49,17 @@ describe('ProgressRing', () => {
         expect(fill()).toHaveAttribute('stroke-dashoffset', '100');
     });
 
-    it('defaults to size 20 and supports 16, 20 and 24 with unclipped 2 px stroke geometry', () => {
-        expect(PROGRESS_RING_SIZES).toEqual([16, 20, 24]);
+    it('defaults to size 16 and supports 16 and 24 with unclipped 2 px stroke geometry', () => {
+        expect(PROGRESS_RING_SIZES).toEqual([16, 24]);
 
         const { rerender } = render(<ProgressRing value={50} label="Upload progress" />);
         const ring = screen.getByRole('progressbar', { name: 'Upload progress' });
-        expect(ring).toHaveAttribute('data-size', '20');
-        expect(ring.querySelector('svg')).toHaveAttribute('viewBox', '0 0 20 20');
-        expect(ring.querySelector('circle')).toHaveAttribute('r', '9');
-
-        rerender(<ProgressRing value={50} size={16} label="Upload progress" />);
         expect(ring).toHaveAttribute('data-size', '16');
         expect(ring.querySelector('svg')).toHaveAttribute('viewBox', '0 0 16 16');
         expect(ring.querySelector('circle')).toHaveAttribute('r', '7');
+
+        rerender(<ProgressRing value={50} size={20} label="Upload progress" />);
+        expect(ring).toHaveAttribute('data-size', '16');
 
         rerender(<ProgressRing value={50} size="24" label="Upload progress" />);
         expect(ring).toHaveAttribute('data-size', '24');

@@ -77,4 +77,11 @@ describe('AiIcon', () => {
         expect(container.firstChild).toHaveClass('plus-ai-icon', 'mine');
         expect(screen.getByTestId('icon')).toBe(container.firstChild);
     });
+
+    it('shifts the 24 ask drawing 0.75 right and up so it centers optically, and leaves 16 alone', () => {
+        const { container, rerender } = render(<AiIcon name="ask" size={24} />);
+        expect(container.querySelector('svg')).toHaveAttribute('viewBox', '-0.75 0.75 24 24');
+        rerender(<AiIcon name="ask" size={16} />);
+        expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 16 16');
+    });
 });

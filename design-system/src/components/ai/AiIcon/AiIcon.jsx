@@ -20,8 +20,8 @@ export const AI_ICON_ALL_SIZES = [12, 16, 24];
  * - **label** names the icon for assistive technology. Without it the icon is
  *   hidden, so pair it with visible text.
  *
- * The shapes fill with `currentColor`, which starts at the icon color; set `color`
- * to change it. Pair every icon with a label unless its meaning is obvious.
+ * The shapes fill with `currentColor`, which is the color around the icon, as with
+ * `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.
  */
 const AiIcon = ({ name = 'generate', size = 16, label, className = '', style, ...props }) => {
     const bySize = AI_ICON_SHAPES[name];

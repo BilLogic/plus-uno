@@ -64,7 +64,7 @@ Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` �
 
 ## Parts
 
-1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes `--icon-md` or the size the component around it sets.
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes 12 (`--icon-sm`) from the global glyph rule, the heading's size inside a heading, or the size the component around it sets.
 
 ### States
 

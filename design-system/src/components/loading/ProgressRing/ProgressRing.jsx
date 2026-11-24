@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './ProgressRing.scss';
 
-export const PROGRESS_RING_SIZES = [16, 20, 24];
+export const PROGRESS_RING_SIZES = [16, 24];
 export const PROGRESS_RING_APPEARANCES = ['default', 'inverse'];
 
 const STROKE_WIDTH = 2;
@@ -15,7 +15,7 @@ const STROKE_WIDTH = 2;
  */
 const ProgressRing = ({
     value,
-    size = 20,
+    size = 16,
     label,
     appearance = 'default',
     className = '',
@@ -24,7 +24,7 @@ const ProgressRing = ({
     const numeric = Number(value);
     const percentage = Number.isFinite(numeric) ? Math.min(Math.max(numeric, 0), 100) : 0;
     const numericSize = Number(size);
-    const resolvedSize = PROGRESS_RING_SIZES.includes(numericSize) ? numericSize : 20;
+    const resolvedSize = PROGRESS_RING_SIZES.includes(numericSize) ? numericSize : 16;
     const resolvedAppearance = PROGRESS_RING_APPEARANCES.includes(appearance) ? appearance : 'default';
     const center = resolvedSize / 2;
     const radius = (resolvedSize - STROKE_WIDTH) / 2;
@@ -76,7 +76,7 @@ const ProgressRing = ({
 ProgressRing.propTypes = {
     /** Percent complete, from 0 to 100. Values outside 0 to 100 clamp on both the drawn arc and `aria-valuenow`. */
     value: PropTypes.number.isRequired,
-    /** Diameter in pixels: 16, 20 or 24. */
+    /** Diameter in pixels: 16 or 24. */
     size: PropTypes.oneOf(PROGRESS_RING_SIZES),
     /** Accessible name describing what the ring measures, such as "Uploading session recording". */
     label: PropTypes.string.isRequired,

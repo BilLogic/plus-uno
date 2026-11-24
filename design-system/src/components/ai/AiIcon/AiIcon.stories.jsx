@@ -149,12 +149,14 @@ Labeled.play = async ({ canvasElement }) => {
 
 export const Color = () => (
     <div style={{ display: 'flex', gap: 'var(--inline-xl)', alignItems: 'center' }}>
-        <AiIcon name="suggest" data-testid="default" />
+        <span style={{ color: 'var(--ds-icon)' }}>
+            <AiIcon name="suggest" data-testid="default" />
+        </span>
         <AiIcon name="suggest" data-testid="brand" style={{ color: 'var(--ds-icon-brand)' }} />
     </div>
 );
 
-/** The shapes fill with `currentColor`: the icon token by default, and whatever `color` says otherwise. */
+/** The shapes fill with `currentColor`: the color around the icon (here the icon token), and whatever `color` says otherwise. */
 Color.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {

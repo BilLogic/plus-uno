@@ -16,6 +16,11 @@
     box-shadow: var(--ds-shadow-overlay);
 }
 
+// The panel title's icon reads as an icon, not as the title text beside it.
+.plus-ai-chat__title-icon {
+    color: var(--ds-icon);
+}
+
 // The popup is the chat surface itself: no pad of its own, a fixed height.
 .plus-popup.plus-ai-chat__popup {
     width: var(--ai-chat-width);

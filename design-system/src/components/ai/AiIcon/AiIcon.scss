@@ -1,9 +1,8 @@
-// The icon takes the icon color and its own box; a caller recolors it with
-// `color`, since the shapes fill with currentColor.
+// The icon takes its own box and the color around it, like the Icon component,
+// since the shapes fill with currentColor. A caller recolors it with `color`.
 .plus-ai-icon {
     display: inline-block;
     flex: none;
-    color: var(--ds-icon);
     vertical-align: middle;
 }
 
