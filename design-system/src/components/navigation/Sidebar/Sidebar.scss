@@ -271,7 +271,8 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        @include no-travel('.plus-template-sidebar__title--shut .plus-template-sidebar__caret i');
+        // Its button is hidden until hover or focus, so a fade would replay on every reveal.
+        @include no-travel;
     }
 }
 
@@ -446,7 +447,8 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
-        @include no-travel('.plus-template-sidebar__parent--shut .plus-template-sidebar__twist i');
+        // Its button is hidden until hover or focus, so a fade would replay on every reveal.
+        @include no-travel;
     }
 }
 

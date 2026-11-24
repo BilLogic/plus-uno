@@ -3,17 +3,21 @@
 // final place and runs a short opacity fade on the appearance.fast tokens.
 // `$on` is the full selector of the on state (open, checked, shut). The two
 // keyframes are identical on purpose: the animation name changes with the
-// state, so the fade restarts on every change.
+// state, so the fade restarts on every change. Leave `$on` out to stop the
+// transform and run no animation at all.
 @keyframes plus-reduced-fade-off { from { opacity: 0; } to { opacity: 1; } }
 @keyframes plus-reduced-fade-on { from { opacity: 0; } to { opacity: 1; } }
 
-@mixin no-travel($on) {
+@mixin no-travel($on: null) {
     @media (prefers-reduced-motion: reduce) {
         transition-property: none;
-        animation: plus-reduced-fade-off var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
-        @at-root #{$on} {
-            animation-name: plus-reduced-fade-on;
+        @if $on {
+            animation: plus-reduced-fade-off var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+            @at-root #{$on} {
+                animation-name: plus-reduced-fade-on;
+            }
         }
     }
 }

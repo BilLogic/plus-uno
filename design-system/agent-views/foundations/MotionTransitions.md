@@ -201,7 +201,7 @@ Something joins the page from above or beside it.
 | Flag | slides in from the top-right corner | leaves the way it came, by the exit rules in Physics |
 | Tooltip | fades in after a short wait | fades out shortly after the pointer leaves |
 
-A menu is opened dozens of times a day, so it changes opacity and nothing else: the same fade in and out for every member of the family, instant when opened from the keyboard. The in-app Reduced setting shows it with no animation, and the system's reduced-motion setting keeps the fade. Only the floating layers above (Modal, Panel, Flag) move.
+A menu is opened dozens of times a day, so it changes opacity and nothing else: the same fade in and out for every member of the family, instant when opened from the keyboard. Under both reduced-motion settings, the in-app one and the system's, the fade stays. Only the floating layers above (Modal, Panel, Flag) move.
 
 A Modal opens only from user action, moves focus to its first input as the motion starts, and never stacks a second Modal (a confirm swaps content in place). Scale is for floating layers only.
 

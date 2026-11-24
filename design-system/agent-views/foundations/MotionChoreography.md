@@ -85,7 +85,7 @@ When a few items change, each one moves (Add or remove, Reorder). When about a t
 
 ### Same meaning, same motion
 
-A row expanding is a reveal from its seam, and size sets the speed. A menu or a Select opening is not: it fades in place. That fade is instant from the keyboard and absent under the in-app Reduced setting; the system's reduced-motion setting keeps it. Visually similar things that live on different layers get different motion: a Panel on the page's layer pushes; one above it slides over. When one element changes both position and opacity, spatial and appearance run together.
+A row expanding is a reveal from its seam, and size sets the speed. A menu or a Select opening is not: it fades in place. That fade is instant from the keyboard, and it stays under both reduced-motion settings, the in-app one and the system's. Visually similar things that live on different layers get different motion: a Panel on the page's layer pushes; one above it slides over. When one element changes both position and opacity, spatial and appearance run together.
 
 ### Forward is confirm, reverse is cancel
 

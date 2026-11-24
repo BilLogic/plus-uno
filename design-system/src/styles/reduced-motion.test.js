@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
  */
 const SRC = join(__dirname, '..');
 const read = (path) => readFileSync(join(SRC, path), 'utf8');
+const compile = (path) => sass.compile(join(SRC, path), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true }).css;
 const reducedBlocks = (css) => css.split('@media (prefers-reduced-motion: reduce)').slice(1);
 
 describe('reduced motion', () => {
@@ -58,10 +59,24 @@ describe('reduced motion', () => {
         expect(css).not.toMatch(/data-reduced='true'\]\s*\{\s*animation:\s*none/);
     });
 
-    it('SearchField grows with a fade under reduced motion', () => {
-        const [block] = reducedBlocks(read('components/forms-and-inputs/SearchField/SearchField.scss'));
-        expect(block).toMatch(/--grow\s*\{\s*animation:\s*plus-overlay-fade/);
-        expect(block).toMatch(/--closed\.plus-search-field--shrink\s*\{\s*animation:\s*plus-overlay-fade/);
+    it('SearchField grows and closes with different reduced-motion animations so each restarts', () => {
+        const root = postcss.parse(compile('components/forms-and-inputs/SearchField/SearchField.scss'));
+        const nameFor = (selector) => {
+            let name;
+            root.walkAtRules('media', (media) => {
+                if (!/prefers-reduced-motion:\s*reduce/.test(media.params)) return;
+                media.walkRules((rule) => {
+                    if (!rule.selectors.includes(selector)) return;
+                    rule.walkDecls('animation', (decl) => { name = decl.value.split(/\s+/)[0]; });
+                });
+            });
+            return name;
+        };
+        const grow = nameFor('.plus-search-field--open.plus-search-field--grow');
+        const shrink = nameFor('.plus-search-field--closed.plus-search-field--shrink');
+        expect(grow).toBe('plus-reduced-fade-on');
+        expect(shrink).toBe('plus-reduced-fade-off');
+        expect(grow).not.toBe(shrink);
     });
 
     it('Listbox reveal keeps its fade and drops only the stagger', () => {
@@ -84,7 +99,7 @@ describe('reduced motion', () => {
     const stills = (rule) => rule.nodes.some((d) => d.type === 'decl' && d.prop === 'transition-property' && !/\btransform\b/.test(d.value));
 
     it.each(TRAVELERS)('%s: every selector that transitions transform has a reduced-motion rule that does not', (path) => {
-        const { css } = sass.compile(join(SRC, path), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true });
+        const css = compile(path);
         const root = postcss.parse(css);
         const traveling = [];
         const still = new Set();
@@ -99,10 +114,19 @@ describe('reduced motion', () => {
         expect(traveling.filter((sel) => !still.has(sel))).toEqual([]);
     });
 
-    it('Sidebar has a reduced-motion rule for both the caret and the twist', () => {
-        const { css } = sass.compile(join(SRC, 'components/navigation/Sidebar/Sidebar.scss'), { loadPaths: [SRC], silenceDeprecations: ['if-function'], quietDeps: true });
-        expect(css).toMatch(/__caret i \{[^}]*transition-property:\s*none/);
-        expect(css).toMatch(/__twist i \{[^}]*transition-property:\s*none/);
+    it('Sidebar caret and twist stop the transform without an animation', () => {
+        const root = postcss.parse(compile('components/navigation/Sidebar/Sidebar.scss'));
+        for (const part of ['caret', 'twist']) {
+            const decls = [];
+            root.walkAtRules('media', (media) => {
+                if (!/prefers-reduced-motion:\s*reduce/.test(media.params)) return;
+                media.walkRules((rule) => {
+                    if (rule.selectors.some((sel) => sel.endsWith(`__${part} i`))) decls.push(...rule.nodes.map((d) => d.prop));
+                });
+            });
+            expect(decls).toContain('transition-property');
+            expect(decls).not.toContain('animation');
+        }
     });
 
     it('a reduced-motion toggle state fades by swapping between two identical keyframes', () => {
@@ -111,7 +135,6 @@ describe('reduced motion', () => {
         expect(frames).toHaveLength(2);
         expect(frames[0][2]).toBe(frames[1][2]);
         expect(css).toMatch(/--ds-motion-appearance-fast-duration/);
-        expect(css).not.toMatch(/\$keep/);
     });
 
     it.each([
