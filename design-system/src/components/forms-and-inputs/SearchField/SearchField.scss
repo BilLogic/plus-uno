@@ -87,8 +87,13 @@
     }
 }
 
+// Reduced motion: the field appears at its final width with a fade; the
+// shrink's outline ghost has nothing to travel, so it is left out.
 @media (prefers-reduced-motion: reduce) {
-    .plus-search-field--open.plus-search-field--grow,
+    .plus-search-field--open.plus-search-field--grow {
+        animation: plus-overlay-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+
     .plus-search-field--closed.plus-search-field--shrink::before {
         animation: none;
     }

@@ -1,4 +1,5 @@
 @use '../../styles/state' as *;
+@use '../../styles/reduced-motion' as *;
 
 /**
  * Section template (Templates/Section)
@@ -301,6 +302,7 @@
     color: var(--ds-icon-subtle);
     transform: rotate(0deg);
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+    @include no-travel;
 }
 
 .plus-template-section-detail-trigger[data-panel-open] .plus-template-section-detail-chevron {

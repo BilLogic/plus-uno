@@ -8,6 +8,7 @@
  */
 
 @use '../../../styles/state' as *;
+@use '../../../styles/reduced-motion' as *;
 
 // The ring sits inside the row's edge, so the scrolling nav never clips it.
 @mixin sidebar-ring-inside {
@@ -270,6 +271,7 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+        @include no-travel;
     }
 }
 
@@ -444,6 +446,7 @@ button.plus-template-sidebar__title {
     i {
         font-size: var(--icon-sm);
         transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+        @include no-travel;
     }
 }
 

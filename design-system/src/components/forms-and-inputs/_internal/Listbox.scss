@@ -192,13 +192,13 @@
 
 // Options that arrive from a server fade in one after another, `STAGGER.gap`
 // apart, the last wait capped at `STAGGER.cap`; the Listbox hands both in as
-// custom properties. Reduced motion shows them at once.
+// custom properties. Reduced motion keeps the fade and drops the wait.
 .plus-listbox-reveal {
     animation: plus-listbox-reveal var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default) both;
     animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * var(--plus-listbox-reveal-gap)), var(--plus-listbox-reveal-cap));
 
     @media (prefers-reduced-motion: reduce) {
-        animation: none;
+        animation-delay: 0s;
     }
 }
 

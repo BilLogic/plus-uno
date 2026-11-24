@@ -1,0 +1,26 @@
+// Reduced motion for a transform that would travel, turn or scale. The token
+// layer already maps every spatial semantic to the appearance.fast fade, so the
+// duration is short; this stops the transform itself from animating and leaves
+// the properties named in `$keep` (opacity by default) to fade where they are.
+// Pass the color properties a rule also transitions: `no-travel(color, opacity)`.
+@mixin no-travel($keep: opacity) {
+    @media (prefers-reduced-motion: reduce) {
+        transition-property: $keep;
+    }
+}
+
+// A scale-in mark (the Checkbox tick, the Radio dot) shows by fading at its
+// final size instead of growing: hidden until one of `$shown` matches, then opaque.
+@mixin scale-reveal-as-fade($shown...) {
+    @media (prefers-reduced-motion: reduce) {
+        transform: none;
+        opacity: 0;
+        transition-property: opacity;
+
+        @each $selector in $shown {
+            #{$selector} & {
+                opacity: 1;
+            }
+        }
+    }
+}

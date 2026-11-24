@@ -41,11 +41,48 @@ describe('reduced motion', () => {
         'components/labels/Tag/Tag.scss',
         'components/ai/GenerativeBorder/GenerativeBorder.scss',
         'components/ai/AiMessage/AiMessage.scss',
-        'components/forms-and-inputs/_internal/Listbox.scss',
-        'components/forms-and-inputs/SearchField/SearchField.scss',
     ])('%s stops its loop in its own reduced-motion block', (path) => {
         const blocks = reducedBlocks(read(path));
         expect(blocks.some((block) => /animation:\s*none/.test(block.slice(0, 400)))).toBe(true);
+    });
+
+    it('overlays fade under the in-app reduced flag, in and out, never cut', () => {
+        const css = read('styles/_overlay-motion.scss');
+        const block = css.slice(css.indexOf("&[data-reduced='true']"));
+        expect(block.slice(0, 200)).toMatch(/animation:\s*\$fade-enter/);
+        expect(block.slice(0, 300)).toMatch(/data-leaving\][^{]*\{\s*animation:\s*\$fade-exit/);
+        expect(css).not.toMatch(/data-reduced='true'\]\s*\{\s*animation:\s*none/);
+    });
+
+    it('SearchField grows with a fade under reduced motion', () => {
+        const [block] = reducedBlocks(read('components/forms-and-inputs/SearchField/SearchField.scss'));
+        expect(block).toMatch(/--grow\s*\{\s*animation:\s*plus-overlay-fade/);
+    });
+
+    it('Listbox reveal keeps its fade and drops only the stagger', () => {
+        const [block] = reducedBlocks(read('components/forms-and-inputs/_internal/Listbox.scss'));
+        const body = block.slice(0, block.indexOf('}'));
+        expect(body).toMatch(/animation-delay:\s*0s/);
+        expect(body).not.toMatch(/animation:\s*none/);
+    });
+
+    it.each([
+        'components/forms-and-inputs/Toggle/Toggle.scss',
+        'components/forms-and-inputs/Checkbox/Checkbox.scss',
+        'components/forms-and-inputs/Radio/Radio.scss',
+        'components/forms-and-inputs/Cascader/Cascader.scss',
+        'components/forms-and-inputs/TreeSelect/TreeSelect.scss',
+        'components/layout-and-structure/Accordion/Accordion.scss',
+        'components/navigation/Sidebar/Sidebar.scss',
+        'templates/Section/Section.scss',
+    ])('%s does not animate transform under reduced motion', (path) => {
+        expect(read(path)).toMatch(/@include (no-travel|scale-reveal-as-fade)/);
+    });
+
+    it('the shared mixin drops transform from the transition and keeps the rest', () => {
+        const css = read('styles/_reduced-motion.scss');
+        expect(css).toMatch(/prefers-reduced-motion: reduce[^{]*\{\s*transition-property:\s*\$keep/);
+        expect(css).not.toMatch(/transition-property:[^;]*transform/);
     });
 
     it.each([
