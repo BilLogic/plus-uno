@@ -28,7 +28,7 @@
 }
 
 .plus-file-item__start {
-    @include item-row-start(var(--image-xs));
+    @include item-row-start(var(--image-md));
 }
 
 .plus-file-item__body {

@@ -123,7 +123,7 @@ const ChatSurface = ({ presentation }) => {
 
     const surface = (
         <PanelContainer className={`plus-ai-chat plus-ai-chat--${presentation}`} data-ai-chat-presentation={presentation}>
-            <PanelHeader titleIcon={<AiIcon name="ask" />} title={title} actions={actions} />
+            <PanelHeader titleIcon={<AiIcon name="ask" className="plus-ai-chat__title-icon" />} title={title} actions={actions} />
             <PanelBody className="plus-ai-chat__body">
                 <div ref={listRef} className="plus-ai-chat__messages" role="log" aria-label="Conversation" aria-live="polite">
                     {messages.length === 0 ? (

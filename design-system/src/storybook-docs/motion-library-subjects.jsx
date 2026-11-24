@@ -556,6 +556,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     ProgressRing: ({ progress }) => (
         <ProgressRing
             label="Upload progress"
+            size={24}
             value={Math.round(15 + progress * 75)}
         />
     ),

@@ -175,7 +175,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ai-chat-fab-size` · `--ai-chat-height` · `--ai-chat-width` · `--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--ai-chat-fab-size` · `--ai-chat-height` · `--ai-chat-width` · `--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--content-max-width-reading` · `--ds-icon` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popup-radius` · `--radius-md` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/ai/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 
