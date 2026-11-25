@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import FileItem, {
     FILE_ITEM_KINDS,
     FILE_ITEM_REMOVALS,
@@ -420,6 +421,11 @@ export const Disabled = {
         await expectLead(canvasElement, { tile: true });
         await expect(canvas.queryAllByRole('button')).toHaveLength(0);
         await expect(canvas.queryByRole('link')).toBeNull();
+        await inEveryColorModeOf(canvasElement, async () => {
+            const tile = canvasElement.querySelector('.plus-file-item__start .plus-tile');
+            await expect(getComputedStyle(tile).backgroundColor, 'the lead Tile takes the disabled ground').toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+            await expect(getComputedStyle(tile).color, 'the lead Tile icon takes the disabled color').toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
+        });
     },
 };
 

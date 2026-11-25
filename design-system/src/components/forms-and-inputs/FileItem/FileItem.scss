@@ -27,6 +27,12 @@
     cursor: not-allowed;
 }
 
+/* A Tile has no disabled state of its own: the lead Tile takes the disabled ground and glyph. */
+.plus-file-item--disabled .plus-file-item__start .plus-tile {
+    background-color: var(--ds-background-disabled);
+    color: var(--ds-icon-disabled);
+}
+
 .plus-file-item__start {
     @include item-row-start(var(--image-md));
 }

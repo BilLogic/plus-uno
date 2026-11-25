@@ -144,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--ds-background-disabled` · `--ds-border` · `--ds-border-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--file-item-height` · `--image-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--radius-control-md` · `--stack-md`
+`--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--ds-background-disabled` · `--ds-border` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--file-item-height` · `--image-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--radius-control-md` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/FileItem/FileItem.scss`. Override these through the token layer, never with a literal.
 
