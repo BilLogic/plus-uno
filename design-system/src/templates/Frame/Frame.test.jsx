@@ -153,8 +153,8 @@ describe('Frame panelKind', () => {
             const panel = usePanelControl();
             return (
                 <div>
-                    <button type="button" aria-controls={panel?.panelId} onClick={() => onPick('Ava')}>Row 1</button>
-                    <button type="button" aria-controls={panel?.panelId} onClick={() => onPick('Marcus')}>Row 2</button>
+                    <button type="button" aria-controls={panel?.open ? panel.panelId : undefined} onClick={() => onPick('Ava')}>Row 1</button>
+                    <button type="button" aria-controls={panel?.open ? panel.panelId : undefined} onClick={() => onPick('Marcus')}>Row 2</button>
                     <p>Outside page area</p>
                 </div>
             );
@@ -182,14 +182,18 @@ describe('Frame panelKind', () => {
         await withWindowWidth(1440, async () => {
             render(<Demo />);
             const row1 = screen.getByRole('button', { name: 'Row 1' });
+            const row2 = screen.getByRole('button', { name: 'Row 2' });
+            expect(row1).not.toHaveAttribute('aria-controls');
+            expect(row2).not.toHaveAttribute('aria-controls');
             row1.focus();
             fireEvent.click(row1);
 
             const panel = await screen.findByRole('complementary', { name: 'Session details' });
             await waitFor(() => expect(panel.contains(document.activeElement)).toBe(true));
+            expect(row1).toHaveAttribute('aria-controls', panel.id);
+            expect(row2).toHaveAttribute('aria-controls', panel.id);
 
             // Pressing another row trigger swaps the content in the same Panel without closing it.
-            const row2 = screen.getByRole('button', { name: 'Row 2' });
             fireEvent.pointerDown(row2);
             fireEvent.click(row2);
             expect(screen.getByRole('complementary', { name: 'Session details' })).toBe(panel);
@@ -199,6 +203,7 @@ describe('Frame panelKind', () => {
             within(panel).getByRole('button', { name: 'Close' }).focus();
             fireEvent.keyDown(document.activeElement, { key: 'Escape' });
             await waitFor(() => expect(screen.queryByRole('complementary', { name: 'Session details' })).toBeNull());
+            expect(row1).not.toHaveAttribute('aria-controls');
             await waitFor(() => expect(row1).toHaveFocus());
 
             // Opening again and pressing on the page outside the Panel closes it.

@@ -847,7 +847,7 @@ const HeaderChatTrigger = () => {
     return (
         <Button
             text="Chat"
-            aria-controls={panel?.panelId}
+            aria-controls={panel?.open ? panel.panelId : undefined}
             aria-expanded={panel?.open}
             onClick={() => panel?.setOpen(!panel.open)}
         />
@@ -2620,7 +2620,7 @@ const QuickLookButton = ({ name, onSelect }) => {
         <Button
             text={`Quick look ${name}`}
             spacing="compact"
-            aria-controls={panel?.panelId}
+            aria-controls={panel?.open ? panel.panelId : undefined}
             onClick={onSelect}
         />
     );

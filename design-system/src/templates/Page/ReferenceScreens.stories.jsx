@@ -131,7 +131,7 @@ const ReviewPanel = ({ value, onSave }) => {
 
 const EditNotes = () => {
     const panel = usePanelControl();
-    return <Button text="Edit notes" aria-expanded={panel.open} aria-controls={panel.panelId} onClick={() => panel.setOpen(true)} />;
+    return <Button text="Edit notes" aria-expanded={panel.open} aria-controls={panel.open ? panel.panelId : undefined} onClick={() => panel.setOpen(true)} />;
 };
 
 /** A detail page keeps the record visible under a floating Details Panel for editing. */
