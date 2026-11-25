@@ -537,6 +537,8 @@ export const MOTION_REGISTRY = [
     events: {
       enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Opens as a Popup: a fade in place.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
+      'docked-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'As a Frame panel (`panelKind="ai"`), the AI panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked panel never has a Blanket.' },
+      'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
     },
   },
   {
