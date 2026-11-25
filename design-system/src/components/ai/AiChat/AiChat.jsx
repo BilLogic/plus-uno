@@ -354,6 +354,7 @@ const AiChat = ({
         <AiChatContext.Provider value={value}>
             <Frame
                 panel={<ChatSurface presentation="panel" />}
+                panelKind="ai"
                 panelLabel={panelLabel ?? title}
                 panelOpen={state.open && state.mode === 'panel'}
                 onPanelOpenChange={(next) => dispatch({ type: next ? 'open' : 'close' })}

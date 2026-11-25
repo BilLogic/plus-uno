@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
+import Frame from './Frame.jsx';
 import { FRAME_LAYOUT } from './frameLayout.js';
 import { readFileSync as readSource } from 'node:fs';
 
@@ -51,6 +52,53 @@ describe('Frame Show code', () => {
         expect(frameMdx).toContain(String(both));
         expect(frameMdx).toContain(String(panelAlone));
         expect(frameMdx).not.toMatch(/docked wherever it shows/);
+    });
+});
+
+describe('Frame panelKind', () => {
+    it('floats a Details Panel as an overlay at 1440 with the Sidebar docked and full splitter range, while AI chat docks', () => {
+        const previousWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1440 });
+        try {
+            const { unmount } = render(
+                <Frame
+                    panelKind="details"
+                    panelLabel="Session details"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<div>Nav</div>}
+                    panel={<div>Details</div>}
+                >
+                    <div>Page content</div>
+                </Frame>,
+            );
+            const panel = document.querySelector('.plus-frame__panel');
+            expect(panel).toHaveClass('plus-frame__panel--overlay');
+            expect(panel).not.toHaveClass('plus-frame__panel--docked');
+            expect(document.querySelector('.plus-frame__blanket')).toBeNull();
+            expect(document.querySelector('.plus-frame__sidebar')).toHaveClass('plus-frame__sidebar--docked');
+            const splitter = screen.getByRole('separator', { name: /Resize/i });
+            expect(splitter).toHaveAttribute('aria-valuemin', String(FRAME_LAYOUT.panelMin));
+            expect(splitter).toHaveAttribute('aria-valuemax', String(FRAME_LAYOUT.panelMax));
+            unmount();
+
+            render(
+                <Frame
+                    panelLabel="AI chat"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<div>Nav</div>}
+                    panel={<div>Chat</div>}
+                >
+                    <div>Page content</div>
+                </Frame>,
+            );
+            const aiPanel = document.querySelector('.plus-frame__panel');
+            expect(aiPanel).toHaveClass('plus-frame__panel--docked');
+            expect(document.querySelector('.plus-frame__sidebar')).toHaveClass('plus-frame__sidebar--docked');
+        } finally {
+            Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: previousWidth });
+        }
     });
 });
 

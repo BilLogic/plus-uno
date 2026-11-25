@@ -168,6 +168,30 @@ describe('chat mode', () => {
     });
 });
 
+describe('Details Panel (panelKind: details)', () => {
+    it('at 1440 with a Details Panel open, the Panel is overlay and the Sidebar stays docked', () => {
+        expect(resolve({ frameWidth: 1440, chatMode: 'panel', panelKind: 'details' }))
+            .toEqual({ sidebar: 'docked', panel: 'overlay', panelWidth: 400, contentWidth: 1152 });
+    });
+
+    it.each([
+        [1600, 640, 'docked', 'overlay', 640, 1232],
+        [1168, 400, 'docked', 'overlay', 400, 880],
+        [1024, 400, 'docked', 'overlay', 400, 736],
+        [1023, 400, 'collapsed', 'overlay', 320, 975],
+        [768, 400, 'collapsed', 'overlay', 320, 720],
+        [767, 400, 'collapsed', 'overlay', 767, 719],
+    ])('frame %i with requested %i: Sidebar %s, Panel %s at %i, content %i', (frameWidth, panelWidth, sidebar, panel, expectedWidth, contentWidth) => {
+        expect(resolve({ frameWidth, panelWidth, chatMode: 'panel', panelKind: 'details' }))
+            .toEqual({ sidebar, panel, panelWidth: expectedWidth, contentWidth });
+    });
+
+    it('respects a Sidebar closed by hand at 1440 while floating', () => {
+        expect(resolve({ frameWidth: 1440, chatMode: 'panel', panelKind: 'details', sidebar: closedByHand }))
+            .toEqual({ sidebar: 'collapsed', panel: 'overlay', panelWidth: 400, contentWidth: 1232 });
+    });
+});
+
 describe('docked Panel maximum (the splitter)', () => {
     it('keeps the 720 floor', () => {
         // 1440 - 240 - 48 - 720 = 432

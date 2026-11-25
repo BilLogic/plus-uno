@@ -70,11 +70,12 @@ test('Section carries no glossary avoid-word of its own: its hand-kept aliases a
   assert.doesNotMatch(read('design-system/src/templates/Section/Section.jsx'), /with its header, toolbar and tabs/);
 });
 
-test('the Panel page places Details by width, credits Escape to the Frame and lists every part', () => {
+test('the Panel page floats Details at every width, credits Escape to the Frame and lists every part', () => {
   const page = read('design-system/src/templates/Panel/Panel.mdx');
-  assert.doesNotMatch(page, /floating over the right of the Page/);
+  assert.doesNotMatch(page, /Docked from 1168; floating under it|floating at every width is Planned/);
   assert.doesNotMatch(page, /footer, and Escape to close/);
-  assert.match(page, /Docked from 1168; floating under it/);
+  assert.match(page, /Details floats over the right of the Page at every width/);
+  assert.match(page, /Only the AI panel docks/);
   assert.match(page, /The Frame closes the Panel on Escape/);
   assert.match(page, /The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page/);
   assert.doesNotMatch(page, /Archive all|Show filter|Mentions/);

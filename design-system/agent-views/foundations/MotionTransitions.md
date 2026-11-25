@@ -221,7 +221,7 @@ Cancel plays the entrance backward, one speed faster, and nothing else changes. 
 | Panel | slides in from its edge | `spatial.slow` | 0 |
 | Panel content | opacity in | `appearance.fast` | When the page is about 90% done making room |
 
-Below the docking width the Panel slides over with a Blanket.
+Below the docking width the AI panel slides over with no Blanket.
 
 ## Feedback
 

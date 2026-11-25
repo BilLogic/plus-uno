@@ -4,7 +4,7 @@
 
 PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
-A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame.
+A full-height layer with no Blanket. Details floats over the right of the Page at every width; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. Only the AI panel docks, as a Frame region.
 
 Import the Panel and its parts from `@/templates`. This template documents the parts and its layout within the Frame.
 
@@ -20,17 +20,17 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Source:** `design-system/src/templates/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused, FullSizeFloatsNoBlanket, FullSizePanelOnBlanket, FullSizeOneFloatingPanel, FullSizeTwoFloatingPanels, FullSizeBesideAiPanel, FullSizeCoversAiPanel
+**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused, FullSizeFloatsNoBlanket, FullSizePanelOnBlanket, FullSizeOneFloatingPanel, FullSizeTwoFloatingPanels, FullSizeBesideAiPanel, FullSizeCoversAiPanel
 
 **Storybook page:** `design-system/src/templates/Panel/Panel.mdx`
 
-**Motion:** docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default` · floating-enter `spatial.default` · floating-exit `spatial.fast` · start-enter `appearance.fast` · start-exit `appearance.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** floating-enter `spatial.default` · floating-exit `spatial.fast` · start-enter `appearance.fast` · start-exit `appearance.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right and floats over the Page at every width while the Page and Sidebar keep their full width. The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
 
-The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
+Only the AI panel docks: it is a region of the Frame that sits beside the Page where there is room and persists across pages.
 
 ## Motion
 
@@ -38,13 +38,11 @@ Panel reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked Panel never has a Blanket. |
-| docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
 | floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details slides in from its edge over the page. A quick look promoted to its record grows from the Panel itself. |
 | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
 | start-enter | Open and close an overlay | `--ds-motion-appearance-fast` | The Inbox, opened from the Sidebar bell, fades in beside the Sidebar with no travel, like a menu. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
 | start-exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place, the same as the enter. |
-| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket. |
+| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with no Blanket. |
 | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
 
 ## Alternatives
@@ -162,8 +160,8 @@ For the step up when the quick look is not enough.
 
 ## Accessibility
 
-- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or to the bell for the start-side Inbox, on close.
-- Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
+- Floating over the Page, Details is a dialog (`role="dialog"`) named by its title: focus moves inside it, Tab stays inside it, and Escape, a press outside or Close closes it and returns focus to what opened it.
+- The start-side Inbox (`PanelOverlay`) is a complementary landmark named by its title beside the Sidebar; Escape, a press outside or Close closes it and returns focus to the bell.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
 - An unread dot is paired with the text "unread" for a screen reader.
@@ -180,9 +178,9 @@ Same group: `Card` · `Frame` · `Modal` · `Page` · `Section` · `Table`
 
 ## Types
 
-Neither has a Blanket. Details opens on the right, docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths); floating at every width is Planned. Notifications opens at the start, beside the Sidebar.
+Neither has a Blanket. Details floats over the right of the Page at every width, so the Page and Sidebar keep their full width (only the AI panel docks). Notifications opens at the start, beside the Sidebar.
 
-- **Details.** A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.
+- **Details.** A quick look at a row, floating over the right of the Page at every width. The picked row stays highlighted.
 - **Notifications.** The Inbox, opened from the bell beside your name. It opens beside the Sidebar, 360 wide, and stays open as you pick one.
 
 ## Anatomy
@@ -209,7 +207,7 @@ The bell at the end of the main Sidebar's account row, with its unread count, op
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
+Drag the Frame's width. Details floats over the right of the Page at every width on the overlay material and shadow, with no Blanket: 400 by default from 1024 up, capped at 320 under 1024, and full width under 768. The Page and Sidebar stay at full width under it; only the AI panel docks.
 
 ## Composition
 
@@ -223,7 +221,7 @@ The parts on their own, outside a Frame, at the width they are given.
 
 - **Record gone.** When the row no longer exists the body shows its empty state with a way back: Empty.
 
-- **Under 1024.** Too narrow to dock beside the table: the Panel floats on the overlay material and shadow, capped as Width behavior says, still with no Blanket.
+- **Under 1024.** Under 1024, Details still floats on the overlay material and shadow, capped at 320 (full width under 768), with no Blanket.
 
 ### Beside the AI panel
 
@@ -265,7 +263,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
-The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one, decides whether it docks or floats, and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
+The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"` for Details; `'ai'`, the default, for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
 
 | Slot | Details | Notifications |
 | --- | --- | --- |
@@ -275,7 +273,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | `subheader` (`PanelSubheader`) | The record's StatusTag under the title | None: the Unread and All tabs sit under the header |
 | `body` | Sections of the record; the form while editing | Items grouped by day, in Unread and All tabs |
 | `footer` · `disclaimer` (`PanelFooter`, `PanelDisclaimer`) | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. A `PanelDisclaimer` carries small print beside the actions. | None |
-| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. `PanelOverlay` with `placement="start"`, opened from the Sidebar's bell rather than the Frame's Panel area. |
+| Placement | Right. Floats over the Page at every width with no Blanket (`panelKind="details"` on `Frame`): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. `PanelOverlay` with `placement="start"`, opened from the Sidebar's bell rather than the Frame's Panel area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
 ## Sizes
@@ -285,10 +283,10 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | `--panel-width-default` | 400 | The width a Panel opens at. |
 | `--inbox-width` | 360 | The width the Inbox opens at, beside the Sidebar. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
-| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
-| `--ds-border`, `--border-width-default` | color, 1 | The edge line where a docked Panel meets the Page: the color and its width. |
+| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. Standalone parts outside a Frame use `--ds-surface` and an edge line. |
+| `--ds-border`, `--border-width-default` | color, 1 | The edge line on a standalone Panel (and a docked AI panel inside Frame): the color and its width. |
 
-The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
+Details resizes from 320 to 640 by drag or keys at 1024 and above, is capped at 320 under 1024, and is full width under 768.
 
 ## Content guidelines
 

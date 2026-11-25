@@ -606,7 +606,7 @@ export const ReflectionQueue = () => {
         </PanelContainer>
     );
     return (
-        <Frame sidebar={<Sidebar user="tutor" activeTabId="home" account={accountRow} />} panel={panel} panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
+        <Frame sidebar={<Sidebar user="tutor" activeTabId="home" account={accountRow} />} panel={panel} panelKind="details" panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
             <Section
                 title="Reflections to review"
                 views={(
