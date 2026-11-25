@@ -211,7 +211,7 @@ export const AnatomyNotifications = {
 /** The stage renders full size at `width` and scrolls horizontally if wider than the docs column: the Panel is always in view. Details is open on Ben Okafor's row. */
 const WidthStage = ({ width }) => (
     <ScrollStage width={width} height={WINDOW_HEIGHT} data-probe="stage">
-        <InAppFrame height="100%" panel={<DetailsPanel />} panelKind="details" panelLabel="Session details" panelStorageKey={null} panelOpen>
+        <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
             <SessionsBehind />
         </InAppFrame>
     </ScrollStage>
@@ -279,7 +279,7 @@ export const ResponsiveWidth = {
 };
 
 /** At 1440 Details floats over the Page at 400 on the overlay material and shadow, with the Sidebar docked and no Blanket. */
-export const WidthFloating = {
+export const Width = {
     parameters: { fullPage: true },
     name: 'Width: 1440',
     args: { width: 1440 },

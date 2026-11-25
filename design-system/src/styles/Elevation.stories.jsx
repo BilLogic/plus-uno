@@ -432,7 +432,6 @@ export const FloatingPanel = {
     render: () => (
         <SessionsFrame
             edge=".plus-frame__panel-edge"
-            panelKind="details"
             panelLabel="Session notes"
             panelPeek
             panel={(

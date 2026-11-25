@@ -40,6 +40,9 @@ const padTotal = L.pagePad * 2;
 /** The one clamp: the Frame, the splitter and the resolver share it. */
 export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
+/** Whether a Panel of `panelKind` may dock beside the Page. Only `'ai'` docks; `'details'` always floats. */
+export const panelCanDock = (panelKind) => panelKind === 'ai';
+
 /**
  * The splitter's widest docked Panel: it keeps the 720 content floor beside
  * whatever is docked now.
@@ -69,13 +72,13 @@ export function resolveFrameLayout({
     sidebar = { open: true, setBy: 'default' },
     sidebarPeek = false,
     chatMode = 'popup',
-    panelKind = 'ai',
+    panelKind = 'details',
 }) {
     const narrow = frameWidth < L.dockMin;
     const wantsPanel = chatMode === 'panel';
     const byHand = sidebar.setBy === 'hand';
     const sidebarWants = sidebar.open;
-    const canDockPanel = panelKind === 'ai';
+    const canDockPanel = panelCanDock(panelKind);
 
     // Rule 1: Panel width.
     const requestedPanel = clamp(panelWidth, L.panelMin, L.panelMax);

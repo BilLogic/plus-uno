@@ -193,7 +193,7 @@ Details resizes from 320 to 640 by drag or keys at 1024 and above, is capped at 
 import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
-The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"` for Details; `'ai'`, the default, for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
+The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"`, the default, for Details; `'ai'` for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
 
 <DocsTable>
 <thead>
@@ -206,7 +206,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 <tr><td><code>subheader</code> (<code>PanelSubheader</code>)</td><td>The record's StatusTag under the title</td><td>None: the Unread and All tabs sit under the header</td></tr>
 <tr><td><code>body</code></td><td>Sections of the record; the form while editing</td><td>Items grouped by day, in Unread and All tabs</td></tr>
 <tr><td><code>footer</code> · <code>disclaimer</code> (<code>PanelFooter</code>, <code>PanelDisclaimer</code>)</td><td>Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. <PlannedTag /> Planned as a prop. A <code>PanelDisclaimer</code> carries small print beside the actions.</td><td>None</td></tr>
-<tr><td>Placement</td><td>Right. Floats over the Page at every width with no Blanket (<code>panelKind="details"</code> on <code>Frame</code>): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. <code>PanelOverlay</code> with <code>placement="start"</code>, opened from the Sidebar's bell rather than the Frame's Panel area.</td></tr>
+<tr><td>Placement</td><td>Right. Floats over the Page at every width with no Blanket (<code>Frame</code> defaults to <code>panelKind="details"</code>): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. <code>PanelOverlay</code> with <code>placement="start"</code>, opened from the Sidebar's bell rather than the Frame's Panel area.</td></tr>
 <tr><td>Beside the AI panel <PlannedTag /></td><td>Planned. The Frame has one Panel area.</td><td>Planned.</td></tr>
 </tbody>
 </DocsTable>

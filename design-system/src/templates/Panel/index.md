@@ -20,7 +20,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Source:** `design-system/src/templates/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthFloating, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused, FullSizeFloatsNoBlanket, FullSizePanelOnBlanket, FullSizeOneFloatingPanel, FullSizeTwoFloatingPanels, FullSizeBesideAiPanel, FullSizeCoversAiPanel
+**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, Width, KeyEditing, KeyWithForm, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused, FullSizeFloatsNoBlanket, FullSizePanelOnBlanket, FullSizeOneFloatingPanel, FullSizeTwoFloatingPanels, FullSizeBesideAiPanel, FullSizeCoversAiPanel
 
 **Storybook page:** `design-system/src/templates/Panel/Panel.mdx`
 
@@ -263,7 +263,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
-The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"` for Details; `'ai'`, the default, for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
+The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"`, the default, for Details; `'ai'` for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
 
 | Slot | Details | Notifications |
 | --- | --- | --- |
@@ -273,7 +273,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 | `subheader` (`PanelSubheader`) | The record's StatusTag under the title | None: the Unread and All tabs sit under the header |
 | `body` | Sections of the record; the form while editing | Items grouped by day, in Unread and All tabs |
 | `footer` · `disclaimer` (`PanelFooter`, `PanelDisclaimer`) | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. A `PanelDisclaimer` carries small print beside the actions. | None |
-| Placement | Right. Floats over the Page at every width with no Blanket (`panelKind="details"` on `Frame`): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. `PanelOverlay` with `placement="start"`, opened from the Sidebar's bell rather than the Frame's Panel area. |
+| Placement | Right. Floats over the Page at every width with no Blanket (`Frame` defaults to `panelKind="details"`): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks. | Start, beside the Sidebar, 360 wide (`--inbox-width`), over the page with no Blanket. `PanelOverlay` with `placement="start"`, opened from the Sidebar's bell rather than the Frame's Panel area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
 ## Sizes
