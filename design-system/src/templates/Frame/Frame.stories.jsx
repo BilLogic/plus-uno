@@ -866,6 +866,7 @@ const WithPanel = ({ withModal = false, withHeaderTrigger = false, ...args }) =>
         <>
             <InAppFrame
                 panel={<ChatPanel onSettings={withModal ? () => setModal(true) : undefined} />}
+                panelKind="ai"
                 panelLabel="AI chat"
                 {...(header ? { header } : {})}
                 {...args}
@@ -1454,7 +1455,7 @@ const FrameState = ({ act, overlay, ...args }) => {
     const close = () => setOverlayOpen(false);
     return (
         <div ref={ref}>
-            <InAppFrame panelLabel="AI chat" panelStorageKey={null} {...args}>
+            <InAppFrame panelKind="ai" panelLabel="AI chat" panelStorageKey={null} {...args}>
                 {slot('Content slot')}
                 {slot('Content slot')}
             </InAppFrame>
@@ -1608,6 +1609,7 @@ const DefaultType = ({ withPanel = false, address = 'app.plus.org/dashboard', ..
     <BrowserWindow address={address} height={WINDOW_HEIGHT}>
         <InAppFrame
             height="100%"
+            panelKind="ai"
             panelLabel="AI chat"
             panelStorageKey={null}
             {...(withPanel ? { panel: <ChatPanel />, panelOpen: true } : {})}
@@ -1801,7 +1803,7 @@ export const AnatomyDefault = {
 /** A stage whose own width the control sets, with the AI panel open. */
 const WidthStage = ({ width, ...args }) => (
     <ScrollStage width={width} height={WINDOW_HEIGHT} data-probe="stage">
-        <InAppFrame height="100%" panel={<ChatPanel />} panelLabel="AI chat" panelStorageKey={null} defaultPanelOpen {...args}>
+        <InAppFrame height="100%" panelKind="ai" panel={<ChatPanel />} panelLabel="AI chat" panelStorageKey={null} defaultPanelOpen {...args}>
             <SkeletonSection title="Upcoming sessions" />
         </InAppFrame>
     </ScrollStage>
@@ -2612,6 +2614,18 @@ export const MotionClimbTwoLevelsReduced = {
     play: climbTwoLevelsPlay(),
 };
 
+const QuickLookButton = ({ name, onSelect }) => {
+    const panel = usePanelControl();
+    return (
+        <Button
+            text={`Quick look ${name}`}
+            spacing="compact"
+            aria-controls={panel?.panelId}
+            onClick={onSelect}
+        />
+    );
+};
+
 const RecordOverlayDemo = () => {
     const controller = useDrillStack([{ key: 'students' }]);
     const [panelStudent, setPanelStudent] = useState(null);
@@ -2645,7 +2659,6 @@ const RecordOverlayDemo = () => {
                     <Frame
                         header={crumbs ? <Breadcrumb label="Breadcrumb" items={crumbs} /> : undefined}
                         sidebar={<Sidebar user="tutor" activeTabId="toolkit-students" account={SUPERVISOR_ACCOUNT} />}
-                        panelKind="details"
                         panelLabel="Student details"
                         panelStorageKey={null}
                         panelOpen={Boolean(panelStudent)}
@@ -2703,10 +2716,9 @@ const RecordOverlayDemo = () => {
                                                         description={student.detail}
                                                         actions={(
                                                             <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
-                                                                <Button
-                                                                    text={`Quick look ${student.name}`}
-                                                                    spacing="compact"
-                                                                    onClick={(e) => {
+                                                                <QuickLookButton
+                                                                    name={student.name}
+                                                                    onSelect={(e) => {
                                                                         panelTriggerRef.current = e.currentTarget;
                                                                         setPanelStudent(student);
                                                                     }}

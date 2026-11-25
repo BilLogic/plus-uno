@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveFrameLayout, dockedPanelMax, FRAME_LAYOUT, clamp } from './frameLayout';
+import { resolveFrameLayout, dockedPanelMax, panelCanDock, FRAME_LAYOUT, clamp } from './frameLayout';
 
 const byDefault = { open: true, setBy: 'default' };
 const byHand = { open: true, setBy: 'hand' };
@@ -98,7 +98,7 @@ describe('Panel thresholds, Sidebar by default', () => {
         [640, 1408, 'collapsed', 'docked', 720],
         [640, 1407, 'docked', 'overlay', 1119],
     ])('Panel %i at frame %i: Sidebar %s, Panel %s, content %i', (panelWidth, frameWidth, sidebar, panel, content) => {
-        const r = resolve({ frameWidth, panelWidth, chatMode: 'panel', sidebar: byDefault });
+        const r = resolve({ frameWidth, panelWidth, chatMode: 'panel', panelKind: 'ai', sidebar: byDefault });
         expect(r.sidebar).toBe(sidebar);
         expect(r.panel).toBe(panel);
         expect(r.contentWidth).toBe(content);
@@ -106,29 +106,29 @@ describe('Panel thresholds, Sidebar by default', () => {
     });
 
     it('collapses the default Sidebar one pixel under 1408, and docks it at 1408', () => {
-        expect(resolve({ frameWidth: 1407, chatMode: 'panel' }).sidebar).toBe('collapsed');
-        expect(resolve({ frameWidth: 1408, chatMode: 'panel' }).sidebar).toBe('docked');
+        expect(resolve({ frameWidth: 1407, chatMode: 'panel', panelKind: 'ai' }).sidebar).toBe('collapsed');
+        expect(resolve({ frameWidth: 1408, chatMode: 'panel', panelKind: 'ai' }).sidebar).toBe('docked');
     });
 
     it('restores the Sidebar when the Panel closes', () => {
-        expect(resolve({ frameWidth: 1407, chatMode: 'popup' }).sidebar).toBe('docked');
+        expect(resolve({ frameWidth: 1407, chatMode: 'popup', panelKind: 'ai' }).sidebar).toBe('docked');
     });
 });
 
 describe('Panel with the Sidebar opened by hand', () => {
     it('wins over the Panel when both do not fit: Panel goes to overlay', () => {
-        const r = resolve({ frameWidth: 1407, chatMode: 'panel', sidebar: byHand });
+        const r = resolve({ frameWidth: 1407, chatMode: 'panel', panelKind: 'ai', sidebar: byHand });
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('overlay');
     });
     it('both dock when they fit', () => {
-        const r = resolve({ frameWidth: 1408, chatMode: 'panel', sidebar: byHand });
+        const r = resolve({ frameWidth: 1408, chatMode: 'panel', panelKind: 'ai', sidebar: byHand });
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('docked');
     });
     it('a Sidebar closed by hand leaves room: Panel docks from 1168', () => {
-        expect(resolve({ frameWidth: 1168, chatMode: 'panel', sidebar: closedByHand }).panel).toBe('docked');
-        expect(resolve({ frameWidth: 1167, chatMode: 'panel', sidebar: closedByHand }).panel).toBe('overlay');
+        expect(resolve({ frameWidth: 1168, chatMode: 'panel', panelKind: 'ai', sidebar: closedByHand }).panel).toBe('docked');
+        expect(resolve({ frameWidth: 1167, chatMode: 'panel', panelKind: 'ai', sidebar: closedByHand }).panel).toBe('overlay');
     });
 });
 
@@ -162,13 +162,20 @@ describe('Panel width is clamped to 320..640', () => {
 
 describe('chat mode', () => {
     it('only the panel mode shows the Panel', () => {
-        expect(resolve({ chatMode: 'popup' }).panel).toBe('none');
-        expect(resolve({ chatMode: 'fullscreen' }).panel).toBe('none');
-        expect(resolve({ chatMode: 'panel' }).panel).toBe('docked');
+        expect(resolve({ chatMode: 'popup', panelKind: 'ai' }).panel).toBe('none');
+        expect(resolve({ chatMode: 'fullscreen', panelKind: 'ai' }).panel).toBe('none');
+        expect(resolve({ chatMode: 'panel', panelKind: 'ai' }).panel).toBe('docked');
     });
 });
 
-describe('Details Panel (panelKind: details)', () => {
+describe('Details Panel (panelKind: details, default)', () => {
+    it('defaults panelKind to details so a Frame without the prop floats', () => {
+        expect(panelCanDock('ai')).toBe(true);
+        expect(panelCanDock('details')).toBe(false);
+        expect(resolve({ frameWidth: 1440, chatMode: 'panel' }))
+            .toEqual({ sidebar: 'docked', panel: 'overlay', panelWidth: 400, contentWidth: 1152 });
+    });
+
     it('at 1440 with a Details Panel open, the Panel is overlay and the Sidebar stays docked', () => {
         expect(resolve({ frameWidth: 1440, chatMode: 'panel', panelKind: 'details' }))
             .toEqual({ sidebar: 'docked', panel: 'overlay', panelWidth: 400, contentWidth: 1152 });

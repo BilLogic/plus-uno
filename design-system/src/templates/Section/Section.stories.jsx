@@ -680,22 +680,30 @@ export const TypeQueue = {
         await expect(canvasElement.querySelector('.plus-frame__sidebar--docked'), 'the Sidebar stays docked').not.toBeNull();
         await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Blanket on a floating Panel').toBeNull();
 
-        const panel = within(canvas.getByRole('dialog', { name: 'Reflection' }));
+        const panelEl = canvas.getByRole('complementary', { name: 'Reflection' });
+        const panel = within(panelEl);
         await expect(panel.getByRole('heading', { name: 'Ava Thompson' })).toBeInTheDocument();
 
-        const selectedReviews = () => [...canvasElement.querySelectorAll('tbody button')].map((b) => b.getAttribute('aria-pressed') === 'true');
+        const table = canvas.getByRole('table');
+        const reviewButtons = () => within(table).getAllByRole('button', { name: 'Review' });
+        const selectedReviews = () => reviewButtons().map((b) => b.getAttribute('aria-pressed') === 'true');
         await expect(selectedReviews(), 'the first row is highlighted').toEqual([true, false, false, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Next' }));
         await waitFor(() => expect(panel.getByRole('heading', { name: 'Marcus Lee' })).toBeInTheDocument());
         await expect(selectedReviews(), 'Next moves the highlighted row').toEqual([false, true, false, false]);
 
+        await userEvent.click(reviewButtons()[2]);
+        await expect(canvas.getByRole('complementary', { name: 'Reflection' }), 'clicking another row swaps the content in the same Panel').toBe(panelEl);
+        await waitFor(() => expect(panel.getByRole('heading', { name: 'Priya Nair' })).toBeInTheDocument());
+        await expect(selectedReviews(), 'picking another row updates the highlighted row').toEqual([false, false, true, false]);
+
         await userEvent.click(panel.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Reflection' })).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Reflection' })).toBeNull());
         await expect(selectedReviews(), 'Close clears the highlight').toEqual([false, false, false, false]);
 
-        await userEvent.click(canvas.getAllByRole('button', { name: 'Review' })[0]);
-        await waitFor(() => expect(canvas.getByRole('dialog', { name: 'Reflection' })).toBeInTheDocument());
+        await userEvent.click(reviewButtons()[0]);
+        await waitFor(() => expect(canvas.getByRole('complementary', { name: 'Reflection' })).toBeInTheDocument());
     }),
 };
 

@@ -143,7 +143,7 @@ export const DetailWithPanel = {
         return (
             <FitStage width={1600} scrollable>
                 <Frame style={{ blockSize: '100vh' }} defaultPanelOpen panelStorageKey={null}
-                    panelKind="details" panelLabel="Session review notes" panel={<ReviewPanel value={saved} onSave={setSaved} />}>
+                    panelLabel="Session review notes" panel={<ReviewPanel value={saved} onSave={setSaved} />}>
                     <Page
                         header={<PageHeader title="Ana Ruiz · Session review" actions={<EditNotes />} />}
                         banner={<Banner appearance="announcement">Saved notes are shared with the tutor.</Banner>}
@@ -160,7 +160,7 @@ export const DetailWithPanel = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const panel = () => canvas.getByRole('dialog', { name: 'Session review notes' });
+        const panel = () => canvas.getByRole('complementary', { name: 'Session review notes' });
         await waitFor(() => expect(panel()).toHaveClass('plus-frame__panel--overlay'));
         await expect(canvasElement.querySelector('.plus-frame__blanket')).toBeNull();
         const discard = within(panel()).getByRole('button', { name: 'Discard' });
@@ -168,13 +168,13 @@ export const DetailWithPanel = {
         await expect(discard.getBoundingClientRect().right).toBeLessThanOrEqual(save.getBoundingClientRect().left);
         await userEvent.type(canvas.getByRole('textbox', { name: 'Notes' }), ' Discard this.');
         await userEvent.click(discard);
-        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Session review notes' })).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Session review notes' })).toBeNull());
         await userEvent.click(canvas.getByRole('button', { name: 'Edit notes' }));
         await expect(canvas.getByRole('textbox', { name: 'Notes' })).toHaveValue('Start with unit rates.');
         await userEvent.clear(canvas.getByRole('textbox', { name: 'Notes' }));
         await userEvent.type(canvas.getByRole('textbox', { name: 'Notes' }), 'Practice ratios next.');
         await userEvent.click(within(panel()).getByRole('button', { name: 'Save notes' }));
-        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Session review notes' })).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Session review notes' })).toBeNull());
         await expect(canvas.getAllByRole('status').at(-1).textContent).toBe('Practice ratios next.');
         await userEvent.click(canvas.getByRole('button', { name: 'Edit notes' }));
         await userEvent.type(canvas.getByRole('textbox', { name: 'Notes' }), ' Discard this.');
