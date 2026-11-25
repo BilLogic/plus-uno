@@ -21,8 +21,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Page | template | title | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | anchor | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Panel | template | docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` |  |
-| Panel | template | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Panel | template | floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Panel | template | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Panel | template | start-enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
@@ -90,6 +88,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
 | AiChat | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | AiChat | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| AiChat | component | docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` |  |
+| AiChat | component | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |  |
 | AiMessage | component | ready | Load content | `--ds-motion-appearance-fast` | `sound.ai.ready` on land: the feedback took over 1 s, so a Spinner showed |
 | AiMessage | component | strong | Load content | `--ds-motion-appearance-fast` | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |

@@ -1,10 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { render, screen, within } from '@testing-library/react';
+import { useState } from 'react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { BarInOrder, BarScrambled, BareColumn, BareWithSidebar, CODE, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
+import Frame from './Frame.jsx';
+import { usePanelControl } from './PanelControl.js';
 import { FRAME_LAYOUT } from './frameLayout.js';
 import { readFileSync as readSource } from 'node:fs';
 
@@ -51,6 +54,186 @@ describe('Frame Show code', () => {
         expect(frameMdx).toContain(String(both));
         expect(frameMdx).toContain(String(panelAlone));
         expect(frameMdx).not.toMatch(/docked wherever it shows/);
+    });
+});
+
+const withWindowWidth = (width, fn) => {
+    const previousWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: width });
+    try {
+        return fn();
+    } finally {
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: previousWidth });
+    }
+};
+
+describe('Frame panelKind', () => {
+    it('defaults panelKind to details and floats as an overlay at 1440 with the Sidebar docked and full splitter range', () => {
+        withWindowWidth(1440, () => {
+            render(
+                <Frame
+                    panelLabel="Session details"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<div>Nav</div>}
+                    panel={<div>Details</div>}
+                >
+                    <div>Page content</div>
+                </Frame>,
+            );
+            const panel = document.querySelector('.plus-frame__panel');
+            expect(panel).toHaveClass('plus-frame__panel--overlay');
+            expect(panel).not.toHaveClass('plus-frame__panel--docked');
+            expect(document.querySelector('.plus-frame__blanket')).toBeNull();
+            expect(document.querySelector('.plus-frame__sidebar')).toHaveClass('plus-frame__sidebar--docked');
+            const splitter = screen.getByRole('separator', { name: /Resize/i });
+            expect(splitter).toHaveAttribute('aria-valuemin', String(FRAME_LAYOUT.panelMin));
+            expect(splitter).toHaveAttribute('aria-valuemax', String(FRAME_LAYOUT.panelMax));
+        });
+    });
+
+    it('docks AI chat at 1440 when panelKind="ai" is passed', () => {
+        withWindowWidth(1440, () => {
+            render(
+                <Frame
+                    panelKind="ai"
+                    panelLabel="AI chat"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<div>Nav</div>}
+                    panel={<div>Chat</div>}
+                >
+                    <div>Page content</div>
+                </Frame>,
+            );
+            const aiPanel = document.querySelector('.plus-frame__panel');
+            expect(aiPanel).toHaveClass('plus-frame__panel--docked');
+            expect(document.querySelector('.plus-frame__sidebar')).toHaveClass('plus-frame__sidebar--docked');
+        });
+    });
+
+    it('leaves a Sidebar link and a table button focusable and not inert when Details is open at 1440', () => {
+        withWindowWidth(1440, () => {
+            render(
+                <Frame
+                    panelLabel="Session details"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<nav aria-label="Primary"><a href="#sessions">Sessions</a></nav>}
+                    panel={<button type="button">Close</button>}
+                >
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><button type="button">Review</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </Frame>,
+            );
+            const panel = screen.getByRole('complementary', { name: 'Session details' });
+            expect(panel).not.toHaveAttribute('aria-modal');
+            expect(document.querySelector('.plus-frame__sidebar')).not.toHaveAttribute('inert');
+            expect(document.querySelector('.plus-frame__surface')).not.toHaveAttribute('inert');
+
+            const sidebarLink = screen.getByRole('link', { name: 'Sessions' });
+            const tableButton = screen.getByRole('button', { name: 'Review' });
+            expect(sidebarLink.closest('[inert]')).toBeNull();
+            expect(tableButton.closest('[inert]')).toBeNull();
+
+            sidebarLink.focus();
+            expect(sidebarLink).toHaveFocus();
+            tableButton.focus();
+            expect(tableButton).toHaveFocus();
+        });
+    });
+
+    it('moves focus into Details when opened at 1440, swaps on another row trigger, and closes on Escape or outside press', async () => {
+        const RowTriggers = ({ onPick }) => {
+            const panel = usePanelControl();
+            return (
+                <div>
+                    <button type="button" aria-controls={panel?.open ? panel.panelId : undefined} onClick={() => onPick('Ava')}>Row 1</button>
+                    <button type="button" aria-controls={panel?.open ? panel.panelId : undefined} onClick={() => onPick('Marcus')}>Row 2</button>
+                    <p>Outside page area</p>
+                </div>
+            );
+        };
+        const Demo = () => {
+            const [picked, setPicked] = useState(null);
+            return (
+                <Frame
+                    panelLabel="Session details"
+                    panelOpen={Boolean(picked)}
+                    onPanelOpenChange={(next) => { if (!next) setPicked(null); }}
+                    panelStorageKey={null}
+                    sidebar={<nav aria-label="Primary"><a href="#sessions">Sessions</a></nav>}
+                    panel={(
+                        <div>
+                            <h2>{picked}</h2>
+                            <button type="button" onClick={() => setPicked(null)}>Close</button>
+                        </div>
+                    )}
+                >
+                    <RowTriggers onPick={setPicked} />
+                </Frame>
+            );
+        };
+        await withWindowWidth(1440, async () => {
+            render(<Demo />);
+            const row1 = screen.getByRole('button', { name: 'Row 1' });
+            const row2 = screen.getByRole('button', { name: 'Row 2' });
+            expect(row1).not.toHaveAttribute('aria-controls');
+            expect(row2).not.toHaveAttribute('aria-controls');
+            row1.focus();
+            fireEvent.click(row1);
+
+            const panel = await screen.findByRole('complementary', { name: 'Session details' });
+            await waitFor(() => expect(panel.contains(document.activeElement)).toBe(true));
+            expect(row1).toHaveAttribute('aria-controls', panel.id);
+            expect(row2).toHaveAttribute('aria-controls', panel.id);
+
+            // Pressing another row trigger swaps the content in the same Panel without closing it.
+            fireEvent.pointerDown(row2);
+            fireEvent.click(row2);
+            expect(screen.getByRole('complementary', { name: 'Session details' })).toBe(panel);
+            expect(within(panel).getByRole('heading', { name: 'Marcus' })).toBeInTheDocument();
+
+            // Escape closes the Panel and returns focus to the opener.
+            within(panel).getByRole('button', { name: 'Close' }).focus();
+            fireEvent.keyDown(document.activeElement, { key: 'Escape' });
+            await waitFor(() => expect(screen.queryByRole('complementary', { name: 'Session details' })).toBeNull());
+            expect(row1).not.toHaveAttribute('aria-controls');
+            await waitFor(() => expect(row1).toHaveFocus());
+
+            // Opening again and pressing on the page outside the Panel closes it.
+            row2.focus();
+            fireEvent.click(row2);
+            await screen.findByRole('complementary', { name: 'Session details' });
+            const outside = screen.getByText('Outside page area');
+            fireEvent.pointerDown(outside);
+            fireEvent.click(outside);
+            await waitFor(() => expect(screen.queryByRole('complementary', { name: 'Session details' })).toBeNull());
+        });
+    });
+
+    it('keeps a full-width Details Panel modal under 768', () => {
+        withWindowWidth(600, () => {
+            render(
+                <Frame
+                    panelLabel="Session details"
+                    panelOpen
+                    panelStorageKey={null}
+                    sidebar={<div>Nav</div>}
+                    panel={<button type="button">Close</button>}
+                >
+                    <div>Page content</div>
+                </Frame>,
+            );
+            const panel = screen.getByRole('dialog', { name: 'Session details' });
+            expect(panel).toHaveAttribute('aria-modal', 'true');
+            expect(document.querySelector('.plus-frame__surface')).toHaveAttribute('inert');
+        });
     });
 });
 

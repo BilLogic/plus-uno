@@ -14,7 +14,7 @@ Also asked as: chat, assistant, chatbot, conversation.
 
 **Storybook page:** `design-system/src/components/ai/AiChat/AiChat.mdx`
 
-**Motion:** enter `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `appearance.fast` · exit `appearance.fast` · docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -23,7 +23,7 @@ Use AI chat to ask about the current page. Choose a mode for the task.
 | Mode | When to use |
 | --- | --- |
 | Popup | The default. A quick ask that keeps the page in view. |
-| Panel | Ongoing work beside the page. The Frame docks it, or floats it over the Page when there is no room. |
+| Panel | Ongoing work beside the page. Only the AI panel docks (`panelKind="ai"`): the Frame docks it, or floats it over the Page when there is no room. |
 | Full screen | Long answers that need room. It covers the window. |
 
 Follow the six AI interaction guidelines for identity, answer marking, fallibility, sources, confirmation and feedback.
@@ -48,6 +48,8 @@ AiChat reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | enter | Open and close an overlay | `--ds-motion-appearance-fast` | Opens as a Popup: a fade in place. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| docked-enter | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | As a Frame panel (`panelKind="ai"`), the AI panel slides in from its edge while the page makes room; its content fades in once the page is about 90% done. A docked panel never has a Blanket. |
+| docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
 
 ## Alternatives
 
@@ -63,7 +65,7 @@ A popup keeps the page in view. For ongoing work it covers the page and loses co
 
 ### Open AiChat in the Panel beside the page. {#open-aichat-in-the-panel-beside-the-page}
 
-The Panel docks next to the work. For a quick ask it takes more room than the question needs.
+Only the AI panel docks next to the work (Details Panels always float). For a quick ask it takes more room than the question needs.
 
 ### Open AiChat full screen for long work. {#open-aichat-full-screen-for-long-work}
 
@@ -95,7 +97,7 @@ Don't: An answer from records with nothing to check it against.
 
 ## Related
 
-- Frame: use when the chat docks in a Panel beside the Page; the Panel never draws a Blanket and the Page stays in view.
+- Frame: use with `panelKind="ai"` when the chat docks in a Panel beside the Page (only the AI panel docks); the Panel never draws a Blanket and the Page stays in view.
 - `AiMessage`: use when one reply stands on its own.
 - `PromptInput`: use when only the field is needed.
 - `PromptStarters`: use when people need suggested prompts before they type.
@@ -119,7 +121,7 @@ The same surface fills every mode; the mode only changes which header controls s
 | --- | --- |
 | Closed | Only the button shows. |
 | Popup | The popup opens anchored to the button, over the Page. The button stays. |
-| Panel | Chat docks in the Frame's Panel, or floats over the Page. The button hides. |
+| Panel | Chat docks in the Frame's Panel (only the AI panel docks), or floats over the Page. The button hides. |
 | Full screen | Chat covers the window, in a column capped at the reading width. The button hides. |
 | Replying | A typing indicator stands in for the reply, and the prompt input's send button becomes Stop. |
 

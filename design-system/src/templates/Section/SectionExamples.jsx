@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Checkbox, CountTag, DynamicTable, EmptyState, Facts, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
-import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section } from '@/templates';
+import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section, usePanelControl } from '@/templates';
 
 /**
  * The Section page's do and don't examples, as PLUS parts only. Show code
@@ -568,6 +568,19 @@ const accountRow = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 export const queueStudents = roster.slice(0, 4);
 
+const QueueReviewButton = ({ isSelected, onClick }) => {
+    const panel = usePanelControl();
+    return (
+        <Button
+            text="Review"
+            spacing="compact"
+            isSelected={isSelected}
+            aria-controls={panel?.open ? panel.panelId : undefined}
+            onClick={onClick}
+        />
+    );
+};
+
 export const ReflectionQueue = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -636,9 +649,7 @@ export const ReflectionQueue = () => {
                             {
                                 key: 'action',
                                 content: (
-                                    <Button
-                                        text="Review"
-                                        spacing="compact"
+                                    <QueueReviewButton
                                         isSelected={isPanelOpen && i === activeIndex}
                                         onClick={() => {
                                             setActiveIndex(i);

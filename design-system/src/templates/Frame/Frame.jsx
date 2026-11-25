@@ -11,7 +11,7 @@ import { SidebarControlContext } from '@/lib/sidebarControl';
 import { PanelControlContext } from './PanelControl';
 import PanelSplitter from './PanelSplitter';
 import { useOwnWidth } from './useOwnWidth';
-import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
+import { FRAME_LAYOUT, clamp, dockedPanelMax, panelCanDock, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
 
 /** How long a peek survives the pointer leaving it, so a pass between toggle and panel does not drop it. */
@@ -80,21 +80,26 @@ const DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   not wire its modals to the frame. A modal opened from inside the floating
  *   Sidebar hands focus to the toggle when it closes, since its trigger left
  *   with the Sidebar.
- * - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks
- *   it beside the Page at a hairline when the content keeps 720, collapsing a
- *   default Sidebar first (and restoring it when the Panel closes); otherwise
- *   it floats over the Page on the overlay material and shadow, with no Blanket,
- *   and a press outside or Escape closes it. Under 1024 it is an overlay
- *   capped at 320, and only one overlay is open at a time; under 768 it is
- *   full width. As an overlay the Panel is modal: focus moves into it and
- *   stays there, the Page and the Sidebar under it are inert, and
- *   closing it hands focus back to what opened it. Docked or peeking it is not
+ * - The Panel area (`panel`) is the Frame's right-hand area. A Details Panel
+ *   (`panelKind="details"`, the default) always floats as an overlay at every
+ *   width with no Blanket, so the Page and Sidebar keep their full width. Only
+ *   the AI chat panel (`panelKind="ai"`) docks beside the Page at a hairline
+ *   when the content keeps 720, collapsing a default Sidebar first (and
+ *   restoring it when the Panel closes). As an overlay, either Panel floats over
+ *   the Page on the overlay material and shadow, with no Blanket, and a press
+ *   outside or Escape closes it (a press on a trigger with `aria-controls`
+ *   leaves it open to swap or toggle). Under 1024 it is capped at 320, and only
+ *   one overlay is open at a time; under 768 it is full width. From 768 up a
+ *   floating Details Panel is not modal so the Page and Sidebar stay usable;
+ *   focus moves into an overlay Panel when it opens and returns to the opener
+ *   when it closes. An overlay AI panel (and a full-width Details Panel under
+ *   768) is modal with the Page and Sidebar inert. Docked or peeking it is not
  *   modal and leaves focus where it is. Its open state, dismissal and focus
  *   run on Base UI's `Dialog`, portaled into the Frame's row so a dock or
  *   overlay switch never remounts the Panel's content. Its splitter resizes
- *   it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by
- *   drag or keys. Width and open state are kept in sessionStorage. A modal
- *   leaves it open. Anything inside the Frame opens it through
+ *   it from 320 to 640 (when docked, never past what keeps 720 beside a docked
+ *   Sidebar) by drag or keys. Width and open state are kept in sessionStorage.
+ *   A modal leaves it open. Anything inside the Frame opens it through
  *   `usePanelControl`.
  * - A multi-step task runs in the
  *   Sidebar's inner mode: its steps are the rows, and the Page's footer holds
@@ -112,6 +117,7 @@ const Frame = ({
     sidebar,
     sidebarDocked,
     panel,
+    panelKind = 'details',
     panelLabel = 'AI chat',
     panelOpen: panelOpenProp,
     defaultPanelOpen = false,
@@ -184,7 +190,8 @@ const Frame = ({
         sidebar: hand === null ? { open: defaultOpen, setBy: 'default' } : { open: hand, setBy: 'hand' },
         sidebarPeek: peek,
         chatMode: panelOpen ? 'panel' : 'popup',
-    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen]);
+        panelKind,
+    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, panelKind]);
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
@@ -275,13 +282,17 @@ const Frame = ({
     const stateRef = useRef(layout.sidebar);
     stateRef.current = layout.sidebar;
 
+    const panelOpenerCapturedRef = useRef(false);
     const setPanelOpen = useCallback((next) => {
         const doc = frameRef.current?.ownerDocument ?? document;
         if (next) {
             const active = doc.activeElement;
             panelOpenerRef.current = active && active !== doc.body && !panelRef.current?.contains(active) ? active : null;
+            panelOpenerCapturedRef.current = true;
             // Under 1024 only one overlay at a time: an overlay Sidebar gives way to the Panel.
             if (narrowRef.current) setHand((h) => (h === true ? null : h));
+        } else {
+            panelOpenerCapturedRef.current = false;
         }
         setPanelPeeking(false);
         if (panelOpenProp === undefined) setPanelOpenState(next);
@@ -408,22 +419,30 @@ const Frame = ({
         }, PEEK_LEAVE_MS);
     }, [cancelPanelLeave]);
 
-    // An overlay Panel is modal; docked or peeking it is not.
-    const panelModal = panelShown && panelOverlay && !panelPeekShown;
+    const panelFullWidth = frameWidth < FRAME_LAYOUT.fullWidthBelow;
+    // An overlay AI panel is modal, and a full-width Details Panel under 768 is modal; from 768 up Details stays non-modal so the Page and Sidebar remain usable.
+    const panelModal = panelShown && panelOverlay && !panelPeekShown && (panelCanDock(panelKind) || panelFullWidth);
     const wasPanelShownRef = useRef(panelShown);
-    const panelModalRef = useRef(panelModal);
-    panelModalRef.current = panelModal;
+    if (panelShown && !wasPanelShownRef.current && !panelOpenerCapturedRef.current && readyRef.current) {
+        const doc = frameRef.current?.ownerDocument ?? document;
+        const active = doc.activeElement;
+        panelOpenerRef.current = active && active !== doc.body && !panelRef.current?.contains(active) ? active : null;
+    } else if (!panelShown && wasPanelShownRef.current) {
+        panelOpenerCapturedRef.current = false;
+    }
+    const panelOverlayOpenRef = useRef(panelShown && panelOverlay && !panelPeekShown);
+    panelOverlayOpenRef.current = panelShown && panelOverlay && !panelPeekShown;
     // Only an overlay or a peek is dismissed; a docked Panel closes from its own controls.
-    const panelDismissible = panelModal || panelPeekShown;
+    const panelDismissible = (panelShown && panelOverlay) || panelPeekShown;
 
     /**
      * Base UI reports each attempt to dismiss the Panel's dialog; the Frame
      * keeps the rules. Only an overlay or a peek is dismissed, by a press
      * outside it or by Escape. A press inside an open modal, in
      * a popup drawn outside the Frame, or on a trigger that controls the Panel
-     * (which toggles it itself) leaves it open. So does Escape while a modal
-     * is open, since that Escape is the modal's, and an Escape a control in
-     * the Panel (a menu, a field) already handled.
+     * (which toggles or swaps it itself) leaves it open. So does Escape while
+     * a modal is open, since that Escape is the modal's, and an Escape a
+     * control in the Panel (a menu, a field) already handled.
      */
     const panelKeepsOpen = (next, details) => {
         if (next || !panelDismissible) return true;
@@ -463,7 +482,7 @@ const Frame = ({
     // docked Panel only when what had focus left the page (a Sidebar that
     // auto-collapsed under it), and a peek never.
     const panelInitialFocus = useCallback(() => {
-        if (panelModalRef.current) return true;
+        if (panelOverlayOpenRef.current) return true;
         const doc = frameRef.current?.ownerDocument ?? document;
         return panelStateRef.current === 'docked' && focusLost(doc) ? panelRef.current : false;
     }, []);
@@ -475,18 +494,20 @@ const Frame = ({
         const doc = frameRef.current?.ownerDocument ?? document;
         if (!focusLost(doc) && !panelRef.current?.contains(doc.activeElement)) return false;
         const opener = panelOpenerRef.current;
+        if (!opener) return true;
         return (canFocus(opener) ? opener : [toggleRef.current, closeRef.current].find(canFocus)) ?? false;
     }, []);
 
     // The splitter's range never lets a resize collapse the Sidebar. Docked,
     // the widest width keeps the content floor beside whatever is docked now.
-    // As an overlay beside a Sidebar docked by default, the narrowest width
-    // stays too wide for the Panel to dock alone, which would collapse it.
+    // As an overlay AI panel beside a Sidebar docked by default, the narrowest
+    // width stays too wide for the Panel to dock alone, which would collapse it.
+    // A Details Panel never docks, so it always keeps the full 320..640 range.
     const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
-    const splitterMax = panelState === 'docked'
+    const splitterMax = panelCanDock(panelKind) && panelState === 'docked'
         ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked' })
         : FRAME_LAYOUT.panelMax;
-    const splitterMin = panelState === 'overlay' && layout.sidebar === 'docked' && hand !== true
+    const splitterMin = panelCanDock(panelKind) && panelState === 'overlay' && layout.sidebar === 'docked' && hand !== true
         ? clampPanelWidth(room + 1)
         : FRAME_LAYOUT.panelMin;
     const commitPanelWidth = useCallback((next) => setPanelWidth(clampPanelWidth(next)), []);
@@ -499,7 +520,7 @@ const Frame = ({
         panelId,
     } : null), [hasPanel, panelOpen, setPanelOpen, panelState, layout.panelWidth, panelId]);
 
-    const lastPanelLook = useRef({ mode: 'docked', width: panelWidth, narrow });
+    const lastPanelLook = useRef({ mode: panelCanDock(panelKind) ? 'docked' : 'overlay', width: panelWidth, narrow });
     const prevPanelLiveRef = useRef(panelPeekShown ? 'peek' : panelState);
     const panelEnteringRef = useRef(false);
     const renderPanel = () => {
@@ -522,7 +543,7 @@ const Frame = ({
             <Dialog.Popup
                 ref={panelRef}
                 id={panelId}
-                // Docked or peeking it is the complementary landmark; as an overlay, a Modal.
+                // Modal overlays take dialog; docked, peeking, or non-modal floating Details stay a complementary landmark.
                 role={panelModal ? 'dialog' : 'complementary'}
                 aria-modal={panelModal ? 'true' : undefined}
                 aria-label={panelLabel}
@@ -717,6 +738,8 @@ Frame.propTypes = {
      * @ds-context Used in: Frame.panel (ds guide frame)
      */
     panel: PropTypes.node,
+    /** Whether the Panel is a Details Panel (`'details'`, the default — always floats over the Page with no Blanket) or the dockable AI panel (`'ai'`). */
+    panelKind: PropTypes.oneOf(['ai', 'details']),
     /** The Panel's complementary landmark name, named for its content. */
     panelLabel: PropTypes.string,
     /** Controlled open state. Leave unset to let the Frame keep it (and remember it for the tab). */

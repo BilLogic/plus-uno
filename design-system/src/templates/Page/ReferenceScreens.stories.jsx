@@ -131,10 +131,10 @@ const ReviewPanel = ({ value, onSave }) => {
 
 const EditNotes = () => {
     const panel = usePanelControl();
-    return <Button text="Edit notes" aria-expanded={panel.open} aria-controls={panel.panelId} onClick={() => panel.setOpen(true)} />;
+    return <Button text="Edit notes" aria-expanded={panel.open} aria-controls={panel.open ? panel.panelId : undefined} onClick={() => panel.setOpen(true)} />;
 };
 
-/** A detail page keeps the record visible beside a docked editing Panel. */
+/** A detail page keeps the record visible under a floating Details Panel for editing. */
 export const DetailWithPanel = {
     name: 'Detail with panel',
     tags: ['reference:detail'],
@@ -161,7 +161,8 @@ export const DetailWithPanel = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const panel = () => canvas.getByRole('complementary', { name: 'Session review notes' });
-        await waitFor(() => expect(panel()).toHaveClass('plus-frame__panel--docked'));
+        await waitFor(() => expect(panel()).toHaveClass('plus-frame__panel--overlay'));
+        await expect(canvasElement.querySelector('.plus-frame__blanket')).toBeNull();
         const discard = within(panel()).getByRole('button', { name: 'Discard' });
         const save = within(panel()).getByRole('button', { name: 'Save notes' });
         await expect(discard.getBoundingClientRect().right).toBeLessThanOrEqual(save.getBoundingClientRect().left);
