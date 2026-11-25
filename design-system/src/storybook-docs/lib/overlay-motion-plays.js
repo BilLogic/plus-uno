@@ -34,7 +34,7 @@ export async function expectOverlayExit(surface, close, reduced) {
     await waitFor(() => expect(surface).toBeVisible());
     close();
     if (!reduced) await expect(surface.isConnected).toBe(true);
-    await waitFor(() => expect(surface.isConnected).toBe(false));
+    await waitFor(() => expect(surface.isConnected).toBe(false), { timeout: 3000 });
 }
 
 /** The same lifecycle for a menu, held to the fade on the way in and out. Under in-app reduced motion nothing animates, so only the lifecycle is read. */

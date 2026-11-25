@@ -575,7 +575,7 @@ const QueueReviewButton = ({ isSelected, onClick }) => {
             text="Review"
             spacing="compact"
             isSelected={isSelected}
-            aria-controls={panel?.panelId}
+            aria-controls={panel?.open ? panel.panelId : undefined}
             onClick={onClick}
         />
     );

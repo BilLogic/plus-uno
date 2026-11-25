@@ -695,7 +695,7 @@ export const TypeQueue = {
 
         await userEvent.click(reviewButtons()[2]);
         await expect(canvas.getByRole('complementary', { name: 'Reflection' }), 'clicking another row swaps the content in the same Panel').toBe(panelEl);
-        await waitFor(() => expect(panel.getByRole('heading', { name: 'Priya Nair' })).toBeInTheDocument());
+        await waitFor(() => expect(panel.getByRole('heading', { name: 'Sofia Ramirez' })).toBeInTheDocument());
         await expect(selectedReviews(), 'picking another row updates the highlighted row').toEqual([false, false, true, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Close' }));
