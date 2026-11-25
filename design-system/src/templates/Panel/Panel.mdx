@@ -33,7 +33,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="templates-panel"
     eyebrow="Template"
     title="Panel"
-    purpose="A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame."
+    purpose="A full-height layer with no Blanket. Details floats over the right of the Page at every width; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. Only the AI panel docks, as a Frame region."
     links={{
         label: 'Uses',
         items: [
@@ -61,14 +61,14 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 
 ## Types
 
-Neither has a Blanket. Details opens on the right, docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths); floating at every width is Planned. Notifications opens at the start, beside the Sidebar.
+Neither has a Blanket. Details floats over the right of the Page at every width, so the Page and Sidebar keep their full width (only the AI panel docks). Notifications opens at the start, beside the Sidebar.
 
 <TypeGrid>
-<TypeCard of={PanelStories.TypeDetails} to="#details-panel" title="Details" stage={1100}>A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.</TypeCard>
+<TypeCard of={PanelStories.TypeDetails} to="#details-panel" title="Details" stage={1100}>A quick look at a row, floating over the right of the Page at every width. The picked row stays highlighted.</TypeCard>
 <TypeCard of={PanelStories.TypeNotifications} to="#notifications-panel" title="Notifications" stage={1100}>The Inbox, opened from the bell beside your name. It opens beside the Sidebar, 360 wide, and stays open as you pick one.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={PanelStories.TypeDetails} title="Details panel" description="A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted." />
+<ComponentExample of={PanelStories.TypeDetails} title="Details panel" description="A quick look at a row, floating over the right of the Page at every width. The picked row stays highlighted." />
 
 <ComponentExample of={PanelStories.TypeNotifications} title="Notifications panel" description="The Inbox, opened from the bell beside your name. It opens beside the Sidebar, 360 wide, over the page, and stays open as you pick one." />
 
@@ -108,7 +108,7 @@ The bell at the end of the main Sidebar's account row, with its unread count, op
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
+Drag the Frame's width. Details floats over the right of the Page at every width on the overlay material and shadow, with no Blanket: 400 by default from 1024 up, capped at 320 under 1024, and full width under 768. The Page and Sidebar stay at full width under it; only the AI panel docks.
 
 <DocsInteractivePlayground of={PanelStories.ResponsiveWidth} description="The width control sets the Frame's own width." />
 
@@ -140,7 +140,7 @@ The parts on their own, outside a Frame, at the width they are given.
 
 <ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
-<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay material and shadow, capped as Width behavior says, still with no Blanket." />
+<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Under 1024, Details still floats on the overlay material and shadow, capped at 320 (full width under 768), with no Blanket." />
 
 ### Beside the AI panel <PlannedTag />
 
@@ -160,12 +160,12 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 <tr><td><code>--panel-width-default</code></td><td>400</td><td>The width a Panel opens at.</td></tr>
 <tr><td><code>--inbox-width</code></td><td>360</td><td>The width the Inbox opens at, beside the Sidebar.</td></tr>
 <tr><td><code>--panel-min-width</code></td><td>320</td><td>The narrowest, and the cap under 1024.</td></tr>
-<tr><td><code>--ds-surface-material-overlay</code>, <code>--ds-border-material</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses <code>--ds-surface</code> and an edge line.</td></tr>
-<tr><td><code>--ds-border</code>, <code>--border-width-default</code></td><td>color, 1</td><td>The edge line where a docked Panel meets the Page: the color and its width.</td></tr>
+<tr><td><code>--ds-surface-material-overlay</code>, <code>--ds-border-material</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. Standalone parts outside a Frame use <code>--ds-surface</code> and an edge line.</td></tr>
+<tr><td><code>--ds-border</code>, <code>--border-width-default</code></td><td>color, 1</td><td>The edge line on a standalone Panel (and a docked AI panel inside Frame): the color and its width.</td></tr>
 </tbody>
 </DocsTable>
 
-The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
+Details resizes from 320 to 640 by drag or keys at 1024 and above, is capped at 320 under 1024, and is full width under 768.
 
 </div>
 
@@ -193,7 +193,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter, PanelOverlay } from '@/templates';
 ```
 
-The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one, decides whether it docks or floats, and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
+The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one (`panelKind="details"` for Details; `'ai'`, the default, for the dockable AI panel), and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel` region.
 
 <DocsTable>
 <thead>
@@ -206,7 +206,7 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 <tr><td><code>subheader</code> (<code>PanelSubheader</code>)</td><td>The record's StatusTag under the title</td><td>None: the Unread and All tabs sit under the header</td></tr>
 <tr><td><code>body</code></td><td>Sections of the record; the form while editing</td><td>Items grouped by day, in Unread and All tabs</td></tr>
 <tr><td><code>footer</code> · <code>disclaimer</code> (<code>PanelFooter</code>, <code>PanelDisclaimer</code>)</td><td>Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. <PlannedTag /> Planned as a prop. A <code>PanelDisclaimer</code> carries small print beside the actions.</td><td>None</td></tr>
-<tr><td>Placement</td><td>Right. Docked from 1168; floating under it. <PlannedTag /> Floating at every width is Planned.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. <code>PanelOverlay</code> with <code>placement="start"</code>, opened from the Sidebar's bell rather than the Frame's Panel area.</td></tr>
+<tr><td>Placement</td><td>Right. Floats over the Page at every width with no Blanket (<code>panelKind="details"</code> on <code>Frame</code>): 400 from 1024 up, capped at 320 under 1024, full width under 768. Only the AI panel docks.</td><td>Start, beside the Sidebar, 360 wide (<code>--inbox-width</code>), over the page with no Blanket. <code>PanelOverlay</code> with <code>placement="start"</code>, opened from the Sidebar's bell rather than the Frame's Panel area.</td></tr>
 <tr><td>Beside the AI panel <PlannedTag /></td><td>Planned. The Frame has one Panel area.</td><td>Planned.</td></tr>
 </tbody>
 </DocsTable>
@@ -225,9 +225,9 @@ The Panel components are the parts: header with its fixed actions, subheader, bo
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that. The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right and floats over the Page at every width while the Page and Sidebar keep their full width. The Inbox opens from the Sidebar's bell, beside the Sidebar at the start, 360 wide, over the page. One floating Panel is open at a time; opening another replaces it.
 
-The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
+Only the AI panel docks: it is a region of the Frame that sits beside the Page where there is room and persists across pages.
 
 </div>
 
@@ -456,8 +456,8 @@ For the step up when the quick look is not enough.
 
 ## Accessibility
 
-- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or to the bell for the start-side Inbox, on close.
-- Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
+- Floating over the Page, Details is a dialog (`role="dialog"`) named by its title: focus moves inside it, Tab stays inside it, and Escape, a press outside or Close closes it and returns focus to what opened it.
+- The start-side Inbox (`PanelOverlay`) is a complementary landmark named by its title beside the Sidebar; Escape, a press outside or Close closes it and returns focus to the bell.
 - The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
 - An unread dot is paired with the text "unread" for a screen reader.

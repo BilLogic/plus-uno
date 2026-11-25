@@ -29,15 +29,15 @@ import { typeStyle } from '../../storybook-docs/lib/type-style.js';
 
 /**
  * The Panel template's examples: the real Frame with its Panel area, filled the
- * way each type fills it. A Frame under 1408 wide cannot dock a Sidebar and a
- * 400 Panel beside 720 of content, so at the docs stage the Panel floats on the
- * overlay material and shadow with no Blanket, which is what Details does. The
- * Inbox is the other type: it opens from the Sidebar's bell and docks beside the
- * Sidebar at the start, 360 wide, so it is drawn by the Notifications pattern's
- * `InboxInSidebar` rather than in the Frame's right-hand Panel area.
+ * way each type fills it. Details (`panelKind="details"`) floats over the Page
+ * on the overlay material and shadow with no Blanket at every width; only the
+ * AI chat panel docks. The Inbox is the other type: it opens from the Sidebar's
+ * bell and opens beside the Sidebar at the start, 360 wide, so it is drawn by
+ * the Notifications pattern's `InboxInSidebar` rather than in the Frame's
+ * right-hand Panel area.
  */
 
-/** The width the docs lay the Frame out at so the Panel floats: under 1168, where a 400 Panel docks alone. Docs geometry, px. */
+/** The docs stage width used by Details examples, px. */
 export const FLOAT_STAGE = 1100; // docs-literal
 
 const SESSIONS = [
@@ -140,6 +140,7 @@ export const PanelFrame = ({ panel, label, behind, height = WINDOW_HEIGHT, addre
         <InAppFrame
             height="100%"
             panel={panel}
+            panelKind="details"
             panelLabel={label}
             panelOpen
             panelStorageKey={null}

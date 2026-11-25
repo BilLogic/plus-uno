@@ -2645,6 +2645,7 @@ const RecordOverlayDemo = () => {
                     <Frame
                         header={crumbs ? <Breadcrumb label="Breadcrumb" items={crumbs} /> : undefined}
                         sidebar={<Sidebar user="tutor" activeTabId="toolkit-students" account={SUPERVISOR_ACCOUNT} />}
+                        panelKind="details"
                         panelLabel="Student details"
                         panelStorageKey={null}
                         panelOpen={Boolean(panelStudent)}

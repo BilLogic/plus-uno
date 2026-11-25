@@ -211,7 +211,7 @@ export const AnatomyNotifications = {
 /** The stage renders full size at `width` and scrolls horizontally if wider than the docs column: the Panel is always in view. Details is open on Ben Okafor's row. */
 const WidthStage = ({ width }) => (
     <ScrollStage width={width} height={WINDOW_HEIGHT} data-probe="stage">
-        <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
+        <InAppFrame height="100%" panel={<DetailsPanel />} panelKind="details" panelLabel="Session details" panelStorageKey={null} panelOpen>
             <SessionsBehind />
         </InAppFrame>
     </ScrollStage>
@@ -232,31 +232,20 @@ const expectNoBlanket = (canvasElement) => expect(
     'no Blanket at any width',
 ).toBeNull();
 
-/** Docked: an edge line, the Page's own fill and no shadow. */
-const expectDocked = async (canvasElement) => {
-    await expectNotInert(canvasElement);
-    await expectFullScale(canvasElement);
-    const { frame, panel } = frameParts(canvasElement);
-    await panelMode(canvasElement, 'docked');
-    await expect(getComputedStyle(panel()).boxShadow, 'docked: no shadow').toBe('none');
-    await expect(parseFloat(getComputedStyle(panel()).borderInlineStartWidth), 'docked: an edge line').toBeGreaterThan(0);
-    await expect(getComputedStyle(panel()).position, 'beside the Page, not over it').not.toBe('absolute');
-    await expect(frame.querySelector('tbody tr:nth-child(2)').className, 'Ben Okafor\'s row is the picked one').toMatch(/highlighted/);
-    await expectNoBlanket(canvasElement);
-};
-
-/** Floating: over the Page on the overlay material and shadow. */
+/** Floating: over the Page on the overlay material and shadow, keeping the picked row highlighted. */
 const expectOverlay = async (canvasElement) => {
     await expectNotInert(canvasElement);
     await expectFullScale(canvasElement);
     const { frame, panel } = frameParts(canvasElement);
     await panelMode(canvasElement, 'overlay');
+    await expect(getComputedStyle(panel()).position, 'floating over the Page').toBe('absolute');
     await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(getComputedStyle(panel()).backgroundColor, 'floating: the overlay material').toBe(tokenColor(frame, '--ds-surface-material-overlay'));
+    await expect(frame.querySelector('tbody tr:nth-child(2)').className, 'Ben Okafor\'s row stays highlighted').toMatch(/highlighted/);
     await expectNoBlanket(canvasElement);
 };
 
-/** Width behavior: Details is open; from 1168 up the Panel docks at an edge line, under it it floats on the overlay pair; never a Blanket. */
+/** Width behavior: Details floats over the Page at every width with no Blanket, capped at 320 under 1024 and full width under 768. */
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1440 },
@@ -267,7 +256,9 @@ export const ResponsiveWidth = {
     render: WidthStage,
     play: async ({ canvasElement }) => {
         const { frame } = frameParts(canvasElement);
-        await expectDocked(canvasElement);
+        await expectOverlay(canvasElement);
+        await expect(frame.querySelector('.plus-frame__sidebar--docked'), 'at 1440 the Sidebar stays docked').not.toBeNull();
+        await expect(frameParts(canvasElement).panel().offsetWidth, 'at 1440 Details opens at 400').toBeCloseTo(FRAME_LAYOUT.panelDefault, 0);
 
         setStageWidth(canvasElement, FRAME_LAYOUT.contentFloor + FRAME_LAYOUT.panelDefault - 64);
         await expectOverlay(canvasElement);
@@ -278,30 +269,27 @@ export const ResponsiveWidth = {
         const narrowest = tokenLength(frame, '--panel-min-width');
         await waitFor(() => expect(frameParts(canvasElement).panel().offsetWidth, 'under 1024 the Panel is capped at its narrowest').toBeCloseTo(narrowest, 0));
         await expectNoBlanket(canvasElement);
+
+        const narrow = FRAME_LAYOUT.fullWidthBelow - 128;
+        setStageWidth(canvasElement, narrow);
+        await panelMode(canvasElement, 'overlay');
+        await waitFor(() => expect(frameParts(canvasElement).panel().offsetWidth, 'under 768 the Panel is full width').toBeCloseTo(narrow, 0));
+        await expectNoBlanket(canvasElement);
     },
 };
 
-/** At 1440 the Panel is docked: an edge line and no shadow. */
-export const WidthDocked = {
+/** At 1440 Details floats over the Page at 400 on the overlay material and shadow, with the Sidebar docked and no Blanket. */
+export const WidthFloating = {
     parameters: { fullPage: true },
     name: 'Width: 1440',
     args: { width: 1440 },
     render: WidthStage,
     play: async ({ canvasElement }) => {
         setStageWidth(canvasElement, 1440); // docs-literal
-        await expectDocked(canvasElement);
-    },
-};
-
-/** At 1000 the Panel floats on the overlay material and shadow, with no Blanket. */
-export const WidthFloating = {
-    parameters: { fullPage: true },
-    name: 'Width: 1000',
-    args: { width: 1000 },
-    render: WidthStage,
-    play: async ({ canvasElement }) => {
-        setStageWidth(canvasElement, 1000); // docs-literal
         await expectOverlay(canvasElement);
+        const { frame, panel } = frameParts(canvasElement);
+        await expect(frame.querySelector('.plus-frame__sidebar--docked'), 'the Sidebar stays docked').not.toBeNull();
+        await expect(panel().offsetWidth, 'default 400 width').toBeCloseTo(FRAME_LAYOUT.panelDefault, 0);
     },
 };
 

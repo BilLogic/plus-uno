@@ -665,7 +665,7 @@ export const TypeList = {
     },
 };
 
-/** Queue: a queue page docks the Panel beside the list, and the record opens on demand. */
+/** Queue: a queue page opens a floating Details Panel over the list on demand, with no Blanket. */
 export const TypeQueue = {
     name: 'Type: Queue',
     parameters: { layout: 'fullscreen', ...codeOf('ReflectionQueue') },
@@ -674,15 +674,16 @@ export const TypeQueue = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const canvas = within(canvasElement);
         await waitFor(() => expect(
-            canvasElement.querySelector('.plus-frame__panel--docked'),
-            'queue pages dock the Panel beside the list',
+            canvasElement.querySelector('.plus-frame__panel--overlay'),
+            'queue pages float the Details Panel over the list',
         ).not.toBeNull());
-        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Blanket on a docked Panel').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__sidebar--docked'), 'the Sidebar stays docked').not.toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Blanket on a floating Panel').toBeNull();
 
-        const panel = within(canvas.getByRole('complementary', { name: 'Reflection' }));
+        const panel = within(canvas.getByRole('dialog', { name: 'Reflection' }));
         await expect(panel.getByRole('heading', { name: 'Ava Thompson' })).toBeInTheDocument();
 
-        const selectedReviews = () => canvas.getAllByRole('button', { name: 'Review' }).map((b) => b.getAttribute('aria-pressed') === 'true');
+        const selectedReviews = () => [...canvasElement.querySelectorAll('tbody button')].map((b) => b.getAttribute('aria-pressed') === 'true');
         await expect(selectedReviews(), 'the first row is highlighted').toEqual([true, false, false, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Next' }));
@@ -690,11 +691,11 @@ export const TypeQueue = {
         await expect(selectedReviews(), 'Next moves the highlighted row').toEqual([false, true, false, false]);
 
         await userEvent.click(panel.getByRole('button', { name: 'Close' }));
-        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Reflection' })).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Reflection' })).toBeNull());
         await expect(selectedReviews(), 'Close clears the highlight').toEqual([false, false, false, false]);
 
         await userEvent.click(canvas.getAllByRole('button', { name: 'Review' })[0]);
-        await waitFor(() => expect(canvas.getByRole('complementary', { name: 'Reflection' })).toBeInTheDocument());
+        await waitFor(() => expect(canvas.getByRole('dialog', { name: 'Reflection' })).toBeInTheDocument());
     }),
 };
 
