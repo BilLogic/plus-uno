@@ -169,7 +169,7 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 1. **Title row.** The h2, an optional one-line description, and the actions at the end: More and the labeled Primary.
 2. **Header rows** (optional). Row 2 holds the pill views at the start and the format switch at the end. Row 3 holds Search, then the filter triggers.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the header rows with nothing between.
-4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
+4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which opens a floating `Panel` over the list.
 5. **Footer** (optional). Paging or "View all".
 
 ## Width behavior
@@ -200,7 +200,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |
 | `sidePlacement` | Planned. `start` puts the side first, for a filter side or a step rail. |
-| `detail` · `detailTitle` · `detailDescription` · `detailFooter` | An inline expand that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel`. |
+| `detail` · `detailTitle` · `detailDescription` · `detailFooter` | An inline expand that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which opens a floating `Panel`. |
 | `detailOpen` · `defaultDetailOpen` · `onDetailOpenChange` | Open state of the inline detail expand. |
 | `footer` | Paging or "View all". |
 

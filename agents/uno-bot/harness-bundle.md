@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,787 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,881 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,481 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,575 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -2054,7 +2054,7 @@ The full-height area at the left of the **Frame**, holding navigation. From 1024
 _Avoid_: "left nav", "side nav", "side navigation"
 
 **Panel**:
-The full-height layer at the right of the **Frame**, with no **Blanket**. It is 320 to 640 wide (400 by default) and **docks** beside the **Page** when it fits, from a Frame 1168 wide, and floats over the **Page** on the overlay material and shadow when it does not. Details and Notifications are its two types; the AI panel is its own region of the Frame. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height layer at the right of the **Frame**, with no **Blanket**. Details is 320 to 640 wide (400 by default) and floats over the **Page** on the overlay material and shadow at every width while the **Page** and **Sidebar** keep their full width. Details and Notifications are its two types; the AI panel is its own region of the Frame and is the only panel that **docks** beside the **Page** (from a Frame 1168 wide). The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
@@ -2066,7 +2066,7 @@ A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, s
 _Avoid_: "flyout" as our word, "hover menu"
 
 **Splitter**:
-The draggable edge of the docked **Panel**, a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
+The draggable edge of a right-hand **Panel** (from 1024 up), a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
 _Avoid_: "resize handle", "drag bar"
 
 **Page**:
@@ -2074,7 +2074,7 @@ The template for the main content area inside a **Frame**: it carries the page t
 _Avoid_: "surface" as a name
 
 **Section**:
-The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail`, a sunken **Card** that expands inline inside the Section and pushes the content below it down. A queue page does not use it: it docks a **Panel** beside the list. A bare "Section" always means this template.
+The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail`, a sunken **Card** that expands inline inside the Section and pushes the content below it down. A queue page does not use it: it opens a floating **Panel** over the list. A bare "Section" always means this template.
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:

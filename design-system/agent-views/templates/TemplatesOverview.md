@@ -45,7 +45,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | An area page with one collection | Page · default, with a Section holding the views, Search and filters | Filtering · Search · Common actions | `PageHeader`, `Tabs` (pill), `FilterButton`, `IconButton`, `Button`, `Table` |
 | A home page with several Sections | Page · default, titled Sections, cards | Empty · Loading | `PageHeader`, `Card`, `Button` |
 | A record page, one level down | Page with a breadcrumb and page tabs | Navigation · Indicators | `Breadcrumb`, `PageHeader`, `StatusTag`, `Tabs`, `PopupSelect` |
-| Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
+| Working through a queue | Panel · Details, floating over the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Dialog`, `Button` |
 | A long task with steps | Frame multi-step task, with a form in steps | Forms · Navigation | `Sidebar` (inner mode), `Fieldset`, `FooterActions`, `Button` |
