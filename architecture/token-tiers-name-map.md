@@ -94,6 +94,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 
 | Group | Token | Note |
 |---|---|---|
+| Frame | `--frame-head-band` | 36: the top band the Sidebar logo row and the page's first line share |
 | Frame | `--frame-sidebar-width` |  |
 | Frame | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
 | Frame | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |

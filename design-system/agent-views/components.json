@@ -6764,7 +6764,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.",
+          "description": "The Page's header row, the top band (36 high, y 24 to 60), level with the logo row: the breadcrumb. While the Sidebar is closed it follows the toggle.",
           "deprecated": null
         },
         {
@@ -7042,14 +7042,15 @@
         "MultiStepFooterAt1440",
         "MultiStepFooterAt1280",
         "MultiStepExampleFooterAt1440",
-        "MultiStepExampleFooterAt1280"
+        "MultiStepExampleFooterAt1280",
+        "TopBandWithoutBreadcrumb",
+        "TopBandWithBreadcrumb"
       ],
       "tokens": [
         "--border-width-default",
         "--content-max-width",
         "--content-max-width-reading",
         "--content-min-width",
-        "--control-md",
         "--ds-border",
         "--ds-border-material",
         "--ds-motion-appearance-fast",
@@ -7065,6 +7066,7 @@
         "--ds-surface-material-overlay",
         "--ds-surface-sunken",
         "--ds-text",
+        "--frame-head-band",
         "--frame-panel-width",
         "--frame-sidebar-pad",
         "--frame-sidebar-width",
@@ -9526,6 +9528,7 @@
       "tokens": [
         "--ds-surface",
         "--ds-text",
+        "--frame-head-band",
         "--heading-lg",
         "--heading-lg-tracking",
         "--page-pad",
@@ -9636,6 +9639,7 @@
       "tokens": [
         "--body-sm",
         "--body-sm-tracking",
+        "--frame-head-band",
         "--inline-lg",
         "--page-header-gap",
         "--page-header-stack"
@@ -14409,6 +14413,7 @@
         "--ds-text-subtle",
         "--ds-text-subtlest",
         "--focus-ring-width",
+        "--frame-head-band",
         "--frame-sidebar-group-gap",
         "--frame-sidebar-pad",
         "--frame-sidebar-row-gap",
@@ -14422,6 +14427,7 @@
         "--pad-x-md",
         "--pad-x-sm",
         "--pad-x-xs",
+        "--page-pad",
         "--radius-sm",
         "--stack-md",
         "--stack-sm",

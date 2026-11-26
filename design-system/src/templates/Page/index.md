@@ -200,7 +200,7 @@ Drag the width control. Above the content cap, content centers at the cap; below
 
 ## Tokens touched
 
-`--ds-surface` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`
+`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`
 
 From `design-system/src/templates/Page/Page.scss`. Override these through the token layer, never with a literal.
 

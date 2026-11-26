@@ -250,7 +250,8 @@ export const Overview = {
 /**
  * The grid, measured at 1x: icon center x 32, label x 48, trailing center x
  * 208, thread x 32, section title x 20, logo mark x 20 to 44, toggle center x
- * 208, bell center x 208, the docked edge one 1px `--ds-border`.
+ * 208, bell center x 208, the docked edge one 1px `--ds-border`. The logo row is the
+ * top band: y 24 to 60, center y 42, the nav from y 72.
  */
 export const Geometry = {
     args: { tabSet: 'many' },
@@ -281,6 +282,12 @@ export const Geometry = {
         await expect(centerX(canvasElement, close), 'Close all on the trailing column').toBeCloseTo(208, 0);
         const twist = within(nav(canvasElement)).getAllByRole('button', { name: /Hide .* tabs/ })[0];
         await expect(centerX(canvasElement, twist), 'the collapse angle on the icon column').toBeCloseTo(32, 0);
+        const logoRow = canvasElement.querySelector('.plus-template-sidebar__logo-row');
+        const frameTop = canvasElement.querySelector('.plus-frame').getBoundingClientRect().top;
+        const rowBox = logoRow.getBoundingClientRect();
+        await expect(rowBox.top - frameTop, 'logo row starts at the page pad').toBeCloseTo(tokenLength(canvasElement, '--page-pad'), 0);
+        await expect(rowBox.height, 'logo row is the band tall').toBeCloseTo(tokenLength(canvasElement, '--frame-head-band'), 0);
+        await expect(rowBox.top + rowBox.height / 2 - frameTop, 'logo row center at y 42').toBeCloseTo(42, 0);
         // The nav sits 12 under the logo row, the account row pads 8 over 16 and
         // 12 around, and the two small corners stay 2: none of these may move.
         await expect(px(getComputedStyle(nav(canvasElement)).marginTop), 'nav sits 12 under the logo row').toBeCloseTo(12, 0);
@@ -766,7 +773,7 @@ export const SidebarClosed = {
         const frame = rect(canvasElement.querySelector('.plus-frame'));
         const t = rect(toggle);
         await expect(t.left + t.width / 2 - frame.left, 'the toggle on the icon column').toBeCloseTo(32, 0);
-        await expect(t.top + t.height / 2 - frame.top, 'on the logo row\'s center line').toBeCloseTo(28, 0);
+        await expect(t.top + t.height / 2 - frame.top, 'on the logo row\'s center line').toBeCloseTo(42, 0);
         const crumb = rect(canvasElement.querySelector('.plus-frame__head .breadcrumb, .plus-frame__head nav'));
         await expect(crumb.left - frame.left, 'the breadcrumb from x 56').toBeCloseTo(56, 0);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no rail').toBeNull();

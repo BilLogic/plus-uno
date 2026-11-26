@@ -192,6 +192,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--footer-height', old: null, ref: 'var(--control-xl)', use: 'Height of a Modal or Panel footer: 48px, one spacious button with no padding of its own.' },
 
   // ─── Templates / Frame (with the Sidebar) ──────────────────────
+  { tier: 'templates', group: 'Frame', new: '--frame-head-band', old: null, ref: 'var(--type-line-height-225)', note: '36: the top band the Sidebar logo row and the page\'s first line share', use: 'Height of the top band: the Sidebar logo row and the page header\'s first line fill it, starting at the page pad.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },

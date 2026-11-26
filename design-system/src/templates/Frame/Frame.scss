@@ -116,7 +116,7 @@
 // the toggle's row, so a pointer resting on the toggle opens nothing.
 .plus-frame__edge {
     position: absolute;
-    top: calc(var(--frame-sidebar-pad) + var(--control-md));
+    top: calc(var(--page-pad) + var(--frame-head-band));
     bottom: 0;
     left: 0;
     z-index: var(--layer-frame-edge);
@@ -146,8 +146,8 @@
     background-color: transparent;
 }
 
-// The Page's header row: 32 high on the Sidebar logo row's center line, so
-// it starts the Sidebar's pad from the top rather than the Page's. While the
+// The Page's header row: the top band, as tall as the Sidebar logo row and level
+// with it, starting at the Page's pad. While the
 // Sidebar is closed, the toggle leads it, centered on the icon column (x 32),
 // and the header follows 8 later (x 56).
 .plus-frame__head {
@@ -156,8 +156,7 @@
     flex-shrink: 0;
     gap: var(--inline-md);
     min-width: 0;
-    height: var(--control-md);
-    margin-top: calc(var(--frame-sidebar-pad) - var(--page-pad));
+    height: var(--frame-head-band);
     margin-bottom: var(--page-stack-sm);
 }
 

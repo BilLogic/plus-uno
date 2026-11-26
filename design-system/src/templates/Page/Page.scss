@@ -37,6 +37,9 @@
 
 /* The page's h1: Heading/large 24/28, the top of the page outline. */
 .plus-template-page-title {
+    display: flex;
+    align-items: center;
+    min-height: var(--frame-head-band);
     margin: 0 0 var(--page-stack-md);
     font: var(--heading-lg);
     letter-spacing: var(--heading-lg-tracking);
