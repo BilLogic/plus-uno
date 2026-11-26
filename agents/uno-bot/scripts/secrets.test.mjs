@@ -66,18 +66,25 @@ test("a live secret nobody declared is reported — the #288 case", () => {
   assert.deepEqual(undeclared, ["ANTHROPIC_API_KEY", "SUPABASE_MCP_TOKEN"]);
 });
 
-test("a secret marked never-set is reported when it IS set", () => {
-  // GEMINI_API_KEY on the Worker is the ADR-018 violation: the AI Studio key
-  // takes a lane the Vertex SA is supposed to own, and it cannot reach Claude
-  // at all. Declaring it and then finding it is a finding, not a pass.
-  const { forbidden } = classify(["GEMINI_API_KEY"]);
-  assert.deepEqual(forbidden, ["GEMINI_API_KEY"]);
-  assert.deepEqual(classify([]).forbidden, []);
+test("GEMINI_API_KEY is an expected secret, and the service-account pair is optional", () => {
+  // The key is the canonical Gemini credential (ADR-053); the pair is needed
+  // only for the opt-in vertex-claude adapter, which the key cannot reach.
+  const { missing, optionalUnset } = classify([]);
+  assert.ok(missing.includes("GEMINI_API_KEY"));
+  for (const n of ["GEMINI_SA_EMAIL", "GEMINI_SA_PRIVATE_KEY"]) {
+    assert.ok(!missing.includes(n), `${n} must not be required`);
+    assert.ok(optionalUnset.includes(n), `${n} must be optional`);
+  }
 });
 
-test("classify does not mistake a forbidden secret for an undeclared one", () => {
-  const { undeclared } = classify(["GEMINI_API_KEY"]);
+test("a set GEMINI_API_KEY is accounted for, not flagged", () => {
+  const { present, undeclared } = classify(["GEMINI_API_KEY"]);
+  assert.deepEqual(present, ["GEMINI_API_KEY"]);
   assert.deepEqual(undeclared, []);
+});
+
+test("no secret is declared must-not-be-set", () => {
+  for (const s of SECRETS) assert.equal(s.forbidden, undefined, `${s.name} is forbidden`);
 });
 
 /* --------------------------------------------------- the plaintext firewall */

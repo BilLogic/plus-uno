@@ -353,8 +353,8 @@ else
   note "dashboard's Variables tab for anything it does not name."
 fi
 say ""
-warn "GEMINI_API_KEY must stay UNSET. The Vertex SA is canonical (ADR-018); the"
-warn "AI Studio key cannot reach Claude and its presence silently changes the lane."
+warn "GEMINI_API_KEY is the canonical Gemini credential (ADR-053) and must be on the"
+warn "list. The Vertex SA pair is optional: the fallback, and what vertex-claude needs."
 pause "Noted the list? Enter to continue"
 
 # ── 4 ─────────────────────────────────────────────────────────────────────

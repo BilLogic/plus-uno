@@ -26,7 +26,7 @@ try {
   process.exit(1);
 }
 
-const { present, missing, optionalUnset, undeclared, forbidden } = classify(live);
+const { present, missing, optionalUnset, undeclared } = classify(live);
 const why = new Map(SECRETS.map((s) => [s.name, s.why]));
 
 console.log(`${live.length} secret(s) set on the Worker; ${SECRETS.length} declared.\n`);
@@ -48,13 +48,6 @@ if (missing.length) {
   console.log(`\nREQUIRED and not set (${missing.length}):`);
   for (const n of missing) console.log(`  ✗ ${n} — ${why.get(n)}`);
   console.log("  -> npm run secrets:set");
-}
-
-if (forbidden.length) {
-  bad += forbidden.length;
-  console.log(`\nSET AND MUST NOT BE (${forbidden.length}):`);
-  for (const n of forbidden) console.log(`  ✗ ${n} — ${why.get(n)}`);
-  console.log("  -> npx wrangler secret delete <name>");
 }
 
 if (undeclared.length) {

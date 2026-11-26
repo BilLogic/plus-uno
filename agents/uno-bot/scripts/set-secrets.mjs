@@ -68,26 +68,9 @@ try {
   console.error(String(err.message ?? err));
   process.exit(1);
 }
-const { missing, present, forbidden } = classify(live);
-
-if (forbidden.length) {
-  console.error(`\n⚠ set on this Worker and must not be: ${forbidden.join(", ")}`);
-  console.error("  -> wrangler secret delete <name>. See the reason in scripts/secrets.mjs.\n");
-}
-
-if (only) {
-  // Asked for by name and refused. Reporting "nothing to do" would answer a
-  // question nobody asked and leave the reason — ADR-018 — undiscovered.
-  const refused = SECRETS.filter((s) => s.forbidden && only.has(s.name));
-  for (const s of refused) {
-    console.error(`\n${s.name} is declared MUST-NOT-BE-SET, so this will not set it.`);
-    console.error(`  ${s.why}`);
-  }
-  if (refused.length === only.size) process.exit(1);
-}
+const { missing, present } = classify(live);
 
 const queue = SECRETS.filter((s) => {
-  if (s.forbidden) return false; // never offered, whatever the flags say
   if (only) return only.has(s.name);
   if (all) return true;
   return missing.includes(s.name);
