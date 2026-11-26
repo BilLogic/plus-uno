@@ -535,6 +535,25 @@
         "19364:0": 1
       },
       "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:40",
+      "name": "Letter spacing/wide",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-tracking-wide)"
+      },
+      "valuesByMode": {
+        "19364:0": 4
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 4
+      },
+      "hiddenFromPublishing": false
     }
   ],
   "textStyles": [
@@ -580,7 +599,7 @@
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -1.5
+        "value": -2
       }
     },
     {
@@ -591,11 +610,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:102",
         "lineHeight": "VariableID:19364:108",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -0.5
+        "value": -2
       }
     },
     {
@@ -606,11 +625,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:101",
         "lineHeight": "VariableID:19364:107",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": 0
+        "value": -0.5
       }
     },
     {
@@ -696,11 +715,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:104",
         "lineHeight": "VariableID:19364:110",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -1
+        "value": -2
       }
     },
     {
@@ -711,11 +730,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:103",
         "lineHeight": "VariableID:19364:109",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -1
+        "value": -2
       }
     },
     {
@@ -726,7 +745,37 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:101",
         "lineHeight": "VariableID:19364:107",
+        "fontWeight": "VariableID:19364:114"
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": -0.5
+      }
+    },
+    {
+      "id": "S:label-eyebrow,",
+      "name": "Label/eyebrow",
+      "description": "CSS: var(--label-eyebrow)",
+      "boundVariables": {
+        "fontFamily": "VariableID:19364:112",
+        "fontSize": "VariableID:19364:99",
+        "lineHeight": "VariableID:19364:106",
         "fontWeight": "VariableID:19364:115"
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": 4
+      }
+    },
+    {
+      "id": "S:code-small,",
+      "name": "Code/small",
+      "description": "CSS: var(--code-sm)",
+      "boundVariables": {
+        "fontFamily": "VariableID:20219:29",
+        "fontSize": "VariableID:19364:99",
+        "lineHeight": "VariableID:19364:106",
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",

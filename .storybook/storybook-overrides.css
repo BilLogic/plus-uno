@@ -61,12 +61,12 @@ body,
  * h1 and h2 the same 32px, and h3 and h4 the same 28px, so the outline had no
  * visible steps.
  *
- *   h1 page title     --heading-xxl   32 / 36 sans semibold
- *   h2 section        --heading-xl     28 / 32 sans semibold
- *   h3 example, sub   --heading-lg     24 / 28 sans semibold
- *   h4                --heading-md     20 / 24 sans semibold
- *   h5                --heading-sm     16 / 20 sans semibold
- *   h6                --heading-xs     14 / 20 sans semibold
+ *   h1 page title     --heading-xxl   32 / 36 sans regular
+ *   h2 section        --heading-lg     24 / 28 sans regular
+ *   h3 example, sub   --heading-md     20 / 24 sans regular
+ *   h4                --heading-sm     16 / 20 sans regular
+ *   h5                --heading-xs     14 / 20 sans regular
+ *   h6                --heading-xxs    12 / 16 sans regular
  *
  * The space above a heading is the Page template's: `--page-stack-lg` before a
  * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
@@ -101,20 +101,20 @@ body,
 }
 
 .sbdocs h2:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-xl) !important;
-    letter-spacing: var(--heading-xl-tracking) !important;
-    color: var(--ds-text) !important;
-}
-
-.sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-lg) !important;
     letter-spacing: var(--heading-lg-tracking) !important;
     color: var(--ds-text) !important;
 }
 
-.sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+.sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-md) !important;
     letter-spacing: var(--heading-md-tracking) !important;
+    color: var(--ds-text) !important;
+}
+
+.sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-sm) !important;
+    letter-spacing: var(--heading-sm-tracking) !important;
     color: var(--ds-text) !important;
 }
 
@@ -127,14 +127,14 @@ body,
 }
 
 .sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-sm) !important;
-    letter-spacing: var(--heading-sm-tracking) !important;
+    font: var(--heading-xs) !important;
+    letter-spacing: var(--heading-xs-tracking) !important;
     color: var(--ds-text) !important;
 }
 
 .sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
-    font: var(--heading-xs) !important;
-    letter-spacing: var(--heading-xs-tracking) !important;
+    font: var(--heading-xxs) !important;
+    letter-spacing: var(--heading-xxs-tracking) !important;
     color: var(--ds-text) !important;
 }
 

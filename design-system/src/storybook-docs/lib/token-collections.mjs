@@ -55,7 +55,7 @@ export function placeToken(name, record = {}) {
   if (/^--type-(size|line-height)-\d/.test(name) || /^--type-(family|weight|tracking)-/.test(name)) {
     return place('typography', 'primitive');
   }
-  if (/^--(heading|body|metric|code)(-|$)/.test(name)) return place('typography', 'semantic', 'global');
+  if (/^--(heading|body|metric|code|label-eyebrow)(-|$)/.test(name)) return place('typography', 'semantic', 'global');
 
   if (/^--motion-spring-/.test(name)) return place('motion', 'primitive');
 

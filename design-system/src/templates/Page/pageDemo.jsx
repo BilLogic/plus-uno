@@ -51,7 +51,7 @@ export const DemoPageHeader = ({ breadcrumb, title, status, description, actions
         title={(
             <div data-part="title-block" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <div style={row}>
-                    <Heading size="lg">{title}</Heading>
+                    <Heading size="xxl">{title}</Heading>
                     {status && <StatusTag appearance={status.appearance} spacing="spacious">{status.text}</StatusTag>}
                 </div>
                 {description && <p data-part="description" style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{description}</p>}

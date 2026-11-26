@@ -38,17 +38,19 @@ const rem = (px) => `${px / 16}rem`;
 const STYLES = [
   ['Heading/xxlarge', 'heading', 32, 36, 400, -2],
   ['Heading/xlarge', 'heading', 28, 32, 400, -2],
-  ['Heading/large', 'heading', 24, 28, 400, -1.5],
-  ['Heading/medium', 'heading', 20, 24, 500, -0.5],
-  ['Heading/small', 'heading', 16, 20, 500, 0],
+  ['Heading/large', 'heading', 24, 28, 400, -2],
+  ['Heading/medium', 'heading', 20, 24, 400, -2],
+  ['Heading/small', 'heading', 16, 20, 400, -0.5],
   ['Heading/xsmall', 'heading', 14, 20, 500, 0],
   ['Heading/xxsmall', 'heading', 12, 16, 500, 1],
   ['Body/large', 'body', 16, 24, 400, 0],
   ['Body/default', 'body', 14, 20, 400, 0.5],
   ['Body/small', 'body', 12, 16, 400, 1],
-  ['Metric/large', 'heading', 28, 32, 500, -1],
-  ['Metric/medium', 'heading', 24, 28, 500, -1],
-  ['Metric/small', 'heading', 16, 20, 500, 0],
+  ['Metric/large', 'heading', 28, 32, 400, -2],
+  ['Metric/medium', 'heading', 24, 28, 400, -2],
+  ['Metric/small', 'heading', 16, 20, 400, -0.5],
+  ['Label/eyebrow', 'heading', 12, 16, 500, 4],
+  ['Code/small', 'code', 12, 16, 400, 0],
 ];
 const STACKS = {
   heading: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
@@ -56,7 +58,7 @@ const STACKS = {
   body: '"Google Sans Flex", "Google Sans Flex Fallback", sans-serif',
   code: '"Google Sans Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
-const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^(heading|body|metric)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)$/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`)}`;
+const cssName = (style) => `--${style.toLowerCase().replace('/', '-').replace(/^(heading|body|metric|code)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)$/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`)}`;
 
 test('the font primitives are named by rem × 100 and resolve to their rem value', () => {
   for (const [step, px] of Object.entries(FONT_SIZES)) {
@@ -87,6 +89,28 @@ test('every text style resolves to its size, line height, weight and family', ()
       cssName(style),
     );
   }
+});
+
+test('headings 16px and up are regular, 20px and up track at -2% and 16px at -0.5%; 14px and 12px are medium', () => {
+  for (const [style, , size, , weight, tracking] of STYLES.filter(([name]) => name.startsWith('Heading/'))) {
+    assert.equal(weight, size >= 16 ? 400 : 500, style);
+    if (size >= 20) assert.equal(tracking, -2, style);
+    if (size === 16) assert.equal(tracking, -0.5, style);
+  }
+});
+
+test('metrics are regular, tracking -2% at 28 and 24 and -0.5% at 16', () => {
+  for (const [style, , size, , weight, tracking] of STYLES.filter(([name]) => name.startsWith('Metric/'))) {
+    assert.equal(weight, 400, style);
+    assert.equal(tracking, size >= 24 ? -2 : -0.5, style);
+  }
+});
+
+test('the eyebrow is medium 12/16 in the heading family at +4%, and code-sm is regular 12/16 in the code family', () => {
+  assert.equal(resolved('--label-eyebrow'), `500 0.75rem / 1rem ${STACKS.heading}`);
+  assert.equal(resolved('--label-eyebrow-tracking'), '0.04em');
+  assert.equal(corpus.get('--type-tracking-wide')?.value, '0.04em');
+  assert.equal(resolved('--code-sm'), `400 0.75rem / 1rem ${STACKS.code}`);
 });
 
 test('every text style has a tracking companion in em, and the tracking variables hold its percent', () => {
@@ -161,6 +185,9 @@ test('metric classes and .num set tabular figures; running text does not', () =>
   for (const size of ['lg', 'md', 'sm']) {
     assert.match(css, new RegExp(`\\.metric-${size} \{[^}]*font-variant-numeric: tabular-nums`), `.metric-${size}`);
   }
+  assert.match(css, /\.code-sm \{[^}]*font-variant-numeric: tabular-nums/, '.code-sm');
+  assert.match(css, /\.label-eyebrow \{[^}]*text-transform: uppercase/, '.label-eyebrow');
+  assert.doesNotMatch(css, /\.label-eyebrow \{[^}]*tabular-nums/);
   assert.match(css, /\.num \{ font-variant-numeric: tabular-nums; \}/);
   assert.doesNotMatch(css, /\.body-\w+ \{[^}]*tabular-nums/);
 });

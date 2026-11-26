@@ -35,13 +35,13 @@
     margin-block: 0;
 }
 
-/* The page's h1: Heading/large 24/28, the top of the page outline. */
+/* The page's h1: Heading/xxlarge 32/36, the top of the page outline. */
 .plus-template-page-title {
     display: flex;
     align-items: center;
     min-height: var(--frame-head-band);
     margin: 0 0 var(--page-stack-md);
-    font: var(--heading-lg);
-    letter-spacing: var(--heading-lg-tracking);
+    font: var(--heading-xxl);
+    letter-spacing: var(--heading-xxl-tracking);
     color: var(--ds-text);
 }

@@ -297,6 +297,10 @@ export const FAMILIES = [
   { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
   { family: 'metric', prefix: '--metric-', what: 'a metric text style: the `font` shorthand' },
   { family: 'code', prefix: '--code-default', what: 'the code text style, relative to the text around it' },
+  { family: 'code-sm', prefix: '--code-sm', what: 'the small code text style: machine values in a fixed 12/16' },
+  { family: 'code-sm-tracking', prefix: '--code-sm-tracking', what: 'the small code text style\'s letter spacing' },
+  { family: 'label-eyebrow', prefix: '--label-eyebrow', what: 'the eyebrow text style: an uppercase group or stat label' },
+  { family: 'label-eyebrow-tracking', prefix: '--label-eyebrow-tracking', what: 'the eyebrow text style\'s letter spacing' },
   {
     family: 'type',
     prefix: '--type-',

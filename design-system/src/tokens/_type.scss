@@ -43,18 +43,19 @@
     --type-tracking-none: 0em;
     --type-tracking-open: 0.005em;
     --type-tracking-loose: 0.01em;
+    --type-tracking-wide: 0.04em;
 
     /* Text styles */
     --heading-xxl-tracking: var(--type-tracking-tighter);
     --heading-xxl: var(--type-weight-regular) var(--type-size-200) / var(--type-line-height-225) var(--type-family-heading);
     --heading-xl-tracking: var(--type-tracking-tighter);
     --heading-xl: var(--type-weight-regular) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
-    --heading-lg-tracking: var(--type-tracking-close);
+    --heading-lg-tracking: var(--type-tracking-tighter);
     --heading-lg: var(--type-weight-regular) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
-    --heading-md-tracking: var(--type-tracking-snug);
-    --heading-md: var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading);
-    --heading-sm-tracking: var(--type-tracking-none);
-    --heading-sm: var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --heading-md-tracking: var(--type-tracking-tighter);
+    --heading-md: var(--type-weight-regular) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading);
+    --heading-sm-tracking: var(--type-tracking-snug);
+    --heading-sm: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
     --heading-xs-tracking: var(--type-tracking-none);
     --heading-xs: var(--type-weight-medium) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-heading);
     --heading-xxs-tracking: var(--type-tracking-loose);
@@ -65,12 +66,16 @@
     --body-default: var(--type-weight-regular) var(--type-size-0875) / var(--type-line-height-125) var(--type-family-body);
     --body-sm-tracking: var(--type-tracking-loose);
     --body-sm: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-body);
-    --metric-lg-tracking: var(--type-tracking-tight);
-    --metric-lg: var(--type-weight-medium) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
-    --metric-md-tracking: var(--type-tracking-tight);
-    --metric-md: var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
-    --metric-sm-tracking: var(--type-tracking-none);
-    --metric-sm: var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --metric-lg-tracking: var(--type-tracking-tighter);
+    --metric-lg: var(--type-weight-regular) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading);
+    --metric-md-tracking: var(--type-tracking-tighter);
+    --metric-md: var(--type-weight-regular) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading);
+    --metric-sm-tracking: var(--type-tracking-snug);
+    --metric-sm: var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading);
+    --label-eyebrow-tracking: var(--type-tracking-wide);
+    --label-eyebrow: var(--type-weight-medium) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading);
+    --code-sm-tracking: var(--type-tracking-none);
+    --code-sm: var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-code);
 
     /* Code only (CODE_ONLY_TYPE_STYLES) */
     --code-default: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
@@ -90,5 +95,7 @@
 .metric-lg { font: var(--metric-lg); letter-spacing: var(--metric-lg-tracking); font-variant-numeric: tabular-nums; }
 .metric-md { font: var(--metric-md); letter-spacing: var(--metric-md-tracking); font-variant-numeric: tabular-nums; }
 .metric-sm { font: var(--metric-sm); letter-spacing: var(--metric-sm-tracking); font-variant-numeric: tabular-nums; }
+.label-eyebrow { font: var(--label-eyebrow); letter-spacing: var(--label-eyebrow-tracking); text-transform: uppercase; }
+.code-sm { font: var(--code-sm); letter-spacing: var(--code-sm-tracking); font-variant-numeric: tabular-nums; }
 /* Numbers that line up vertically: table columns, times, counts in lists. Running text keeps proportional figures. */
 .num { font-variant-numeric: tabular-nums; }

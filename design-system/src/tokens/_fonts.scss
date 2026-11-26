@@ -44,7 +44,7 @@ body :is(.fa-solid, .fa-regular, .fas, .far) {
 }
 
 /* Bare heading elements take the heading text style that matches their level
-   (h1 xxl through h6 xs), the same pairing the Heading component uses; a
+   (h1 xxl, h2 lg, h3 md, h4 sm, h5 xs, h6 xxs), the same pairing the Heading component uses; a
    component that names its own text style wins. A glyph in a heading takes the
    heading's size. */
 h1,
@@ -63,28 +63,28 @@ h1 {
 }
 
 h2 {
-    font: var(--heading-xl);
-    letter-spacing: var(--heading-xl-tracking);
-}
-
-h3 {
     font: var(--heading-lg);
     letter-spacing: var(--heading-lg-tracking);
 }
 
-h4 {
+h3 {
     font: var(--heading-md);
     letter-spacing: var(--heading-md-tracking);
 }
 
-h5 {
+h4 {
     font: var(--heading-sm);
     letter-spacing: var(--heading-sm-tracking);
 }
 
-h6 {
+h5 {
     font: var(--heading-xs);
     letter-spacing: var(--heading-xs-tracking);
+}
+
+h6 {
+    font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
 }
 
 :is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {

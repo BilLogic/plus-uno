@@ -67,7 +67,7 @@ Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const heading = canvas.getByRole('heading', { name: 'No students yet' });
     await expect(getComputedStyle(heading).fontFamily, 'sans at 20').toMatch(/Google Sans Flex/);
-    await expect(getComputedStyle(heading).fontWeight, 'medium').toBe('500');
+    await expect(getComputedStyle(heading).fontWeight, 'regular').toBe('400');
     await expect(px(getComputedStyle(heading).fontSize), 'size 20').toBe(20);
     const buttons = canvas.getAllByRole('button').map((b) => b.textContent.trim());
     await expect(buttons, 'primary first, then secondary').toEqual(['Add student', 'Import a list']);

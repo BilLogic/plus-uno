@@ -17,12 +17,13 @@ export default {
 const meta = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 
 const LEVELS = [
-    ['Page title', '--heading-lg', 'Heading/large · 24 · the page’s one h1'],
+    ['Page title', '--heading-xxl', 'Heading/xxlarge · 32 · the page’s one h1'],
     ['Section title', '--heading-md', 'Heading/medium · 20 · h2'],
     ['Subsection title', '--heading-sm', 'Heading/small · 16 · h3'],
     ['Modal title', '--heading-md', 'Heading/medium · 20 · the modal’s h1, named by aria-labelledby'],
     ['Card, popup and flag title', '--heading-xs', 'Heading/xsmall · 14 · one level below its section'],
-    ['Group label', '--heading-xxs', 'Heading/xxsmall · 12 · a menu group or a head cell, never a heading'],
+    ['Table head', '--heading-xxs', 'Heading/xxsmall · 12 · a head cell, never a heading'],
+    ['Group label', '--label-eyebrow', 'Label/eyebrow · 12 · a menu group, a select-list group, a Sidebar section or a stat label, never a heading'],
 ];
 
 /** Which style each kind of title takes. */
@@ -30,7 +31,7 @@ export const HeadingLevels = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         {LEVELS.map(([name, token, note]) => (
             <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <span style={{ font: `var(${token})`, color: 'var(--ds-text)' }}>{name}</span>
+                <span style={{ font: `var(${token})`, letterSpacing: `var(${token}-tracking)`, textTransform: token === '--label-eyebrow' ? 'uppercase' : undefined, color: 'var(--ds-text)' }}>{name}</span>
                 <span style={meta}>{note}</span>
             </div>
         ))}
@@ -41,6 +42,13 @@ export const HeadingLevels = () => (
 export const CodeStyle = () => (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
         Pad a card with <C>--card-pad</C>: the code span takes 0.875em of the text around it, in Google Sans Code.
+    </p>
+);
+
+/** Code/small sets a position or range in a recording and a version. */
+export const CodeSmallStyle = () => (
+    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+        Flag at <span className="code-sm">22:48</span>, range <span className="code-sm">0:30 – 5:10</span>, model <span className="code-sm">gemini-2.5-pro</span>.
     </p>
 );
 
@@ -56,8 +64,8 @@ const Outline = ({ sizes }) => (
 /** Step one size per nesting level. */
 export const OneStepPerLevel = () => (
     <DoDont>
-        <Do caption="Page 24, section 20, subsection 16: one step per level.">
-            <Outline sizes={['--heading-lg', '--heading-md', '--heading-sm']} />
+        <Do caption="Page 32, section 20, subsection 16: one step per level.">
+            <Outline sizes={['--heading-xxl', '--heading-md', '--heading-sm']} />
         </Do>
         <Dont caption="Sizes picked by feel: a hero size for the page, and a section smaller than its subsection.">
             <Outline sizes={['--heading-xxl', '--heading-xs', '--heading-md']} />
@@ -180,7 +188,7 @@ const H1ThenH2DoFigure = () => (
     <>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
+                <C>h1</C> <Heading as="span" size="xxl">Tutor dashboard</Heading>
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
                 <C>h2</C> <Heading as="span" size="md">Upcoming sessions</Heading>
@@ -196,7 +204,7 @@ const AnH3StraightDontFigure = () => (
     <>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
+                <C>h1</C> <Heading as="span" size="xxl">Tutor dashboard</Heading>
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
                 <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>

@@ -155,7 +155,7 @@ Drag the width control. Above the content cap, content centers at the cap; below
 
 | Slot or prop | Holds |
 | --- | --- |
-| `title` | The page's one h1, at the heading-lg size, above the content. |
+| `title` | The page's one h1, at the heading-xxl size, above the content. |
 | `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |
 | `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |
 | `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |
@@ -171,7 +171,7 @@ Drag the width control. Above the content cap, content centers at the cap; below
 | `--page-header-stack` | Between the breadcrumb, the title row and the page tabs. |
 | `--page-header-gap` | Between the title and the page actions. |
 | `--page-stack-md` | Header to the banner and the first Section; between Sections. |
-| `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |
+| `--heading-xxl`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |
 | `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |
 | `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |
 | `--ds-surface` | The Page's one fill, with no shadow. |
@@ -200,7 +200,7 @@ Drag the width control. Above the content cap, content centers at the cap; below
 
 ## Tokens touched
 
-`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`
+`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-xxl` · `--heading-xxl-tracking` · `--page-pad` · `--page-stack-md`
 
 From `design-system/src/templates/Page/Page.scss`. Override these through the token layer, never with a literal.
 

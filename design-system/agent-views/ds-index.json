@@ -20834,7 +20834,7 @@
 					"\n",
 					"| Slot or prop | Holds |\n",
 					"| --- | --- |\n",
-					"| `title` | The page's one h1, at the heading-lg size, above the content. |\n",
+					"| `title` | The page's one h1, at the heading-xxl size, above the content. |\n",
 					"| `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |\n",
 					"| `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |\n",
 					"| `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |\n",
@@ -20850,7 +20850,7 @@
 					"| `--page-header-stack` | Between the breadcrumb, the title row and the page tabs. |\n",
 					"| `--page-header-gap` | Between the title and the page actions. |\n",
 					"| `--page-stack-md` | Header to the banner and the first Section; between Sections. |\n",
-					"| `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
+					"| `--heading-xxl`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
 					"| `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |\n",
 					"| `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |\n",
 					"| `--ds-surface` | The Page's one fill, with no shadow. |\n",
@@ -20879,7 +20879,7 @@
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`\n",
+					"`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-xxl` · `--heading-xxl-tracking` · `--page-pad` · `--page-stack-md`\n",
 					"\n",
 					"From `design-system/src/templates/Page/Page.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",
@@ -20971,7 +20971,7 @@
 					"required": false,
 					"default": null,
 					"values": null,
-					"description": "The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
+					"description": "The page title. Drawn as an `xxl` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
 					"deprecated": null
 				},
 				{
@@ -21181,7 +21181,7 @@
 					"\n",
 					"| Part | Token |\n",
 					"| --- | --- |\n",
-					"| Title | `Heading` at `lg` (24/28); see Best practices for heading level. |\n",
+					"| Title | `Heading` at `xxl` (32/36); see Best practices for heading level. |\n",
 					"| Rows | `--page-header-stack` between breadcrumbs, title row and bottom bar. |\n",
 					"| Title row | `--page-header-gap` between the title and its actions; `--inline-lg` between actions. |\n",
 					"| Breadcrumbs | `--body-sm`. |\n",
@@ -21198,7 +21198,7 @@
 					"\n",
 					"| Prop | Type | Default | Description |\n",
 					"|------|------|---------|-------------|\n",
-					"| `title` | node | — | The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |\n",
+					"| `title` | node | — | The page title. Drawn as an `xxl` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |\n",
 					"| `children` | node | — | `children` is the title when `title` is not given. |\n",
 					"| `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |\n",
 					"| `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |\n",
@@ -28772,7 +28772,7 @@
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--inline-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`\n",
+					"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--heading-xxl` · `--heading-xxl-tracking` · `--inline-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`\n",
 					"\n",
 					"From `design-system/src/templates/Section/Section.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",
@@ -31317,7 +31317,7 @@
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-head-band` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-lg` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--radius-sm` · `--stack-md` · `--stack-sm` · `--type-weight-medium`\n",
+					"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-head-band` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-lg` · `--inline-sm` · `--label-eyebrow` · `--label-eyebrow-tracking` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--radius-sm` · `--stack-md` · `--stack-sm` · `--type-weight-medium`\n",
 					"\n",
 					"From `design-system/src/components/navigation/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",
@@ -43532,14 +43532,14 @@
 					"| `--page-header-stack` | Between the breadcrumb, the title row and the page tabs. |\n",
 					"| `--page-header-gap` | Between the title and the page actions. |\n",
 					"| `--page-stack-md` | Header to the banner and the first Section; between Sections. |\n",
-					"| `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
+					"| `--heading-xxl`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
 					"| `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |\n",
 					"| `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |\n",
 					"| `--ds-surface` | The Page's one fill, with no shadow. |\n",
 					"\n",
 					"## Heading outline\n",
 					"\n",
-					"Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading lg (24), a section's h2 is Heading md (20), and a subsection's h3 is Heading sm (16).\n",
+					"Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading xxl (32), a section's h2 is Heading md (20), and a subsection's h3 is Heading sm (16).\n",
 					"\n",
 					"The outline keeps a page's headings in one order, so a reader and assistive technology see the same structure the sizes show. It applies across the Page, Section, Card, Modal, Popup and Flag.\n",
 					"\n",
@@ -43561,7 +43561,7 @@
 					"\n",
 					"| Slot or prop | Holds |\n",
 					"| --- | --- |\n",
-					"| `title` | The page's one h1, at the heading-lg size, above the content. |\n",
+					"| `title` | The page's one h1, at the heading-xxl size, above the content. |\n",
 					"| `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |\n",
 					"| `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |\n",
 					"| `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |\n",
@@ -43657,7 +43657,7 @@
 				"$lines": [
 					"| Slot or prop | Holds |\n",
 					"| --- | --- |\n",
-					"| `title` | The page's one h1, at the heading-lg size, above the content. |\n",
+					"| `title` | The page's one h1, at the heading-xxl size, above the content. |\n",
 					"| `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |\n",
 					"| `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |\n",
 					"| `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |\n",
@@ -48495,6 +48495,18 @@
 			"value": "var(--type-weight-regular) 0.875em / 1 var(--type-family-code)"
 		},
 		{
+			"name": "--code-sm",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-weight-regular) var(--type-size-075) / var(--type-line-height-100) var(--type-family-code)"
+		},
+		{
+			"name": "--code-sm-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-none)"
+		},
+		{
 			"name": "--comment-gap",
 			"tier": "component",
 			"group": "Ladder Components",
@@ -52242,31 +52254,31 @@
 			"name": "--heading-lg-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-close)"
+			"value": "var(--type-tracking-tighter)"
 		},
 		{
 			"name": "--heading-md",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-medium) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-125) / var(--type-line-height-150) var(--type-family-heading)"
 		},
 		{
 			"name": "--heading-md-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-snug)"
+			"value": "var(--type-tracking-tighter)"
 		},
 		{
 			"name": "--heading-sm",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
 		},
 		{
 			"name": "--heading-sm-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-none)"
+			"value": "var(--type-tracking-snug)"
 		},
 		{
 			"name": "--heading-xl",
@@ -52490,6 +52502,18 @@
 			"intent": "Width of the Home page join row: the Join button with its session Select beside it."
 		},
 		{
+			"name": "--label-eyebrow",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-weight-medium) var(--type-size-075) / var(--type-line-height-100) var(--type-family-heading)"
+		},
+		{
+			"name": "--label-eyebrow-tracking",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "var(--type-tracking-wide)"
+		},
+		{
 			"name": "--label-height-md",
 			"tier": "semantic",
 			"group": "Scale Tokens",
@@ -52635,37 +52659,37 @@
 			"name": "--metric-lg",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-medium) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-175) / var(--type-line-height-200) var(--type-family-heading)"
 		},
 		{
 			"name": "--metric-lg-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-tight)"
+			"value": "var(--type-tracking-tighter)"
 		},
 		{
 			"name": "--metric-md",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-medium) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-150) / var(--type-line-height-175) var(--type-family-heading)"
 		},
 		{
 			"name": "--metric-md-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-tight)"
+			"value": "var(--type-tracking-tighter)"
 		},
 		{
 			"name": "--metric-sm",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-weight-medium) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
+			"value": "var(--type-weight-regular) var(--type-size-100) / var(--type-line-height-125) var(--type-family-heading)"
 		},
 		{
 			"name": "--metric-sm-tracking",
 			"tier": "semantic",
 			"group": "Type Scale",
-			"value": "var(--type-tracking-none)"
+			"value": "var(--type-tracking-snug)"
 		},
 		{
 			"name": "--modal-body-min-height",
@@ -55551,6 +55575,12 @@
 			"tier": "semantic",
 			"group": "Type Scale",
 			"value": "-0.02em"
+		},
+		{
+			"name": "--type-tracking-wide",
+			"tier": "semantic",
+			"group": "Type Scale",
+			"value": "0.04em"
 		},
 		{
 			"name": "--type-weight-medium",
@@ -59168,7 +59198,7 @@
 			"$lines": [
 				"# Typography\n",
 				"\n",
-				"Heading, Body, Metric and Code are the text styles for all work.\n",
+				"Heading, Body, Metric, Label and Code are the text styles for all work.\n",
 				"\n",
 				"**Kind:** Foundation\n",
 				"\n",
@@ -59176,7 +59206,7 @@
 				"\n",
 				"## Overview\n",
 				"\n",
-				"PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
+				"PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings from 16 up and every metric are regular (400), so size alone carries rank; the two smallest headings (14 and 12) are medium (500) to hold up as table heads, card titles and group labels; body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.\n",
 				"\n",
 				"```css\n",
 				"font: var(--heading-md);\n",
@@ -59190,7 +59220,7 @@
 				"font-variant-numeric: tabular-nums;\n",
 				"```\n",
 				"\n",
-				"Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (Tokens: Typography).\n",
+				"Figma holds `Heading/*`, `Body/*`, `Metric/*`, `Label/eyebrow` and `Code/small`, and code adds `Code/default`, bound to the typography variables (Tokens: Typography).\n",
 				"\n",
 				"## Type scale\n",
 				"\n",
@@ -59202,6 +59232,8 @@
 				"- **Body/default (14/20):** default interface text and control labels (sets the 24, 32 and 40 control heights). Do not use heading styles inside components; use body with a heavier weight instead.\n",
 				"- **Body/small (12/16):** secondary meta text, tags, statuses, counts and tooltips.\n",
 				"- **Metric (large, medium, small):** featured numbers such as session counts or scores.\n",
+				"- **Label/eyebrow (12/16, medium, uppercase, +4%):** the label that names a group of rows or a stat. Use it for a menu group title, a select-list group row, a Sidebar section title, and the stat label above a metric. Type the text in sentence case; the style sets the capitals.\n",
+				"- **Code/small (12/16, regular, Google Sans Code, tabular figures):** machine values the reader scans or compares: a position in a recording (\"22:48\"), a range in a recording (\"0:30 – 5:10\", with an en dash, never \"to\" or \"at\"), and a model, prompt or rule-set version (\"v14\", \"gemini-2.5-pro\"). A clock time stays in sans with am or pm (\"4:05 pm\").\n",
 				"- **Paragraph spacing:** space blocks with Section and stack tokens (Spacing), never a paragraph-spacing style.\n",
 				"\n",
 				"| Style | Size/line | Weight | Role | Sample |\n",
@@ -59222,21 +59254,23 @@
 				"| `--type-family-body` | Google Sans Flex | Body text |\n",
 				"| `--type-family-code` | Google Sans Code | Code |\n",
 				"| `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |\n",
-				"| `--type-weight-regular` | 400 | Body text and headings xxl, xl and lg |\n",
-				"| `--type-weight-medium` | 500 | Headings md to xxs, metrics, labels and icon-paired text |\n",
+				"| `--type-weight-regular` | 400 | Body text, headings 16 and up, and metrics |\n",
+				"| `--type-weight-medium` | 500 | Headings 14 and 12, eyebrow labels and icon-paired text |\n",
 				"| `--type-weight-semibold` | 600 | Inline bold only: strong in running text, never a component or text style |\n",
-				"| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |\n",
+				"| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` · `-wide` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% · +4% | The letter-spacing steps the companions below read |\n",
 				"| `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |\n",
-				"| `--heading-lg-tracking` | −1.5% | Heading 24 |\n",
-				"| `--heading-md-tracking` | −0.5% | Heading 20 |\n",
-				"| `--heading-sm-tracking` · `--heading-xs-tracking` | 0 | Headings 16 and 14 |\n",
+				"| `--heading-lg-tracking` | −2% | Heading 24 |\n",
+				"| `--heading-md-tracking` | −2% | Heading 20 |\n",
+				"| `--heading-sm-tracking` | −0.5% | Heading 16 |\n",
+				"| `--heading-xs-tracking` | 0 | Heading 14 |\n",
 				"| `--heading-xxs-tracking` | +1% | Heading 12 |\n",
 				"| `--body-lg-tracking` · `--body-default-tracking` · `--body-sm-tracking` | 0 · +0.5% · +1% | Body 16, 14 and 12 |\n",
-				"| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −1% · −1% · 0 | Metrics 28, 24 and 16 |\n",
+				"| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −2% · −2% · −0.5% | Metrics 28, 24 and 16 |\n",
+				"| `--label-eyebrow-tracking` | +4% | Eyebrow label 12 |\n",
 				"\n",
 				"### Text-style classes\n",
 				"\n",
-				"Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and `letter-spacing` together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.\n",
+				"Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`, `.label-eyebrow`, `.code-sm`), which set `font` and `letter-spacing` together. The metric classes and `.code-sm` also set tabular figures, and `.label-eyebrow` sets uppercase. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.\n",
 				"\n",
 				"```jsx\n",
 				"<p className=\"body-default\">Helper text</p>\n",
@@ -59249,12 +59283,13 @@
 				"\n",
 				"| Level | Style |\n",
 				"| --- | --- |\n",
-				"| Page title | Heading/large · 24 · the page's one h1 |\n",
+				"| Page title | Heading/xxlarge · 32 · the page's one h1 |\n",
 				"| Section title | Heading/medium · 20 · h2 |\n",
 				"| Subsection title | Heading/small · 16 · h3 |\n",
 				"| Modal title | Heading/medium · 20 · the modal's h1, named by aria-labelledby |\n",
 				"| Card, popup and flag title | Heading/xsmall · 14 · one level below its section |\n",
-				"| Group label (menu group, table head) | Heading/xxsmall · 12 · a group or head cell, never a heading tag |\n",
+				"| Table head | Heading/xxsmall · 12 · a head cell, never a heading tag |\n",
+				"| Group label (menu group, select-list group, Sidebar section, stat label) | Label/eyebrow · 12 · uppercase, never a heading tag |\n",
 				"\n",
 				"Every page has one `h1` (visually hidden when a tab strip replaces a visible page header). Card titles take the heading tag one level below their section.\n",
 				"\n",
@@ -59268,7 +59303,7 @@
 				"\n",
 				"## Code\n",
 				"\n",
-				"`Code/default` (12/16, Google Sans Code) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.\n",
+				"`Code/small` (12/16, Google Sans Code, tabular figures) sets positions and ranges in a recording and model, prompt and rule-set versions; `Code/default` sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.\n",
 				"\n",
 				"## Truncate and wrap\n",
 				"\n",
@@ -59308,13 +59343,13 @@
 				"\n",
 				"### Headings\n",
 				"\n",
-				"Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
+				"Headings are Google Sans Flex. From 20 up they are 400 and track at −2%, so size, not weight, carries rank; Heading/small (16) is 400 and tracks at −0.5%; Heading/xsmall and Heading/xxsmall (14 and 12) are 500, because they style table heads, card titles, accordion triggers, message titles and group labels. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).\n",
 				"\n",
-				"Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.\n",
+				"Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading, and do not change a heading's weight from the one its style sets.\n",
 				"\n",
 				"### Numbers\n",
 				"\n",
-				"Metric styles are Google Sans Flex 500 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration (\"3:30 to 4:30\", \"12 min\") takes the body or heading style of its context, never mono.\n",
+				"Metric styles are Google Sans Flex 400 with tabular figures; the large and medium sizes track at −2% and the small at −0.5%. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A clock time or duration (\"3:30 – 4:30 pm\", \"12 min\") takes the body or heading style of its context, never mono. A stat label above a metric uses `Label/eyebrow`.\n",
 				"\n",
 				"Do: Metric/large for the figure.\n",
 				"\n",
@@ -59322,7 +59357,7 @@
 				"\n",
 				"### Mono\n",
 				"\n",
-				"Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.\n",
+				"Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. `Code/small` also sets positions and ranges in a recording and model, prompt and rule-set versions. Never use it for metrics, clock times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.\n",
 				"\n",
 				"Do: Metric/large for the count, mono for the session ID.\n",
 				"Don't: Mono for the count.\n",
@@ -63056,7 +63091,7 @@
 				"\n",
 				"| Slot or prop | Holds |\n",
 				"| --- | --- |\n",
-				"| `title` | The page's one h1, at the heading-lg size, above the content. |\n",
+				"| `title` | The page's one h1, at the heading-xxl size, above the content. |\n",
 				"| `children` | The Sections and other page content. Existing pages may still supply the header and banner here. |\n",
 				"| `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |\n",
 				"| `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |\n",
@@ -63072,7 +63107,7 @@
 				"| `--page-header-stack` | Between the breadcrumb, the title row and the page tabs. |\n",
 				"| `--page-header-gap` | Between the title and the page actions. |\n",
 				"| `--page-stack-md` | Header to the banner and the first Section; between Sections. |\n",
-				"| `--heading-lg`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
+				"| `--heading-xxl`, `--body-default`, `--body-sm` | The title, the description, the breadcrumb. |\n",
 				"| `--content-max-width`, `--content-max-width-reading`, `--content-min-width` | The default cap, the reading cap and the floor of the content grid. Full width has no cap. |\n",
 				"| `--grid-columns`, `--grid-gutter`, `--page-pad` | The 12-column grid, its gutter and the pad. |\n",
 				"| `--ds-surface` | The Page's one fill, with no shadow. |\n",
@@ -63101,7 +63136,7 @@
 				"\n",
 				"## Tokens touched\n",
 				"\n",
-				"`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`\n",
+				"`--ds-surface` · `--ds-text` · `--frame-head-band` · `--heading-xxl` · `--heading-xxl-tracking` · `--page-pad` · `--page-stack-md`\n",
 				"\n",
 				"From `design-system/src/templates/Page/Page.scss`. Override these through the token layer, never with a literal."
 			]
@@ -63956,7 +63991,7 @@
 				"\n",
 				"## Tokens touched\n",
 				"\n",
-				"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--inline-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`\n",
+				"`--body-default` · `--body-default-tracking` · `--body-sm` · `--body-sm-tracking` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--heading-xs` · `--heading-xs-tracking` · `--heading-xxl` · `--heading-xxl-tracking` · `--inline-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`\n",
 				"\n",
 				"From `design-system/src/templates/Section/Section.scss`. Override these through the token layer, never with a literal."
 			]
