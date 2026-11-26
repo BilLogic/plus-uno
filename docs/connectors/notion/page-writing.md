@@ -7,8 +7,6 @@ description: writing or correcting a Notion page body, a PRD, a decision page or
 
 # Writing a Notion page
 
-<!-- canonical per ADR-017 (docs/adr/) · split 2026-10-14 out of the Notion connector doc, whose always-loaded half is overview.md beside this file; the hub sections, comments and quirks were IDE-only until then · applied by uno-bot and writers/notion. -->
-
 ## Writing a body — bot tools (`notion_create`, `notion_update`)
 
 **Write standard Markdown**, the same dialect as everywhere else (`docs/connectors/slack/overview.md` § Message formatting). The Worker parses it into real Notion blocks — `agents/uno-bot/src/integrations/notion-blocks.ts`.

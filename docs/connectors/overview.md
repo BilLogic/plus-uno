@@ -5,8 +5,6 @@ summary: One row per connected tool: where its conventions live, what touches it
 
 # Integrations Index
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand, ~150 tokens) · distilled 2026-07-07 · load when deciding which tool or integration path to use. -->
-
 One row per connected tool: where its conventions live, what touches it. Concrete sync scripts/env vars for the Figma pipeline: `design-system/guidelines/figma/overview.md` § Quick commands.
 
 | Tool | Conventions | Primary access | Written by |

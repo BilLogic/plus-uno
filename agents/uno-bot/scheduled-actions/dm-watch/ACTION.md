@@ -7,8 +7,6 @@ description: DM watch — read before answering a reminder about a promise in so
 
 # DM watch
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `dm-watch` · built 2026-10-14 from ADR-032, which is the law it keeps, and the headers of agents/uno-bot/src/dm-watch/ · the code is agents/uno-bot/src/dm-watch/. -->
-
 DM watch reads a person's own DMs, with their own Slack token, for promises, and reminds that person alone in their DM with uno-bot. Nobody else is ever told. ADR-032 is the rule: opt-in per purpose, the person's own token with its live scopes checked, output only to them, and nothing of the message kept.
 
 ## The switches

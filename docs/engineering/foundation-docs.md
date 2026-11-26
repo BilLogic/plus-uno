@@ -5,8 +5,6 @@ summary: Code-side notes behind the Foundations docs pages — the checks, helpe
 
 # Foundations docs: the code half
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · applied by every agent editing a Foundations page or the token plan. -->
-
 The Foundations pages in `design-system/src/styles/*.mdx` are written for designers. What an engineer needs lives here, and each page links to this file instead of carrying it.
 
 ## Tokens and the plan

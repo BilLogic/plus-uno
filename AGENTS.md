@@ -37,7 +37,7 @@ Match intent to the Use-when column; if ambiguous, ask which capability is meant
 
 ## Conventions — what agents obey
 
-Authored protocol is normative and lives in `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase) and `docs/conventions/writing.md` (long-form and findings pages). Conventions are **canonical in this repo** (ADR-017); on conflict with a legacy Notion page, the repo wins and the page gets a superseded banner via uno-maintain. Bundle membership, headers and their checks: `docs/engineering/setup.md` § The harness gate.
+Authored protocol is normative and lives in `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase) and `docs/conventions/writing.md` (long-form and findings pages). Conventions are **canonical in this repo** (ADR-017); on conflict with a legacy Notion page, the repo wins and the page gets a superseded banner via uno-maintain. Bundle membership and its checks: `docs/engineering/setup.md` § The harness gate.
 
 **Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint (`writers/blueprint` / `search_blueprint`) · DS truth ← uno-storybook · team conventions ← `docs/conventions/`. **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 

@@ -5,8 +5,6 @@ summary: Use these terms consistently across all design system work, prototypes,
 
 # PLUS Terminology
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 1 in uno-bot's prompt (its constitution section), read on demand in the IDE · distilled 2026-07-07 · applied by every agent naming a product, organization, estate or harness term. -->
-
 For component, pattern, token, motion or sound terms, read `docs/conventions/design-system-glossary.md` (uno-bot: `read_reference` name `docs/conventions/design-system-glossary`); product, organization, estate and harness terms are defined below.
 
 ## Language

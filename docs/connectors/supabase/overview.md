@@ -5,8 +5,6 @@ summary: Two hard rules, every row: never merge two sources into one unattribute
 
 # Supabase / uno-blueprint Conventions
 
-<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->
-
 ## The contract
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.

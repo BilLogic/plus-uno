@@ -7,8 +7,6 @@ description: Figma comments — read before answering a reply on a comment-decis
 
 # Figma comments
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `figma-comments` · moved 2026-10-14 out of the sweep's doc (#900) and docs/connectors/figma/uno-bot-access.md (#903) · the code is agents/uno-bot/src/figma-comments/ and src/figma-ask/. -->
-
 Three things happen to a comment in a subscribed team's file: the end-of-day `sweep-figma-comments` job reads it for a decision or an open question, the morning `sweep-figma-post` job hands what it found to the sweep's morning message, and an @uno in it is answered as soon as Figma's notification arrives.
 
 ## Decisions in comments

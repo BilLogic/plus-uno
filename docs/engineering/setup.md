@@ -214,8 +214,6 @@ throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
 
 Membership in the uno-bot bundle is a property of the document: each doc declares `embodiment: all | ide | uno-bot` in its own frontmatter, and `agents/uno-bot/scripts/bundle-harness.mjs` globs for it, so no list anywhere else decides it. `<!-- ide-only -->` regions are stripped from the bot's copy. A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name through `read_reference` on the turns whose pointer fires. A skill's `.claude/skills/` stub is generated from its canonical frontmatter by `npm run generate:skill-surfaces`.
 
-Every convention header carries the ADR-017 canonical line and its `distilled:` lineage.
-
 That registry is also the author of the places that used to state the same
 set by hand: the `check:*` block of `package.json` and the check steps of
 `.github/workflows/storybook-gate.yml`. Each carries a generated region between

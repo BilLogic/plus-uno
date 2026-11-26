@@ -12,7 +12,7 @@ summary: the standing sweeps (Figma hygiene · conventions integrity · comment 
   registers the automated ones. The auditor inspects and files intakes;
   writers fix.
 - Integrity sweep checklist:
-  [`references/staleness-sweep.md`](staleness-sweep.md) (canonicality headers +
+  [`references/staleness-sweep.md`](staleness-sweep.md) (legacy Notion banners +
   agents↔docs cross-references + path integrity).
 - Scored audits (rubric against an artifact) → summon
   `reviewers/rubric-applier`.

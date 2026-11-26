@@ -7,8 +7,6 @@ description: the share-out post, a result table, a chart, answer cards, a ⚠️
 
 # Slack output shapes
 
-<!-- canonical per ADR-017 (docs/adr/) · split 2026-10-14 out of the Slack connector doc, whose always-loaded half is overview.md beside this file · applied by agents/uno-bot. -->
-
 Each shape the bot's Slack output takes, and which bot skill produces it. The rules every message follows — the dialect, mentions, threading, writing style — are the overview's (`overview.md`, always loaded).
 
 | Shape | Produced by |

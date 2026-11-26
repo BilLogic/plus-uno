@@ -7,8 +7,6 @@ description: commitment reminders and card follow-ups — read before answering 
 
 # Follow-through
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `follow-through` · moved 2026-10-14 out of the sweep's doc (distilled 2026-09-29 from #742, #749, #750, #751, #764 and #795) · the code is agents/uno-bot/src/commitments/ and src/follow-through/. -->
-
 Follow-through holds people to what they said they would do. The end-of-day `card-follow-through` job and the sweep's own read find the work; the morning `commitment-nudge` job asks about it.
 
 ## Commitment reminders

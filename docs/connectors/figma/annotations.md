@@ -7,8 +7,6 @@ description: writing, classifying or auditing a Figma annotation — the five ca
 
 # Figma annotation category labels
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · Tooltip folded into Content 2026-11-03 · moved out of the overview 2026-10-14, read on demand. -->
-
 Every annotation carries exactly one category label. There are five:
 
 | Label | Color | What it holds |

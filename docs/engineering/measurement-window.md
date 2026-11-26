@@ -5,8 +5,6 @@ summary: How to run uno-bot's measurement window each week and close it — the 
 
 # Measurement window
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-10-13 · applied by whoever runs the uno-bot measurement window, weekly and at its close. -->
-
 The measurement window asks one question: does uno-bot take housekeeping off the
 lead without anyone losing an answer? It is answered by five numbers, read from
 the usage record (D1 `uno-bot-usage`) and from the lead's inbox, and recorded in

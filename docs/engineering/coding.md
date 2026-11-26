@@ -5,8 +5,6 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 
 # Coding Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->
-
 ## File naming
 
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `SectionMessage/SectionMessage.scss`)

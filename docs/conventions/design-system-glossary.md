@@ -6,8 +6,6 @@ summary: Design-system vocabulary — load for component, pattern, token, motion
 
 # Design-system glossary
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 · split from GLOSSARY.md 2026-11-13 -->
-
 ## Language
 
 ### Design system: structure
