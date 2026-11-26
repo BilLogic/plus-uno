@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, ButtonItem } from '@/components';
 import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -7,7 +7,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './StatusTag';
 import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
-import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -529,4 +529,280 @@ export const Disabled = {
         await expect(el).not.toHaveAttribute('aria-disabled');
         await expect(getComputedStyle(el).opacity, 'never dimmed').toBe('1');
     },
+};
+
+/* --------------------------------------------------------------- with a menu */
+
+/** The statuses a menu offers, the current one checked. */
+const MENU_STATUSES = ['Present', 'Late', 'Absent', 'Excused'];
+/** Each row is the Status tag it stands for, so the menu reads as the tags a person can pick. */
+const MENU_TONES = { Present: 'success', Late: 'warning', Absent: 'danger', Excused: 'neutral' };
+const statusRow = (status, current, props = {}) => (
+    <ButtonItem key={status} isSelected={status === current} {...props}>
+        <StatusTag appearance={MENU_TONES[status]}>{status}</StatusTag>
+    </ButtonItem>
+);
+const menuRows = (current = 'Present') => MENU_STATUSES.map((status) => statusRow(status, current));
+
+/** The gap between label and chevron (`--stack-sm`, `--tag-gap`), and the chevron's glyph size (`--icon-sm`, `--icon-md`). */
+const MENU_GAP = { default: 4, spacious: 6 };
+const CHEVRON_BOX = { default: 12, spacious: 16 };
+
+/** The hovered background token of each appearance. */
+const HOVERED = {
+    neutral: '--ds-background-neutral-hovered',
+    success: '--ds-background-success-hovered',
+    warning: '--ds-background-warning-hovered',
+    danger: '--ds-background-danger-hovered',
+    info: '--ds-background-information-hovered',
+    discovery: '--ds-background-discovery-hovered',
+};
+
+/** Every appearance at both spacings, each a menu trigger named like a row's field. */
+const MenuMatrix = ({ tagProps = {}, current = 'Present' }) => (
+    <div style={grid}>
+        {STATUS_TAG_SPACINGS.map((size) => (
+            <div key={size} style={row}>
+                {STATUS_TAG_APPEARANCES.map((appearance) => (
+                    <StatusTag
+                        key={appearance}
+                        appearance={appearance}
+                        spacing={size}
+                        menu={menuRows(current)}
+                        aria-label={`Attendance, Hermione Granger: ${appearance}`}
+                        data-testid={`${appearance}-${size}`}
+                        {...tagProps}
+                    >
+                        {appearance}
+                    </StatusTag>
+                ))}
+            </div>
+        ))}
+    </div>
+);
+
+const eachMenuTag = async (canvasElement, check) => {
+    const canvas = within(canvasElement);
+    for (const size of STATUS_TAG_SPACINGS) {
+        for (const appearance of STATUS_TAG_APPEARANCES) {
+            await check(canvas.getByTestId(`${appearance}-${size}`), appearance, size, `${appearance}-${size}`);
+        }
+    }
+};
+
+/** The menu is portaled out of the canvas, so its rows are found from the document. */
+const inDocument = (canvasElement) => within(canvasElement.ownerDocument.body);
+
+/**
+ * With a `menu` the tag is a button that opens the other statuses. Same box and
+ * tone as the label, plus the `angle-down` chevron: 12 in a default tag, 16 in a
+ * spacious one, with equal padding on both sides.
+ */
+export const WithMenu = () => <MenuMatrix />;
+WithMenu.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        const [fill, ink, edge] = STATE_COLORS[appearance];
+        const s = getComputedStyle(el);
+        await expect(el.tagName, `${name} is a button`).toBe('BUTTON');
+        await expect(el, `${name} announces a menu`).toHaveAttribute('aria-haspopup', 'menu');
+        await expect(el, `${name} is closed`).toHaveAttribute('aria-expanded', 'false');
+        await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
+        await expect(s.backgroundColor, `${name} fill`).toBe(tokenColor(canvasElement, fill));
+        await expect(s.color, `${name} text`).toBe(tokenColor(canvasElement, ink));
+        await expect(innerBorder(el), `${name} edge`).toBe(tokenColor(canvasElement, edge));
+
+        const box = el.getBoundingClientRect();
+        const label = within(el).getByText(appearance).getBoundingClientRect();
+        const chevron = el.querySelector('.plus-status__chevron');
+        const glyph = chevron.querySelector('i');
+        await expect(getComputedStyle(glyph, '::before').content, `${name} draws angle-down`).toBe(glyphOf(canvasElement, 'fa-angle-down'));
+        await expect(px(getComputedStyle(glyph).fontSize), `${name} chevron size`).toBe(CHEVRON_BOX[size]);
+        await expect(label.left - box.left, `${name} leading padding`).toBe(PAD[size]);
+        await expect(box.right - chevron.getBoundingClientRect().right, `${name} trailing padding`).toBe(PAD[size]);
+        await expect(chevron.getBoundingClientRect().left - label.right, `${name} gap before the chevron`).toBe(MENU_GAP[size]);
+    });
+};
+
+/** Rest: the tone's fill, the chevron down, in the tab order. */
+export const MenuRest = () => <MenuMatrix />;
+MenuRest.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expect(el, `${name} is enabled`).toBeEnabled();
+        await expect(el, `${name} is a tab stop`).not.toHaveAttribute('tabindex', '-1');
+        await expect(getComputedStyle(el).cursor, `${name} cursor`).toBe('pointer');
+        await expectGroundUnder(canvasElement, el, undefined, STATE_COLORS[appearance][0], name);
+    });
+};
+
+/** Hovered: the tone's hovered background. The edge stays the pressed background. */
+export const MenuHovered = () => <MenuMatrix />;
+MenuHovered.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expectGroundUnder(canvasElement, el, ':hover', HOVERED[appearance], name);
+        await expect(innerBorder(el), `${name} keeps its edge`).toBe(tokenColor(canvasElement, STATE_COLORS[appearance][2]));
+    });
+};
+
+/** Pressed: the tone's pressed background. */
+export const MenuPressed = () => <MenuMatrix />;
+MenuPressed.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expectGroundUnder(canvasElement, el, ':active', STATE_COLORS[appearance][2], name);
+    });
+};
+
+/** Focused: the standard focus ring, outside the edge, and the fill unchanged. */
+export const MenuFocused = () => <MenuMatrix />;
+MenuFocused.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await userEvent.tab();
+        await expect(el, `${name} takes focus from Tab`).toHaveFocus();
+        const s = getComputedStyle(el);
+        await expect(s.outlineStyle, `${name} ring`).toBe('solid');
+        await expect(s.outlineColor, `${name} ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(s.outlineWidth), `${name} ring width`).toBe(2);
+        await expect(s.backgroundColor, `${name} fill`).toBe(tokenColor(canvasElement, STATE_COLORS[appearance][0]));
+    });
+};
+
+/**
+ * Open: the menu lists the statuses with the current one checked, the tag is
+ * drawn selected (the pressed background) and the chevron flips to `angle-up`.
+ */
+export const MenuOpen = () => <MenuMatrix />;
+MenuOpen.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await userEvent.click(el);
+        await waitFor(() => expect(el, `${name} reports open`).toHaveAttribute('aria-expanded', 'true'));
+        await waitFor(async () => expect(await doc.findByRole('menuitem', { name: 'Late' }), `${name} lists the other statuses`).toBeVisible());
+        await expect(doc.getByRole('menuitem', { name: 'Present' }), `${name} checks the current status`).toHaveAttribute('aria-current', 'true');
+        await expectGroundUnder(canvasElement, el, undefined, STATE_COLORS[appearance][2], `${name} open`);
+        await expect(getComputedStyle(el.querySelector('.plus-status__chevron i'), '::before').content, `${name} draws angle-up`)
+            .toBe(glyphOf(canvasElement, 'fa-angle-up'));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
+    });
+};
+
+/** Picking a row closes the menu and the tag shows the pick. */
+export const MenuPick = () => {
+    const [status, setStatus] = useState('Present');
+    return (
+        <StatusTag
+            appearance={MENU_TONES[status]}
+            aria-label={`Attendance, Hermione Granger: ${status}`}
+            data-testid="pick"
+            menu={MENU_STATUSES.map((value) => statusRow(value, status, { onClick: () => setStatus(value) }))}
+        >
+            {status}
+        </StatusTag>
+    );
+};
+MenuPick.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    const el = within(canvasElement).getByTestId('pick');
+    await userEvent.click(el);
+    await userEvent.click(await doc.findByRole('menuitem', { name: 'Late' }));
+    await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
+    await expect(el, 'the trigger follows the pick').toHaveAccessibleName('Attendance, Hermione Granger: Late');
+    await expect(within(el).getByText('Late')).toBeInTheDocument();
+};
+
+/** Loading: the content hides but keeps its width; one spinner, 12 on default and 16 on spacious, sits centered. */
+export const MenuLoading = () => (
+    <div style={grid}>
+        <MenuMatrix tagProps={{ isLoading: true }} />
+        <div style={row}>
+            {STATUS_TAG_SPACINGS.map((size) => (
+                <React.Fragment key={size}>
+                    <StatusTag spacing={size} menu={menuRows()} aria-label="Attendance, at rest" data-testid={`rest-${size}`}>Present</StatusTag>
+                    <StatusTag spacing={size} menu={menuRows()} aria-label="Attendance, loading" isLoading data-testid={`loading-${size}`}>Present</StatusTag>
+                </React.Fragment>
+            ))}
+        </div>
+    </div>
+);
+MenuLoading.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expect(el, `${name} is busy`).toHaveAttribute('aria-busy', 'true');
+        await expect(el.querySelectorAll('.plus-spinner'), `${name} has one spinner`).toHaveLength(1);
+        const spinner = el.querySelector('.plus-spinner');
+        await expect(spinner.getBoundingClientRect().width, `${name} spinner size`).toBe(CHEVRON_BOX[size]);
+        const box = el.getBoundingClientRect();
+        const ring = spinner.getBoundingClientRect();
+        await expect(Math.abs((ring.left + ring.width / 2) - (box.left + box.width / 2)), `${name} spinner centered across`).toBeLessThan(1);
+        await expect(Math.abs((ring.top + ring.height / 2) - (box.top + box.height / 2)), `${name} spinner centered down`).toBeLessThan(1);
+        await expect(getComputedStyle(el.querySelector('.plus-status__content')).opacity, `${name} content hidden`).toBe('0');
+        await expect(getComputedStyle(el).backgroundColor, `${name} keeps its tone`).toBe(tokenColor(canvasElement, STATE_COLORS[appearance][0]));
+    });
+    for (const size of STATUS_TAG_SPACINGS) {
+        await expect(canvas.getByTestId(`loading-${size}`).getBoundingClientRect().width, `${size} keeps its width while loading`)
+            .toBe(canvas.getByTestId(`rest-${size}`).getBoundingClientRect().width);
+    }
+};
+
+/** Disabled: the disabled background and text, never an opacity fade, and it does not open. */
+export const MenuDisabled = () => <MenuMatrix tagProps={{ isDisabled: true }} />;
+MenuDisabled.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        const s = getComputedStyle(el);
+        await expect(el, `${name} is disabled`).toBeDisabled();
+        await expect(s.backgroundColor, `${name} fill`).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        await expect(s.color, `${name} text`).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await expect(s.opacity, `${name} is never faded`).toBe('1');
+        await expect(innerBorder(el), `${name} edge stays the pressed background`).toBe(tokenColor(canvasElement, STATE_COLORS[appearance][2]));
+        await userEvent.click(el, { pointerEventsCheck: 0 });
+        await expect(doc.queryAllByRole('menu'), `${name} does not open`).toHaveLength(0);
+    });
+};
+
+/**
+ * Keyboard: Enter, Space and ArrowDown open the menu; Escape closes it and
+ * returns focus to the tag.
+ */
+export const MenuKeyboard = () => (
+    <StatusTag appearance="success" menu={menuRows()} aria-label="Attendance, Hermione Granger: Present" data-testid="keyboard">Present</StatusTag>
+);
+MenuKeyboard.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    const el = within(canvasElement).getByTestId('keyboard');
+    await userEvent.tab();
+    await expect(el).toHaveFocus();
+    for (const key of ['{Enter}', ' ', '{ArrowDown}']) {
+        await userEvent.keyboard(key);
+        await waitFor(() => expect(doc.queryAllByRole('menu').length, `${JSON.stringify(key)} opens the menu`).toBeGreaterThan(0));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
+        await expect(el, 'Escape returns focus to the tag').toHaveFocus();
+    }
+};
+
+/** The accessible name reads "<field>, <record>: <status>". */
+export const MenuAccessibleName = () => (
+    <StatusTag appearance="success" menu={menuRows()} aria-label="Attendance, Hermione Granger: Present" data-testid="named">Present</StatusTag>
+);
+MenuAccessibleName.play = async ({ canvasElement }) => {
+    const el = within(canvasElement).getByTestId('named');
+    await expect(el).toHaveAccessibleName('Attendance, Hermione Granger: Present');
+    await expect(el).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(el).toHaveAttribute('aria-expanded', 'false');
+};
+
+/** Interactive playground for the menu mode. */
+export const InteractiveMenu = {
+    args: {
+        children: 'Present',
+        appearance: 'success',
+        spacing: 'default',
+        isLoading: false,
+        isDisabled: false,
+    },
+    argTypes: {
+        appearance: { control: 'select', options: STATUS_TAG_APPEARANCES },
+        spacing: { control: 'inline-radio', options: STATUS_TAG_SPACINGS },
+    },
+    render: (args) => <StatusTag {...args} aria-label={`Attendance, Hermione Granger: ${args.children}`} menu={menuRows(args.children)} />,
 };

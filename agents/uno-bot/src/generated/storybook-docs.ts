@@ -173,6 +173,16 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-labels-count-tag--docs"
   ],
   [
+    "design-system/src/components/labels/DateTag/",
+    "DateTag",
+    "components-labels-date-tag--docs"
+  ],
+  [
+    "design-system/src/components/labels/StatusTag/",
+    "StatusTag",
+    "components-labels-status-tag--docs"
+  ],
+  [
     "design-system/src/components/labels/Tag/",
     "Tag",
     "components-labels-tag-tag--docs"

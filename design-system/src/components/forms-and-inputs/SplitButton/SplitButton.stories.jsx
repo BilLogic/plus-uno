@@ -9,7 +9,7 @@ import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_intern
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
-const chevronDown = <Icon name="chevron-down" size={12} />;
+const angleDown = <Icon name="angle-down" size={12} />;
 
 export default {
     title: 'Components/Forms and inputs/Button/Split button',
@@ -30,7 +30,7 @@ export const Overview = {
     render: () => (
         <SplitButton>
             <Button text="Save" />
-            <IconButton icon={chevronDown} label="More save options" aria-haspopup="menu" aria-expanded={false} />
+            <IconButton icon={angleDown} label="More save options" aria-haspopup="menu" aria-expanded={false} />
         </SplitButton>
     ),
     play: async ({ canvasElement }) => {
@@ -55,7 +55,7 @@ export const Appearances = {
             {['default', 'primary'].map((appearance) => (
                 <SplitButton key={appearance}>
                     <Button text={title(appearance)} appearance={appearance} />
-                    <IconButton icon={chevronDown} label={`More ${appearance} options`} appearance={appearance} aria-haspopup="menu" />
+                    <IconButton icon={angleDown} label={`More ${appearance} options`} appearance={appearance} aria-haspopup="menu" />
                 </SplitButton>
             ))}
         </div>
@@ -72,11 +72,11 @@ export const Spacing = {
         <div style={row}>
             <SplitButton>
                 <Button text="Default" />
-                <IconButton icon={chevronDown} label="More default options" aria-haspopup="menu" />
+                <IconButton icon={angleDown} label="More default options" aria-haspopup="menu" />
             </SplitButton>
             <SplitButton>
                 <Button text="Compact" spacing="compact" />
-                <IconButton icon={chevronDown} label="More compact options" spacing="compact" aria-haspopup="menu" />
+                <IconButton icon={angleDown} label="More compact options" spacing="compact" aria-haspopup="menu" />
             </SplitButton>
         </div>
     ),
@@ -93,7 +93,7 @@ const WithMenuState = () => {
         <SplitButton>
             <Button text="Publish" />
             <IconButton
-                icon={chevronDown}
+                icon={angleDown}
                 label="More publish options"
                 aria-haspopup="menu"
                 aria-expanded={open}
@@ -118,11 +118,11 @@ export const States = {
         <div style={row}>
             <SplitButton>
                 <Button text="Disabled" isDisabled />
-                <IconButton icon={chevronDown} label="More disabled options" isDisabled aria-haspopup="menu" />
+                <IconButton icon={angleDown} label="More disabled options" isDisabled aria-haspopup="menu" />
             </SplitButton>
             <SplitButton>
                 <Button text="Loading" isLoading />
-                <IconButton icon={chevronDown} label="More loading options" aria-haspopup="menu" />
+                <IconButton icon={angleDown} label="More loading options" aria-haspopup="menu" />
             </SplitButton>
         </div>
     ),
@@ -140,7 +140,7 @@ export const HoveredState = {
     render: () => (
         <SplitButton>
             <Button text="Publish hover" appearance="primary" />
-            <IconButton icon={chevronDown} label="More hover options" appearance="primary" aria-haspopup="menu" />
+            <IconButton icon={angleDown} label="More hover options" appearance="primary" aria-haspopup="menu" />
         </SplitButton>
     ),
     play: async ({ canvasElement }) => {
@@ -156,7 +156,7 @@ export const PressedState = {
     render: () => (
         <SplitButton>
             <Button text="Publish press" appearance="primary" />
-            <IconButton icon={chevronDown} label="More press options" appearance="primary" aria-haspopup="menu" />
+            <IconButton icon={angleDown} label="More press options" appearance="primary" aria-haspopup="menu" />
         </SplitButton>
     ),
     play: async ({ canvasElement }) => {
@@ -172,7 +172,7 @@ export const KeyboardFocus = {
     render: () => (
         <SplitButton>
             <Button text="Publish focus" />
-            <IconButton icon={chevronDown} label="More focus options" aria-haspopup="menu" />
+            <IconButton icon={angleDown} label="More focus options" aria-haspopup="menu" />
         </SplitButton>
     ),
     play: async ({ canvasElement }) => {
@@ -191,7 +191,7 @@ export const Interactive = {
     render: () => (
         <SplitButton>
             <Button text="Save" />
-            <IconButton icon={chevronDown} label="More save options" aria-haspopup="menu" />
+            <IconButton icon={angleDown} label="More save options" aria-haspopup="menu" />
         </SplitButton>
     ),
 };
@@ -202,7 +202,7 @@ export const Overflow = {
         <div style={{ width: '220px' /* demo frame */ }}>
             <SplitButton>
                 <Button text={LONG_SCHOOL} />
-                <IconButton icon={chevronDown} label="More save options" aria-haspopup="menu" aria-expanded={false} />
+                <IconButton icon={angleDown} label="More save options" aria-haspopup="menu" aria-expanded={false} />
             </SplitButton>
         </div>
     ),

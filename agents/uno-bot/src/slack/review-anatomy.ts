@@ -2,8 +2,7 @@
 // from, in order, and the words around them — the pop-up's title and what each
 // decision does — per tool.
 //
-// THE ZONES (`docs/plans/2026-10-15-review-modal-redesign.md` § The shared
-// anatomy). A tool's reading (`review-draft.ts` § `anatomyOf`) supplies what
+// THE ZONES (`docs/connectors/slack/shapes.md` § The Review pop-up). A tool's reading (`review-draft.ts` § `anatomyOf`) supplies what
 // goes in each; this file decides the blocks.
 //   1. What this does, and where: a `header` in a person's words, then one
 //      `rich_text` line of native `channel`, `user` and `link` elements. The

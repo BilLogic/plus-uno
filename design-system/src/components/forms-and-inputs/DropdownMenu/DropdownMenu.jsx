@@ -114,7 +114,7 @@ const DropdownMenu = ({
 };
 
 DropdownMenu.propTypes = {
-    /** The element that opens the menu. A `Button` with a chevron is the default pattern. */
+    /** The element that opens the menu. A `Button` with an angle is the default pattern. */
     trigger: PropTypes.element.isRequired,
     /** The menu's rows: `Section`, `ButtonItem`, `LinkItem`, `CustomItem`. */
     children: PropTypes.node,

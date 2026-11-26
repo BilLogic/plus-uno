@@ -3992,6 +3992,60 @@
           "deprecated": null
         },
         {
+          "name": "menu",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The popup's content, normally a `Calendar`. With it the tag is a button that opens the popup; without it the tag is a label. Name it with `aria-label`: \"Due date, Session 12: Due tomorrow\".",
+          "deprecated": null
+        },
+        {
+          "name": "isOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled open state of the popup. Pair it with `onOpenChange`. The open tag is drawn as selected.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether an uncontrolled popup starts open.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the next open state when the popup opens or closes.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Prevents opening the popup. Drawn in the disabled tokens, never faded.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -4021,20 +4075,32 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "WithCalendar",
+        "CalendarRest",
+        "CalendarHovered",
+        "CalendarPressed",
+        "CalendarFocused",
+        "CalendarOpen",
+        "CalendarLoading",
+        "CalendarDisabled",
+        "CalendarKeyboard",
+        "CalendarAccessibleName"
       ],
       "tokens": [
         "--body-default",
         "--body-sm",
         "--border-width-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
         "--ds-border",
         "--ds-border-danger-subtle",
-        "--ds-border-focused",
+        "--ds-border-disabled",
         "--ds-border-warning-subtle",
         "--ds-text-danger",
+        "--ds-text-disabled",
         "--ds-text-subtle",
         "--ds-text-warning",
-        "--focus-ring-width",
         "--icon-md",
         "--icon-sm",
         "--image-xs",
@@ -4669,7 +4735,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "The element that opens the menu. A `Button` with a chevron is the default pattern.",
+          "description": "The element that opens the menu. A `Button` with an angle is the default pattern.",
           "deprecated": null
         },
         {
@@ -5986,7 +6052,7 @@
       "import": "import { FilterButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx",
-      "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.",
+      "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and an angle when it opens a menu.",
       "props": [
         {
           "name": "label",
@@ -6030,7 +6096,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "The chevron that says a menu opens.",
+          "description": "The angle that says a menu opens.",
           "deprecated": null
         },
         {
@@ -10118,7 +10184,7 @@
       "import": "import { PopupSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
-      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with an angle, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
         {
           "name": "container",
@@ -14536,6 +14602,7 @@
           "required": false,
           "default": "24",
           "values": [
+            "12",
             "16",
             "24",
             "48"
@@ -14577,6 +14644,7 @@
       "stories": [
         "Overview",
         "Sizes",
+        "Size12",
         "Size16",
         "Size24",
         "Size48",
@@ -14592,6 +14660,7 @@
         "--ds-icon-inverse",
         "--ds-motion-loop",
         "--ds-motion-loop-duration",
+        "--icon-sm",
         "--plus-spinner-size",
         "--radius-full",
         "--spinner-size-lg",
@@ -14605,7 +14674,7 @@
       "import": "import { SplitButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx",
-      "summary": "Split button: a primary action joined to a chevron that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (chevron) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.",
+      "summary": "Split button: a primary action joined to an angle that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (angle) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.",
       "props": [
         {
           "name": "children",
@@ -15096,6 +15165,60 @@
           "deprecated": null
         },
         {
+          "name": "menu",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The menu's rows, `ButtonItem`s from `@/components`, the current one `isSelected`. With it the tag is a button that opens the menu; without it the tag is a label. Name it with `aria-label`: \"Attendance, Hermione Granger: Present\".",
+          "deprecated": null
+        },
+        {
+          "name": "isOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled open state of the menu. Pair it with `onOpenChange`. The open tag is drawn as selected.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether an uncontrolled menu starts open.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the next open state when the menu opens or closes.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "isDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Prevents opening the menu. Drawn in the disabled tokens, never faded.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -15130,26 +15253,46 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "Disabled"
+        "Disabled",
+        "WithMenu",
+        "MenuRest",
+        "MenuHovered",
+        "MenuPressed",
+        "MenuFocused",
+        "MenuOpen",
+        "MenuPick",
+        "MenuLoading",
+        "MenuDisabled",
+        "MenuKeyboard",
+        "MenuAccessibleName",
+        "InteractiveMenu"
       ],
       "tokens": [
         "--body-default",
         "--body-sm",
         "--border-width-default",
         "--ds-background-danger",
+        "--ds-background-danger-hovered",
         "--ds-background-danger-pressed",
+        "--ds-background-disabled",
         "--ds-background-discovery",
+        "--ds-background-discovery-hovered",
         "--ds-background-discovery-pressed",
         "--ds-background-information",
+        "--ds-background-information-hovered",
         "--ds-background-information-pressed",
         "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
         "--ds-background-neutral-pressed",
         "--ds-background-success",
+        "--ds-background-success-hovered",
         "--ds-background-success-pressed",
         "--ds-background-warning",
+        "--ds-background-warning-hovered",
         "--ds-background-warning-pressed",
         "--ds-text",
         "--ds-text-danger",
+        "--ds-text-disabled",
         "--ds-text-discovery",
         "--ds-text-information",
         "--ds-text-success",
@@ -15161,6 +15304,7 @@
         "--pad-x-xs",
         "--plus-status-edge",
         "--plus-status-height",
+        "--plus-status-hovered",
         "--plus-status-icon-box",
         "--plus-status-max",
         "--radius-control-md",

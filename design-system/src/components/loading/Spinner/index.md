@@ -12,7 +12,7 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
-**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
+**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size12, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused, ReducedMotion
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
@@ -49,7 +49,7 @@ Spinner reads these motion tokens and no literal duration or curve.
 
 ### Size the spinner to its container. {#size-the-spinner-to-its-container}
 
-A small control takes the `size={16}` spinner; `size={48}` dwarfs the label it replaces.
+A small control takes the `size={16}` spinner, and a 20-tall tag the `size={12}` one; `size={48}` dwarfs the label it replaces.
 
 Do: Small spinner in a compact row.
 Don't: Large spinner in a compact row.
@@ -114,7 +114,7 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton`
 | Part | Token |
 | --- | --- |
 | Ring | `currentColor`; `--ds-icon-inverse` for `invert`. |
-| Size | `--spinner-size-sm` (16), `--spinner-size-md` (24), `--spinner-size-lg` (48), on the size scale (`--size-100`, `--size-150`, `--size-300`), read through `--plus-spinner-size`. |
+| Size | `--icon-sm` (12), `--spinner-size-sm` (16), `--spinner-size-md` (24), `--spinner-size-lg` (48), on the size scale (`--size-100`, `--size-150`, `--size-300`), read through `--plus-spinner-size`. |
 
 ## Content guidelines
 
@@ -134,7 +134,7 @@ Same group: `ProgressBar` · `ProgressRing` · `Skeleton`
 
 ## Variants
 
-**`size`** — `16` · `24` · `48`
+**`size`** — `12` · `16` · `24` · `48`
 
 **`appearance`** — `inherit` · `invert`
 
@@ -142,7 +142,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
+`--ds-icon-inverse` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--icon-sm` · `--plus-spinner-size` · `--radius-full` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 

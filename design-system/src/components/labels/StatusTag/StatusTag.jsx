@@ -5,6 +5,9 @@ import { devWarn } from '../../../lib/devWarn';
 import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
 import { ClippedTooltip } from '../../../lib/ClippedTooltip';
 import Icon from '../../images-and-icons/Icon';
+import Spinner from '../../loading/Spinner/Spinner';
+import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
+import useTagOpen from '../useTagOpen';
 import './StatusTag.scss';
 
 /**
@@ -20,11 +23,13 @@ import './StatusTag.scss';
  * `trailingMetric` take the same words Button and Count tag use, and the same
  * values as the Status tag set in Figma, so handoff needs no translation.
  *
- * A STATUS TAG IS NEVER A BUTTON. It is a `span` with no role and no click
- * handler. Where a status can be edited, the field around it becomes an inline
- * Dropdown; the label itself never becomes a control. The one time it takes
- * focus is when its text is truncated, so a keyboard user can reach the tooltip
- * that holds the full text.
+ * A STATUS TAG IS A LABEL UNTIL IT HAS A `menu`. Without one it is a `span`
+ * with no role and no click handler; the one time it takes focus is when its
+ * text is truncated, so a keyboard user can reach the tooltip that holds the
+ * full text. With `menu` (rows of `ButtonItem`) the same tag is the trigger of
+ * a `DropdownMenu`: a real button, with a chevron, that opens the other
+ * statuses in place. Use it where a person changes the status in a row;
+ * everywhere else it stays a label.
  */
 
 export const STATUS_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
@@ -34,6 +39,9 @@ const MATERIAL_COLOR_OF = { success: 'success', warning: 'warning', danger: 'dan
 export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
 const warn = devWarn('StatusTag');
+
+/** Whether the tag is a menu trigger, `menu` being any renderable node but `false`, `null` or nothing. */
+const hasMenu = (menu) => menu !== undefined && menu !== null && menu !== false;
 
 /** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */
 export const StatusTag = ({
@@ -45,6 +53,12 @@ export const StatusTag = ({
     trailingMetric,
     trailingMetricAppearance,
     maxWidth = 200,
+    menu,
+    isOpen,
+    defaultOpen,
+    onOpenChange,
+    isLoading = false,
+    isDisabled = false,
     className = '',
     id,
     onClick,
@@ -57,9 +71,18 @@ export const StatusTag = ({
      * click handler, a role, a tab stop. Whether it takes focus is decided by
      * truncation alone.
      */
+    const isMenu = hasMenu(menu);
+    // The tag owns the open state so the chevron can follow it; the menu is
+    // handed it back as a controlled `isOpen`.
+    const { isOpen: open, setOpen } = useTagOpen({ isOpen, defaultOpen, onOpenChange });
     for (const [name, value] of [['onClick', onClick], ['role', role], ['tabIndex', tabIndex]]) {
         if (value !== undefined) {
-            warn(`\`${name}\` is ignored: a Status tag is never a button. Edit a status through an inline Dropdown in its field.`);
+            warn(`\`${name}\` is ignored: a Status tag is a label. Give it a \`menu\` to let a person change the status in place.`);
+        }
+    }
+    if (!isMenu) {
+        for (const [name, value] of [['isOpen', isOpen], ['defaultOpen', defaultOpen], ['onOpenChange', onOpenChange], ['isLoading', isLoading || undefined], ['isDisabled', isDisabled || undefined]]) {
+            if (value !== undefined) warn(`\`${name}\` does nothing without a \`menu\`.`);
         }
     }
 
@@ -99,8 +122,56 @@ export const StatusTag = ({
         `plus-status--${effectiveSpacing}`,
         materialColor ? `plus-status--material-${material} plus-status--material-${materialColor}` : '',
         wantsMetric ? 'plus-status--with-count' : '',
+        isMenu ? 'plus-status--menu' : '',
+        isMenu && isLoading ? 'plus-status--loading' : '',
         className,
     ].filter(Boolean).join(' ');
+
+    if (isMenu) {
+        if (!rest['aria-label']) {
+            warn('A Status tag with a `menu` needs an `aria-label` naming the field and the record: "Attendance, Hermione Granger: Present".');
+        }
+        const cap = typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth;
+        const trigger = (
+            <button
+                type="button"
+                id={id}
+                className={classes}
+                style={{ '--plus-status-max': cap }}
+                aria-haspopup="menu"
+                aria-busy={isLoading || undefined}
+                disabled={isDisabled || isLoading}
+                {...rest}
+            >
+                <span className="plus-status__content">
+                    {iconBefore && (
+                        <span className="plus-status__visual" aria-hidden="true"><Icon name={iconBefore} /></span>
+                    )}
+                    <span className="plus-status__label">{children}</span>
+                </span>
+                {wantsMetric && (
+                    <CountTag value={trailingMetric} appearance={metricAppearance} />
+                )}
+                <span className="plus-status__chevron" aria-hidden="true">
+                    <Icon name={open ? 'angle-up' : 'angle-down'} iconStyle="solid" />
+                </span>
+                {isLoading && (
+                    <span className="plus-status__spinner" aria-hidden="true">
+                        <Spinner size={effectiveSpacing === 'spacious' ? 16 : 12} appearance="inherit" label="" />
+                    </span>
+                )}
+            </button>
+        );
+        return (
+            <DropdownMenu
+                trigger={trigger}
+                isOpen={open}
+                onOpenChange={setOpen}
+            >
+                {menu}
+            </DropdownMenu>
+        );
+    }
 
     /*
      * `maxWidth` travels as a custom property, not an inline `max-width`, so
@@ -164,6 +235,18 @@ StatusTag.propTypes = {
     trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),
     /** The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** The menu's rows, `ButtonItem`s from `@/components`, the current one `isSelected`. With it the tag is a button that opens the menu; without it the tag is a label. Name it with `aria-label`: "Attendance, Hermione Granger: Present". */
+    menu: PropTypes.node,
+    /** Controlled open state of the menu. Pair it with `onOpenChange`. The open tag is drawn as selected. */
+    isOpen: PropTypes.bool,
+    /** Whether an uncontrolled menu starts open. */
+    defaultOpen: PropTypes.bool,
+    /** Called with the next open state when the menu opens or closes. */
+    onOpenChange: PropTypes.func,
+    /** A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed. */
+    isLoading: PropTypes.bool,
+    /** Prevents opening the menu. Drawn in the disabled tokens, never faded. */
+    isDisabled: PropTypes.bool,
     /** Extra class names added to the tag element beside the component's own. */
     className: PropTypes.string,
     /** The `id` attribute of the tag element. */

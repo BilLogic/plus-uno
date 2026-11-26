@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, Calendar } from '@/components';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import DateTag, { DATE_TAG_APPEARANCES, DATE_TAG_SPACINGS } from './DateTag';
-import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `DateTag` — a due or event date.
@@ -300,4 +300,222 @@ export const Disabled = {
         await expect(el).not.toHaveAttribute('aria-disabled');
         await expect(getComputedStyle(el).opacity, 'never dimmed').toBe('1');
     },
+};
+
+/* --------------------------------------------------------------- with a menu */
+
+/** The calendar a Date tag opens: pick a day and the popup keeps showing it. */
+const PickCalendar = ({ date = '2026-12-04' }) => {
+    const [year, month] = date.split('-').map(Number);
+    const [viewDate, setViewDate] = useState(new Date(year, month - 1, 1));
+    const [selected, setSelected] = useState(date);
+    return <Calendar viewDate={viewDate} onViewDateChange={setViewDate} selected={selected} onPick={setSelected} />;
+};
+
+/** The date each tag says, which the Calendar opens on and has picked. */
+const DATES = { neutral: ['2026-12-04', /December 4/], warning: ['2026-11-27', /November 27/], danger: ['2026-11-24', /November 24/] };
+const LABELS = { neutral: 'Due Dec 4', warning: 'Due tomorrow', danger: '2 days overdue' };
+const CHEVRON_BOX = { default: 12, spacious: 16 };
+const MENU_GAP = { default: 4, spacious: 6 };
+
+/** Every appearance at both spacings, each a calendar trigger. */
+const MenuMatrix = ({ tagProps = {} }) => (
+    <div style={grid}>
+        {DATE_TAG_SPACINGS.map((size) => (
+            <div key={size} style={row}>
+                {DATE_TAG_APPEARANCES.map((appearance) => (
+                    <DateTag
+                        key={appearance}
+                        appearance={appearance}
+                        spacing={size}
+                        menu={<PickCalendar date={DATES[appearance][0]} />}
+                        aria-label={`Due date, Session 12: ${LABELS[appearance]}`}
+                        data-testid={`${appearance}-${size}`}
+                        {...tagProps}
+                    >
+                        {LABELS[appearance]}
+                    </DateTag>
+                ))}
+            </div>
+        ))}
+    </div>
+);
+
+const eachMenuTag = async (canvasElement, check) => {
+    const canvas = within(canvasElement);
+    for (const size of DATE_TAG_SPACINGS) {
+        for (const appearance of DATE_TAG_APPEARANCES) {
+            await check(canvas.getByTestId(`${appearance}-${size}`), appearance, size, `${appearance}-${size}`);
+        }
+    }
+};
+
+/** The popup is portaled out of the canvas, so it is found from the document. */
+const inDocument = (canvasElement) => within(canvasElement.ownerDocument.body);
+
+/**
+ * With a `menu`, normally a Calendar, the tag is a button that opens it in a
+ * Popup. Same outline as the label, plus the `angle-down` chevron: 12 in a
+ * default tag, 16 in a spacious one, with equal padding on both sides.
+ */
+export const WithCalendar = () => <MenuMatrix />;
+WithCalendar.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        const [border, ink] = DATE_LOOK[appearance];
+        const s = getComputedStyle(el);
+        await expect(el.tagName, `${name} is a button`).toBe('BUTTON');
+        await expect(el, `${name} has a popup`).toHaveAttribute('aria-haspopup');
+        await expect(el, `${name} is closed`).toHaveAttribute('aria-expanded', 'false');
+        await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
+        await expect(alpha(s.backgroundColor), `${name} has no fill at rest`).toBe(0);
+        await expect(s.color, `${name} text`).toBe(tokenColor(canvasElement, ink));
+        await expect(innerBorder(el), `${name} edge`).toBe(tokenColor(canvasElement, border));
+
+        const box = el.getBoundingClientRect();
+        const icon = el.querySelector('.plus-date-tag__visual').getBoundingClientRect();
+        const label = within(el).getByText(LABELS[appearance]).getBoundingClientRect();
+        const chevron = el.querySelector('.plus-date-tag__chevron');
+        const glyph = chevron.querySelector('i');
+        await expect(getComputedStyle(glyph, '::before').content, `${name} draws angle-down`).toBe(glyphOf(canvasElement, 'fa-angle-down'));
+        await expect(px(getComputedStyle(glyph).fontSize), `${name} chevron size`).toBe(CHEVRON_BOX[size]);
+        await expect(icon.left - box.left, `${name} leading padding`).toBe(PAD[size]);
+        await expect(box.right - chevron.getBoundingClientRect().right, `${name} trailing padding`).toBe(PAD[size]);
+        await expect(chevron.getBoundingClientRect().left - label.right, `${name} gap before the chevron`).toBe(MENU_GAP[size]);
+    });
+};
+
+/** Rest: no fill, outlined, in the tab order. */
+export const CalendarRest = () => <MenuMatrix />;
+CalendarRest.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expect(el, `${name} is enabled`).toBeEnabled();
+        await expect(getComputedStyle(el).cursor, `${name} cursor`).toBe('pointer');
+    });
+};
+
+/** Hovered: the neutral subtle hovered background. The outline stays. */
+export const CalendarHovered = () => <MenuMatrix />;
+CalendarHovered.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expectGroundUnder(canvasElement, el, ':hover', '--ds-background-neutral-subtle-hovered', name);
+        await expect(innerBorder(el), `${name} keeps its edge`).toBe(tokenColor(canvasElement, DATE_LOOK[appearance][0]));
+    });
+};
+
+/** Pressed: the neutral subtle pressed background. */
+export const CalendarPressed = () => <MenuMatrix />;
+CalendarPressed.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expectGroundUnder(canvasElement, el, ':active', '--ds-background-neutral-subtle-pressed', name);
+    });
+};
+
+/** Focused: the standard focus ring. */
+export const CalendarFocused = () => <MenuMatrix />;
+CalendarFocused.play = async ({ canvasElement }) => {
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await userEvent.tab();
+        await expect(el, `${name} takes focus from Tab`).toHaveFocus();
+        const s = getComputedStyle(el);
+        await expect(s.outlineStyle, `${name} ring`).toBe('solid');
+        await expect(s.outlineColor, `${name} ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(s.outlineWidth), `${name} ring width`).toBe(2);
+    });
+};
+
+/** Open: the Calendar shows in a Popup, the tag is drawn selected (the pressed background) and the chevron flips to `angle-up`. */
+export const CalendarOpen = () => <MenuMatrix />;
+CalendarOpen.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await userEvent.click(el);
+        await waitFor(() => expect(el, `${name} reports open`).toHaveAttribute('aria-expanded', 'true'));
+        await waitFor(async () => expect(await doc.findByRole('dialog'), `${name} opens a popup`).toBeVisible());
+        await expect(doc.getByRole('button', { name: DATES[appearance][1] }), `${name} opens on the tag's month with its day picked`).toHaveAttribute('aria-pressed', 'true');
+        await expectGroundUnder(canvasElement, el, undefined, '--ds-background-neutral-subtle-pressed', `${name} open`);
+        await expect(getComputedStyle(el.querySelector('.plus-date-tag__chevron i'), '::before').content, `${name} draws angle-up`)
+            .toBe(glyphOf(canvasElement, 'fa-angle-up'));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.queryByRole('dialog')).toBeNull());
+    });
+};
+
+/** Loading: the content hides but keeps its width; one spinner, 12 on default and 16 on spacious, sits centered. */
+export const CalendarLoading = () => (
+    <div style={grid}>
+        <MenuMatrix tagProps={{ isLoading: true }} />
+        <div style={row}>
+            {DATE_TAG_SPACINGS.map((size) => (
+                <React.Fragment key={size}>
+                    <DateTag spacing={size} menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, at rest" data-testid={`rest-${size}`}>Due tomorrow</DateTag>
+                    <DateTag spacing={size} menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, loading" isLoading data-testid={`loading-${size}`}>Due tomorrow</DateTag>
+                </React.Fragment>
+            ))}
+        </div>
+    </div>
+);
+CalendarLoading.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        await expect(el, `${name} is busy`).toHaveAttribute('aria-busy', 'true');
+        await expect(el.querySelectorAll('.plus-spinner'), `${name} has one spinner`).toHaveLength(1);
+        const spinner = el.querySelector('.plus-spinner');
+        await expect(spinner.getBoundingClientRect().width, `${name} spinner size`).toBe(CHEVRON_BOX[size]);
+        const box = el.getBoundingClientRect();
+        const ring = spinner.getBoundingClientRect();
+        await expect(Math.abs((ring.left + ring.width / 2) - (box.left + box.width / 2)), `${name} spinner centered across`).toBeLessThan(1);
+        await expect(Math.abs((ring.top + ring.height / 2) - (box.top + box.height / 2)), `${name} spinner centered down`).toBeLessThan(1);
+        await expect(getComputedStyle(el.querySelector('.plus-date-tag__content')).opacity, `${name} content hidden`).toBe('0');
+    });
+    for (const size of DATE_TAG_SPACINGS) {
+        await expect(canvas.getByTestId(`loading-${size}`).getBoundingClientRect().width, `${size} keeps its width while loading`)
+            .toBe(canvas.getByTestId(`rest-${size}`).getBoundingClientRect().width);
+    }
+};
+
+/** Disabled: the disabled text and edge, no fill, never an opacity fade, and it does not open. */
+export const CalendarDisabled = () => <MenuMatrix tagProps={{ isDisabled: true }} />;
+CalendarDisabled.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
+        const s = getComputedStyle(el);
+        await expect(el, `${name} is disabled`).toBeDisabled();
+        await expect(s.color, `${name} text`).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await expect(innerBorder(el), `${name} edge`).toBe(tokenColor(canvasElement, '--ds-border-disabled'));
+        await expect(s.opacity, `${name} is never faded`).toBe('1');
+        await userEvent.click(el, { pointerEventsCheck: 0 });
+        await expect(doc.queryByRole('dialog'), `${name} does not open`).toBeNull();
+    });
+};
+
+/**
+ * Keyboard: Enter and Space open the popup; Escape closes it and returns focus
+ * to the tag.
+ */
+export const CalendarKeyboard = () => (
+    <DateTag appearance="warning" menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, Session 12: Due tomorrow" data-testid="keyboard">Due tomorrow</DateTag>
+);
+CalendarKeyboard.play = async ({ canvasElement }) => {
+    const doc = inDocument(canvasElement);
+    const el = within(canvasElement).getByTestId('keyboard');
+    await userEvent.tab();
+    await expect(el).toHaveFocus();
+    for (const key of ['{Enter}', ' ']) {
+        await userEvent.keyboard(key);
+        await waitFor(async () => expect(await doc.findByRole('dialog'), `${JSON.stringify(key)} opens the popup`).toBeVisible());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.queryByRole('dialog')).toBeNull());
+        await expect(el, 'Escape returns focus to the tag').toHaveFocus();
+    }
+};
+
+/** The accessible name reads "<field>, <record>: <date>". */
+export const CalendarAccessibleName = () => (
+    <DateTag appearance="warning" menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, Session 12: Due tomorrow" data-testid="named">Due tomorrow</DateTag>
+);
+CalendarAccessibleName.play = async ({ canvasElement }) => {
+    const el = within(canvasElement).getByTestId('named');
+    await expect(el).toHaveAccessibleName('Due date, Session 12: Due tomorrow');
+    await expect(el).toHaveAttribute('aria-haspopup');
+    await expect(el).toHaveAttribute('aria-expanded', 'false');
 };

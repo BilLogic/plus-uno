@@ -1,5 +1,5 @@
 // The blueprint cards in the Review pop-up and in the thread
-// (`docs/plans/2026-10-15-review-modal-redesign.md` § Blueprint cards): the
+// (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § Blueprint cards): the
 // revision from shipped work (A3–A6) and the idea offered as a proposal
 // (B1–B4), each drawn from the facts its real stager puts on the proposal.
 //

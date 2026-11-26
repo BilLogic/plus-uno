@@ -100,7 +100,7 @@ Each rule is one line here and its body lives in the document it names; the lead
 
 ## Knowledge
 
-Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, an **archive** entry in `docs/knowledge/archive/` while something live cites it, or **nothing** (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
+Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, or **nothing** — git history and closed issues keep the trail (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
 
 <!-- ide-only -->
 ## Progressive loading

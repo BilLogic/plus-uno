@@ -18,8 +18,8 @@
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .html .mdx` file under
  * `design-system/src`, `prototypes` and `src` (`.mjs` counts as js), by `git ls-files` (a filesystem
  * walk finds a second copy of the tree under `.claude/worktrees/`), the token
- * files included. The list's allowed places (decision records, the knowledge
- * archive, changelogs, plans, eval history) and `_Avoid_:` glossary lines record
+ * files included. The list's allowed places (decision records,
+ * changelogs, eval history) and `_Avoid_:` glossary lines record
  * the old words on purpose, as history or as what not to say.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:

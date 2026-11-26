@@ -48,14 +48,13 @@ structure rather than interactive or functional behavior (interactive flows
 belong in `deliverables/interactive.md`). End with the embedded self-check
 block (brief card + the five dial settings as pass/fail checks). Golden
 example: `skills/uno-prototype/examples/wireframe-spec.md`; check with
-`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Offer the
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` on a local draft of the spec (scratch file; the issue holds the posted copy). Offer the
 paste-back re-check.
 
-**Where the spec lives.** Write it to
-`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/engineering/coding.md`) and give the designer the path plus
-the ready-to-paste text. The file is what `uno-review` receives with the
-manifest.
+**Where the spec lives.** Put it in the prototype's GitHub issue, in the body
+or a comment, and give the designer the issue link plus the ready-to-paste
+text. The Notion PRD may link it. The issue is what `uno-review` receives with
+the manifest.
 
 ## Exit
 

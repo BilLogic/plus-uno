@@ -1,6 +1,6 @@
 // The Review pop-up's readings of the two blueprint cards, in the shared
 // anatomy (`review-anatomy.ts`): the blueprint revision from shipped work
-// (`docs/plans/2026-10-15-review-modal-redesign.md` § Blueprint cards, A3–A6)
+// (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § Blueprint cards, A3–A6)
 // and the idea offered as a blueprint proposal (B3, B4). Both are
 // `blueprint_revise`; the facts say which (`PendingProposal.facts`,
 // `blueprint-upkeep/facts.ts`). A card staged before its facts rode the

@@ -22,7 +22,7 @@
 //
 // Until 2026-09-04 the level was pinned at medium on every tier, so "think
 // harder" ran the pro model BELOW its own default and a six-word reply ran the
-// lite model above its own (docs/plans/2026-08-07-006). The attribution rule
+// lite model above its own (`git show 7b0cea5ef:docs/plans/2026-08-07-006-feat-gemini-tiers-and-routing-plan.md`). The attribution rule
 // that pinning bought — a regression is the model or the level, never both —
 // is replaced by a rule about process: change one tier at a time.
 import type { ModelTier } from "./routing";

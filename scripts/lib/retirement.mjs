@@ -5,7 +5,7 @@
  * (the Not-here list): components, props, tokens, words, spellings and the
  * outside names (another design system's words), each with what to use
  * instead, and `allowed`, the one list of places old names may stay (decision
- * records, the knowledge archive, changelogs, eval history, Figma-side names).
+ * records, changelogs, eval history, Figma-side names).
  * Retired tokens the generator needs stay in the token plan
  * (`tokens/plan.mjs`, ADR-038) and are read through the same lookup, and the
  * glossary's `_Avoid_:` words join it as warnings.

@@ -1,7 +1,7 @@
 <!-- Tier 2 (on demand) — the rule-adoption ledger for this folder. Append; do not rewrite history. -->
 # Disposition ledger
 
-One line per note that became a rule, an ADR, or an archive entry. The
+One line per note that became a rule or an ADR. The
 2026-04-19 harness audit's own P2 finding was that no such trail existed —
 "the knowledge layer captures lessons well, but there is no visible
 lesson-to-rule adoption trail" — so promotions happened invisibly or not at all.
@@ -88,3 +88,7 @@ The harness round records the merged Panel, Radius and drag decisions in ADR-044
 ## 2026-11-13 — routing and authoring conventions
 
 The animation load points to the generated event-to-token library, and rule 5 names the drag exception recorded in ADR-046. Setup owns the fresh-origin/main branch rule. Page documentation and the illustration kit carry the existing soft skeleton-bar convention; the component overview drops the vendor-name map.
+
+## 2026-11-26 — plans, todos and the archive retired
+
+`docs/plans/`, `todos/` and `docs/knowledge/archive/` (including `eval-runs/`) were deleted; the `archive` disposition went with them, leaving rule, ADR, or nothing. Deleted work lives in git history, and specs and tickets live in GitHub Issues. A citation to a deleted file reads `git show 7b0cea5ef:<path>`; the Review pop-up's shared anatomy moved to `docs/connectors/slack/shapes.md` § The Review pop-up.

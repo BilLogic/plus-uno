@@ -15,6 +15,7 @@
  */
 @use '../../../styles/label-heights' as label;
 @use '../../../styles/type' as *;
+@use '../../../styles/state' as *;
 
 .plus-date-tag {
     --plus-date-tag-height: #{label.$status-height};
@@ -109,10 +110,91 @@ $date-look: (
     }
 }
 
+/*
+ * A TAG WITH A MENU is a button that opens a Popup, normally with a Calendar.
+ *
+ * The same box and outline as the label, plus a chevron: `angle-down`, and
+ * `angle-up` while open, in a 12 box on default and a 16 box on spacious. The
+ * padding is equal on both sides (`--pad-x-xs` / `--pad-x-md`) and the gap is
+ * `--stack-sm` / `--tag-gap`.
+ *
+ * STATES. There is no fill at rest. Hovered takes the neutral subtle hovered
+ * background, pressed and open (the tag is selected while its popup shows) the
+ * subtle pressed background. Disabled uses the disabled tokens with no
+ * opacity. Loading hides the content at `opacity: 0`, keeping its width, and
+ * centers one Spinner over the tag.
+ */
+.plus-date-tag--menu {
+    position: relative;
+    padding: 0 var(--pad-x-xs);
+    gap: var(--stack-sm);
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    text-align: start;
+    appearance: none;
+
+    .plus-date-tag__content {
+        padding-right: 0;
+    }
+
+    &.plus-date-tag--spacious {
+        padding: 0 var(--pad-x-md);
+        gap: var(--tag-gap);
+
+        .plus-date-tag__content {
+            padding-right: 0;
+        }
+    }
+}
+
+.plus-date-tag__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    height: var(--plus-date-tag-icon-box);
+
+    > i {
+        font-size: var(--icon-sm);
+        line-height: 1;
+    }
+}
+
+.plus-date-tag--spacious .plus-date-tag__chevron > i {
+    font-size: var(--icon-md);
+}
+
+.plus-date-tag__spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+.plus-date-tag--loading {
+    pointer-events: none;
+
+    .plus-date-tag__content,
+    .plus-date-tag__chevron {
+        opacity: 0;
+    }
+}
+
+.plus-date-tag--menu {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        selected: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        disabled: (color: var(--ds-text-disabled), --plus-date-tag-edge: var(--ds-border-disabled)),
+    ), $selected-selector: '&[aria-expanded="true"]', $disabled-selector: '&:disabled:not(.plus-date-tag--loading), &[aria-disabled="true"]');
+}
+
 /* Focusable only while truncated, as the tooltip's trigger. */
-.plus-date-tag:focus-visible {
-    outline: var(--focus-ring-width) solid var(--ds-border-focused);
-    outline-offset: var(--focus-ring-width);
+.plus-date-tag {
+    @include plus-state();
 }
 
 /* Forced colors drop box-shadows; a real border keeps the edge. */

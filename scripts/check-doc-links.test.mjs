@@ -153,7 +153,7 @@ test("a disclosed doc's read_reference name resolves; the same name on an undisc
 test('a glob, a placeholder and a line reference are not claims that a file exists', () => {
   const r = repo({
     'docs/conventions/a.md':
-      'Sweep `docs/**/*.md`, name it `docs/plans/YYYY-MM-DD-001.md`, and see `AGENTS.md:42`.\n',
+      'Sweep `docs/**/*.md`, name it `docs/notes/YYYY-MM-DD-001.md`, and see `AGENTS.md:42`.\n',
   });
   try {
     assert.deepEqual(messages(r.root), []);
@@ -255,9 +255,8 @@ test('a retired path shape surviving in an active file fails, and is counted', (
   }
 });
 
-test('history keeps the words it was written in: a plan and an ADR are not active files', () => {
+test('history keeps the words it was written in: an ADR is not an active file', () => {
   const r = repo({
-    'docs/plans/2026-01-01-001.md': 'Filed under docs/project/notes.\n',
     'docs/adr/001-a-move.md': 'It used to live under docs/project/notes.\n',
   });
   try {

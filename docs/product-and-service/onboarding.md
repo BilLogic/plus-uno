@@ -34,7 +34,7 @@ You never invoke agents directly — skills summon them (that's the `agents/` fo
 - **Design-system truth** → Storybook (plus-uno.netlify.app/storybook) + `design-system/` source.
 - **Team conventions** → `docs/conventions/` in this repo (canonical); legacy Notion playbook pages are superseded.
 - **Project docs** → each project's Notion hub (TLDR → People → Now/Next/Blocked → …).
-- **This repo's history** → `docs/adr/` for decisions, and git for everything that has landed; `docs/plans/` keeps only the plans a live doc or ADR still cites.
+- **This repo's history** → `docs/adr/` for decisions, and git history plus closed GitHub issues for everything that has landed.
 
 ## Tooling
 

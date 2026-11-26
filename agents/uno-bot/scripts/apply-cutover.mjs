@@ -26,8 +26,7 @@
 //     Slack agree.
 //   * Secrets. Cloudflare stores them write-only; `npm run secrets:set` is how
 //     they are re-entered, on the human's own terminal, never through here.
-//   * `docs/plans/` and `docs/knowledge/archive/`. Those are history — they describe a
-//     deployment that existed on the day they were written.
+//   * Git history. It describes a deployment that existed on the day it was written.
 //
 // Usage:
 //   node scripts/apply-cutover.mjs --check        report what would change

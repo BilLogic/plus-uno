@@ -46,7 +46,7 @@ const basicMenu = (
 
 export const Overview = () => (
     <div style={{ padding: `${DEMO_SIZE.top} var(--inline-2xl) 160px` /* demo frame */ }}>
-        <DropdownMenu trigger={<Button text="Session actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+        <DropdownMenu trigger={<Button text="Session actions" iconAfter={<Icon name="angle-down" size={12} />} />}>
             {basicMenu}
         </DropdownMenu>
     </div>
@@ -236,7 +236,7 @@ const noop = () => {};
 export const Default = {
     render: () => (
         <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--stack-2xl)' }}>
-            <DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+            <DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="angle-down" size={12} />} />}>
                 {basicMenu}
             </DropdownMenu>
         </div>
@@ -486,7 +486,7 @@ export const BestPracticesLive = {
 export const Overflow = {
     render: () => (
         <div style={{ padding: `${DEMO_SIZE.top} var(--inline-2xl) 160px` /* demo frame */ }}>
-            <DropdownMenu trigger={<Button text="Move to site" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+            <DropdownMenu trigger={<Button text="Move to site" iconAfter={<Icon name="angle-down" size={12} />} />}>
                 <ButtonItem onClick={() => {}}>{LONG_SCHOOL}</ButtonItem>
                 <ButtonItem onClick={() => {}}>Lincoln Middle</ButtonItem>
             </DropdownMenu>

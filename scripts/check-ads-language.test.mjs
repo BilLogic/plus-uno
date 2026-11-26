@@ -51,8 +51,8 @@ test('a size prop type that lists small / medium / large is counted; pixel sizes
   assert.equal(countOf([src('a.jsx', named)], 'proptype:size a.jsx'), 1, 'a named constant does not hide it');
 });
 
-test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on purpose', () => {
-  assert.equal(measure([src('docs/knowledge/archive/x.mdx', 'Rovo scrim')]).size, 0);
+test('the allowlist: changelog, ADR text and _Avoid_ lines say the old words on purpose', () => {
+  assert.equal(measure([src('docs/knowledge/changelog.md', 'Rovo scrim')]).size, 0);
   assert.equal(measure([src('docs/adr/001.mdx', 'Rovo')]).size, 0);
   assert.equal(measure([src('design-system/src/G.mdx', '_Avoid_: "scrim", "Rovo"\n')]).size, 0);
 });

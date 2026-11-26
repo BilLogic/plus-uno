@@ -1,6 +1,6 @@
 // The Review pop-up for the archive and the three GitHub writes, drawn in the
-// shared anatomy (`docs/plans/2026-10-15-review-modal-redesign.md` § 3, 4, 5
-// and 8, and Decision 7).
+// shared anatomy (`docs/connectors/slack/shapes.md` § The Review pop-up; the
+// per-tool drafts are § 3, 4, 5 and 8 and Decision 7 of `git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md`).
 //
 // Driven at the review door, as `tests/review-shareout.test.ts` drives the
 // share-out: the in-memory ThreadState and a views client that refuses what

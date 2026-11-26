@@ -110,7 +110,7 @@ describe('IconButton', () => {
     });
 
     it('renders an explicit small chevron Icon node with plus-icon--size-12 and leaves string icons at default size', () => {
-        const { container, rerender } = render(<IconButton icon={<Icon name="chevron-down" size={12} />} label="More options" />);
+        const { container, rerender } = render(<IconButton icon={<Icon name="angle-down" size={12} />} label="More options" />);
         expect(container.querySelector('.plus-btn-visual i')).toHaveClass('plus-icon--size-12');
         rerender(<IconButton icon="plus" label="Add" />);
         expect(container.querySelector('.plus-btn-visual i')).not.toHaveClass('plus-icon--size-12');

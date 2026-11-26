@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import { devWarn } from '../../../lib/devWarn';
 
 import Tooltip from '../../overlays-and-layering/Tooltip';
+import useTagOpen from '../useTagOpen';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import Icon from '../../images-and-icons/Icon';
+import Spinner from '../../loading/Spinner/Spinner';
+import Popup from '../../overlays-and-layering/Popup';
 import './DateTag.scss';
 
 /**
@@ -18,9 +21,11 @@ import './DateTag.scss';
  * close, `warning` when it is due soon, `danger` when it is overdue. Derive it
  * from the date and the due-soon window, and write the label as people say it.
  *
- * A DATE TAG IS NEVER A BUTTON. It is a `span` with no role and no click
- * handler. The one time it takes focus is when its text is truncated, so a
- * keyboard user can reach the tooltip that holds the full text.
+ * A DATE TAG IS A LABEL UNTIL IT HAS A `menu`. Without one it is a `span`
+ * with no role and no click handler; the one time it takes focus is when its
+ * text is truncated, so a keyboard user can reach the tooltip that holds the
+ * full text. With `menu`, normally a `Calendar`, the same tag is the trigger of
+ * a `Popup`: a real button, with a chevron, that opens the picker in place.
  */
 
 export const DATE_TAG_APPEARANCES = ['neutral', 'warning', 'danger'];
@@ -41,6 +46,12 @@ export const DateTag = ({
     appearance = 'neutral',
     spacing = 'default',
     maxWidth = 200,
+    menu,
+    isOpen,
+    defaultOpen,
+    onOpenChange,
+    isLoading = false,
+    isDisabled = false,
     className = '',
     id,
     onClick,
@@ -53,9 +64,16 @@ export const DateTag = ({
      * click handler, a role, a tab stop. Whether it takes focus is decided by
      * truncation alone.
      */
+    const isMenu = menu !== undefined && menu !== null && menu !== false;
+    const { isOpen: open, setOpen } = useTagOpen({ isOpen, defaultOpen, onOpenChange });
     for (const [name, value] of [['onClick', onClick], ['role', role], ['tabIndex', tabIndex]]) {
         if (value !== undefined) {
-            warn(`\`${name}\` is ignored: a Date tag is never a button.`);
+            warn(`\`${name}\` is ignored: a Date tag is a label. Give it a \`menu\` to let a person change the date in place.`);
+        }
+    }
+    if (!isMenu) {
+        for (const [name, value] of [['isOpen', isOpen], ['defaultOpen', defaultOpen], ['onOpenChange', onOpenChange], ['isLoading', isLoading || undefined], ['isDisabled', isDisabled || undefined]]) {
+            if (value !== undefined) warn(`\`${name}\` does nothing without a \`menu\`.`);
         }
     }
 
@@ -80,8 +98,47 @@ export const DateTag = ({
         'plus-date-tag',
         `plus-date-tag--${effectiveAppearance}`,
         `plus-date-tag--${effectiveSpacing}`,
+        isMenu ? 'plus-date-tag--menu' : '',
+        isMenu && isLoading ? 'plus-date-tag--loading' : '',
         className,
     ].filter(Boolean).join(' ');
+
+    if (isMenu) {
+        if (!rest['aria-label']) {
+            warn('A Date tag with a `menu` needs an `aria-label` naming the field and the record: "Due date, Session 12: Due tomorrow".');
+        }
+        const trigger = (
+            <button
+                type="button"
+                id={id}
+                className={classes}
+                style={{ '--plus-date-tag-max': typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }}
+                aria-busy={isLoading || undefined}
+                disabled={isDisabled || isLoading}
+                {...rest}
+            >
+                <span className="plus-date-tag__content">
+                    <span className="plus-date-tag__visual" aria-hidden="true">
+                        <Icon name={icon} />
+                    </span>
+                    <span className="plus-date-tag__label">{children}</span>
+                </span>
+                <span className="plus-date-tag__chevron" aria-hidden="true">
+                    <Icon name={open ? 'angle-up' : 'angle-down'} iconStyle="solid" />
+                </span>
+                {isLoading && (
+                    <span className="plus-date-tag__spinner" aria-hidden="true">
+                        <Spinner size={effectiveSpacing === 'spacious' ? 16 : 12} appearance="inherit" label="" />
+                    </span>
+                )}
+            </button>
+        );
+        return (
+            <Popup trigger={trigger} placement="bottom-start" show={open} onToggle={setOpen}>
+                {menu}
+            </Popup>
+        );
+    }
 
     /*
      * `maxWidth` travels as a custom property, not an inline `max-width`, so
@@ -123,6 +180,18 @@ DateTag.propTypes = {
     spacing: PropTypes.oneOf(DATE_TAG_SPACINGS),
     /** The widest the Date tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** The popup's content, normally a `Calendar`. With it the tag is a button that opens the popup; without it the tag is a label. Name it with `aria-label`: "Due date, Session 12: Due tomorrow". */
+    menu: PropTypes.node,
+    /** Controlled open state of the popup. Pair it with `onOpenChange`. The open tag is drawn as selected. */
+    isOpen: PropTypes.bool,
+    /** Whether an uncontrolled popup starts open. */
+    defaultOpen: PropTypes.bool,
+    /** Called with the next open state when the popup opens or closes. */
+    onOpenChange: PropTypes.func,
+    /** A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed. */
+    isLoading: PropTypes.bool,
+    /** Prevents opening the popup. Drawn in the disabled tokens, never faded. */
+    isDisabled: PropTypes.bool,
     /** Extra class names added to the tag element beside the component's own. */
     className: PropTypes.string,
     /** The `id` attribute of the tag element. */

@@ -17,7 +17,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Title />
 Opens or toggles a filter. It shows the filter's name, an optional count of
-what is applied, and a chevron when it opens a menu.
+what is applied, and an angle when it opens a menu.
 
 <DocsTabs of={FilterButtonStories}>
 
@@ -34,7 +34,7 @@ what is applied, and a chevron when it opens a menu.
 
 ## Content
 
-<ComponentExample of={FilterButtonStories.Overview} title="Default" description="A filter's name with a chevron." />
+<ComponentExample of={FilterButtonStories.Overview} title="Default" description="A filter's name with an angle." />
 
 <ComponentExample of={FilterButtonStories.Label} title="Label" description={'The field and its value, "Status: Upcoming": the field in subtle text, the value in ink. Use it when the button names a field and shows what it is set to.'} />
 
@@ -194,7 +194,7 @@ state.
 
 ### Let it hug its label.
 
-Keep the natural width, so the chevron stays right after the name. Filter
+Keep the natural width, so the angle stays right after the name. Filter
 button has no prop to fill its container; don't stretch it across a wide row
 with your own styles.
 
@@ -215,7 +215,7 @@ Below the desktop breakpoint (`768px`), a row of filter buttons does not fit. Fo
     dontCaption="A verb phrase repeats what the button already does."
 />
 
-### Turn off the chevron only when the button doesn't open a menu.
+### Turn off the angle only when the button doesn't open a menu.
 
 `hasChevronDown` defaults to `true`. Set it `false` only for a filter that
 toggles directly on click, with nothing to open.
@@ -251,7 +251,7 @@ The name and the count keep their places, and the Tooltip is on only while the v
 - **A real button, unchanged.** `FilterButton` renders a `Button`
   underneath, so focus, activation and disabled/loading states all follow
   `Button`'s own contract.
-- **The chevron is decorative.** It signals that a menu opens, but the
+- **The angle is decorative.** It signals that a menu opens, but the
   accessible name comes from `text` and, when present, the applied count.
 
 </div>

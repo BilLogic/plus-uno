@@ -612,8 +612,8 @@ function mergeRows(semantic: BlueprintRow[], keyword: BlueprintRow[]): Blueprint
 // retrievers run inside Postgres and are fused by reciprocal rank.
 //
 // WHY THIS REPLACED THE LADDER. The retrieval baseline (2026-08-19,
-// docs/knowledge/archive/eval-runs/2026-08-19-retrieval-baseline.json) measured structural-name
-// recall at 0/10 while paraphrase and exact-term were both 100%. Every one of
+// `git show 7b0cea5ef:docs/knowledge/archive/eval-runs/2026-08-19-retrieval-baseline.json`)
+// measured structural-name recall at 0/10 while paraphrase and exact-term were both 100%. Every one of
 // the ten returned 15 rows on 2 subrequests — the vector pass and nothing else.
 // The keyword pass never ran: SEMANTIC_THIN_RESULTS short-circuits it whenever
 // the vector pass clears SEMANTIC_MIN_SIMILARITY, and that floor (0.5) sits

@@ -127,9 +127,9 @@ test('the definition beside an _Avoid_ line is swept', () => {
   assert.equal(findingsIn(definition, 'agents/uno-bot/README.md').length, 1);
 });
 
-test('plans, decision records, the archive and the generated bundle are the list\'s allowed places', () => {
+test('decision records and the generated bundle are the list\'s allowed places', () => {
   const retirement = loadRetirement(REPO_ROOT);
-  for (const p of ['docs/plans/x.md', 'docs/adr/001-x.md', 'docs/knowledge/archive/x.md', 'todos/x.md', 'agents/uno-bot/harness-bundle.md', 'agents/uno-bot/src/x.ts']) {
+  for (const p of ['docs/adr/001-x.md', 'agents/uno-bot/harness-bundle.md', 'agents/uno-bot/src/x.ts']) {
     assert.equal(retirement.allowed(p, 'spelling'), true, `${p} must be allowed`);
     assert.deepEqual(findingsIn('the Tier 1 fix', p), [], p);
   }

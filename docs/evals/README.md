@@ -12,7 +12,7 @@ What "good" means for each artifact, the scenarios a skill must pass, and the fr
 | `scenarios/` | `<skill>.md` — ≥3 scenarios (query + expected behavior) per skill, **written before the skill body**: baseline without the skill, then write the minimal skill that passes | each skill's quality bar |
 | `fixtures/` | frozen golden inputs + answer keys (see `fixtures/README.md`) | the rubric benchmarks; the Worker's detector unit tests |
 
-A rubric review returns its scored verdict to the skill that asked for it; nothing is logged here. The results measured before that — the 2026-07-08 golden runs, the retrieval baselines, the Cursor acceptance runs — are in `docs/knowledge/archive/eval-runs/`.
+A rubric review returns its scored verdict to the skill that asked for it; nothing is logged here. The results measured before that — the 2026-07-08 golden runs, the retrieval baselines, the Cursor acceptance runs — are in git history: `git show 7b0cea5ef:docs/knowledge/archive/eval-runs/`.
 
 **The uno-bot answer evals are retired** (2026-10-13): the judged run cost far more in bot spend than the bot's real use, several cases asserted rules nobody follows, and the bot is known to work. Their cases, recordings and runners remain in the repository's history; ADR-027's addendum names what measures the bot now. What stays here for uno-bot:
 

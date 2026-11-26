@@ -4,7 +4,7 @@ summary: uno-review — eval scenarios
 
 # uno-review — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-review.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see `git show 7b0cea5ef:docs/knowledge/archive/eval-runs/`. Rubric: docs/evals/rubrics/uno-review.md -->
 
 ## S1 — stage-lens review, stage-appropriate
 - **Trigger:** "review this" + a mid-fi prototype

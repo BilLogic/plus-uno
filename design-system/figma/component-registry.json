@@ -457,6 +457,64 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
       }
     },
+    "DateTag": {
+      "code": {
+        "import": "@/components",
+        "export": "default",
+        "mdxPath": "design-system/src/components/labels/DateTag/DateTag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/DateTag",
+        "source": "design-system/src/components/labels/DateTag/DateTag.jsx",
+        "storybookId": "components-labels-date-tag--docs",
+        "props": {
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "warning",
+              "danger"
+            ]
+          },
+          "spacing": {
+            "type": "enum",
+            "values": [
+              "default",
+              "spacious"
+            ]
+          },
+          "menu": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "enum",
+            "values": [
+              "rest",
+              "hovered",
+              "pressed",
+              "focused",
+              "selected",
+              "loading",
+              "disabled"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "date-tag",
+            "name": "Date tag",
+            "componentSetNodeId": "20682:1687",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20682-1687",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "menu=true is the tag with a calendar; the selected state is the open popup. menu=false keeps only the rest state."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2387"
+      }
+    },
     "DateTimePicker": {
       "code": {
         "import": "@/components",
@@ -1579,6 +1637,67 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
+      }
+    },
+    "StatusTag": {
+      "code": {
+        "import": "@/components",
+        "export": "default",
+        "mdxPath": "design-system/src/components/labels/StatusTag/StatusTag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/StatusTag",
+        "source": "design-system/src/components/labels/StatusTag/StatusTag.jsx",
+        "storybookId": "components-labels-status-tag--docs",
+        "props": {
+          "appearance": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "success",
+              "warning",
+              "danger",
+              "info",
+              "discovery"
+            ]
+          },
+          "spacing": {
+            "type": "enum",
+            "values": [
+              "default",
+              "spacious"
+            ]
+          },
+          "menu": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "enum",
+            "values": [
+              "rest",
+              "hovered",
+              "pressed",
+              "focused",
+              "selected",
+              "loading",
+              "disabled"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "status-tag",
+            "name": "Status tag",
+            "componentSetNodeId": "20095:99",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-99",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "menu=true is the tag with a menu; the selected state is the open menu. menu=false keeps only the rest state."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-85"
       }
     },
     "Suggestion": {
