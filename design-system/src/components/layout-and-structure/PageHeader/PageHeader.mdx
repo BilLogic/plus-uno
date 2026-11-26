@@ -226,7 +226,7 @@ Every extra row pushes content down; add a part only when the page uses it.
                 breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }]} label="Breadcrumbs, every part" />}
                 title="Session plans"
                 actions={<Button appearance="primary" text="New plan" />}
-                bottomBar={<Tabs defaultActiveKey="all" spacing="compact"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}
+                bottomBar={<Tabs defaultActiveKey="all"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}
             />
         </HeadingContextProvider>
     }

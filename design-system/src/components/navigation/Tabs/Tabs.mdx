@@ -49,9 +49,9 @@ A tab strip that switches between panels of related content on one page.
 
 ## Appearance
 
-<ComponentExample of={TabsStories.Appearance} title="Underline, pill and compact" description={<><code>default</code> draws an underline, <code>pill</code> a filled selected tab, and <code>spacing="compact"</code> draws 24 high.</>} />
+<ComponentExample of={TabsStories.Appearance} title="Underline and pill" description={<><code>default</code> draws an underline and <code>pill</code> a filled selected tab. Tabs have one size: 32 high, padded <code>--pad-x-lg</code>.</>} />
 
-<ComponentExample of={TabsStories.WithCount} title="With count" description={<>A trailing <code>CountTag</code> renders at 16 inside both 32 and 24 tabs.</>} />
+<ComponentExample of={TabsStories.WithCount} title="With count" description={<>A trailing <code>CountTag</code> renders at 16 inside the 32 tab.</>} />
 
 </div>
 
@@ -68,6 +68,18 @@ A tab strip that switches between panels of related content on one page.
 <ComponentExample of={TabsStories.Overflow} title="Overflow" description="Truncate: a label longer than its cap ends in an ellipsis, and its full text opens in a Tooltip on hover and focus, only while it is clipped." />
 
 <ComponentExample of={TabsStories.OverflowMore} title="Overflow: More" description={<>Tabs keep one row: the tabs that fit show, and the rest fold into a More tab that names how many it holds. Its menu lists them by name; picking one selects it and More holds the selection. <code>overflow="wrap"</code> lets extra tabs flow onto more rows instead.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Narrow
+
+On a narrow page, a Frame under 768, a strip with the default <code>overflow="auto"</code> takes its narrow form. It reads the page's width, not its own box, through <code>usePageNarrow()</code> from <code>@/lib/pageWidth</code>, so page tabs and Section views get it without a prop, and a strip outside a Frame stays wide. A story stages a narrow page with a Frame at narrow width or <code>{'<PageWidthContext.Provider value={{ narrow: true }}>'}</code>.
+
+<ComponentExample of={TabsStories.NarrowScroll} title="Underline: scroll" description={<>Page tabs keep the underline bar and scroll sideways, the end fading while more lies past it. The selected tab scrolls into view, and nothing folds into More. <code>overflow="scroll"</code> holds this form at every width.</>} />
+
+<ComponentExample of={TabsStories.NarrowMenu} title="Pill: menu" description={<>Views collapse to the selected pill with a 12 angle-down. It opens a menu of every view, the selected one checked; picking one selects it. <code>overflow="menu"</code> holds this form at every width.</>} />
 
 </div>
 
@@ -131,8 +143,11 @@ separately.
 It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, center, right and `justified`, which
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
-`pill` (a filled, rounded selected tab); `spacing` is `default` (`--control-md`) or
-`compact` (`--control-sm`).
+`pill` (a filled, rounded selected tab). There is one size: a 32 tab
+(`--control-md`). `overflow` is `auto` by default: extra tabs fold into More,
+and on a narrow page (a Frame under 768) an underline strip scrolls sideways
+while a pill strip becomes one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
+`wrap` hold one form at every width.
 
 </div>
 
@@ -179,8 +194,9 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Tab height</td><td><code>--control-md</code> (default), <code>--control-sm</code> (compact)</td></tr>
-<tr><td>Tab padding</td><td><code>--pad-x-lg</code>, <code>--pad-x-md</code></td></tr>
+<tr><td>Tab height</td><td><code>--control-md</code></td></tr>
+<tr><td>Tab padding</td><td><code>--pad-x-lg</code></td></tr>
+<tr><td>Narrow</td><td>scroll end fade <code>--inline-3xl</code>; menu chevron <code>--icon-sm</code>, check <code>--ds-icon-selected</code></td></tr>
 <tr><td>Ink</td><td><code>--ds-text-subtle</code>, selected <code>--ds-text-selected</code>, disabled <code>--ds-text-disabled</code></td></tr>
 <tr><td>Baseline and bar</td><td><code>--ds-border</code>, <code>--border-width-default</code>; <code>--ds-border-selected</code>, <code>--border-width-selected</code></td></tr>
 <tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
@@ -263,7 +279,7 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip.
 
-The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. A `justified` strip shares the row and never folds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. On a narrow page nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 
@@ -315,6 +331,13 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
   `activeKey` contention without removing it from the strip's keyboard path.
 - **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
   matching `Tabs.Panel` gets no pointer at all.
+- **Narrow pill views are a menu button.** The selected pill carries
+  `aria-haspopup="menu"` and `aria-expanded`, and is named from the strip's
+  `aria-label` and the selected view ("Views: Active"). It opens from Enter,
+  Space or a click with focus on the checked row; each view is a
+  `menuitemradio` row, the selected one `aria-checked`, and each panel is
+  labeled by the trigger. Underline tabs that scroll stay a tablist, and the focused
+  tab's ring is drawn inside it so the strip's edge never clips it.
 
 </div>
 

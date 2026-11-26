@@ -391,6 +391,9 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Switch views', spatial: 'spatial.fast', note: 'The indicator glides; both tab bodies slide together toward the chosen tab, no fade. Pill views: the fill glides and the content swaps in place.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Narrow pill views: the selected pill opens the menu of every view, which fades in place with no clip or travel, as DropdownMenu does. From the keyboard it opens with no animation.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Picking a view, Escape or an outside click closes the menu on the same fade; the pill takes the new view\'s name at once.' },
+      scroll: { transition: 'Scroll to a spot on the page', spatial: 'spatial.fast', note: 'Narrow page tabs: when the selection moves, the strip scrolls the selected tab wholly into view, clear of the end fade, on the indicator\'s clock. On first draw it is placed at once; under reduced motion it jumps.' },
     },
   },
   {
