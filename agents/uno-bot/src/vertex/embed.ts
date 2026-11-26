@@ -3,8 +3,9 @@
 // blueprint). Returns null on any misconfig/failure so callers fall back to
 // keyword search — embeddings are an enhancement, never a hard dependency.
 //
-// Two credential paths, mirroring the backfill: GEMINI_API_KEY (AI Studio) or
-// the Vertex service account (getGoogleAccessToken). Embeddings are REGIONAL on
+// Two credential paths, in the order the backfill and `geminiConfigured` use
+// (ADR-053): GEMINI_API_KEY (Gemini API) first, the Vertex service account
+// (getGoogleAccessToken) as the fallback. Embeddings are REGIONAL on
 // Vertex — the "global" endpoint used for generation does NOT serve them — so
 // this pins us-central1 regardless of GEMINI_REGION.
 
@@ -51,32 +52,11 @@ export async function embedText(
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   const model = embedModelName(env, modelOverride);
   try {
-    // ORDER MATTERS: prefer the Vertex SA path, because the model it reaches
-    // is the one the live index was built with, and vectors from different
-    // models are NOT comparable. The AI-Studio key is a fallback for
-    // deployments without an SA, and it reaches a different model — which is
-    // why `embedModelName` declares whichever one this request actually used
-    // rather than the one the index is assumed to hold.
-    if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
-      const token = await getGoogleAccessToken(env);
-      const url =
-        `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${env.GEMINI_PROJECT_ID}` +
-        `/locations/${EMBED_REGION}/publishers/google/models/${model}:predict`;
-      const res = await countedFetch(url, {
-        method: "POST",
-        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-        body: JSON.stringify({
-          instances: [{ content: t, task_type: taskType }],
-          parameters: { outputDimensionality: EMBED_DIM },
-        }),
-        signal: controller.signal,
-      });
-      if (!res.ok) return null;
-      const data = (await res.json()) as {
-        predictions?: Array<{ embeddings?: { values?: number[] } }>;
-      };
-      return data.predictions?.[0]?.embeddings?.values ?? null;
-    }
+    // ORDER MATTERS: the key wins, as in `geminiConfigured`, because the model
+    // it reaches is the one the live index was built with, and vectors from
+    // different models are NOT comparable. `embedModelName` declares whichever
+    // model this request actually used, with the same precedence, so the query
+    // and the index never disagree.
     if (env.GEMINI_API_KEY) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`;
       const res = await countedFetch(url, {
@@ -96,6 +76,26 @@ export async function embedText(
       if (!res.ok) return null;
       const data = (await res.json()) as { embedding?: { values?: number[] } };
       return data.embedding?.values ?? null;
+    }
+    if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+      const token = await getGoogleAccessToken(env);
+      const url =
+        `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${env.GEMINI_PROJECT_ID}` +
+        `/locations/${EMBED_REGION}/publishers/google/models/${model}:predict`;
+      const res = await countedFetch(url, {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ content: t, task_type: taskType }],
+          parameters: { outputDimensionality: EMBED_DIM },
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as {
+        predictions?: Array<{ embeddings?: { values?: number[] } }>;
+      };
+      return data.predictions?.[0]?.embeddings?.values ?? null;
     }
     return null;
   } catch {

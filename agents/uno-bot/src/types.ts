@@ -278,11 +278,10 @@ export interface Env {
   // Flipping it is the whole switch — see agent/run-agent.ts.
   MODEL_PROVIDER?: string;
   // Gemini auth mode auto-selected by which credential exists (gemini/client.ts).
-  // RULE (2026-07-16, ADR-018): the Vertex service-account pair (GEMINI_SA_EMAIL
-  // + GEMINI_SA_PRIVATE_KEY + GEMINI_PROJECT_ID) is canonical and takes
-  // precedence; it ALSO powers the Vertex-Claude adapter (vertex/claude.ts) — same
-  // token. GEMINI_API_KEY (AI Studio) is a local-dev fallback only — never set
-  // it on the Worker.
+  // RULE (ADR-053): GEMINI_API_KEY is canonical and takes precedence whenever
+  // set. The Vertex service-account pair (GEMINI_SA_EMAIL + GEMINI_SA_PRIVATE_KEY
+  // + GEMINI_PROJECT_ID) is the loud fallback, and the only credential the
+  // Vertex-Claude adapter (vertex/claude.ts) can use.
   GEMINI_API_KEY?: string;
   GEMINI_SA_EMAIL?: string;
   GEMINI_SA_PRIVATE_KEY?: string;

@@ -1,16 +1,13 @@
 // Minimal Gemini client for the provider adapter (phase 1, 2026-07-10).
 //
-// Supports BOTH access paths, auto-selected by which credential is present:
-//   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
-//                                 an OAuth token minted in ./auth.ts. THE
-//                                 CANONICAL PATH — always wins when configured
-//                                 (rule set 2026-07-16 after the Vertex-vs-AI-
-//                                 Studio key mixup; docs/adr/
-//                                 ADR-018).
+// Supports BOTH access paths, picked by which credential is present, in a
+// fixed order (docs/adr/053):
 //   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
-//                                 googleapis.com) — plain key header. Emergency
-//                                 fallback only; do NOT set this secret on the
-//                                 deployed Worker.
+//                                 googleapis.com) — plain key header. THE
+//                                 CANONICAL PATH — always wins when set.
+//   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
+//                                 an OAuth token minted in ./auth.ts. The
+//                                 fallback, and loud when traffic lands on it.
 //
 // Phase 1 scope: non-streaming generateContent with a system prompt and plain
 // text — enough for the /debug/gemini smoke test and the delegate-subagent
@@ -49,29 +46,26 @@ interface GenerateContentResponse {
 }
 
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
-  // SA FIRST (flipped 2026-07-16, live incident; ADR-018): the service account
-  // carries the GCP project's real Vertex quota and matches the credential used
-  // everywhere else (the Claude adapter, embeddings, backfill). An AI-Studio
-  // GEMINI_API_KEY used to take precedence — free-tier keys have small daily
-  // caps, and when one is set on the Worker it starved EVERY turn with 429s
-  // (bot down in Slack + the whole eval run). API key remains the fallback for
-  // deployments without an SA — and only ever local-dev, never the Worker.
+  // KEY FIRST (ADR-053, which reverses ADR-018): one credential wins
+  // deterministically, so which auth and billing boundary served a request never
+  // depends on which other secrets happen to exist. The key is the path the
+  // semantic index's embedding model already lives on, and with the region at
+  // "global" the Vertex-only cachedContents path was already inlining, so
+  // choosing it gives up no caching.
+  if (env.GEMINI_API_KEY) return "api-key";
   if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+    // Loud on purpose: the key going missing (rotation, rename, typo) silently
+    // shifting traffic to a different auth/billing boundary is the failure mode
+    // a single deterministic path exists to catch.
+    console.warn("[gemini] GEMINI_API_KEY is not set — falling back to the Vertex service account");
     return "service-account";
-  }
-  if (env.GEMINI_API_KEY) {
-    // Loud on purpose: the SA config going missing (rotation, rename, typo)
-    // silently shifting traffic to a different auth/billing boundary is the
-    // failure mode ADR-018 exists to catch.
-    console.warn("[gemini] Vertex SA not fully configured — falling back to the AI Studio key (emergency path)");
-    return "api-key";
   }
   return null;
 }
 
 /**
  * Vertex project/region/host + auth headers, or null when this deployment is on
- * the AI-Studio key path (which has no cachedContents surface).
+ * the API-key path (which has no cachedContents surface).
  *
  * Shared with ./cache.ts so the cache and the generateContent call can never
  * drift onto different projects or regions — a cachedContents resource is

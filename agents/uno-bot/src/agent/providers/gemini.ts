@@ -1,4 +1,4 @@
-// The Gemini adapter — production's ModelProvider (ADR-018: Vertex only).
+// The Gemini adapter — production's ModelProvider (ADR-053: the API key first).
 //
 // Everything Gemini-shaped stops here. The loop hands in a neutral conversation,
 // a tool roster, an opaque tier name and a `toolsEnabled` flag; what goes back is

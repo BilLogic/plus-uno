@@ -20,20 +20,17 @@ export type EmbedCredentials = {
   GEMINI_API_KEY?: string;
 };
 
-/** The Vertex service-account path's model, and the one the live index holds. */
+/** The Vertex service-account path's model. */
 export const VERTEX_MODEL = "text-embedding-005";
 
 /**
- * The AI Studio path's model, and why it is no longer a DIFFERENT model.
+ * The Gemini API key path's model, and the one the live index holds.
  *
- * It used to be `text-embedding-004`, which Google deprecated on 2026-01-14 —
- * so the "fallback" was a dead endpoint, and had been for months. Worse than
- * dead: 004 and 005 are both 768-dim, so a deployment missing the service
- * account produced vectors that type-checked perfectly and scored against an
- * 005 index as noise. `gemini-embedding-001` is reachable through BOTH
- * transports, which is the property that lets one index serve the bot's
- * service account and a person's own browser key, so local dev now speaks the
- * model the index is moving to rather than a third one.
+ * It used to be `text-embedding-004`, which Google deprecated on 2026-01-14,
+ * and 004 and 005 are both 768-dim, so a vector from a model the index did not
+ * hold type-checked perfectly and scored as noise. `gemini-embedding-001` is
+ * reachable through BOTH transports and is what the index is built with, so
+ * the key path, which now wins whenever the key is set, speaks it.
  */
 export const AISTUDIO_MODEL = "gemini-embedding-001";
 
@@ -51,6 +48,9 @@ export const AISTUDIO_MODEL = "gemini-embedding-001";
  */
 export function embedModelName(env: EmbedCredentials, override?: string): string {
   if (override) return override;
+  // Same order as `geminiConfigured` (ADR-053): the key wins, so a deployment
+  // holding both credentials embeds with the model the live index holds.
+  if (env.GEMINI_API_KEY) return AISTUDIO_MODEL;
   return env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID
     ? VERTEX_MODEL
     : AISTUDIO_MODEL;

@@ -79,7 +79,7 @@ function cacheKey(model: string, region: string, systemText: string): string {
 /**
  * The cached-prompt name for this (model, region, build), creating it if needed.
  *
- * @param env - Worker env (needs the Vertex SA + HARNESS_KV to memo across isolates)
+ * @param env - Worker env (needs the Vertex SA path, so no GEMINI_API_KEY, + HARNESS_KV to memo across isolates)
  * @param model - Exact model id the generateContent call will use
  * @param systemText - The STABLE harness text only — never per-request blocks,
  *   which would change the cached bytes every turn and defeat the point

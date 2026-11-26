@@ -5,7 +5,7 @@
 // proxy's 524 timeout — fails over
 // to `GEMINI_FALLBACK_MODEL`, on a turn (`send`, which the loop retries) and on
 // a one-shot (`generate`, which every scheduled job's model call goes through).
-// The loop's side of the retry is `tests/agent-loop.test.ts`'s. Driven against a stubbed fetch on the AI Studio key path, which needs no
+// The loop's side of the retry is `tests/agent-loop.test.ts`'s. Driven against a stubbed fetch on the API-key path, which needs no
 // service-account token and builds the same request bodies.
 
 import { test } from "node:test";
