@@ -305,12 +305,15 @@ export const Disabled = {
 /* --------------------------------------------------------------- with a menu */
 
 /** The calendar a Date tag opens: pick a day and the popup keeps showing it. */
-const PickCalendar = () => {
-    const [viewDate, setViewDate] = useState(new Date(2026, 10, 1));
-    const [selected, setSelected] = useState('2026-11-27');
+const PickCalendar = ({ date = '2026-12-04' }) => {
+    const [year, month] = date.split('-').map(Number);
+    const [viewDate, setViewDate] = useState(new Date(year, month - 1, 1));
+    const [selected, setSelected] = useState(date);
     return <Calendar viewDate={viewDate} onViewDateChange={setViewDate} selected={selected} onPick={setSelected} />;
 };
 
+/** The date each tag says, which the Calendar opens on and has picked. */
+const DATES = { neutral: ['2026-12-04', /December 4/], warning: ['2026-11-27', /November 27/], danger: ['2026-11-24', /November 24/] };
 const LABELS = { neutral: 'Due Dec 4', warning: 'Due tomorrow', danger: '2 days overdue' };
 const CHEVRON_BOX = { default: 12, spacious: 16 };
 const MENU_GAP = { default: 4, spacious: 6 };
@@ -325,7 +328,7 @@ const MenuMatrix = ({ tagProps = {} }) => (
                         key={appearance}
                         appearance={appearance}
                         spacing={size}
-                        menu={<PickCalendar />}
+                        menu={<PickCalendar date={DATES[appearance][0]} />}
                         aria-label={`Due date, Session 12: ${LABELS[appearance]}`}
                         data-testid={`${appearance}-${size}`}
                         {...tagProps}
@@ -428,7 +431,7 @@ CalendarOpen.play = async ({ canvasElement }) => {
         await userEvent.click(el);
         await waitFor(() => expect(el, `${name} reports open`).toHaveAttribute('aria-expanded', 'true'));
         await waitFor(async () => expect(await doc.findByRole('dialog'), `${name} opens a popup`).toBeVisible());
-        await expect(doc.getByRole('button', { name: /November 27/ }), `${name} shows the current day picked`).toHaveAttribute('aria-pressed', 'true');
+        await expect(doc.getByRole('button', { name: DATES[appearance][1] }), `${name} opens on the tag's month with its day picked`).toHaveAttribute('aria-pressed', 'true');
         await expectGroundUnder(canvasElement, el, undefined, '--ds-background-neutral-subtle-pressed', `${name} open`);
         await expect(getComputedStyle(el.querySelector('.plus-date-tag__chevron i'), '::before').content, `${name} draws angle-up`)
             .toBe(glyphOf(canvasElement, 'fa-angle-up'));
@@ -444,8 +447,8 @@ export const CalendarLoading = () => (
         <div style={row}>
             {DATE_TAG_SPACINGS.map((size) => (
                 <React.Fragment key={size}>
-                    <DateTag spacing={size} menu={<PickCalendar />} aria-label="Due date, at rest" data-testid={`rest-${size}`}>Due tomorrow</DateTag>
-                    <DateTag spacing={size} menu={<PickCalendar />} aria-label="Due date, loading" isLoading data-testid={`loading-${size}`}>Due tomorrow</DateTag>
+                    <DateTag spacing={size} menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, at rest" data-testid={`rest-${size}`}>Due tomorrow</DateTag>
+                    <DateTag spacing={size} menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, loading" isLoading data-testid={`loading-${size}`}>Due tomorrow</DateTag>
                 </React.Fragment>
             ))}
         </div>
@@ -490,7 +493,7 @@ CalendarDisabled.play = async ({ canvasElement }) => {
  * to the tag.
  */
 export const CalendarKeyboard = () => (
-    <DateTag appearance="warning" menu={<PickCalendar />} aria-label="Due date, Session 12: Due tomorrow" data-testid="keyboard">Due tomorrow</DateTag>
+    <DateTag appearance="warning" menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, Session 12: Due tomorrow" data-testid="keyboard">Due tomorrow</DateTag>
 );
 CalendarKeyboard.play = async ({ canvasElement }) => {
     const doc = inDocument(canvasElement);
@@ -508,7 +511,7 @@ CalendarKeyboard.play = async ({ canvasElement }) => {
 
 /** The accessible name reads "<field>, <record>: <date>". */
 export const CalendarAccessibleName = () => (
-    <DateTag appearance="warning" menu={<PickCalendar />} aria-label="Due date, Session 12: Due tomorrow" data-testid="named">Due tomorrow</DateTag>
+    <DateTag appearance="warning" menu={<PickCalendar date="2026-11-27" />} aria-label="Due date, Session 12: Due tomorrow" data-testid="named">Due tomorrow</DateTag>
 );
 CalendarAccessibleName.play = async ({ canvasElement }) => {
     const el = within(canvasElement).getByTestId('named');

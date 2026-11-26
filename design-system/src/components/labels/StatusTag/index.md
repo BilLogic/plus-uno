@@ -26,7 +26,7 @@ the system calculated the state or a person set it.
 
 Give it a `menu` where a person changes the status in place: attendance,
 engagement or a workflow status in a row. The tag becomes the trigger of a
-`DropdownMenu` and the rows are `ButtonItem`s, the current one `isSelected`.
+`DropdownMenu` and the rows are Status tags, each in a `ButtonItem`, with the current one `isSelected`.
 Leave `menu` off where nobody changes the status there.
 
 Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
@@ -103,8 +103,9 @@ Don't: A menu that only reads is a Popup.
 
 ### List the other statuses, each one a row. {#list-the-other-statuses-each-one-a-row}
 
-Each row is a `ButtonItem` with the same wording as the tag it stands for, and
-the current one is `isSelected`. Picking one closes the menu.
+Each row is a Status tag in its own appearance, wrapped in a `ButtonItem`, with the
+same wording as the tag it stands for. The current one is `isSelected`. Picking one
+closes the menu.
 
 ### Name the tag by field, record and status. {#name-the-tag-by-field-record-and-status}
 

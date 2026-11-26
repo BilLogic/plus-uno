@@ -535,9 +535,14 @@ export const Disabled = {
 
 /** The statuses a menu offers, the current one checked. */
 const MENU_STATUSES = ['Present', 'Late', 'Absent', 'Excused'];
-const menuRows = (current = 'Present') => MENU_STATUSES.map((status) => (
-    <ButtonItem key={status} isSelected={status === current}>{status}</ButtonItem>
-));
+/** Each row is the Status tag it stands for, so the menu reads as the tags a person can pick. */
+const MENU_TONES = { Present: 'success', Late: 'warning', Absent: 'danger', Excused: 'neutral' };
+const statusRow = (status, current, props = {}) => (
+    <ButtonItem key={status} isSelected={status === current} {...props}>
+        <StatusTag appearance={MENU_TONES[status]}>{status}</StatusTag>
+    </ButtonItem>
+);
+const menuRows = (current = 'Present') => MENU_STATUSES.map((status) => statusRow(status, current));
 
 /** The gap between label and chevron (`--stack-sm`, `--tag-gap`), and the chevron's glyph size (`--icon-sm`, `--icon-md`). */
 const MENU_GAP = { default: 4, spacious: 6 };
@@ -685,12 +690,10 @@ export const MenuPick = () => {
     const [status, setStatus] = useState('Present');
     return (
         <StatusTag
-            appearance={status === 'Present' ? 'success' : 'warning'}
+            appearance={MENU_TONES[status]}
             aria-label={`Attendance, Hermione Granger: ${status}`}
             data-testid="pick"
-            menu={MENU_STATUSES.map((value) => (
-                <ButtonItem key={value} isSelected={value === status} onClick={() => setStatus(value)}>{value}</ButtonItem>
-            ))}
+            menu={MENU_STATUSES.map((value) => statusRow(value, status, { onClick: () => setStatus(value) }))}
         >
             {status}
         </StatusTag>
