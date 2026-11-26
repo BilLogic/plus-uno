@@ -265,7 +265,9 @@ test('#2513: router, engineering docs, and skills point at @plus-uno/cli, ds-mcp
   const read = (rel) => readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 
   const agents = read('AGENTS.md');
-  assert.match(agents, /Verifying a component's API, or writing a story's code[^\n]*`docs\/connectors\/ds-mcp\.md`[^\n]*`docs\/connectors\/storybook-mcp\.md`/);
+  assert.match(agents, /Building or changing any screen[^\n]*`design-system\/guidelines\/overview\.md`/);
+  const overview = read('design-system/guidelines/overview.md');
+  assert.match(overview, /Verifying a component's API, or writing a story's code[^\n]*ds-mcp\.md[^\n]*storybook-mcp\.md/);
   assert.ok(
     frontmatter(agents).body.length < 18_000,
     `expected dieted AGENTS.md body < 18,000 chars, got ${frontmatter(agents).body.length}`,

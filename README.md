@@ -102,7 +102,7 @@ uno is the PLUS design team's agent. In the IDE (Claude Code, Cursor, any tool t
 | `uno-review` | review against the design system, product intent and accessibility; run Design QA |
 | `uno-maintain` | file an intake, fix drift, and keep the docs and estates in sync |
 
-Each skill is `skills/<name>/SKILL.md` over its `references/method.md`. The agents a skill summons are in `agents/`: **researchers** gather, **reviewers** judge, **writers** write to Notion, Figma and the blueprint. [`AGENTS.md`](AGENTS.md) is the constitution every agent loads first: identity, the skill routing table, the loading contract and the hard rules.
+Each skill is `skills/<name>/SKILL.md` over its `references/method.md`. The agents a skill summons are in `agents/`: **researchers** gather, **reviewers** judge, **writers** write to Notion, Figma and the blueprint. [`AGENTS.md`](AGENTS.md) is the constitution every agent loads first: identity, the skill routing table, the conventions and the hard rules.
 
 ## uno-bot
 

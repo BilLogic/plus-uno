@@ -87,7 +87,7 @@ artifacts exist to converge cheaply before the next rung.
 | A prototype run starts | `references/intake.md` + `.cursor/hooks/uno-prototype/intake-steps.json` (the 8-step, 4-question interview + five fidelity dials) |
 | Brief card confirmed | the ONE deliverable doc the confirmed deliverable selects (table above) |
 | Figma design input or static hi-fi mockup | `design-system/guidelines/figma/registry-load-gate.md` (MANDATORY, registries first) → `design-system/guidelines/figma/mcp-guide.md` |
-| Building UI (components/tokens) | DS agent-views per **AGENTS.md § Progressive loading**; estate conventions per **AGENTS.md § The loading contract** |
+| Building UI (components/tokens) | DS agent-views per **AGENTS.md § Progressive loading**; estate conventions per **AGENTS.md § Conventions** |
 
 ## Constraints
 

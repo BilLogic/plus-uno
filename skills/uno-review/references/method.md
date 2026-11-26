@@ -21,6 +21,10 @@ Every designer-initiated review starts from a one-line manifest: **fidelity (low
 | **Handoff gate** (Flow 3, H4) | a handoff package is about to publish — after rails propagation, before sign-off | same three lenses in parallel; uno-lens additionally checks the spec against what was just propagated to uno-storybook / uno-blueprint |
 | **Design QA** (Flow 3, H7) | the Roadmap card hits `Dev Status: Ready for QA (RTT)` — spotted by a human today; the auto-trigger is not built (`docs/engineering/operations.md`) | design-qa solo: resolve the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages, walk the QA build against them with the Design QA checklist |
 
+## What a review judges
+
+The workspace is a prototype estate: judge design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR and API hardening sit outside the frame.
+
 ## Lens dispatch — parallel, in-lane, stage-appropriate
 
 Lenses run **in parallel** and stay in-lane — no lens comments outside its own scope. Each lens confirms the manifest's fidelity tier first and reviews at that depth:

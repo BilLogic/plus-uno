@@ -83,7 +83,7 @@ That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
 agents reach for by habit is laid out differently for FA 7 and the icons come up
 blank. Copy the `<link>` from `skills/uno-prototype/scripts/scaffold-prototype.sh` rather than typing
 it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
-(AGENTS.md § Hard rules 3).
+(`FA-Free-only`, AGENTS.md § Hard rules).
 
 **Minimal structure** (if not using the scaffold):
 
@@ -207,6 +207,14 @@ that cheap — every findings check takes the root, so a test hands it a
 throwaway directory instead of the repo. `scripts/check-doc-links.test.mjs` and
 `scripts/check-knowledge-disposition.test.mjs` are the shape to copy, and
 `npm run test:scripts` runs them.
+
+### What AGENTS.md carries, and what the bundle takes
+
+`AGENTS.md` is the one always-loaded document, on a soft char budget (`BUDGETS.constitution`); everything else loads on demand through its § Progressive loading table or is retrieved live (product truth from `uno-blueprint`, DS truth from `uno-storybook`).
+
+Membership in the uno-bot bundle is a property of the document: each doc declares `embodiment: all | ide | uno-bot` in its own frontmatter, and `agents/uno-bot/scripts/bundle-harness.mjs` globs for it, so no list anywhere else decides it. `<!-- ide-only -->` regions are stripped from the bot's copy. A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name through `read_reference` on the turns whose pointer fires. A skill's `.claude/skills/` stub is generated from its canonical frontmatter by `npm run generate:skill-surfaces`.
+
+Every convention header carries the ADR-017 canonical line and its `distilled:` lineage.
 
 That registry is also the author of the places that used to state the same
 set by hand: the `check:*` block of `package.json` and the check steps of
