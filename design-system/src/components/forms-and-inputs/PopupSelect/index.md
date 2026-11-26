@@ -2,7 +2,7 @@
 
 # PopupSelect
 
-Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
+Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads "Status: Upcoming" with an angle, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.
 
 **Import:** `import { PopupSelect } from '@/components';`
 
@@ -60,7 +60,7 @@ Two lists, or picks that wait for an Apply, are a different menu.
 
 ### Let a `PopupSelect` value longer than its trigger end in an ellipsis. {#let-a-popupselect-value-longer-than-its-trigger-end-in-an-ellipsis}
 
-The Tooltip is on only while the value is clipped; the chevron keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the value is clipped; the angle keeps its place. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ## Accessibility
 
@@ -82,7 +82,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Trigger.** The labeled trigger is a subtle `FilterButton` reading "Label: Value" with a chevron. Any other trigger is the caller's.
+1. **Trigger.** The labeled trigger is a subtle `FilterButton` reading "Label: Value" with an angle. Any other trigger is the caller's.
 2. **Popup.** A `Popup` at `width="auto"`: at least the trigger's width, never under 160, up to 320. It sits 4 from the trigger.
 3. **Search** (optional). A compact search field above the list, on by default. Turn it off with `isSearchable={false}` for a short list.
 4. **List.** `Select`'s list: the same rows, groups, descriptions and messages. The picked row takes the selected fill and a radio before its label, since the menu picks one value. `marker="check"` draws a check at the row's end instead.

@@ -46,7 +46,7 @@ export const webAppSourceSnippets = {
     splitButton: snippet([
         '<SplitButton>',
         '  <Button text="Save" appearance="primary" />',
-        '  <IconButton icon={<Icon name="chevron-down" size={12} />} label="More save options" aria-haspopup="menu" />',
+        '  <IconButton icon={<Icon name="angle-down" size={12} />} label="More save options" aria-haspopup="menu" />',
         '</SplitButton>'
     ]),
     filterButton: snippet([

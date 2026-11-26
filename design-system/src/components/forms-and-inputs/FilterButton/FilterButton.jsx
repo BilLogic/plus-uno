@@ -10,7 +10,7 @@ export const FILTER_BUTTON_APPEARANCES = ['default', 'subtle'];
 
 /**
  * Filter button: opens or toggles a filter. It shows the filter's name, an
- * optional count of what is applied, and a chevron when it opens a menu.
+ * optional count of what is applied, and an angle when it opens a menu.
  */
 export const FilterButton = ({
     label,
@@ -29,7 +29,7 @@ export const FilterButton = ({
             {({ measureRef }) => (
                 <Button
                     appearance={appearance}
-                    iconAfter={hasChevronDown ? <Icon name="chevron-down" size={12} /> : undefined}
+                    iconAfter={hasChevronDown ? <Icon name="angle-down" size={12} /> : undefined}
                     className={clsx('plus-filter-btn', className)}
                     {...props}
                 >
@@ -53,7 +53,7 @@ FilterButton.propTypes = {
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The icon before the name, passed to Button: a Font Awesome name or a node. */
     iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** The chevron that says a menu opens. */
+    /** The angle that says a menu opens. */
     hasChevronDown: PropTypes.bool,
     appearance: PropTypes.oneOf(FILTER_BUTTON_APPEARANCES),
     /** `default` draws 32. `compact` draws 24. */

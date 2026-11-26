@@ -36,7 +36,7 @@ export const Overview = {
     play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole('button', { name: 'Status' });
         await expect(button.getBoundingClientRect().height).toBe(32);
-        await expect(button.querySelector('.fa-chevron-down')).not.toBeNull();
+        await expect(button.querySelector('.fa-angle-down')).not.toBeNull();
     },
 };
 
@@ -70,7 +70,7 @@ export const Metric = {
         const canvas = within(canvasElement);
         await expect(canvasElement.querySelectorAll('.plus-filter-btn__metric')).toHaveLength(3);
         await expect(canvas.getByRole('button', { name: /Assignee/ })).toHaveTextContent('0');
-        await expect(canvas.getByRole('button', { name: 'Sort' }).querySelector('.fa-chevron-down')).toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Sort' }).querySelector('.fa-angle-down')).toBeNull();
     },
 };
 

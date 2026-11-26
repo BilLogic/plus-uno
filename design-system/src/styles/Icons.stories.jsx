@@ -143,7 +143,7 @@ export const IconSizingInControls = {
                     appearance="default"
                     text="Add tutor"
                     iconBefore="plus"
-                    iconAfter={<Icon name="chevron-down" size={12} />}
+                    iconAfter={<Icon name="angle-down" size={12} />}
                 />
             </Do>
             <Dont caption="A 12 leading icon is too small beside 14 body text.">

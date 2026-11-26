@@ -476,7 +476,7 @@ const TreeSelect = ({
                     invalidIcon
                     onClick={handleInputClick}
                     elemAfter={(
-                        <Icon name="caret-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />
+                        <Icon name="angle-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />
                     )}
                 >
                     <ClippedTooltip text={isOpen ? '' : displayText} placement="top" deps={[displayText, isOpen]}>

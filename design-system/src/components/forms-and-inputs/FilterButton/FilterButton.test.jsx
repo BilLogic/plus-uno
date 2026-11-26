@@ -3,15 +3,15 @@ import { describe, it, expect } from 'vitest';
 import FilterButton from './FilterButton';
 
 describe('FilterButton', () => {
-    it('shows the name and a chevron by default', () => {
+    it('shows the name and an angle by default', () => {
         const { container } = render(<FilterButton text="Status" />);
         expect(screen.getByRole('button', { name: 'Status' })).toBeInTheDocument();
-        expect(container.querySelector('.fa-chevron-down')).not.toBeNull();
+        expect(container.querySelector('.fa-angle-down')).not.toBeNull();
     });
 
-    it('drops the chevron when hasChevronDown is false', () => {
+    it('drops the angle when hasChevronDown is false', () => {
         const { container } = render(<FilterButton text="Status" hasChevronDown={false} />);
-        expect(container.querySelector('.fa-chevron-down')).toBeNull();
+        expect(container.querySelector('.fa-angle-down')).toBeNull();
     });
 
     it('shows a count of 0 and hides it when omitted', () => {

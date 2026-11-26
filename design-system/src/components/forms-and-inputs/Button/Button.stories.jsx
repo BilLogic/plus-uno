@@ -657,7 +657,7 @@ export const Anatomy = {
                     testId="button-anatomy"
                     text="Session options"
                     iconBefore="calendar"
-                    iconAfter={<Icon name="chevron-down" size={12} />}
+                    iconAfter={<Icon name="angle-down" size={12} />}
                 />
             </div>
         </LiveAnatomy>
@@ -804,7 +804,7 @@ export const FooterLayouts = {
 export const Overflow = {
     render: () => (
         <div style={{ width: '220px' /* demo frame */ }}>
-            <Button text={LONG_SCHOOL} iconBefore="plus" iconAfter={<Icon name="chevron-down" size={12} />} />
+            <Button text={LONG_SCHOOL} iconBefore="plus" iconAfter={<Icon name="angle-down" size={12} />} />
         </div>
     ),
     play: async ({ canvasElement }) => {
