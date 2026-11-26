@@ -171,7 +171,7 @@ export const KeyAreaPage = {
     },
 };
 
-/** One tab system: page tabs, and the Section's views as one labeled PopupSelect. */
+/** One tab system: page tabs, no views row, and Status as a quick filter after Search. */
 export const KeyOneTabSystem = {
     name: 'Key case: One tab system per page',
     render: () => staged(<TabsUnderPicture />),
@@ -180,8 +180,9 @@ export const KeyOneTabSystem = {
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
+        await expect(canvasElement.querySelector('.plus-section-row--views'), 'no views row under page tabs').toBeNull();
         const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
-        await expect(trigger, 'the Section picks its view from a labeled PopupSelect').toBeInTheDocument();
+        await expect(trigger.closest('.plus-section-row__filters'), 'Status is a quick filter after Search').not.toBeNull();
         await expect(canvas.getByRole('cell', { name: 'Algebra' }), 'Subject column holds subjects').toBeInTheDocument();
         await userEvent.click(trigger);
         const body = within(canvasElement.ownerDocument.body);

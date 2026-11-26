@@ -30,7 +30,7 @@ import { NamesDo, TabLabelDo, TabLabelDont } from '../../lib/sidebar-cases.jsx';
  *   PageTabsPicture          page tabs under a record's title
  *   DrillPicture             the record page after a drill-in, breadcrumb above the title
  *   AreaPagePicture          an area page: no breadcrumb
- *   TabsUnderPicture         page tabs with the Section's views as one PopupSelect
+ *   TabsUnderPicture         page tabs with Status as a quick filter after Search
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -116,14 +116,14 @@ export const DrillPicture = () => (
 export const AreaPagePicture = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" />}>
-            <Section title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
+            <Section title="All students" actions={<SectionActions primary="Add student" more={false} />}>
                 <StudentsTable count={4} />
             </Section>
         </Page>
     </BrowserWindow>
 );
 
-/** One tab system: page tabs under the title, and the Section's views as one labeled PopupSelect. */
+/** One tab system: page tabs under the title, no views row, and Status as a quick filter after Search. */
 export const TabsUnderPicture = () => {
     const [tab, setTab] = useState('sessions');
     const [status, setStatus] = useState('upcoming');

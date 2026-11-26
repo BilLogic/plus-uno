@@ -99,7 +99,7 @@ const oneListFilters = ({ category, value, onPick, menuProps, mount }) => {
  * @param {object} [props.initial]  the values applied at first, by category id
  * @param {string} [props.openMenu]  holds a menu open for a picture: a category id (tier 1) or `filters`
  * @param {string[]} [props.views]  the pill views at the bar's start
- * @param {(mount: Element | null) => React.ReactNode} [props.start]  the bar's start in place of the pills (a view picker), given the picture's mount
+ * @param {boolean} [props.pageTabs]  draws page tabs above: the Section then has no views row, and the view switch is a quick filter leading row 3
  */
 export const FilteredStudents = ({
     tier,
@@ -107,7 +107,6 @@ export const FilteredStudents = ({
     initial = {},
     openMenu,
     views = ['All students', 'Needs follow-up'],
-    start,
     loading = false,
     pageTabs = false,
 }) => {
@@ -172,6 +171,24 @@ export const FilteredStudents = ({
         ));
     } else if (tier === '3' && !sideFits) {
         filters = opensSide(categoryFilters(cats, value, pick));
+    }
+
+    // Under page tabs there is no views row: the view switch is a quick filter, first in row 3.
+    if (pageTabs && filters) {
+        filters = [{
+            key: 'view',
+            label: 'View',
+            text: activeView,
+            menu: (trigger) => (
+                <ViewPicker
+                    trigger={trigger}
+                    mount={mount}
+                    value={activeView}
+                    onChange={setActiveView}
+                    {...(openMenu === 'view' ? { open: mount !== null && activeMenu === 'view', onOpenChange: (next) => setActiveMenu(next ? 'view' : null) } : {})}
+                />
+            ),
+        }, ...filters];
     }
 
     // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, that menu waits, so none lands on the page. A held-open menu waits on its own (`held`).
@@ -268,14 +285,7 @@ export const FilteredStudents = ({
                             title="Students"
                             description="Lincoln Middle"
                             actions={<SectionActions primary="Add students" more={false} />}
-                            views={start
-                                ? start(mount, {
-                                    activeView,
-                                    onViewChange: setActiveView,
-                                    open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
-                                    onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
-                                })
-                                : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
+                            views={pageTabs ? undefined : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
                             filters={filters}
                             onClearAll={reset}
                             hasNoMatches={rows.length === 0}
@@ -290,10 +300,11 @@ export const FilteredStudents = ({
     );
 };
 
-/** The view picker under page tabs: a Popup select at the bar's start, picking a view, not a filter. */
-export const ViewPicker = ({ open = false, onOpenChange, mount, value, onChange }) => (
+/** The view switch under page tabs: a Popup select opened from a quick filter trigger, first in row 3. */
+export const ViewPicker = ({ open = false, onOpenChange, mount, value, onChange, trigger }) => (
     <PopupSelect
         label="View"
+        trigger={trigger}
         options={['All students', 'Needs follow-up', 'New this term']}
         {...(value !== undefined ? { value, onChange } : { defaultValue: 'All students' })}
         isSearchable={false}

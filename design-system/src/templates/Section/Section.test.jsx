@@ -358,12 +358,49 @@ describe('Section header rows', () => {
         expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
     });
 
-    it('shows three filters and folds the rest into More filters with a count', () => {
-        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All' }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
-        render(<Section title="Sessions" search={<div />} filters={many}>Body</Section>);
-        expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
-        expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+    it('folds four or more filters into one Filter button, never three and More filters', () => {
+        const onOpenFilters = vi.fn();
+        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All', isSelected: true }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
+        render(<Section title="Sessions" search={<div />} filters={many} onOpenFilters={onOpenFilters}>Body</Section>);
+        expect(screen.queryByRole('button', { name: 'Date: All time' })).toBeNull();
+        expect(screen.queryByRole('button', { name: /More filters/ })).toBeNull();
+        const trigger = screen.getByRole('button', { name: /^Filter/ });
+        expect(trigger).toHaveTextContent('1');
+        trigger.click();
+        expect(onOpenFilters).toHaveBeenCalled();
+    });
+
+    it('draws a filterMenu after Search in place of the triggers', () => {
+        render(<Section title="Sessions" search={<div data-testid="search" />} filters={filters} filterMenu={<button type="button">Filters</button>}>Body</Section>);
+        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Date: All time' })).toBeNull();
+    });
+
+    it('ends a filterMenu row with the count and Reset filters once a count is given', () => {
+        const menu = <button type="button">Filters</button>;
+        const { rerender } = render(<Section title="Sessions" search={<div />} filterMenu={menu} onClearAll={() => {}}>Body</Section>);
+        expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
+        rerender(<Section title="Sessions" search={<div />} filterMenu={menu} count="3 of 12" onClearAll={() => {}}>Body</Section>);
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
+    });
+
+    it('keeps the labeled Primary at full width and folds it to an icon-only primary under 768', async () => {
+        const { Button } = await import('@/components');
+        const actions = <Button text="Add students" iconBefore="plus" appearance="primary" onClick={() => {}} />;
+        const { unmount } = render(<Section title="Students" actions={actions}>Body</Section>);
+        expect(screen.getByRole('button', { name: 'Add students' })).toHaveTextContent('Add students');
+        unmount();
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            render(<Section title="Students" actions={actions}>Body</Section>);
+            const icon = screen.getByRole('button', { name: 'Add students' });
+            expect(icon).not.toHaveTextContent('Add students');
+            expect(icon.className).toMatch(/primary/);
+        } finally {
+            window.innerWidth = before;
+        }
     });
 
     it('hands a filter entry\'s trigger to its menu, so the same button opens it', () => {
@@ -406,7 +443,7 @@ describe('Section retired header props', () => {
     it('no longer exports the toolbar, the tabs or the Add view props', () => {
         expect(SectionModule.SectionToolbar).toBeUndefined();
         expect(Section.Toolbar).toBeUndefined();
-        ['tabs', 'toolbar', 'onAddView', 'addViewLabel'].forEach((name) => expect(Section.propTypes[name], name).toBeUndefined());
+        ['tabs', 'toolbar', 'onAddView', 'addViewLabel', 'onMoreFilters'].forEach((name) => expect(Section.propTypes[name], name).toBeUndefined());
     });
 
     it('stays quiet for the three-row slots', async () => {

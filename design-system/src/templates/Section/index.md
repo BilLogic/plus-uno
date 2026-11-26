@@ -69,7 +69,7 @@ Don't: The title pushed into the views row: the heading and the pills fight for 
 
 **Checked:** Review
 
-Actions sit at the end of the title row, More then the labeled Primary, whether or not the Section has views. The views row is for views and the format switch, the third for Search and filters, so an action there is a second home.
+Actions sit at the end of the title row, More then the labeled Primary, whether or not the Section has views. The views row is for views and the format switch, the third for Search and filters, so an action there is a second home. A Section with actions therefore always shows its title row, and its title names the collection.
 
 Do: The actions at the end of the title row, with the views under it.
 Don't: Add students in the title row and again in the views row: one action, two homes.
@@ -78,13 +78,13 @@ Don't: Add students in the title row and again in the views row: one action, two
 
 **Checked:** Review
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line and scrolls sideways when the pills do not fit. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
+Views are a fixed set the product defines, two or more: with one view the Section has no views row, and never a lone pill. The strip stays on one line and scrolls sideways when the pills do not fit. Under page tabs there is no views row, so the page keeps one tab system; a switch such as Status is a quick filter after Search.
 
 ### Order the header: actions, then views and format, then Search and filters. {#order-the-header-actions-then-views-and-format-then-search-and-filters}
 
 **Checked:** Review
 
-The title row ends with More, then the labeled Primary, which is last. The views row holds the views at the start and the format switch at the end. The filters row holds a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the row is tight), then the filter triggers; a trigger that opens a list takes a `menu`. More is an Icon button with a Tooltip. Fold extras into More.
+The title row ends with More, then the labeled Primary, which is last. The views row holds the views at the start and the format switch at the end. The filters row holds a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the row is tight), then one to three filter triggers or one Filter menu; a trigger that opens a list takes a `menu`. More is an Icon button at `appearance="default"` with a Tooltip. Fold extras into More.
 
 Do: More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead the filters row.
 Don't: Five controls in no order, the Primary first, a second labeled button and a Filter icon in the title row: fold extras into More and give the filter its own row.
@@ -142,7 +142,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 - Page: use when the heading is the page's own.
 - Panel: use when a queue page docks the Panel beside the list, or for a quick look from a table.
-- Popup: use when choosing the menu the labeled view trigger (`PopupSelect`) or a filter trigger opens.
+- Popup: use when choosing the menu a filter trigger opens (`PopupSelect` or `FilterMenu`).
 - Table: use when the body is rows and columns.
 - Filtering: use when picking a filter tier for the header.
 - Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
@@ -166,8 +166,8 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 A Section with its header rows, a detail and a footer. The title, the first pill's box and the first table row's box share one left edge; the pill's label and the first cell's text sit inside their boxes.
 
-1. **Title row.** The h2, an optional one-line description, and the actions at the end: More and the labeled Primary.
-2. **Header rows** (optional). Row 2 holds the pill views at the start and the format switch at the end. Row 3 holds Search, then the filter triggers.
+1. **Title row.** The h2, an optional one-line description, and the actions at the end: More and the labeled Primary. It shows when the page or tab has several Sections, or when the Section has actions.
+2. **Header rows** (optional). Row 2 holds the pill views, two or more, at the start and the format switch at the end. Row 3 holds Search, then one to three filter triggers or one Filter menu.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the header rows with nothing between.
 4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which opens a floating `Panel` over the list.
 5. **Footer** (optional). Paging or "View all".
@@ -187,14 +187,15 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | Slot or prop | Holds |
 | --- | --- |
 | `title` · `description` · `actions` | The title row. |
-| `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch (the `format` slot holds a `SegmentedControl`), then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
+| `views` · `format` · `search` · `filters` · `filterMenu` · `count` | Rows 2 and 3 of the header: pill Tabs, two or more, and the format switch (the `format` slot holds a `SegmentedControl`), then a compact Search and one to three "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select. Four or more categories go in `filterMenu`, one `FilterMenu`; pass `count` once it applies a value. |
 | `header` · `type` | With `type="custom"` the `header` slot replaces the title and description; `title` stays as the visually hidden heading. `type` is `default` or `custom`, and is read from the slots when left off. |
 | `isLoading` | Draws a skeleton shape at each header control's real size and position, with no text, while the Section loads. The header keeps its height. |
-| `isTitleHidden` | Hides the title visually and keeps it as the heading and the Section's accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown. |
+| `isTitleHidden` | Hides the title visually and keeps it as the heading and the Section's accessible name. Set it when the page or tab has one Section with no actions; several Sections, or a Section with actions, show the title row. |
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |
-| `onClearAll` · `onMoreFilters` · `onOpenFilters` | Reset filters, More filters, and the Filter button of a narrow Section. |
+| `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |
+| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, so the title row stays one row. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
@@ -234,18 +235,18 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `id` | string | — | — |
 | `title` | node | — | Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section |
 | `description` | node | — | Optional description under the title, Body/default |
-| `actions` | node | — | Actions slot, aligned to the end of the title row |
+| `actions` | node | — | Actions slot, aligned to the end of the title row: More (an IconButton at `appearance="default"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, so the title row stays one row. |
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
 | `type` | enum | — | Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. |
-| `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
+| `views` | node | — | Row 2, at the start: the views, Tabs in the pill appearance, two or more of them; with one view leave the slot empty. Under page tabs there is no views row: a switch such as Status is a quick filter after Search. It scrolls sideways when it does not fit. |
 | `format` | node | — | Row 2, at the end: the format switch (Table / Cards), a `SegmentedControl`. With no `views` it moves to the end of row 3. |
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
-| `filters` | arrayOf | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
+| `filters` | arrayOf | — | Row 3, after Search: one to three `{ key, label, text, isSelected, onClick, menu }` triggers, each drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select, so the same button opens the list and keeps its selected state. Four or more categories belong in `filterMenu`; given four or more here, they fold into one Filter button that calls `onOpenFilters`, never three and a "More filters". Under 768 two or more fold the same way. When they do not fit beside Search they wrap to their own row, end-aligned. |
+| `filterMenu` | node | — | Row 3, after Search, in place of `filters`: one `FilterMenu`, for four or more filter categories. Its Filter icon button is the one trigger at every width. The Section cannot see what the menu applies, so pass `count` once a value is applied: the row then ends with the count and Reset filters. |
 | `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |
 | `onClearAll` | func | — | Runs when "Reset filters" is pressed. The button shows once a filter is applied. |
 | `hasNoMatches` | bool | `false` | True while the content is a No matches empty state, which offers its own "Reset filters": the header hides its button so one control remains. |
-| `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
-| `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
+| `onOpenFilters` | func | — | Runs when the one Filter button is pressed: a narrow Section's, or the fold of four or more `filters`. |
 | `isLoading` | bool | `false` | Draws a skeleton shape at each header control's real size and position, with no text, and marks the section busy |
 | `layout` | enum | `'single'` | Body layout: the content alone, content beside `side`, or stacked subsections |
 | `side` | node | — | Side column of `layout="split"` |
@@ -259,7 +260,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `onDetailOpenChange` | func | — | Called with the next open boolean when the inline detail expand toggles |
 | `level` | enum | — | `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down |
 | `spacing` | enum | `'default'` | Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value |
-| `isTitleHidden` | bool | `false` | Hides the title visually and keeps it as the Section's heading and accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown. |
+| `isTitleHidden` | bool | `false` | Hides the title visually and keeps it as the Section's heading and accessible name. Set it when the page (or the active page tab) has one Section with no actions: the page title is enough, so the Section starts at the rows it needs. Several Sections, or a Section with actions, show the title row. |
 | `named` | bool | `false` | Makes the section a region named by its title, for a section that stands apart as a landmark |
 | `className` | string | `''` | — |
 | `style` | object | — | — |

@@ -307,7 +307,7 @@ export const Anatomy = () => (
             image={imagePlaceholder('16:9')}
             title="Ana Ruiz"
             description="Lincoln Middle · Thu 4:00 PM"
-            actions={<IconButton icon="ellipsis-vertical" appearance="subtle" spacing="compact" label="More actions" onClick={() => {}} />}
+            actions={<IconButton icon="ellipsis-vertical" appearance="default" spacing="compact" label="More actions" onClick={() => {}} />}
             footer={viewSession}
         >
             {sessionBody}
@@ -721,7 +721,7 @@ export const Overflow = {
             <Card
                 title={`${LONG_TUTOR}: ${LONG_TOPIC}`}
                 description="Lincoln Middle · Thu 4:00 PM"
-                actions={<IconButton appearance="subtle" spacing="compact" icon="ellipsis" label="More actions" />}
+                actions={<IconButton appearance="default" spacing="compact" icon="ellipsis" label="More actions" />}
             >
                 {bodyCopy}
             </Card>

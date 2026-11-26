@@ -894,7 +894,7 @@ export const ViewsOnly = {
     },
 };
 
-/** Many filters: three triggers show, the rest sit in More filters with a count. */
+/** Many filters: four or more categories go in one Filter menu after Search, never three triggers and More filters. */
 export const ManyFilters = {
     name: 'Many filters',
     render: () => <Example.ManyFilters />,
@@ -902,11 +902,11 @@ export const ManyFilters = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
-        await expect(canvas.getByRole('button', { name: 'Group: All' })).toBeInTheDocument();
-        await expect(canvas.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
-        await expect(canvas.queryByRole('button', { name: 'Grade: All' }), 'the fourth trigger is folded').toBeNull();
-        await expect(canvas.getByRole('button', { name: /More filters/ }), 'one filter sits behind it').toHaveTextContent('1');
+        const row = canvasElement.querySelector('.plus-section-row--filters');
+        await expect(within(row).getAllByRole('button'), 'one control after Search: the Filter menu trigger').toHaveLength(1);
+        await expect(canvas.getByRole('button', { name: 'Filters' }), 'the Filter icon button').toBeInTheDocument();
+        await expect(canvas.queryByRole('button', { name: /More filters/ }), 'no More filters').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /^Status:/ }), 'no quick triggers beside the menu').toBeNull();
     },
 };
 
@@ -928,7 +928,7 @@ export const WrappedFilters = {
 
         await waitFor(() => expect(triggers(), 'too wide for one line: the triggers are marked wrapped').toHaveAttribute('data-wrapped'));
         await expect(triggers().getBoundingClientRect().top, 'on their own row, under Search').toBeGreaterThanOrEqual(search.getBoundingClientRect().bottom);
-        await expect(canvas.getByRole('button', { name: /More filters/ }).getBoundingClientRect().right, 'the last trigger meets the end of the row').toBeCloseTo(rowEnd(), 0);
+        await expect(canvas.getByRole('button', { name: 'Date: All time' }).getBoundingClientRect().right, 'the last trigger meets the end of the row').toBeCloseTo(rowEnd(), 0);
         await expectOneHeight(canvasElement);
 
         stage.style.inlineSize = '1100px';
@@ -970,6 +970,10 @@ export const Narrow = {
         const canvas = within(canvasElement);
         await expectOneHeight(canvasElement);
         await expectRowOne(canvasElement);
+        const primary = canvas.getByRole('button', { name: 'Sign up' });
+        await expect(primary.textContent.trim(), 'under 768 the Primary is icon-only, named by its text').toBe('');
+        const titleRow = canvasElement.querySelector('.plus-template-section-title-row');
+        await expect(Math.abs(primary.getBoundingClientRect().top - titleRow.getBoundingClientRect().top), 'the title row stays one row').toBeLessThan(8);
         const filter = await canvas.findByRole('button', { name: /^Filter/ });
         await expect(filter).toHaveTextContent('1');
         await expect(canvas.getAllByRole('button', { name: /^Filter/ }), 'one Filter button').toHaveLength(1);

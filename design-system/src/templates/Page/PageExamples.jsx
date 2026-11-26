@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Breadcrumb, Button, DynamicTable, Heading, PageHeader, PopupSelect, Tabs } from '@/components';
+import { Breadcrumb, Button, DynamicTable, Heading, PageHeader, PopupSelect, SearchField, Tabs } from '@/components';
 import { Card, Page, Section } from '@/templates';
 
 /**
@@ -44,23 +44,17 @@ const StudentRoster = () => (
     />
 );
 
-const SessionViews = () => (
-    <Tabs appearance="pill" defaultActiveKey="upcoming" aria-label="Views">
-        <Tabs.Tab eventKey="upcoming">Upcoming</Tabs.Tab>
-    </Tabs>
-);
+const STATUS_OPTIONS = [{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }];
 
-const PastSessionViews = () => (
-    <Tabs appearance="pill" defaultActiveKey="past" aria-label="Views">
-        <Tabs.Tab eventKey="past">Past</Tabs.Tab>
-    </Tabs>
-);
-
-const StudentViews = () => (
-    <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
-        <Tabs.Tab eventKey="all">All students</Tabs.Tab>
-    </Tabs>
-);
+/** Status as a quick filter after Search: the form a switch takes under page tabs. */
+const statusFilter = (status, setStatus) => ({
+    key: 'status',
+    label: 'Status',
+    text: STATUS_OPTIONS.find((option) => option.value === status).label,
+    menu: (trigger) => (
+        <PopupSelect label="Status" options={STATUS_OPTIONS} value={status} onChange={setStatus} isSearchable={false} placement="bottom-start" trigger={trigger} />
+    ),
+});
 
 const AddSessionAction = () => (
     <Button text="Add session" iconBefore="plus" appearance="primary" onClick={() => {}} />
@@ -74,7 +68,7 @@ const RecordTabs = ({ active, onSelect }) => (
 );
 
 const StudentsSection = () => (
-    <Section title="Students" isTitleHidden views={<StudentViews />}>
+    <Section title="Students" isTitleHidden>
         <StudentRoster />
     </Section>
 );
@@ -88,7 +82,7 @@ const TitleWithDescription = ({ title, children }) => (
 
 export const HeaderIsTheH1 = () => (
     <Page header={<PageHeader title="Students" />}>
-        <Section title="Sessions" views={<SessionViews />}>
+        <Section title="Sessions" isTitleHidden>
             <SessionsTable />
         </Section>
     </Page>
@@ -96,10 +90,10 @@ export const HeaderIsTheH1 = () => (
 
 export const SectionsAsTitles = () => (
     <Page>
-        <Section level="page" title="Students" views={<StudentViews />}>
+        <Section level="page" title="Students">
             <StudentRoster />
         </Section>
-        <Section level="page" title="Sessions" views={<PastSessionViews />}>
+        <Section level="page" title="Sessions">
             <SessionsTable status="past" />
         </Section>
     </Page>
@@ -156,7 +150,7 @@ export const ParagraphUnderTitle = () => (
 
 export const AddInTitleRow = () => (
     <Page header={<PageHeader title="Students" />}>
-        <Section title="Sessions" views={<SessionViews />} actions={<AddSessionAction />}>
+        <Section title="Sessions" actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>
@@ -164,7 +158,7 @@ export const AddInTitleRow = () => (
 
 export const AddTwice = () => (
     <Page header={<PageHeader title="Students" actions={<AddSessionAction />} />}>
-        <Section title="Sessions" views={<SessionViews />} actions={<AddSessionAction />}>
+        <Section title="Sessions" actions={<AddSessionAction />}>
             <SessionsTable />
         </Section>
     </Page>
@@ -176,21 +170,15 @@ export const OneTabSystem = () => {
     return (
         <Page header={<PageHeader title="Maya Rodriguez" bottomBar={<RecordTabs active={tab} onSelect={setTab} />} />}>
             {tab === 'overview' ? (
-                <Section title="Overview">
+                <Section title="Overview" isTitleHidden>
                     <Card title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
                 </Section>
             ) : (
                 <Section
                     title="Sessions"
-                    views={(
-                        <PopupSelect
-                            label="Status"
-                            options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]}
-                            value={status}
-                            onChange={setStatus}
-                            isSearchable={false}
-                        />
-                    )}
+                    isTitleHidden
+                    search={<SearchField mode="active" spacing="compact" placeholder="Search sessions" />}
+                    filters={[statusFilter(status, setStatus)]}
                 >
                     <SessionsTable status={status} />
                 </Section>

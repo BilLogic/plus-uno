@@ -52,7 +52,7 @@ describe('Page live cases', () => {
         r2.unmount();
     });
 
-    it('OneTabSystem uses one tablist and switches Status via PopupSelect and page tabs', () => {
+    it('OneTabSystem uses one tablist and switches Status from a quick filter after Search', () => {
         render(<OneTabSystem />);
         expect(screen.getAllByRole('tablist')).toHaveLength(1);
         expect(screen.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();

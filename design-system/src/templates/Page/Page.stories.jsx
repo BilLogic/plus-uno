@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Banner, Button, Link, Tabs } from '@/components';
+import { Banner, Button, Link, SearchField, Tabs } from '@/components';
 import { Frame, Card, Section, Page } from '@/templates';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SlideViews } from '@/lib/navigationMotion';
@@ -19,10 +19,10 @@ import {
     PageStage,
     PageTabs,
     RecordTabSection,
+    SessionSearch,
     SessionsTable,
-    StudentViews,
     AddStudentAction,
-    ViewSelect,
+    statusFilter,
 } from './pageDemo.jsx';
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -301,14 +301,14 @@ export const AnatomyRecord = {
     },
 };
 
-/** Area page, one collection: the title alone; the collection's Primary sits in the Section's title row. */
+/** Area page, one collection: the title alone; the collection's Primary sits in the Section's title row, which names the collection. */
 export const ScenarioArea = {
     parameters: { fullPage: true },
     name: 'Area page, one collection',
     render: () => (
         <PageStage scrollable>
             <DemoPageHeader title="Students" />
-            <Section title="Students" views={<StudentViews />} actions={<AddStudentAction />}>
+            <Section title="Student list" actions={<AddStudentAction />} search={<SearchField mode="active" spacing="compact" placeholder="Search students" />}>
                 <StudentsTable count={4} />
             </Section>
         </PageStage>
@@ -322,7 +322,9 @@ export const ScenarioArea = {
         const add = canvas.getByRole('button', { name: 'Add student' });
         await expect(add.closest('.plus-template-section-actions'), '"Add student" sits in the Section title row, not the page header').not.toBeNull();
         await expect(Math.round(add.getBoundingClientRect().height), 'the action draws 32').toBe(32);
-        await expect(canvasElement.querySelectorAll('.plus-section-rows > .plus-section-row'), 'views row only; no search or filter row').toHaveLength(1);
+        await expect(canvas.getByRole('heading', { level: 2, name: 'Student list' }), 'the title row shows, since the actions live there').toBeVisible();
+        await expect(canvasElement.querySelector('.plus-section-row--views'), 'one view is no view: no views row').toBeNull();
+        await expect(canvasElement.querySelectorAll('.plus-section-rows > .plus-section-row'), 'the Search row only').toHaveLength(1);
     },
 };
 
@@ -354,7 +356,7 @@ export const ScenarioSeveralSections = {
     },
 };
 
-/** Record page under page tabs: the Section's views become one labeled PopupSelect. */
+/** Record page under page tabs: no views row; Status is a quick filter after Search, and each tab's lone Section hides its title. */
 const ScenarioRecordTabsDemo = () => {
     const [tab, setTab] = useState('sessions');
     const [status, setStatus] = useState('upcoming');
@@ -376,8 +378,10 @@ export const ScenarioRecordTabs = {
         await expectFullScale(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
         await expect(canvas.getByRole('tab', { name: 'Sessions' })).toHaveAttribute('aria-selected', 'true');
+        await expect(canvasElement.querySelector('.plus-section-row--views'), 'no views row under page tabs').toBeNull();
+        await expect(canvasElement.querySelector('.plus-template-section-title-row'), 'one Section, no actions: no title row').toBeNull();
         const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
-        await expect(trigger).toBeInTheDocument();
+        await expect(trigger.closest('.plus-section-row__filters'), 'Status is a quick filter after Search').not.toBeNull();
         await userEvent.click(trigger);
         const body = within(canvasElement.ownerDocument.body);
         await userEvent.click(await body.findByRole('option', { name: 'Past' }));
@@ -479,17 +483,17 @@ const SwitchViewsDemo = () => {
     const [status, setStatus] = useState('upcoming');
     const views = {
         overview: (
-            <Section title="Current goals">
+            <Section title="Current goals" isTitleHidden>
                 <Card title="Multi-step equations" description="Target 80% accuracy by Friday." />
             </Section>
         ),
         sessions: (
-            <Section title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
+            <Section title="Sessions" isTitleHidden search={<SessionSearch />} filters={[statusFilter(status, setStatus)]}>
                 <SessionsTable status={status} />
             </Section>
         ),
         notes: (
-            <Section title="Tutor notes">
+            <Section title="Tutor notes" isTitleHidden>
                 <Card title="Oct 14 reflection" description="Worked through distributive property together." />
             </Section>
         ),

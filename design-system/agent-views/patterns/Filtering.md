@@ -34,7 +34,7 @@ A one-list menu is auto: at least the trigger, 160 to 320, truncating with a too
 
 ## Usage
 
-Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: "Field: value" triggers, then More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine.
+Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: one to three "Field: value" triggers, or, for four or more categories, one Filter menu (the Section's `filterMenu` slot), never three triggers and More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine. Under page tabs a Section has no views row, so a switch such as Status is a quick filter after Search.
 
 | Tier | Use when | Controls | Applies | Shows it is on |
 | --- | --- | --- | --- | --- |
@@ -112,7 +112,7 @@ Filtering reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the header, and the header's order: Section › Order the header.
+Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, at four or more categories, all of its filters move into the one menu, the Section's `filterMenu` slot. Where the filters sit in the header, and the header's order: Section › Order the header.
 
 Do: One tier: three quick filters, all in the bar.
 Don't: Two quick filters plus a Filter button: two systems in one bar.
