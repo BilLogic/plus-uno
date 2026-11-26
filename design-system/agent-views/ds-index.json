@@ -21215,7 +21215,7 @@
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--body-sm` · `--body-sm-tracking` · `--frame-head-band` · `--inline-lg` · `--page-header-gap` · `--page-header-stack`\n",
+					"`--body-sm` · `--body-sm-tracking` · `--frame-head-band` · `--inline-lg` · `--page-header-gap` · `--page-header-stack` · `--stack-md`\n",
 					"\n",
 					"From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",

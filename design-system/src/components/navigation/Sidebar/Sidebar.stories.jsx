@@ -283,11 +283,12 @@ export const Geometry = {
         const twist = within(nav(canvasElement)).getAllByRole('button', { name: /Hide .* tabs/ })[0];
         await expect(centerX(canvasElement, twist), 'the collapse angle on the icon column').toBeCloseTo(32, 0);
         const logoRow = canvasElement.querySelector('.plus-template-sidebar__logo-row');
-        const frameTop = canvasElement.querySelector('.plus-frame').getBoundingClientRect().top;
+        const frameTop = canvasElement.querySelector('.plus-frame__sidebar').getBoundingClientRect().top;
         const rowBox = logoRow.getBoundingClientRect();
         await expect(rowBox.top - frameTop, 'logo row starts at the page pad').toBeCloseTo(tokenLength(canvasElement, '--page-pad'), 0);
         await expect(rowBox.height, 'logo row is the band tall').toBeCloseTo(tokenLength(canvasElement, '--frame-head-band'), 0);
         await expect(rowBox.top + rowBox.height / 2 - frameTop, 'logo row center at y 42').toBeCloseTo(42, 0);
+        await expect(nav(canvasElement).getBoundingClientRect().top - frameTop, 'the nav starts at y 72').toBeCloseTo(72, 0);
         // The nav sits 12 under the logo row, the account row pads 8 over 16 and
         // 12 around, and the two small corners stay 2: none of these may move.
         await expect(px(getComputedStyle(nav(canvasElement)).marginTop), 'nav sits 12 under the logo row').toBeCloseTo(12, 0);
