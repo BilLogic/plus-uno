@@ -408,6 +408,37 @@ export const Widths = {
     }
 };
 
+/** A narrow page: the table keeps its 720 content minimum, so its scroll region overflows sideways and takes a tab stop. */
+export const NarrowPage = {
+    render: (args) => (
+        <div data-testid="narrow-stage" style={{ width: '375px' /* demo frame */ }}>
+            <DynamicTable {...args} />
+        </div>
+    ),
+    args: {
+        head,
+        rows: rows.slice(0, 4),
+        label: 'Students',
+    },
+    parameters: { docs: { description: { story: 'At 375 the table keeps its 720 content minimum and scrolls sideways. While it overflows, the scroll region is a region named by the table\'s label and takes a tab stop, so the rows past the edge can be scrolled with the arrow keys; a table that fits takes neither.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const scroll = canvasElement.querySelector('.plus-table-shell-scroll');
+        await expect(scroll.scrollWidth, 'at 375 the table scrolls sideways').toBeGreaterThan(scroll.clientWidth);
+        const region = await canvas.findByRole('region', { name: 'Students' });
+        await expect(region).toBe(scroll);
+        await userEvent.tab();
+        await expect(region, 'the scroll region is the first tab stop').toHaveFocus();
+        await expect(getComputedStyle(region).outlineStyle, 'focus shows a ring').toBe('solid');
+        await expect(getComputedStyle(region).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        canvas.getByTestId('narrow-stage').style.width = '960px' /* demo frame */;
+        await waitFor(() => expect(scroll).not.toHaveAttribute('tabindex'));
+        await expect(scroll, 'a table that fits is no region').not.toHaveAttribute('role');
+        canvas.getByTestId('narrow-stage').style.width = '375px' /* demo frame */;
+        await waitFor(() => expect(scroll).toHaveAttribute('tabindex', '0'));
+    }
+};
+
 const BULK = ['Message', 'Export', 'Assign tutor', 'Remove'];
 
 const RosterWithBulkBar = (args) => {

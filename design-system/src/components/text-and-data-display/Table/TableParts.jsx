@@ -1,5 +1,5 @@
 import { HeightCell } from '@/lib/heightMotion';
-import React, { Children, Fragment, isValidElement, useCallback, useState } from 'react';
+import React, { Children, Fragment, isValidElement, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { TableBodyMotion } from '@/lib/listMotion';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
@@ -300,6 +300,32 @@ const captionLabel = (children) => {
 };
 
 /**
+ * Whether the scroll region in `ref` overflows: wider than its box, or, when
+ * `bounded` by a `maxHeight`, taller. Measured after layout and again whenever
+ * the region or the table inside it resizes. A 1 tolerance absorbs the rounding
+ * of a fractional width, so a table that fits never reads as overflowing.
+ */
+const useOverflows = (ref, bounded, deps) => {
+    const [overflows, setOverflows] = useState(false);
+    useLayoutEffect(() => {
+        const el = ref.current;
+        if (!el) return undefined;
+        const measure = () => setOverflows(
+            el.scrollWidth > el.clientWidth + 1
+            || (bounded && el.scrollHeight > el.clientHeight + 1),
+        );
+        measure();
+        if (typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(measure);
+        observer.observe(el);
+        if (el.firstElementChild) observer.observe(el.firstElementChild);
+        return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [bounded, ...deps]);
+    return overflows;
+};
+
+/**
  * The table shell the Dynamic and Tree tables draw on: table children (consumers pass their own thead/tbody), a
  * footer slot under the rows, and an empty-state slot. The table has no
  * toolbar of its own: the Section header above it carries the title, search,
@@ -318,8 +344,11 @@ const captionLabel = (children) => {
  *   the card they sit in, and take the overflow shadow only while content is
  *   scrolled under them. `stickyHeader` pairs with `maxHeight`: only a
  *   bounded region scrolls vertically, so without `maxHeight` the header is
- *   not pinned. A bounded region, or one with a sticky column, takes keyboard
- *   focus so it can be scrolled without a pointer.
+ *   not pinned.
+ * - **Overflow**: while the rows overflow the scroll region (sideways, or
+ *   past `maxHeight`), the region takes a tab stop and is a named `region`,
+ *   named by the table's label, so it can be scrolled without a pointer. A
+ *   table that fits takes neither.
  */
 export const TableShell = ({
     id,
@@ -355,15 +384,19 @@ export const TableShell = ({
     ].filter(Boolean).join(' ');
 
     const showEmptyState = Boolean(empty && emptyState);
-    const emptyLabel = showEmptyState
-        ? (tableProps?.['aria-label'] ?? (tableProps?.['aria-labelledby'] ? undefined : captionLabel(children)))
-        : undefined;
-    const emptyLabelledBy = showEmptyState ? tableProps?.['aria-labelledby'] : undefined;
+    // The table's own name, for whichever box stands in for it: the empty
+    // state, or the scroll region while it overflows.
+    const tableLabelledBy = tableProps?.['aria-labelledby'];
+    const tableLabel = tableProps?.['aria-label'] ?? (tableLabelledBy ? undefined : captionLabel(children));
+    const emptyLabel = showEmptyState ? tableLabel : undefined;
+    const emptyLabelledBy = showEmptyState ? tableLabelledBy : undefined;
     const tracksScroll = pinsHeader || stickyColumn;
-    // A region that scrolls must be reachable by keyboard: a bounded region
-    // scrolls vertically, and a sticky column exists for a table that scrolls
-    // sideways. A plain table that only might overflow gets no tab stop.
-    const scrollable = bounded || stickyColumn;
+    // A region that scrolls must be reachable by keyboard, and a focusable
+    // region needs a name. Both last only while the rows overflow it, so a
+    // table that fits keeps no stray tab stop.
+    const scrollRef = useRef(null);
+    const overflows = useOverflows(scrollRef, bounded, [showEmptyState, maxHeight]);
+    const named = overflows && Boolean(tableLabel || tableLabelledBy);
 
     return (
         <div id={id} className={classes} style={style} {...props}>
@@ -373,9 +406,13 @@ export const TableShell = ({
                 </TableEmptyBox>
             ) : (
                 <div
+                    ref={scrollRef}
                     className="plus-table-shell-scroll"
                     style={bounded ? { maxHeight } : undefined}
-                    tabIndex={scrollable ? 0 : undefined}
+                    tabIndex={overflows ? 0 : undefined}
+                    role={named ? 'region' : undefined}
+                    aria-label={named ? tableLabel : undefined}
+                    aria-labelledby={named && !tableLabel ? tableLabelledBy : undefined}
                     onScroll={tracksScroll ? onScroll : undefined}
                     data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
                     data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}

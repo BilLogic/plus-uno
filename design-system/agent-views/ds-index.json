@@ -11323,7 +11323,7 @@
 					"\n",
 					"**Source:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx`\n",
 					"\n",
-					"**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, WrappedHeaders, Interactive, Overflow\n",
+					"**Stories:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.stories.jsx` — Default, Stateless, States, Empty, NoResults, EmptyNothingYet, EmptyHiddenByFilter, EmptyNothingToCreate, Widths, NarrowPage, Selection, StickyHeaderAndFrozenColumn, SortableHeadCells, Rest, Hovered, Pressed, Focused, DisabledRow, WrappedHeaders, Interactive, Overflow\n",
 					"\n",
 					"**Storybook page:** `design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx`\n",
 					"\n",
