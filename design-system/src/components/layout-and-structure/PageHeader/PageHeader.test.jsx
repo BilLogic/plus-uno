@@ -4,17 +4,17 @@ import { HeadingContextProvider } from '@/components/text-and-data-display/Headi
 import PageHeader from './PageHeader';
 
 describe('PageHeader', () => {
-    it('renders the title as an h1 Heading at size lg by default', () => {
+    it('renders the title as an h1 Heading at size xxl by default', () => {
         render(<PageHeader title="Dashboard" />);
         const heading = screen.getByRole('heading', { level: 1, name: 'Dashboard' });
         expect(heading).toBeInTheDocument();
-        expect(heading).toHaveAttribute('data-size', 'lg');
+        expect(heading).toHaveAttribute('data-size', 'xxl');
     });
 
-    it('renders an explicit titleAs heading level at size lg', () => {
+    it('renders an explicit titleAs heading level at size xxl', () => {
         render(<PageHeader title="Details" titleAs="h2" />);
         const heading = screen.getByRole('heading', { level: 2, name: 'Details' });
-        expect(heading).toHaveAttribute('data-size', 'lg');
+        expect(heading).toHaveAttribute('data-size', 'xxl');
     });
 
     it('follows the ambient HeadingContextProvider when titleAs is omitted', () => {
@@ -23,7 +23,7 @@ describe('PageHeader', () => {
                 <PageHeader title="Nested" />
             </HeadingContextProvider>,
         );
-        expect(screen.getByRole('heading', { level: 2, name: 'Nested' })).toHaveAttribute('data-size', 'lg');
+        expect(screen.getByRole('heading', { level: 2, name: 'Nested' })).toHaveAttribute('data-size', 'xxl');
     });
 
     it('renders breadcrumbs, actions and a bottom bar only when given', () => {

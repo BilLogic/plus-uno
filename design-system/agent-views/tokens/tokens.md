@@ -431,6 +431,8 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 --body-sm
 --body-sm-tracking
 --code-default
+--code-sm
+--code-sm-tracking
 --heading-lg
 --heading-lg-tracking
 --heading-md
@@ -445,6 +447,8 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 --heading-xxl-tracking
 --heading-xxs
 --heading-xxs-tracking
+--label-eyebrow
+--label-eyebrow-tracking
 --metric-lg
 --metric-lg-tracking
 --metric-md
@@ -476,6 +480,7 @@ The text styles, generated from Figma: `font: var(--heading-lg)`. A button or ta
 --type-tracking-snug
 --type-tracking-tight
 --type-tracking-tighter
+--type-tracking-wide
 --type-weight-medium
 --type-weight-regular
 --type-weight-semibold

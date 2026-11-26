@@ -49,7 +49,7 @@ const stale = (constant, message) => staleExceptions.push(`${constant}: ${messag
  * A name as a token: `Social-Emotional` -> `social-emotional`,
  * `Spacing/Small/space-000` -> `spacing-small-space-000`.
  */
-const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-').replace(/^(heading|body|metric)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)(?=-|$)/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`);
+const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-').replace(/^(heading|body|metric|code)-(xxlarge|xlarge|large|medium|small|xsmall|xxsmall)(?=-|$)/, (_, family, size) => `${family}-${({ xxlarge: 'xxl', xlarge: 'xl', large: 'lg', medium: 'md', small: 'sm', xsmall: 'xs', xxsmall: 'xxs' })[size]}`);
 
 /**
  * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
@@ -388,7 +388,16 @@ const CODE_ONLY_TYPE_STYLES = {
 };
 
 /** The style groups in the order they are written. */
-const TYPE_STYLE_GROUPS = ['Heading', 'Body', 'Metric'];
+const TYPE_STYLE_GROUPS = ['Heading', 'Body', 'Metric', 'Label', 'Code'];
+
+/**
+ * What a text style's utility class carries beyond `font` and tracking, which a
+ * Figma text style holds as text case or a font feature code cannot read back.
+ */
+const TYPE_CLASS_EXTRAS = {
+    'label-eyebrow': ' text-transform: uppercase;',
+    'code-sm': ' font-variant-numeric: tabular-nums;',
+};
 
 /**
  * Generate type tokens SCSS
@@ -502,7 +511,7 @@ function textStyleClasses(styles) {
         .map(({ token }) => {
             const name = token.slice(2);
             const spacing = tracked.has(token) ? ` letter-spacing: var(${token}-tracking);` : '';
-            const figures = name.startsWith('metric-') ? ' font-variant-numeric: tabular-nums;' : '';
+            const figures = (name.startsWith('metric-') ? ' font-variant-numeric: tabular-nums;' : '') + (TYPE_CLASS_EXTRAS[name] ?? '');
             return `.${name} { font: var(${token});${spacing}${figures} }\n`;
         })
         .join('') + '/* Numbers that line up vertically: table columns, times, counts in lists. Running text keeps proportional figures. */\n.num { font-variant-numeric: tabular-nums; }\n';

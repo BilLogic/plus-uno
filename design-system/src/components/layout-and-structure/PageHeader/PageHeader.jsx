@@ -27,7 +27,7 @@ export const PageHeader = ({
             <div className="plus-page-header-row">
                 <div className="plus-page-header-title">
                     {disableTitleStyles ? titleContent : (
-                        <Heading size="lg" as={titleAs}>{titleContent}</Heading>
+                        <Heading size="xxl" as={titleAs}>{titleContent}</Heading>
                     )}
                 </div>
                 {actions && <div className="plus-page-header-actions">{actions}</div>}
@@ -38,7 +38,7 @@ export const PageHeader = ({
 };
 
 PageHeader.propTypes = {
-    /** The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. */
+    /** The page title. Drawn as an `xxl` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. */
     title: PropTypes.node,
     /** `children` is the title when `title` is not given. */
     children: PropTypes.node,

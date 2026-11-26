@@ -155,7 +155,7 @@ Two whole screens built from the templates: a list that keeps search and quick f
 <tr><td><code>--page-header-stack</code></td><td>Between the breadcrumb, the title row and the page tabs.</td></tr>
 <tr><td><code>--page-header-gap</code></td><td>Between the title and the page actions.</td></tr>
 <tr><td><code>--page-stack-md</code></td><td>Header to the banner and the first Section; between Sections.</td></tr>
-<tr><td><code>--heading-lg</code>, <code>--body-default</code>, <code>--body-sm</code></td><td>The title, the description, the breadcrumb.</td></tr>
+<tr><td><code>--heading-xxl</code>, <code>--body-default</code>, <code>--body-sm</code></td><td>The title, the description, the breadcrumb.</td></tr>
 <tr><td><code>--content-max-width</code>, <code>--content-max-width-reading</code>, <code>--content-min-width</code></td><td>The default cap, the reading cap and the floor of the content grid. Full width has no cap.</td></tr>
 <tr><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--page-pad</code></td><td>The 12-column grid, its gutter and the pad.</td></tr>
 <tr><td><code>--ds-surface</code></td><td>The Page's one fill, with no shadow.</td></tr>
@@ -168,13 +168,13 @@ Two whole screens built from the templates: a list that keeps search and quick f
 
 ## Heading outline
 
-Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading lg (24), a section's h2 is Heading md (20), and a subsection's h3 is Heading sm (16).
+Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading xxl (32), a section's h2 is Heading md (20), and a subsection's h3 is Heading sm (16).
 
 The outline keeps a page's headings in one order, so a reader and assistive technology see the same structure the sizes show. It applies across the Page, Section, Card, Modal, Popup and Flag.
 
 ### Page, Section and Subsection
 
-<DocsCanvasShell attachSourceBelow description={<>The h1 is 24, the section's h2 is 20 and the subsection's h3 is 16.</>}>
+<DocsCanvasShell attachSourceBelow description={<>The h1 is 32, the section's h2 is 20 and the subsection's h3 is 16.</>}>
     <DsCanvasQuiet of={HeadingOutlineStories.PageSectionSubsection} />
 </DocsCanvasShell>
 
@@ -182,7 +182,7 @@ Use one h1 per page. Each Section opens with an h2, and a subsection inside it w
 
 ### Group labels
 
-<DocsCanvasShell description={<>Group labels are 12 semibold and are not headings.</>}>
+<DocsCanvasShell description={<>Group labels are 12 regular and are not headings.</>}>
     <DsCanvasQuiet of={HeadingOutlineStories.GroupLabels} />
 </DocsCanvasShell>
 
@@ -219,7 +219,7 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 <tr><th>Slot or prop</th><th>Holds</th></tr>
 </thead>
 <tbody>
-<tr><td><code>title</code></td><td>The page's one h1, at the heading-lg size, above the content.</td></tr>
+<tr><td><code>title</code></td><td>The page's one h1, at the heading-xxl size, above the content.</td></tr>
 <tr><td><code>children</code></td><td>The Sections and other page content. Existing pages may still supply the header and banner here.</td></tr>
 <tr><td><code>header</code></td><td>One <code>PageHeader</code>: the h1 with <code>breadcrumbs</code> after a drill-in, <code>actions</code> and page tabs in <code>bottomBar</code>. Replaces <code>title</code>.</td></tr>
 <tr><td><code>description</code> · <code>status</code> <PlannedTag /></td><td>Planned. <code>PageHeader</code> has neither slot yet, so the examples here compose both in its <code>title</code> block: the <code>Heading</code>, a StatusTag after it, then one description line.</td></tr>

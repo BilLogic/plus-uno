@@ -1,7 +1,8 @@
 /**
  * The bare heading elements take the Heading size paired with their level:
- * h1 xxl (32), h2 xl (28), h3 lg (24), h4 md (20), h5 sm (16),
- * h6 xs (14). Every level is Google Sans Flex: 400 at xxl to lg, 500 below.
+ * h1 xxl (32), h2 lg (24), h3 md (20), h4 sm (16), h5 xs (14),
+ * h6 xxs (12). Every level is Google Sans Flex: 400 from h1 to h4, 500 for
+ * h5 and h6.
  *
  * `_fonts.scss` gives each bare `h1`-`h6` a heading text style. This compiles
  * it and reads what each element's `font` resolves to, so a heading that drifts
@@ -49,7 +50,7 @@ function font(selector) {
   return got;
 }
 
-const LEVEL_SIZES = { h1: 'xxl', h2: 'xl', h3: 'lg', h4: 'md', h5: 'sm', h6: 'xs' };
+const LEVEL_SIZES = { h1: 'xxl', h2: 'lg', h3: 'md', h4: 'sm', h5: 'xs', h6: 'xxs' };
 
 for (const [level, size] of Object.entries(LEVEL_SIZES)) {
   test(`${level} takes the ${size} heading style`, () => {
@@ -58,7 +59,7 @@ for (const [level, size] of Object.entries(LEVEL_SIZES)) {
 }
 
 for (const level of ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
-  const weight = ['h1', 'h2', 'h3'].includes(level) ? 400 : 500;
+  const weight = ['h5', 'h6'].includes(level) ? 500 : 400;
   test(`${level} is Google Sans Flex at ${weight}`, () => {
     assert.match(font(level), new RegExp(`^${weight} \\S+ \\/ \\S+ "Google Sans Flex"`));
   });
@@ -95,7 +96,7 @@ test('docs stylesheet reads no numbered primitive tokens', () => {
 });
 
 
-for (const size of ['heading-xs', 'heading-xxs', 'body-lg', 'body-sm', 'metric-lg', 'metric-md', 'metric-sm']) {
+for (const size of ['heading-xs', 'heading-xxs', 'body-lg', 'body-sm', 'metric-lg', 'metric-md', 'metric-sm', 'label-eyebrow', 'code-sm']) {
   test(`generated .${size} uses the matching text style`, () => {
     assert.ok(tokens.has(`--${size}`));
     assert.equal(font(`.${size}`), resolve(`var(--${size})`));
