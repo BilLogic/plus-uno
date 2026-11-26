@@ -4,9 +4,12 @@
  * Tabs Component Styles
  *
  * Underline indicator by default (`appearance="default"`); `appearance="pill"`
- * swaps the underline for a pill-shaped selected fill. `spacing="default"` is a
- * 32px tab (`--control-md`), matching a medium button; `spacing="compact"`
- * is 24px (`--control-sm`).
+ * swaps the underline for a pill-shaped selected fill. There is one size: a
+ * 32px tab (`--control-md`), matching a medium button.
+ *
+ * Under 768 a collapsing strip narrows: an underline strip scrolls sideways
+ * with an end fade (`.plus-tabs--scroll`), and a pill strip shows only the
+ * selected pill, a menu trigger with a chevron (`.plus-tabs--menu`).
  *
  * Colors: an unselected tab is text.subtle on a clear ground; hover and press
  * are the neutral subtle steps. The selected tab is text.selected, carried by
@@ -55,12 +58,8 @@
     }
 }
 
-.plus-tabs--spacing-default.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
+.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
     margin-top: calc(var(--control-md) - var(--border-width-selected));
-}
-
-.plus-tabs--spacing-compact.plus-tabs--appearance-default[data-gliding='true'] > .plus-tabs-indicator {
-    margin-top: calc(var(--control-sm) - var(--border-width-selected));
 }
 
 .plus-tabs--appearance-pill[data-gliding='true'] {
@@ -98,6 +97,82 @@
     .plus-tab-ghost {
         flex: 0 0 auto;
     }
+}
+
+// A scrolling strip (narrow underline, or `overflow="scroll"`) keeps one row
+// and scrolls sideways inside its container, with no scrollbar drawn. While
+// more of it lies past the end, the end fades out over --tabs-edge-fade. The
+// list is positioned so a tab's offset is read inside it, whatever its scroll.
+.plus-tabs--scroll {
+    --tabs-edge-fade: var(--inline-3xl);
+
+    max-width: 100%;
+    min-width: 0;
+
+    .plus-tabs-list {
+        position: relative;
+        flex-wrap: nowrap;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .plus-tab {
+        flex: 0 0 auto;
+
+        // The list clips at its own edge, so the ring is drawn inside the tab.
+        &:focus-visible,
+        &[data-focus-visible] {
+            @include plus-ring($ring-offset: calc(-1 * var(--focus-ring-width)), $ring-width: var(--focus-ring-width));
+        }
+    }
+
+    &[data-overflow-end] .plus-tabs-list {
+        mask-image: linear-gradient(to right, black calc(100% - var(--tabs-edge-fade)), transparent);
+    }
+}
+
+// In a scroll container a tab cannot hang over the list's baseline, which
+// would be clipped: the baseline is drawn inside the list, and each tab's own
+// bottom border, the selected bar included, sits inside the tab's 32.
+.plus-tabs--scroll.plus-tabs--appearance-default {
+    .plus-tabs-list {
+        border-bottom: none;
+        box-shadow: inset 0 calc(-1 * var(--border-width-default)) 0 var(--ds-border);
+    }
+
+    .plus-tab,
+    .plus-tab[data-active],
+    .plus-tab[aria-selected='true'],
+    .plus-tab[data-selected] {
+        margin-bottom: 0;
+    }
+}
+
+// The narrow pill strip: the selected pill alone, with a 12 chevron after its
+// label, opening a menu of every view.
+.plus-tabs--menu {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.plus-tab--menu {
+    max-width: 100%;
+}
+
+.plus-tab-chevron {
+    flex: 0 0 auto;
+    font-size: var(--icon-sm);
+}
+
+.plus-tabs-menu-check {
+    color: var(--ds-icon-selected);
 }
 
 // A hidden copy of a tab is drawn as a tab (`@extend`) but is not a `.plus-tab`,
@@ -210,17 +285,11 @@
     white-space: nowrap;
 }
 
-// Sizing
-.plus-tabs--spacing-default .plus-tab {
+// Sizing: one size, a 32 tab.
+.plus-tab {
     --tab-radius: var(--radius-control-md);
     height: var(--control-md);
     padding: 0 var(--pad-x-lg);
-}
-
-.plus-tabs--spacing-compact .plus-tab {
-    --tab-radius: var(--radius-control-sm);
-    height: var(--control-sm);
-    padding: 0 var(--pad-x-md);
 }
 
 
@@ -228,7 +297,7 @@
 .plus-tabs--appearance-default .plus-tab {
     margin-bottom: calc(-1 * var(--border-width-default));
     border-bottom: var(--border-width-default) solid var(--ds-border);
-    // Tab tops round by the tab's height (Radius / Control): 32 md, 24 sm.
+    // Tab tops round by the tab's height (Radius / Control md).
     border-radius: var(--tab-radius) var(--tab-radius) 0 0;
 
     &:disabled,

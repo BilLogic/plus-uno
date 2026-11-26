@@ -4,7 +4,7 @@
  * Base UI owns the WAI-ARIA tabs pattern itself (roving tabindex, arrow-key
  * navigation, the `aria-controls`/`aria-labelledby` pairing) — these tests
  * cover this wrapper's own contract: the `eventKey`/`activeKey`/`onSelect`
- * vocabulary, the appearance/spacing/alignment classes, and that arbitrary props
+ * vocabulary, the appearance/alignment classes, the narrow forms, and that arbitrary props
  * still reach the underlying tab.
  */
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
@@ -167,18 +167,17 @@ describe('Tabs — selection', () => {
 });
 
 describe('Tabs — appearance', () => {
-    it('applies the appearance and spacing classes to the root', () => {
-        const { container } = renderTabs({ appearance: 'pill', spacing: 'compact' });
-        const root = container.firstChild;
-        expect(root).toHaveClass('plus-tabs--appearance-pill');
-        expect(root).toHaveClass('plus-tabs--spacing-compact');
+    it('applies the appearance class to the root', () => {
+        const { container } = renderTabs({ appearance: 'pill' });
+        expect(container.firstChild).toHaveClass('plus-tabs--appearance-pill');
     });
 
-    it('defaults to default spacing and declares no size prop', () => {
+    it('has one size: no spacing or size prop', () => {
         const { container } = renderTabs();
         expect(container.firstChild).toHaveClass('plus-tabs--appearance-default');
+        expect(container.firstChild.className).not.toMatch(/plus-tabs--spacing/);
         expect(Tabs.propTypes.size).toBeUndefined();
-        expect(Tabs.propTypes.spacing).toBeDefined();
+        expect(Tabs.propTypes.spacing).toBeUndefined();
     });
 
     it('applies the alignment class to the tablist', () => {
@@ -287,5 +286,110 @@ describe('Tabs — overflow collapse', () => {
             </Tabs>,
         );
         expect(screen.queryByRole('tab', { name: /^More/ })).toBeNull();
+    });
+});
+
+describe('Tabs — narrow', () => {
+    const VIEWS = ['Active', 'Inactive', 'All'];
+    const renderViews = (props = {}) => render(
+        <Tabs appearance="pill" defaultActiveKey="Active" {...props}>
+            {VIEWS.map((k) => <Tabs.Tab key={k} eventKey={k}>{k}</Tabs.Tab>)}
+            {VIEWS.map((k) => <Tabs.Panel key={k} eventKey={k}>{`${k} list`}</Tabs.Panel>)}
+        </Tabs>,
+    );
+
+    it('menu: shows only the selected pill, a menu button with a chevron', () => {
+        renderViews({ overflow: 'menu' });
+        expect(screen.queryByRole('tablist')).toBeNull();
+        const trigger = screen.getByRole('button', { name: 'Active' });
+        expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        expect(trigger.querySelector('.fa-angle-down')).not.toBeNull();
+        expect(screen.getByText('Active list')).toBeInTheDocument();
+    });
+
+    it('menu: lists every view, the selected one checked, and picking one selects it', async () => {
+        const onSelect = vi.fn();
+        const user = userEvent.setup();
+        renderViews({ overflow: 'menu', onSelect });
+        await user.click(screen.getByRole('button', { name: 'Active' }));
+        const rows = await screen.findAllByRole('menuitemradio');
+        expect(rows.map((r) => r.textContent)).toEqual(VIEWS);
+        expect(rows.map((r) => r.getAttribute('aria-checked'))).toEqual(['true', 'false', 'false']);
+        expect(rows[0].querySelector('.fa-check')).not.toBeNull();
+        await user.click(rows[1]);
+        expect(onSelect).toHaveBeenCalledWith('Inactive', undefined);
+        await waitFor(() => expect(screen.queryAllByRole('menu')).toHaveLength(0));
+        expect(screen.getByRole('button', { name: 'Inactive' })).toBeInTheDocument();
+        expect(screen.getByText('Inactive list')).toBeInTheDocument();
+    });
+
+    it('menu: opens from the keyboard', async () => {
+        const user = userEvent.setup();
+        renderViews({ overflow: 'menu' });
+        screen.getByRole('button', { name: 'Active' }).focus();
+        await user.keyboard('{Enter}');
+        expect(await screen.findAllByRole('menuitemradio')).toHaveLength(3);
+    });
+
+    it('scroll: keeps every tab in one row with no More', () => {
+        const { container } = renderViews({ appearance: 'default', overflow: 'scroll' });
+        expect(container.firstChild).toHaveClass('plus-tabs--scroll');
+        expect(screen.getAllByRole('tab')).toHaveLength(3);
+        expect(screen.queryByRole('tab', { name: /^More/ })).toBeNull();
+    });
+
+    describe('auto (the default), measured on the row it sits in', () => {
+        let restore;
+        beforeEach(() => {
+            const client = Object.getOwnPropertyDescriptor(Element.prototype, 'clientWidth');
+            Object.defineProperty(Element.prototype, 'clientWidth', {
+                configurable: true,
+                get() {
+                    const room = this.dataset?.room;
+                    return room ? Number(room) : 0;
+                },
+            });
+            restore = () => {
+                if (client) Object.defineProperty(Element.prototype, 'clientWidth', client);
+                else delete Element.prototype.clientWidth;
+            };
+        });
+        afterEach(() => restore());
+
+        const inRow = (room, props) => render(
+            <div data-room={room}>
+                <Tabs defaultActiveKey="Active" {...props}>
+                    {VIEWS.map((k) => <Tabs.Tab key={k} eventKey={k}>{k}</Tabs.Tab>)}
+                </Tabs>
+            </div>,
+        );
+
+        it('auto, under 768: a pill strip becomes the view menu', () => {
+            inRow(600, { appearance: 'pill' });
+            expect(screen.queryByRole('tablist')).toBeNull();
+            expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute('aria-haspopup', 'menu');
+        });
+
+        it('auto, under 768: an underline strip scrolls', () => {
+            const { container } = inRow(600, {});
+            expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--scroll');
+            expect(screen.getAllByRole('tab')).toHaveLength(3);
+        });
+
+        it('from 768 up it folds into More, as collapse does', () => {
+            const { container } = inRow(1024, { appearance: 'pill' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
+        });
+
+        it('does not narrow a justified strip, or one whose overflow is set', () => {
+            const { unmount } = inRow(600, { appearance: 'pill', alignment: 'justified' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            unmount();
+            const { container } = inRow(600, { appearance: 'pill', overflow: 'collapse' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
+        });
     });
 });

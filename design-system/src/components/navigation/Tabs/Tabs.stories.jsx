@@ -35,11 +35,11 @@ export default {
             description: 'Underline indicator (default), or a pill-shaped selected fill.',
             table: { category: 'Design' }
         },
-        spacing: {
+        overflow: {
             control: 'inline-radio',
-            options: ['default', 'compact'],
-            description: '`default` is a 32px tab; `compact` is 24px.',
-            table: { category: 'Design' }
+            options: ['auto', 'collapse', 'wrap', 'scroll', 'menu'],
+            description: '`auto` (default) folds what does not fit into More, and under 768 takes the narrow form: underline scrolls, pill becomes a menu. `collapse`, `scroll`, `menu` and `wrap` hold one form at every width.',
+            table: { category: 'Layout' }
         },
         alignment: {
             control: 'select',
@@ -153,7 +153,7 @@ export const Appearance = () => (
     <div style={col}>
         <section>
             <DemoLabel>DEFAULT (UNDERLINE)</DemoLabel>
-            <Tabs defaultActiveKey="1">
+            <Tabs overflow="collapse" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
                 <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
@@ -161,15 +161,7 @@ export const Appearance = () => (
         </section>
         <section>
             <DemoLabel>PILL</DemoLabel>
-            <Tabs appearance="pill" defaultActiveKey="1">
-                <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
-                <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
-                <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
-            </Tabs>
-        </section>
-        <section>
-            <DemoLabel>COMPACT</DemoLabel>
-            <Tabs spacing="compact" defaultActiveKey="1">
+            <Tabs appearance="pill" overflow="collapse" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
                 <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
@@ -178,29 +170,23 @@ export const Appearance = () => (
     </div>
 );
 
-/** Underline tab tops round by the tab's height: Radius / Control sm at 24, md at 32. */
+/** One size: a 32 tab, padded --pad-x-lg, its top rounded by Radius / Control md. */
 export const UnderlineRadius = () => (
     <div style={col}>
         <Tabs defaultActiveKey="1" data-testid="default">
             <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
             <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
         </Tabs>
-        <Tabs spacing="compact" defaultActiveKey="1" data-testid="compact">
-            <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
-            <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
-        </Tabs>
     </div>
 );
 UnderlineRadius.play = async ({ canvasElement }) => {
-    const underline = [...canvasElement.querySelectorAll('.plus-tabs--appearance-default')];
-    for (const [i, [height, radius]] of [[32, 8], [24, 6]].entries()) {
-        const tab = underline[i].querySelector('.plus-tab');
-        const t = getComputedStyle(tab);
-        await expect(tab.getBoundingClientRect().height, 'tab height').toBe(height);
-        await expect(px(t.borderTopLeftRadius), `${height} tab top-left`).toBe(radius);
-        await expect(px(t.borderTopRightRadius), `${height} tab top-right`).toBe(radius);
-        await expect(px(t.borderBottomLeftRadius), 'bottom stays square').toBe(0);
-    }
+    const tab = canvasElement.querySelector('.plus-tabs--appearance-default .plus-tab');
+    const t = getComputedStyle(tab);
+    await expect(tab.getBoundingClientRect().height, 'tab height').toBe(tokenLength(canvasElement, '--control-md'));
+    await expect(px(t.paddingLeft), 'tab padding').toBe(tokenLength(canvasElement, '--pad-x-lg'));
+    await expect(px(t.borderTopLeftRadius), 'tab top-left').toBe(tokenLength(canvasElement, '--radius-control-md'));
+    await expect(px(t.borderTopRightRadius), 'tab top-right').toBe(tokenLength(canvasElement, '--radius-control-md'));
+    await expect(px(t.borderBottomLeftRadius), 'bottom stays square').toBe(0);
 };
 
 /** A pill strip has no baseline: neither the list nor any tab draws a bottom border. */
@@ -215,21 +201,21 @@ Appearance.play = async ({ canvasElement }) => {
     }
 };
 
-/** A trailing `CountTag` sits at 16 inside default (32) and compact (24) tabs. */
+/** A trailing `CountTag` sits at 16 inside a 32 tab, underline or pill. */
 export const WithCount = {
     render: () => (
         <div style={col}>
             <section>
-                <DemoLabel>DEFAULT (32)</DemoLabel>
-                <Tabs defaultActiveKey="1">
+                <DemoLabel>UNDERLINE</DemoLabel>
+                <Tabs overflow="collapse" defaultActiveKey="1">
                     <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                     <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
                     <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
                 </Tabs>
             </section>
             <section>
-                <DemoLabel>COMPACT (24)</DemoLabel>
-                <Tabs spacing="compact" appearance="pill" defaultActiveKey="1">
+                <DemoLabel>PILL</DemoLabel>
+                <Tabs appearance="pill" overflow="collapse" defaultActiveKey="1">
                     <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                     <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
                     <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
@@ -239,7 +225,7 @@ export const WithCount = {
     ),
     play: async ({ canvasElement }) => {
         const strips = [...canvasElement.querySelectorAll('.plus-tabs')];
-        for (const [strip, expectedHeight] of [[strips[0], 32], [strips[1], 24]]) {
+        for (const [strip, expectedHeight] of [[strips[0], 32], [strips[1], 32]]) {
             for (const tab of strip.querySelectorAll('.plus-tab')) {
                 const tabRect = tab.getBoundingClientRect();
                 await expect(Math.round(tabRect.height), `${tab.textContent} tab height`).toBe(expectedHeight);
@@ -319,7 +305,7 @@ export const Interactive = (args) => {
     return (
         <Tabs
             appearance={args.appearance}
-            spacing={args.spacing}
+            overflow={args.overflow}
             alignment={args.alignment}
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
@@ -333,14 +319,15 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     appearance: 'default',
-    spacing: 'default',
+    overflow: 'auto',
     alignment: 'left'
 };
 
 /* ------------------------------------------------------------------- states */
 
+// The states are the wide strip's: held at `collapse`, so a narrow canvas does not swap in the narrow form.
 const StateTabs = (props) => (
-    <Tabs defaultActiveKey="1" {...props}>
+    <Tabs overflow="collapse" defaultActiveKey="1" {...props}>
         <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
         <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
         <Tabs.Tab eventKey="3" isDisabled>Reports</Tabs.Tab>
@@ -429,11 +416,11 @@ export const Disabled = {
     },
 };
 
-/** Truncate: a tab label longer than its cap keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped. Folding extra tabs into More is Planned. */
+/** Truncate: a tab label longer than its cap keeps one line and ends in an ellipsis; its full text opens in a Tooltip on hover and focus, only while it is clipped. */
 export const Overflow = {
     render: () => (
         <div style={{ width: '360px' /* demo frame */ }}>
-            <Tabs defaultActiveKey="one">
+            <Tabs overflow="collapse" defaultActiveKey="one">
                 <Tabs.Tab eventKey="one">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="two">{LONG_TOPIC}</Tabs.Tab>
             </Tabs>
@@ -462,7 +449,7 @@ const TOPICS = ['Overview', 'Sessions', 'Progress', 'Reflections', 'Feedback', '
 export const OverflowMore = {
     render: () => (
         <div style={{ width: '440px' /* demo frame */ }}>
-            <Tabs defaultActiveKey="Overview">
+            <Tabs overflow="collapse" defaultActiveKey="Overview">
                 {TOPICS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
                 {TOPICS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} view</Tabs.Panel>)}
             </Tabs>
@@ -498,7 +485,97 @@ export const OverflowMore = {
 OverflowMore.parameters = {
     docs: {
         description: {
-            story: 'The strip keeps one row (`overflow="collapse"`, the default): the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
+            story: 'The strip keeps one row (`overflow="collapse"`, and `auto` from 768 up): the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
         }
     }
+};
+
+/* ------------------------------------------------------------------- narrow */
+
+const PAGE_TABS = ['Overview', 'Sessions', 'Students', 'Notes', 'Reflections', 'Feedback', 'Schedule'];
+const VIEWS = ['Active', 'Inactive', 'All'];
+// A phone-width row: under 768, so a collapsing strip takes its narrow form.
+const narrowRow = { width: '360px' /* demo frame */ };
+
+/**
+ * Narrow page tabs: under 768 an underline strip keeps its bar and scrolls
+ * sideways, its end fading while more lies past it. The selected tab scrolls
+ * into view, and nothing folds into More.
+ */
+export const NarrowScroll = {
+    render: () => (
+        <div style={narrowRow}>
+            <Tabs defaultActiveKey="Overview" aria-label="Student pages">
+                {PAGE_TABS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
+                {PAGE_TABS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} page</Tabs.Panel>)}
+            </Tabs>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const root = canvasElement.querySelector('.plus-tabs');
+        await waitFor(() => expect(root).toHaveClass('plus-tabs--scroll'));
+        const list = canvas.getByRole('tablist');
+        await expect(canvas.queryByRole('tab', { name: /^More/ }), 'no More fold').toBeNull();
+        await expect(canvas.getAllByRole('tab'), 'every tab stays in the strip').toHaveLength(PAGE_TABS.length);
+        await expect(list.scrollWidth, 'the strip runs past its row').toBeGreaterThan(list.clientWidth);
+        await expect(root, 'the end fades while more lies past it').toHaveAttribute('data-overflow-end');
+        const tops = canvas.getAllByRole('tab').map((tab) => Math.round(tab.getBoundingClientRect().top));
+        await expect(new Set(tops).size, 'one row').toBe(1);
+        await expectInsideWell(list, canvasElement.firstElementChild);
+
+        // The last tab, past the end, is selected and scrolls wholly into view.
+        const last = canvas.getByRole('tab', { name: PAGE_TABS[PAGE_TABS.length - 1] });
+        canvas.getByRole('tab', { name: PAGE_TABS[0] }).focus();
+        await userEvent.keyboard('{End}');
+        await expect(last).toHaveAttribute('aria-selected', 'true');
+        await waitFor(() => {
+            const strip = list.getBoundingClientRect();
+            const tab = last.getBoundingClientRect();
+            expect(tab.left, 'the selected tab starts inside the strip').toBeGreaterThanOrEqual(strip.left - 0.5);
+            expect(tab.right, 'and ends inside it').toBeLessThanOrEqual(strip.right + 0.5);
+        });
+        await waitFor(() => expect(root, 'at the end, no fade').not.toHaveAttribute('data-overflow-end'));
+        await expect(canvas.getByText(`${PAGE_TABS[PAGE_TABS.length - 1]} page`)).toBeInTheDocument();
+    },
+};
+
+/**
+ * Narrow pill views: under 768 only the selected pill shows, with a 12
+ * angle-down. It is a menu button; its menu lists every view, the selected one
+ * checked, and picking one selects it.
+ */
+export const NarrowMenu = {
+    render: () => (
+        <div style={narrowRow}>
+            <Tabs appearance="pill" defaultActiveKey="Active">
+                {VIEWS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
+                {VIEWS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} students</Tabs.Panel>)}
+            </Tabs>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        const trigger = await canvas.findByRole('button', { name: 'Active' });
+        await expect(canvas.queryByRole('tablist'), 'no strip, only the selected pill').toBeNull();
+        await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        const chevron = trigger.querySelector('.fa-angle-down');
+        await expect(chevron, 'a chevron after the label').not.toBeNull();
+        await expect(chevron.getBoundingClientRect().width, '12 wide').toBeLessThanOrEqual(tokenLength(canvasElement, '--icon-sm'));
+        await expect(Math.round(trigger.getBoundingClientRect().height), 'a 32 pill').toBe(tokenLength(canvasElement, '--control-md'));
+        await expectGroundUnder(canvasElement, trigger, undefined, '--ds-background-neutral', 'the selected pill');
+
+        await userEvent.click(trigger);
+        const rows = await body.findAllByRole('menuitemradio');
+        await expect(rows.map((row) => row.textContent), 'every view').toEqual(VIEWS);
+        await expect(rows.map((row) => row.getAttribute('aria-checked')), 'the selected one checked').toEqual(['true', 'false', 'false']);
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+        await userEvent.click(rows[2]);
+        await waitFor(() => expect(body.queryAllByRole('menuitemradio')).toHaveLength(0));
+        await expect(await canvas.findByRole('button', { name: 'All' }), 'the pill names the new view').toBeInTheDocument();
+        await expect(canvas.getByText('All students')).toBeInTheDocument();
+    },
 };
