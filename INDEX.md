@@ -142,9 +142,9 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half and retired in full by ADR-042, which removes Bootstrap |
 | [`docs/adr/010-three-tier-context-loading-architecture.md`](docs/adr/010-three-tier-context-loading-architecture.md) | Three-tier context loading architecture |
 | [`docs/adr/011-doc-splitting-by-task-context.md`](docs/adr/011-doc-splitting-by-task-context.md) | Doc splitting by task context (Index + Modules pattern) |
-| [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps |
+| [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps — retired; the manifest never landed |
 | [`docs/adr/013-harness-ia-one-constitution-dual-face-skills-derived.md`](docs/adr/013-harness-ia-one-constitution-dual-face-skills-derived.md) | Harness IA — one constitution, dual-face skills, derived agent roster (2026-07-07) |
-| [`docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md`](docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md) | uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history) |
+| [`docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md`](docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md) | uno-bot runs as a Cloudflare Worker with a proposal gate (backfilled 2026-07-07 from git history; replaced a Pipedream workflow) |
 | [`docs/adr/015-uno-blueprint-on-supabase-as-the-product-source.md`](docs/adr/015-uno-blueprint-on-supabase-as-the-product-source.md) | uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history) |
 | [`docs/adr/016-the-six-skill-pivot.md`](docs/adr/016-the-six-skill-pivot.md) | The six-skill pivot (backfilled 2026-07-07) |
 | [`docs/adr/017-conventions-are-canonical-in-the-repo-notion-playbook.md`](docs/adr/017-conventions-are-canonical-in-the-repo-notion-playbook.md) | Conventions are canonical in the repo; Notion playbook material obsoleted (2026-07-07) |

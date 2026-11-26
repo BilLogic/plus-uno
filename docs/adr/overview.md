@@ -24,13 +24,14 @@ disagreed the ADR says so instead of continuing to assert the decision.
 
 ## What the verification pass found
 
-Four of 22 needed more than a move:
+Several of 22 needed more than a move:
 
 - **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md), and retired in full (2026-11-11) by [ADR-042](042-plus-ships-no-bootstrap.md), which removes Bootstrap.** Its Tailwind ban holds again since Tailwind was removed (2026-11-09).
 - **[ADR-038](038-every-size-type-and-motion-family-is-a-repo-plan.md) — superseded for motion (2026-11-12) by [ADR-041](041-motion-is-springs-on-four-tiers.md).** Its duration and easing roles give way to springs; space, size and type stand; the Blanket naming, Drawer retirement and Radius 2.0 are recorded as corrections in ADR-044 and ADR-045.
 - **[ADR-018](018-gemini-access-is-vertex-only-in-production-ai.md) — superseded (2026-11-26) by [ADR-053](053-gemini-api-key-is-the-canonical-gemini-credential.md).** The credential order reverses (the Gemini API key wins, the Vertex service account is the loud fallback); the one-deterministic-path lesson stands.
-- **[ADR-012](012-declarative-route-manifest-over-parallel-maps.md) — unverifiable.** No route manifest exists under any name searched.
-- **[ADR-014](014-uno-bot-v2-pipedream-cloudflare-worker.md) — corrected.** Skills are no longer raw-fetched from GitHub at runtime; the harness is baked at build time.
+- **[ADR-012](012-declarative-route-manifest-over-parallel-maps.md) — retired (2026-11-26).** No route manifest exists under any name searched, and it was unverifiable since August; it is superseded by the Frame template's Sidebar.
+- **[ADR-003](003-iframe-embedding-over-proxy-for-storybook.md) and [ADR-004](004-4-digit-numeric-ids-over-slugs-for-prototype.md) — superseded (2026-11-26).** The Vite app on 4100 and the prototype listings live on `archive/legacy-ds`; `main` hosts Storybook only.
+- **[ADR-014](014-uno-bot-v2-pipedream-cloudflare-worker.md) — corrected, retitled "uno-bot runs as a Cloudflare Worker".** Skills are no longer raw-fetched from GitHub at runtime; the harness is baked at build time.
 - **[ADR-010](010-three-tier-context-loading-architecture.md) — superseded.** The paths it names were dissolved in #171.
 
 The other 18 were confirmed by checking the artifact each names — the barrel, the
