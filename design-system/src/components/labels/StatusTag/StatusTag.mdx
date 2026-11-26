@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as StatusTagStories from './StatusTag.stories.jsx';
-import { CountTag, StatusTag } from '@/components';
+import { ButtonItem, CountTag, StatusTag } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -12,11 +12,34 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "appearance": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery"] },
+    "spacing": { "type": "enum", "values": ["default", "spacious"] },
+    "menu": { "type": "boolean" },
+    "state": { "type": "enum", "values": ["rest", "hovered", "pressed", "focused", "selected", "loading", "disabled"] }
+  },
+  "sets": [
+    {
+      "id": "status-tag",
+      "name": "Status tag",
+      "componentSetNodeId": "20095:99",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-99",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "menu=true is the tag with a menu; the selected state is the open menu. menu=false keeps only the rest state."
+    }
+  ]
+};
+
 <Meta of={StatusTagStories} />
 
 <Title />
 The condition something is in, when that condition can change — whether the
-system calculated it or a person set it.
+system calculated it or a person set it. Give it a menu and a person can change
+it in place.
 
 <DocsTabs of={StatusTagStories}>
 
@@ -59,7 +82,35 @@ system calculated it or a person set it.
 
 <ComponentExample of={StatusTagStories.Overflow} title="Overflow" description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus.</>} />
 
-<ComponentExample of={StatusTagStories.NeverAButton} title="Never a button" description={<>An <code>onClick</code> passed to a Status tag is dropped with a development warning.</>} />
+<ComponentExample of={StatusTagStories.NeverAButton} title="A label has no click" description={<>Without a <code>menu</code>, an <code>onClick</code> passed to a Status tag is dropped with a development warning.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## With a menu
+
+<ComponentExample of={StatusTagStories.WithMenu} title="Menu trigger" description={<><code>menu</code> takes the rows, Status tags in <code>ButtonItem</code>s, and the tag becomes a button that opens them. It keeps its box and tone and adds an <code>angle-down</code> chevron, 12 on default spacing and 16 on spacious, with equal padding on both sides.</>} />
+
+<ComponentExample of={StatusTagStories.MenuPick} title="Picking a status" description="A row closes the menu. The app updates the tag's text, appearance and accessible name from the pick." />
+
+<ComponentExample of={StatusTagStories.MenuRest} title="Rest" description="The tone's fill and the chevron down, in the tab order." />
+
+<ComponentExample of={StatusTagStories.MenuHovered} title="Hovered" description="The tone's hovered background. The edge stays the pressed background." />
+
+<ComponentExample of={StatusTagStories.MenuPressed} title="Pressed" description="The tone's pressed background." />
+
+<ComponentExample of={StatusTagStories.MenuFocused} title="Focused" description="The standard focus ring outside the edge." />
+
+<ComponentExample of={StatusTagStories.MenuOpen} title="Open" description="The menu lists the statuses with the current one checked. The tag is drawn selected, on the pressed background, and the chevron points up." />
+
+<ComponentExample of={StatusTagStories.MenuLoading} title="Loading" description={<><code>isLoading</code> hides the content at <code>opacity: 0</code> so the tag keeps its width, and centers one spinner over it: 12 on default spacing, 16 on spacious. The tag cannot be pressed.</>} />
+
+<ComponentExample of={StatusTagStories.MenuDisabled} title="Disabled" description={<><code>isDisabled</code> uses the disabled background and text, with no opacity fade. The edge stays the tone's pressed background.</>} />
+
+<ComponentExample of={StatusTagStories.MenuKeyboard} title="Keyboard" description="Enter, Space and ArrowDown open the menu. Escape closes it and returns focus to the tag." />
+
+<ComponentExample of={StatusTagStories.MenuAccessibleName} title="Accessible name" description={<>Name it <code>aria-label="&lt;field&gt;, &lt;record&gt;: &lt;status&gt;"</code>, such as "Attendance, Hermione Granger: Present".</>} />
 
 </div>
 
@@ -88,6 +139,11 @@ system calculated it or a person set it.
     description="Change props in the table below."
 />
 
+<DocsInteractivePlayground
+    of={StatusTagStories.InteractiveMenu}
+    description="The same tag with a menu: change props in the table below."
+/>
+
 </div>
 
 </div>
@@ -105,6 +161,11 @@ system calculated it or a person set it.
 Use `StatusTag` for the condition something is in when that condition can change:
 completed, needs review, missed, in progress. It is the same component whether
 the system calculated the state or a person set it.
+
+Give it a `menu` where a person changes the status in place: attendance,
+engagement or a workflow status in a row. The tag becomes the trigger of a
+`DropdownMenu` and the rows are Status tags, each in a `ButtonItem`, with the current one `isSelected`.
+Leave `menu` off where nobody changes the status there.
 
 Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 `spacing="spacious"` (`32`) beside a heading.
@@ -131,6 +192,9 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 
 ## Alternatives
 
+- For a status that nobody changes in that place, leave `menu` off: the tag stays a label.
+- For a status inside a form that a Save button submits, use `Select`.
+- For a menu that only reads, with nothing to pick, use `Popup`.
 - For a number on its own, use `CountTag`.
 - For a due or event date, use `DateTag`.
 - For a change over time such as "+3 vs last week", use `ChangeTag`.
@@ -146,6 +210,7 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a 16 `CountTag` nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
+5. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the menu is open.
 
 ### States
 
@@ -154,10 +219,12 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The only state. A status that can change is edited in the field around it.</td></tr>
-<tr><td>Hovered, pressed</td><td>None. It is a label, not a control; the thing around it is what responds.</td></tr>
-<tr><td>Focused</td><td>None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text.</td></tr>
-<tr><td>Disabled</td><td>None. A label is never dimmed; a disabled thing is described by the control beside it.</td></tr>
+<tr><td>Rest</td><td>Without a menu, the only state: a label for the condition something is in.</td></tr>
+<tr><td>Hovered, pressed</td><td>Without a menu, none: it is a label. With a menu, the tone's hovered and pressed backgrounds.</td></tr>
+<tr><td>Focused</td><td>Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring.</td></tr>
+<tr><td>Open</td><td>With a menu only: drawn selected, on the pressed background, with the chevron up.</td></tr>
+<tr><td>Loading</td><td>With a menu only: the content is hidden at <code>opacity: 0</code>, keeping its width, with one spinner centered over it.</td></tr>
+<tr><td>Disabled</td><td>Without a menu, none: a label is never dimmed. With a menu, the disabled background and text, with no opacity.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -171,6 +238,10 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 <tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--control-md</code> (32) when spacious.</td></tr>
 <tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on the leading edge, <code>--tag-pad-x-end-compact</code> on the trailing edge, <code>--tag-gap-compact</code> between icon and label, <code>--stack-sm</code> inside the text; spacious <code>--pad-x-md</code> leading, <code>--tag-pad-x-end</code> trailing, <code>--tag-gap</code> between icon and label.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>; spacious <code>--radius-control-md</code>.</td></tr>
+<tr><td>With a menu: padding and gap</td><td><code>--pad-x-xs</code> on both sides with <code>--stack-sm</code> between the label and the chevron; spacious <code>--pad-x-md</code> on both sides with <code>--tag-gap</code>.</td></tr>
+<tr><td>With a menu: chevron and spinner</td><td>The chevron is <code>--icon-sm</code> (12), or <code>--icon-md</code> (16) when spacious. The spinner is <code>size={'{12}'}</code> (<code>--icon-sm</code>), or <code>size={'{16}'}</code> when spacious.</td></tr>
+<tr><td>With a menu: hovered, pressed, open</td><td>The tone's <code>--ds-background-&lt;tone&gt;-hovered</code> and <code>-pressed</code>; open uses the pressed one.</td></tr>
+<tr><td>With a menu: disabled</td><td><code>--ds-background-disabled</code> and <code>--ds-text-disabled</code>, with no opacity.</td></tr>
 <tr><td>Neutral</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code>, edge <code>--ds-background-neutral-pressed</code>.</td></tr>
 <tr><td>Success, warning, danger</td><td>The same three for each: <code>--ds-background-success</code>, <code>--ds-text-success</code>, edge <code>--ds-background-success-pressed</code>.</td></tr>
 <tr><td>Info and discovery</td><td><code>--ds-background-information</code> and <code>--ds-background-discovery</code>, with their text and pressed steps.</td></tr>
@@ -237,12 +308,37 @@ Two statuses on one object force people to decide which is true.
 only when the number carries a different meaning from the status, such as a
 success status with a danger count of failures.
 
-### Edit in the field, not on the label.
+### Add a menu where the status changes in place.
 
-A Status tag never opens a menu. Where a status can be changed, the field around
-it uses a `Select` whose options are grouped To do · In progress · Complete ·
-Exception · Failed, each group with one appearance (neutral · info · success ·
-warning · danger).
+A row full of `Select` fields is heavy for a value a person mostly reads and
+sometimes flips. Give the tag a `menu` there. Elsewhere, leave it a label.
+
+<DoDontPair
+    doExample={<FigureRow><span>Hermione Granger</span><StatusTag appearance="success" menu={<><ButtonItem isSelected><StatusTag appearance="success">Present</StatusTag></ButtonItem><ButtonItem><StatusTag appearance="warning">Late</StatusTag></ButtonItem></>} aria-label="Attendance, Hermione Granger: Present">Present</StatusTag></FigureRow>}
+    doCaption="A menu where the status is flipped in the row."
+    dontExample={<FigureRow><span>Session summary</span><StatusTag appearance="success" menu={<ButtonItem><StatusTag>Read-only note</StatusTag></ButtonItem>} aria-label="Summary: Complete">Complete</StatusTag></FigureRow>}
+    dontCaption="A menu that only reads is a Popup."
+/>
+
+### List the other statuses, each one a row.
+
+Each row is a Status tag in its own appearance, wrapped in a `ButtonItem`, with the
+same wording as the tag it stands for. The current one is `isSelected`. Picking one
+closes the menu.
+
+### Name the tag by field, record and status.
+
+<DoDontPair
+    doExample={<StatusTag appearance="warning" menu={<ButtonItem isSelected><StatusTag appearance="warning">Late</StatusTag></ButtonItem>} aria-label="Attendance, Hermione Granger: Late">Late</StatusTag>}
+    doCaption="A name with the field, the record and the status."
+    dontExample={<StatusTag appearance="warning" menu={<ButtonItem isSelected><StatusTag appearance="warning">Late</StatusTag></ButtonItem>} aria-label="Late">Late</StatusTag>}
+    dontCaption="A name that does not say which field or record."
+/>
+
+### Use spacious beside buttons.
+
+Use `spacing="spacious"` so the heights line up with the buttons around the
+tag, and `default` in table rows and lists.
 
 </div>
 
@@ -268,9 +364,14 @@ warning · danger).
 
 ## Accessibility
 
-- **Read as its text.** A Status tag is a `span` with no role, so a screen reader
+- **Read as its text.** Without a `menu`, a Status tag is a `span` with no role, so a screen reader
   announces its text and nothing suggests it can be pressed. An `onClick` is
   dropped with a development warning.
+- **A button with a menu.** With a `menu` it is a `button` with `aria-haspopup="menu"`
+  and `aria-expanded`. Its name is the `aria-label`, "field, record: status", so
+  a truncated label stays readable through the name and the menu.
+- **Keyboard.** Enter, Space and ArrowDown open the menu, arrows move through the
+  rows, and Escape closes it and returns focus to the tag.
 - **Not a tab stop, unless truncated.** When the label is clipped, the Status tag
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
@@ -287,7 +388,9 @@ warning · danger).
 ## Related
 
 - `CountTag`: use when nesting a metric inside `StatusTag` through `trailingMetric`.
-- `Select`: use when letting a person change a record's status in a form or table cell.
+- `DropdownMenu`: the menu the tag opens. Its rows are `ButtonItem`s.
+- `Select`: use when letting a person change a status in a form that a Save button submits.
+- `Spinner`: the loading ring, `size={'{12}'}` on a default tag and `size={'{16}'}` on a spacious one.
 
 </div>
 

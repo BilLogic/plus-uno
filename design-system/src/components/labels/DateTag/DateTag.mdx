@@ -12,11 +12,34 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "appearance": { "type": "enum", "values": ["neutral", "warning", "danger"] },
+    "spacing": { "type": "enum", "values": ["default", "spacious"] },
+    "menu": { "type": "boolean" },
+    "state": { "type": "enum", "values": ["rest", "hovered", "pressed", "focused", "selected", "loading", "disabled"] }
+  },
+  "sets": [
+    {
+      "id": "date-tag",
+      "name": "Date tag",
+      "componentSetNodeId": "20682:1687",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20682-1687",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "menu=true is the tag with a calendar; the selected state is the open popup. menu=false keeps only the rest state."
+    }
+  ]
+};
+
 <Meta of={DateTagStories} />
 
 <Title />
 A due or event date, outlined with a fixed icon the app picks from the date
-and the due-soon window — never a caller's choice.
+and the due-soon window — never a caller's choice. Give it a calendar and a
+person can change the date in place.
 
 <DocsTabs of={DateTagStories}>
 
@@ -50,6 +73,32 @@ and the due-soon window — never a caller's choice.
 ## Behavior
 
 <ComponentExample of={DateTagStories.Truncation} title="Truncation" description={<>Past <code>maxWidth</code> the label ends in an ellipsis, and the full text becomes a tooltip reachable by hover or by Tab.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## With a calendar
+
+<ComponentExample of={DateTagStories.WithCalendar} title="Calendar trigger" description={<><code>menu</code> takes the popup's content, normally a <code>Calendar</code>, and the tag becomes a button that opens it in a <code>Popup</code>. It keeps its outline and adds an <code>angle-down</code> chevron, 12 on default spacing and 16 on spacious, with equal padding on both sides.</>} />
+
+<ComponentExample of={DateTagStories.CalendarRest} title="Rest" description="Outlined with no fill, and the chevron down, in the tab order." />
+
+<ComponentExample of={DateTagStories.CalendarHovered} title="Hovered" description="The neutral subtle hovered background. The outline stays." />
+
+<ComponentExample of={DateTagStories.CalendarPressed} title="Pressed" description="The neutral subtle pressed background." />
+
+<ComponentExample of={DateTagStories.CalendarFocused} title="Focused" description="The standard focus ring outside the edge." />
+
+<ComponentExample of={DateTagStories.CalendarOpen} title="Open" description="The Calendar shows in a Popup with the current day picked. The tag is drawn selected, on the pressed background, and the chevron points up." />
+
+<ComponentExample of={DateTagStories.CalendarLoading} title="Loading" description={<><code>isLoading</code> hides the content at <code>opacity: 0</code> so the tag keeps its width, and centers one spinner over it: 12 on default spacing, 16 on spacious. The tag cannot be pressed.</>} />
+
+<ComponentExample of={DateTagStories.CalendarDisabled} title="Disabled" description={<><code>isDisabled</code> uses the disabled text and edge, with no opacity fade.</>} />
+
+<ComponentExample of={DateTagStories.CalendarKeyboard} title="Keyboard" description="Enter and Space open the popup. Escape closes it and returns focus to the tag." />
+
+<ComponentExample of={DateTagStories.CalendarAccessibleName} title="Accessible name" description={<>Name it <code>aria-label="&lt;field&gt;, &lt;record&gt;: &lt;date&gt;"</code>, such as "Due date, Session 12: Due tomorrow".</>} />
 
 </div>
 
@@ -92,6 +141,9 @@ and the due-soon window — never a caller's choice.
 
 ## Usage
 
+Give it a `menu`, normally a `Calendar`, where a person changes the date in place: the
+tag becomes the trigger of a `Popup`. Leave `menu` off where nobody changes the date there.
+
 Use `DateTag` for a due or event date beside the thing it belongs to: an
 assignment, a session, a report. Write `children` as people say the date, such as "Due tomorrow" or "2 days overdue", never a raw timestamp. `DateTag`'s outline, icon and three
 appearances are reserved for dates.
@@ -117,6 +169,7 @@ The app derives `appearance` from the date and a due-soon window it defines.
 
 ## Alternatives
 
+- For a date inside a form that a Save button submits, use `DatePicker`.
 - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 - For a category or subject or person, use `Tag`.
 - For a numeric count, use `CountTag`.
@@ -130,6 +183,7 @@ The app derives `appearance` from the date and a due-soon window it defines.
 1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
 2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
 3. **Outline.** An inset border, so the height stays exact. A date tag has no fill.
+4. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the popup is open.
 
 ### States
 
@@ -138,10 +192,12 @@ The app derives `appearance` from the date and a due-soon window it defines.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window.</td></tr>
-<tr><td>Hovered, pressed</td><td>None. It is a label, not a control; the thing around it is what responds.</td></tr>
-<tr><td>Focused</td><td>None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text.</td></tr>
-<tr><td>Disabled</td><td>None. A label is never dimmed; a disabled thing is described by the control beside it.</td></tr>
+<tr><td>Rest</td><td>Without a menu, the only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window.</td></tr>
+<tr><td>Hovered, pressed</td><td>Without a menu, none: it is a label. With a menu, the neutral subtle hovered and pressed backgrounds.</td></tr>
+<tr><td>Focused</td><td>Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring.</td></tr>
+<tr><td>Open</td><td>With a menu only: drawn selected, on the pressed background, with the chevron up.</td></tr>
+<tr><td>Loading</td><td>With a menu only: the content is hidden at <code>opacity: 0</code>, keeping its width, with one spinner centered over it.</td></tr>
+<tr><td>Disabled</td><td>Without a menu, none: a label is never dimmed. With a menu, the disabled text and edge, with no opacity.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -155,6 +211,10 @@ The app derives `appearance` from the date and a due-soon window it defines.
 <tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--control-md</code> (32) when spacious.</td></tr>
 <tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on the leading edge, <code>--tag-pad-x-end-compact</code> on the trailing edge, <code>--tag-gap-compact</code> between icon and label, <code>--stack-sm</code> inside the text; spacious <code>--pad-x-md</code> leading, <code>--tag-pad-x-end</code> trailing, <code>--tag-gap</code> between icon and label.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>; spacious <code>--radius-control-md</code>.</td></tr>
+<tr><td>With a menu: padding and gap</td><td><code>--pad-x-xs</code> on both sides with <code>--stack-sm</code> between the label and the chevron; spacious <code>--pad-x-md</code> on both sides with <code>--tag-gap</code>.</td></tr>
+<tr><td>With a menu: chevron and spinner</td><td>The chevron is <code>--icon-sm</code> (12), or <code>--icon-md</code> (16) when spacious. The spinner is <code>size={'{12}'}</code> (<code>--icon-sm</code>), or <code>size={'{16}'}</code> when spacious.</td></tr>
+<tr><td>With a menu: hovered, pressed, open</td><td><code>--ds-background-neutral-subtle-hovered</code> and <code>--ds-background-neutral-subtle-pressed</code>; open uses the pressed one.</td></tr>
+<tr><td>With a menu: disabled</td><td><code>--ds-text-disabled</code> and <code>--ds-border-disabled</code>, with no opacity.</td></tr>
 <tr><td>Neutral</td><td><code>--ds-border</code> edge, <code>--ds-text-subtle</code> words.</td></tr>
 <tr><td>Warning</td><td><code>--ds-border-warning-subtle</code> edge, <code>--ds-text-warning</code> words.</td></tr>
 <tr><td>Danger</td><td><code>--ds-border-danger-subtle</code> edge, <code>--ds-text-danger</code> words.</td></tr>
@@ -200,12 +260,24 @@ A row carries one date; extra tags compete for attention.
     dontCaption="Several dates in one row."
 />
 
-### Never make a date tag a button.
+### Add a calendar where the date changes in place.
 
-It renders a `span` with no role and no click handler: `onClick`, `role` and
-`tabIndex` are dropped with a console warning in development. The one time it
-takes focus is when its text is truncated, so a keyboard user can still reach
-the tooltip holding the full date.
+Give the tag a `menu` holding a `Calendar` where a person moves a date in the row.
+Elsewhere, leave it a label.
+
+<DoDontPair
+    doExample={<FigureRow><span>Session 12</span><DateTag appearance="warning" menu={<span>Calendar</span>} aria-label="Due date, Session 12: Due tomorrow">Due tomorrow</DateTag></FigureRow>}
+    doCaption="A calendar where the date is moved in the row."
+    dontExample={<FigureRow><span>Session 12</span><DateTag appearance="warning" menu={<span>Calendar</span>} aria-label="Due tomorrow">Due tomorrow</DateTag></FigureRow>}
+    dontCaption="A name that does not say which field or record."
+/>
+
+### Leave the tag a label where nobody changes the date.
+
+Without a `menu` it renders a `span` with no role and no click handler: `onClick`,
+`role` and `tabIndex` are dropped with a console warning in development. The one
+time it takes focus is when its text is truncated, so a keyboard user can still
+reach the tooltip holding the full date.
 
 </div>
 
@@ -230,8 +302,12 @@ the tooltip holding the full date.
 
 ## Accessibility
 
-- **Not a control.** No role, no tab stop, no click handler: assistive
+- **Without a menu, not a control.** No role, no tab stop, no click handler: assistive
   technology reads it as plain text beside whatever it labels.
+- **A button with a menu.** With a `menu` it is a `button` with `aria-haspopup` and
+  `aria-expanded`. Its name is the `aria-label`, "field, record: date".
+- **Keyboard.** Enter and Space open the popup, and Escape closes it and returns
+  focus to the tag.
 - **Truncated text stays reachable.** When the label is clipped, the tag
   takes a tab stop and its full text is available as a tooltip on hover or
   focus.
@@ -245,6 +321,8 @@ the tooltip holding the full date.
 ## Related
 
 - `DatePicker`: use when the person picks or edits a date in a form field.
+- `Calendar`: the usual content of the popup the tag opens.
+- `Popup`: the popup the tag opens.
 - `StatusTag`: use when showing the workflow state of a dated item.
 
 </div>

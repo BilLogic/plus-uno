@@ -101,25 +101,110 @@
  * fill    the appearance's tinted background token.
  * text    the appearance's (Text) color.
  * border  the appearance's pressed background token.
+ * hovered the appearance's hovered background token, for a tag with a `menu`.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
  * mapping Count tag and Tag use.
  */
 $status-state: (
-    'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed)),
-    'success': (var(--ds-background-success), var(--ds-text-success), var(--ds-background-success-pressed)),
-    'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed)),
-    'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
-    'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed)),
-    'discovery': (var(--ds-background-discovery), var(--ds-text-discovery), var(--ds-background-discovery-pressed)),
+    'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed), var(--ds-background-neutral-hovered)),
+    'success': (var(--ds-background-success), var(--ds-text-success), var(--ds-background-success-pressed), var(--ds-background-success-hovered)),
+    'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed), var(--ds-background-warning-hovered)),
+    'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed), var(--ds-background-danger-hovered)),
+    'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed), var(--ds-background-information-hovered)),
+    'discovery': (var(--ds-background-discovery), var(--ds-text-discovery), var(--ds-background-discovery-pressed), var(--ds-background-discovery-hovered)),
 );
 
 @each $name, $look in $status-state {
     .plus-status--#{$name} {
         --plus-status-edge: #{nth($look, 3)};
+        --plus-status-hovered: #{nth($look, 4)};
 
         background-color: nth($look, 1);
         color: nth($look, 2);
     }
+}
+
+/*
+ * A TAG WITH A MENU is a button that opens a DropdownMenu.
+ *
+ * The same box and tone as the label, plus a chevron: `angle-down`, and
+ * `angle-up` while open, in a 12 box on default and a 16 box on spacious. The
+ * padding is equal on both sides (`--pad-x-xs` / `--pad-x-md`) and the gap is
+ * `--stack-sm` / `--tag-gap`, so the content's own end padding is dropped.
+ *
+ * STATES. Hovered takes the tone's hovered background, pressed and open (the
+ * tag is selected while its menu shows) the tone's pressed background; the
+ * edge stays the pressed background throughout. Disabled uses the disabled
+ * tokens with no opacity. Loading hides the content at `opacity: 0`, keeping
+ * its width, and centers one Spinner over the tag.
+ */
+.plus-status--menu {
+    position: relative;
+    padding: 0 var(--pad-x-xs);
+    gap: var(--stack-sm);
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    text-align: start;
+    appearance: none;
+
+    .plus-status__content {
+        padding-right: 0;
+    }
+
+    &.plus-status--spacious {
+        padding: 0 var(--pad-x-md);
+        gap: var(--tag-gap);
+
+        .plus-status__content {
+            padding-right: 0;
+        }
+    }
+}
+
+.plus-status__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    height: var(--plus-status-icon-box);
+
+    > i {
+        font-size: var(--icon-sm);
+        line-height: 1;
+    }
+}
+
+.plus-status--spacious .plus-status__chevron > i {
+    font-size: var(--icon-md);
+}
+
+.plus-status__spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+.plus-status--loading {
+    pointer-events: none;
+
+    .plus-status__content,
+    .plus-status__chevron,
+    .plus-count {
+        opacity: 0;
+    }
+}
+
+.plus-status--menu {
+    @include plus-state((
+        hovered: (background-color: var(--plus-status-hovered)),
+        pressed: (background-color: var(--plus-status-edge)),
+        selected: (background-color: var(--plus-status-edge)),
+        disabled: (background-color: var(--ds-background-disabled), color: var(--ds-text-disabled)),
+    ), $selected-selector: '&[aria-expanded="true"]', $disabled-selector: '&:disabled:not(.plus-status--loading), &[aria-disabled="true"]');
 }
 
 /* Focusable only while truncated, as the tooltip's trigger. */

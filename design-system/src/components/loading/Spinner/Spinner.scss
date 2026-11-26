@@ -3,7 +3,7 @@
  *
  * THE RING. A circle border in the spinner's own color, with one side
  * transparent so the rotation reads as motion rather than a static ring.
- * Stroke width is a fixed fraction of the diameter (an eighth), so the three
+ * Stroke width is a fixed fraction of the diameter (an eighth), so the four
  * sizes stay visually consistent without a stroke token per size.
  *
  * THE COLOR. `inherit` takes `currentColor`, so a spinner dropped into a
@@ -28,6 +28,10 @@
     border-right-color: transparent;
     color: inherit;
     animation: plus-spinner-rotate var(--ds-motion-loop-duration) var(--ds-motion-loop) infinite alternate;
+}
+
+.plus-spinner[data-size='12'] {
+    --plus-spinner-size: var(--icon-sm);
 }
 
 .plus-spinner[data-size='16'] {

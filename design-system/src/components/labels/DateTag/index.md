@@ -12,11 +12,14 @@ Also asked as: date pill.
 
 **Source:** `design-system/src/components/labels/DateTag/DateTag.jsx`
 
-**Stories:** `design-system/src/components/labels/DateTag/DateTag.stories.jsx` — Overview, Styles, Truncation, NeverAButton, UnknownAppearanceFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/DateTag/DateTag.stories.jsx` — Overview, Styles, Truncation, NeverAButton, UnknownAppearanceFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled, WithCalendar, CalendarRest, CalendarHovered, CalendarPressed, CalendarFocused, CalendarOpen, CalendarLoading, CalendarDisabled, CalendarKeyboard, CalendarAccessibleName
 
 **Storybook page:** `design-system/src/components/labels/DateTag/DateTag.mdx`
 
 ## Usage
+
+Give it a `menu`, normally a `Calendar`, where a person changes the date in place: the
+tag becomes the trigger of a `Popup`. Leave `menu` off where nobody changes the date there.
 
 Use `DateTag` for a due or event date beside the thing it belongs to: an
 assignment, a session, a report. Write `children` as people say the date, such as "Due tomorrow" or "2 days overdue", never a raw timestamp. `DateTag`'s outline, icon and three
@@ -34,6 +37,7 @@ The app derives `appearance` from the date and a due-soon window it defines.
 
 ## Alternatives
 
+- For a date inside a form that a Save button submits, use `DatePicker`.
 - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 - For a category or subject or person, use `Tag`.
 - For a numeric count, use `CountTag`.
@@ -61,17 +65,29 @@ A row carries one date; extra tags compete for attention.
 Do: One date per row.
 Don't: Several dates in one row.
 
-### Never make a date tag a button. {#never-make-a-date-tag-a-button}
+### Add a calendar where the date changes in place. {#add-a-calendar-where-the-date-changes-in-place}
 
-It renders a `span` with no role and no click handler: `onClick`, `role` and
-`tabIndex` are dropped with a console warning in development. The one time it
-takes focus is when its text is truncated, so a keyboard user can still reach
-the tooltip holding the full date.
+Give the tag a `menu` holding a `Calendar` where a person moves a date in the row.
+Elsewhere, leave it a label.
+
+Do: A calendar where the date is moved in the row.
+Don't: A name that does not say which field or record.
+
+### Leave the tag a label where nobody changes the date. {#leave-the-tag-a-label-where-nobody-changes-the-date}
+
+Without a `menu` it renders a `span` with no role and no click handler: `onClick`,
+`role` and `tabIndex` are dropped with a console warning in development. The one
+time it takes focus is when its text is truncated, so a keyboard user can still
+reach the tooltip holding the full date.
 
 ## Accessibility
 
-- **Not a control.** No role, no tab stop, no click handler: assistive
+- **Without a menu, not a control.** No role, no tab stop, no click handler: assistive
   technology reads it as plain text beside whatever it labels.
+- **A button with a menu.** With a `menu` it is a `button` with `aria-haspopup` and
+  `aria-expanded`. Its name is the `aria-label`, "field, record: date".
+- **Keyboard.** Enter and Space open the popup, and Escape closes it and returns
+  focus to the tag.
 - **Truncated text stays reachable.** When the label is clipped, the tag
   takes a tab stop and its full text is available as a tooltip on hover or
   focus.
@@ -81,6 +97,8 @@ the tooltip holding the full date.
 ## Related
 
 - `DatePicker`: use when the person picks or edits a date in a form field.
+- `Calendar`: the usual content of the popup the tag opens.
+- `Popup`: the popup the tag opens.
 - `StatusTag`: use when showing the workflow state of a dated item.
 
 Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag` · `TagGroup`
@@ -90,15 +108,18 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
 2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
 3. **Outline.** An inset border, so the height stays exact. A date tag has no fill.
+4. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the popup is open.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | The only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window. |
-| Hovered, pressed | None. It is a label, not a control; the thing around it is what responds. |
-| Focused | None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text. |
-| Disabled | None. A label is never dimmed; a disabled thing is described by the control beside it. |
+| Rest | Without a menu, the only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window. |
+| Hovered, pressed | Without a menu, none: it is a label. With a menu, the neutral subtle hovered and pressed backgrounds. |
+| Focused | Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring. |
+| Open | With a menu only: drawn selected, on the pressed background, with the chevron up. |
+| Loading | With a menu only: the content is hidden at `opacity: 0`, keeping its width, with one spinner centered over it. |
+| Disabled | Without a menu, none: a label is never dimmed. With a menu, the disabled text and edge, with no opacity. |
 
 ### Tokens
 
@@ -107,6 +128,10 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 | Padding and gap | `--pad-x-xs` on the leading edge, `--tag-pad-x-end-compact` on the trailing edge, `--tag-gap-compact` between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` leading, `--tag-pad-x-end` trailing, `--tag-gap` between icon and label. |
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
+| With a menu: padding and gap | `--pad-x-xs` on both sides with `--stack-sm` between the label and the chevron; spacious `--pad-x-md` on both sides with `--tag-gap`. |
+| With a menu: chevron and spinner | The chevron is `--icon-sm` (12), or `--icon-md` (16) when spacious. The spinner is `size={12}` (`--icon-sm`), or `size={16}` when spacious. |
+| With a menu: hovered, pressed, open | `--ds-background-neutral-subtle-hovered` and `--ds-background-neutral-subtle-pressed`; open uses the pressed one. |
+| With a menu: disabled | `--ds-text-disabled` and `--ds-border-disabled`, with no opacity. |
 | Neutral | `--ds-border` edge, `--ds-text-subtle` words. |
 | Warning | `--ds-border-warning-subtle` edge, `--ds-text-warning` words. |
 | Danger | `--ds-border-danger-subtle` edge, `--ds-text-danger` words. |
@@ -127,6 +152,12 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | `appearance` | enum | `'neutral'` | `neutral` (not close), `warning` (due soon) or `danger` (overdue). Drives the fixed icon too. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
 | `maxWidth` | number or string | `200` | The widest the Date tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
+| `menu` | node | — | The popup's content, normally a `Calendar`. With it the tag is a button that opens the popup; without it the tag is a label. Name it with `aria-label`: "Due date, Session 12: Due tomorrow". |
+| `isOpen` | bool | — | Controlled open state of the popup. Pair it with `onOpenChange`. The open tag is drawn as selected. |
+| `defaultOpen` | bool | — | Whether an uncontrolled popup starts open. |
+| `onOpenChange` | func | — | Called with the next open state when the popup opens or closes. |
+| `isLoading` | bool | `false` | A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed. |
+| `isDisabled` | bool | `false` | Prevents opening the popup. Drawn in the disabled tokens, never faded. |
 | `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
 | `id` | string | — | The `id` attribute of the tag element. |
 
@@ -140,8 +171,12 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-disabled` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
+
+## Figma
+
+- "Date tag" node 20682:1687 in file zAecJNRdvJzAUOcjV32tRX
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

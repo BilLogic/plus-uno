@@ -19,11 +19,15 @@ authored half, counted rather than assumed.
   - For a due or event date, use `DateTag`.
   - For a category or subject or person, use `Tag`.
   - For progress toward a total, use `ProgressBar`.
-- **[DateTag](DateTag/index.md)** — Use `DateTag` for a due or event date beside the thing it belongs to: an assignment, a session, a report. Write `children` as people say the date, such as "Due tomorrow" or "2 days overdue", never a raw timestamp. `DateTag`'s outline, icon and three appearances are reserved for dates.
+- **[DateTag](DateTag/index.md)** — Give it a `menu`, normally a `Calendar`, where a person changes the date in place: the tag becomes the trigger of a `Popup`. Leave `menu` off where nobody changes the date there.
+  - For a date inside a form that a Save button submits, use `DatePicker`.
   - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
   - For a category or subject or person, use `Tag`.
   - For a numeric count, use `CountTag`.
 - **[StatusTag](StatusTag/index.md)** — Use `StatusTag` for the condition something is in when that condition can change: completed, needs review, missed, in progress. It is the same component whether the system calculated the state or a person set it.
+  - For a status that nobody changes in that place, leave `menu` off: the tag stays a label.
+  - For a status inside a form that a Save button submits, use `Select`.
+  - For a menu that only reads, with nothing to pick, use `Popup`.
   - For a number on its own, use `CountTag`.
   - For a due or event date, use `DateTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
@@ -44,8 +48,8 @@ authored half, counted rather than assumed.
 | [ChangeTag](ChangeTag/index.md) | 7 | ✅ | ✅ | ✅ |
 | [CompetencyTag](CompetencyTag/index.md) | 5 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
-| [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
-| [StatusTag](StatusTag/index.md) | 10 | ✅ | ✅ | ✅ |
+| [DateTag](DateTag/index.md) | 12 | ✅ | ✅ | ✅ |
+| [StatusTag](StatusTag/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 24 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
