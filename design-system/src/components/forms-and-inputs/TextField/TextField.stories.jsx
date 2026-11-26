@@ -389,7 +389,7 @@ export const Subtle = (args) => {
                 label="Grade level"
                 appearance="subtle"
                 value={saved}
-                elemAfterInput={icon('caret-down')}
+                elemAfterInput={icon('angle-down')}
                 onSave={async (next) => {
                     if (args.onSave) args.onSave(next);
                     await slowSave(next);

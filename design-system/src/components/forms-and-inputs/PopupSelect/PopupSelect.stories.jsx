@@ -95,7 +95,7 @@ export const Overview = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
-        await expect(trigger.querySelector('.fa-chevron-down')).not.toBeNull();
+        await expect(trigger.querySelector('.fa-angle-down')).not.toBeNull();
         await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
 
         await userEvent.click(trigger);

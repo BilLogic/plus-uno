@@ -4669,7 +4669,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "The element that opens the menu. A `Button` with a chevron is the default pattern.",
+          "description": "The element that opens the menu. A `Button` with an angle is the default pattern.",
           "deprecated": null
         },
         {
@@ -5985,7 +5985,7 @@
       "import": "import { FilterButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx",
-      "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.",
+      "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and an angle when it opens a menu.",
       "props": [
         {
           "name": "label",
@@ -6029,7 +6029,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "The chevron that says a menu opens.",
+          "description": "The angle that says a menu opens.",
           "deprecated": null
         },
         {
@@ -10117,7 +10117,7 @@
       "import": "import { PopupSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
-      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with an angle, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a Section header; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start` (the default); one at the end opens `bottom-end`. - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
         {
           "name": "container",
@@ -14604,7 +14604,7 @@
       "import": "import { SplitButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx",
-      "summary": "Split button: a primary action joined to a chevron that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (chevron) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.",
+      "summary": "Split button: a primary action joined to an angle that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (angle) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.",
       "props": [
         {
           "name": "children",

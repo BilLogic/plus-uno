@@ -6,11 +6,11 @@ import Button from '../Button/Button';
 import IconButton from '../IconButton/IconButton';
 
 describe('SplitButton', () => {
-    it('groups the action and a named menu chevron', () => {
+    it('groups the action and a named menu angle', () => {
         render(
             <SplitButton>
                 <Button text="Save" />
-                <IconButton icon={<Icon name="chevron-down" size={12} />} label="More save options" aria-haspopup="menu" aria-expanded={false} />
+                <IconButton icon={<Icon name="angle-down" size={12} />} label="More save options" aria-haspopup="menu" aria-expanded={false} />
             </SplitButton>
         );
         expect(screen.getByRole('group')).toBeInTheDocument();
@@ -26,7 +26,7 @@ describe('SplitButton', () => {
         render(
             <SplitButton>
                 <Button text="Save" onClick={onClick} />
-                <IconButton icon={<Icon name="chevron-down" size={12} />} label="More" onClick={onMenuClick} />
+                <IconButton icon={<Icon name="angle-down" size={12} />} label="More" onClick={onMenuClick} />
             </SplitButton>
         );
         fireEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -40,7 +40,7 @@ describe('SplitButton', () => {
         render(
             <SplitButton>
                 <Button text="Save" appearance="primary" spacing="compact" isDisabled />
-                <IconButton icon={<Icon name="chevron-down" size={12} />} label="More" appearance="primary" spacing="compact" isDisabled />
+                <IconButton icon={<Icon name="angle-down" size={12} />} label="More" appearance="primary" spacing="compact" isDisabled />
             </SplitButton>
         );
         for (const name of ['Save', 'More']) {
@@ -54,7 +54,7 @@ describe('SplitButton', () => {
         render(
             <SplitButton testId="save-split">
                 <Button text="Save" />
-                <IconButton icon={<Icon name="chevron-down" size={12} />} label="More" />
+                <IconButton icon={<Icon name="angle-down" size={12} />} label="More" />
             </SplitButton>
         );
         expect(screen.getByRole('group')).toHaveAttribute('data-testid', 'save-split');

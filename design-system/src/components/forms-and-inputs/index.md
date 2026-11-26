@@ -54,7 +54,7 @@ authored half, counted rather than assumed.
 - **[DropdownMenu](DropdownMenu/index.md)** — Use `DropdownMenu` for a trigger that opens a menu of actions or navigation links (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`).
   - For picking a value in a form field, use `Select`.
   - For picking a single view or filter value from a button, use `PopupSelect`.
-  - For one primary action joined to a chevron menu of related actions, use `SplitButton`.
+  - For one primary action joined to an angle menu of related actions, use `SplitButton`.
 - **[Fieldset](Fieldset.md)** — Use `Fieldset` when a set of mixed controls shares one legend and one validation message, such as related text fields asked together.
   - For a group of radio buttons under one question, use `RadioGroup`.
   - For a group of checkboxes under one question, use `CheckboxGroup`.

@@ -137,8 +137,8 @@ BlockStyleMenu.play = async ({ canvasElement }) => {
     const toggle = canvas.getByRole('button', { name: /Normal/ });
     const closed = () => waitFor(() => expect(body.queryByRole('menuitem')).toBeNull());
 
-    // The trigger shows the standard menu chevron, as DropdownMenu and PopupSelect do.
-    await expect(toggle.querySelector('.fa-chevron-down')).not.toBeNull();
+    // The trigger shows the standard menu angle, as DropdownMenu and PopupSelect do.
+    await expect(toggle.querySelector('.fa-angle-down')).not.toBeNull();
     await expect(toggle.querySelector('.fa-arrows-up-down')).toBeNull();
 
     // Open with a click: four block styles as menu items, Normal is current.

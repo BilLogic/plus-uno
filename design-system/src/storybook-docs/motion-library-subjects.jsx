@@ -299,7 +299,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     DropdownMenu: () => (
         <DropdownMenu
             trigger={(
-                <Button iconAfter="chevron-down" spacing="compact" onClick={NOOP}>
+                <Button iconAfter="angle-down" spacing="compact" onClick={NOOP}>
                     Session actions
                 </Button>
             )}
@@ -724,7 +724,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 Save notes
             </Button>
             <IconButton
-                icon="chevron-down"
+                icon="angle-down"
                 label="More save options"
                 appearance="primary"
                 spacing="compact"
