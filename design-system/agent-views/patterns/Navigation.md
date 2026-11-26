@@ -40,7 +40,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 | --- | --- |
 | 1 · Expand the row | A few more lines, links at most. |
 | 2 · Section detail | An inline expand inside a Section. |
-| 3 · Details Panel | On a queue page (docked beside the list), or a quick look or short edit from a table. |
+| 3 · Details Panel | On a queue page (floating over the list), or a quick look or short edit from a table. |
 | 4 · Modal | A rare, critical task with fewer than five fields. |
 | 5 · Its own page | Complex or stepped work, or anything worth a URL. The breadcrumb appears. |
 
@@ -125,7 +125,7 @@ Only the selected indicator glides. Nothing slides between views.
 
 **Checked:** Review
 
-Expand the row, then Section detail, then the Details Panel, then a Modal, then its own page. Section detail and the Details Panel both stay: Section detail expands in place (see Section), and the Details Panel docks beside the list on a queue page or opens from a table.
+Expand the row, then Section detail, then the Details Panel, then a Modal, then its own page. Section detail and the Details Panel both stay: Section detail expands in place (see Section), and the Details Panel floats over the right of the list on a queue page or opens from a table.
 
 ### Give a long task its steps in the inner sidebar. {#give-a-long-task-its-steps-in-the-inner-sidebar}
 

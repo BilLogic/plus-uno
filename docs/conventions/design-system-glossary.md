@@ -45,7 +45,7 @@ The full-height area at the left of the **Frame**, holding navigation. From 1024
 _Avoid_: "left nav", "side nav", "side navigation"
 
 **Panel**:
-The full-height layer at the right of the **Frame**, with no **Blanket**. It is 320 to 640 wide (400 by default) and **docks** beside the **Page** when it fits, from a Frame 1168 wide, and floats over the **Page** on the overlay material and shadow when it does not. Details and Notifications are its two types; the AI panel is its own region of the Frame. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height layer at the right of the **Frame**, with no **Blanket**. Details is 320 to 640 wide (400 by default) and floats over the **Page** on the overlay material and shadow at every width while the **Page** and **Sidebar** keep their full width. Details and Notifications are its two types; the AI panel is its own region of the Frame and is the only panel that **docks** beside the **Page** (from a Frame 1168 wide). The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
@@ -57,7 +57,7 @@ A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, s
 _Avoid_: "flyout" as our word, "hover menu"
 
 **Splitter**:
-The draggable edge of the docked **Panel**, a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
+The draggable edge of a right-hand **Panel** (from 1024 up), a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
 _Avoid_: "resize handle", "drag bar"
 
 **Page**:
@@ -65,7 +65,7 @@ The template for the main content area inside a **Frame**: it carries the page t
 _Avoid_: "surface" as a name
 
 **Section**:
-The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail`, a sunken **Card** that expands inline inside the Section and pushes the content below it down. A queue page does not use it: it docks a **Panel** beside the list. A bare "Section" always means this template.
+The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail`, a sunken **Card** that expands inline inside the Section and pushes the content below it down. A queue page does not use it: it opens a floating **Panel** over the list. A bare "Section" always means this template.
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:

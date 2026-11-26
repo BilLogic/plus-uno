@@ -96,7 +96,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 |   | [`Card`](../../src/templates/Card/Card.mdx) | `import { Card } from '@/templates';` | A container for one student, session, metric or other object, with slots for an image, header, body and footer. |
 |   | [`Table`](../../src/templates/Table/Table.mdx) | `import { Table } from '@/templates';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
 | Overlays | [`Modal`](../../src/templates/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | A dialog for one task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps. |
-|   | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer with no Blanket. Details sits on the right, docked beside the Page when it fits and floating over it when it does not; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. The AI panel is a region of the Frame. |
+|   | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer with no Blanket. Details floats over the right of the Page at every width; Notifications, the Inbox, sits at the start beside the Sidebar. Two types: Details and Notifications. Only the AI panel docks, as a Frame region. |
 |   | [`Popup`](../../src/templates/Popup/Popup.mdx) | `import { Popup } from '@/components';` | A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu. |
 
 ## UI components (95)

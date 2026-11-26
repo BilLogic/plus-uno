@@ -43,7 +43,7 @@ describe('browserFor: browser chrome frames full pages only', () => {
     it('is set on a Page or Panel story only when it renders a bare Frame, and on no Checklist widget', () => {
         const flagged = {
             'Page/Page.stories.jsx': ['AnatomyRecord', 'KeyBanner', 'ResponsiveWidth', 'ScenarioArea', 'ScenarioRecordTabs', 'ScenarioSeveralSections', 'ScenarioTwoLevels', 'TypeDefault', 'TypeFullWidth', 'TypeReading'],
-            'Panel/Panel.stories.jsx': ['ResponsiveWidth', 'WidthDocked', 'WidthFloating'],
+            'Panel/Panel.stories.jsx': ['ResponsiveWidth', 'Width'],
             'Page/Checklist.stories.jsx': [],
         };
         for (const [file, names] of Object.entries(flagged)) {

@@ -56,7 +56,7 @@ import './Section.scss';
  * DETAIL. An inline expand built on Base UI's Collapsible: a disclosure row
  * opens in place inside the Section and pushes the content below it down. It
  * is a sunken Card, so it takes the Card's pad and radius.
- * Queue pages dock a Panel beside the list instead.
+ * Queue pages open a floating Panel over the list instead.
  *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
  * commit changes belong in a card footer, not on the section.

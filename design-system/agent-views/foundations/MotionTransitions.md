@@ -213,15 +213,15 @@ Cancel plays the entrance backward, one speed faster, and nothing else changes. 
 
 | Tells the person | When | Not | PLUS case |
 | --- | --- | --- | --- |
-| This sits beside your work, and your work made room for it. | A panel takes space beside the page. | Floating above the page is Open an overlay. | The AI Panel docks on the right of Sessions and the table narrows. |
+| This sits beside your work, and your work made room for it. | The AI panel takes space beside the page. | Floating above the page is Open an overlay (used by Details Panels and narrower AI panels). | The AI panel docks on the right and the page narrows. |
 
 | What | Property | Token | Starts |
 | --- | --- | --- | --- |
 | Page | width, making room | `spatial.slow` | 0 |
-| Panel | slides in from its edge | `spatial.slow` | 0 |
-| Panel content | opacity in | `appearance.fast` | When the page is about 90% done making room |
+| AI panel | slides in from its edge | `spatial.slow` | 0 |
+| AI panel content | opacity in | `appearance.fast` | When the page is about 90% done making room |
 
-Below the docking width the Panel slides over with a Blanket.
+Below the docking width the AI panel slides over with no Blanket.
 
 ## Feedback
 
