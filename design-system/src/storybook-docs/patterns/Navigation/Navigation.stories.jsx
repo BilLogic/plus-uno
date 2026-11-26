@@ -166,7 +166,7 @@ export const KeyAreaPage = {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'nothing to climb out of').toBeNull();
         await expect(canvas.getByRole('button', { name: 'Add student' }).closest('.plus-template-section-actions'), 'the add action is in the Section title row').not.toBeNull();
-        await expectSectionHeader(canvasElement, 1);
+        await expectSectionHeader(canvasElement, 0);
         await fitsCanvas(canvasElement);
     },
 };

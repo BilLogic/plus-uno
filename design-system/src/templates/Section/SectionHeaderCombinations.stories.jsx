@@ -118,7 +118,7 @@ export const Catalog = {
             ) : (
                 <div key={item.id} data-case={item.id} style={caseItem}>
                     <Heading as="div" size="xs">{`${item.id} · ${item.label}`}</Heading>
-                    {item.node}
+                    <article aria-label={`${item.id}: ${item.label}`}>{item.node}</article>
                 </div>
             )))}
         </div>
