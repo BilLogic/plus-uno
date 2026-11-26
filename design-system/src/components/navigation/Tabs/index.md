@@ -181,7 +181,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | Baseline and bar | `--ds-border`, `--border-width-default`; `--ds-border-selected`, `--border-width-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
 | Selected pill | `--ds-background-neutral`, `--ds-text`; `--ds-background-neutral-hovered`, `--ds-background-neutral-pressed` |
-| Gap | `--stack-md`, pill strip `--inline-lg` (12) |
+| Gap | Icon to label `--stack-md` (8). Between tabs: none on the underline strip, `--inline-lg` (12) on the pill strip. |
 | Panel offset | `--section-stack-sm` |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` |
 
