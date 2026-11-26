@@ -60,6 +60,8 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 ## Size and layout
 
+<ComponentExample of={SpinnerStories.Size12} title="12" description="Inside a small tag or a line of 12-point text, where it stands in for an icon at the same size." />
+
 <ComponentExample of={SpinnerStories.Size16} title="16" description="For a small control or a line of text." />
 
 <ComponentExample of={SpinnerStories.Size24} title="24" description="The default." />
@@ -171,7 +173,7 @@ about 300 ms, show nothing so the indicator does not flicker.
 </thead>
 <tbody>
 <tr><td>Ring</td><td><code>currentColor</code>; <code>--ds-icon-inverse</code> for <code>invert</code>.</td></tr>
-<tr><td>Size</td><td><code>--spinner-size-sm</code> (16), <code>--spinner-size-md</code> (24), <code>--spinner-size-lg</code> (48), on the size scale (<code>--size-100</code>, <code>--size-150</code>, <code>--size-300</code>), read through <code>--plus-spinner-size</code>.</td></tr>
+<tr><td>Size</td><td><code>--icon-sm</code> (12), <code>--spinner-size-sm</code> (16), <code>--spinner-size-md</code> (24), <code>--spinner-size-lg</code> (48), on the size scale (<code>--size-100</code>, <code>--size-150</code>, <code>--size-300</code>), read through <code>--plus-spinner-size</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -183,7 +185,7 @@ about 300 ms, show nothing so the indicator does not flicker.
 
 ### Size the spinner to its container.
 
-A small control takes the `size={16}` spinner; `size={48}` dwarfs the label it replaces.
+A small control takes the `size={16}` spinner, and a 20-tall tag the `size={12}` one; `size={48}` dwarfs the label it replaces.
 
 <DoDontPair
     doExample={<FigureRow><Spinner size={16} /><span>Saving notes</span></FigureRow>}

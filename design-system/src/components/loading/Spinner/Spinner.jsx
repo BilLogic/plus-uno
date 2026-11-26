@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Spinner.scss';
 
-export const SPINNER_SIZES = [16, 24, 48];
+export const SPINNER_SIZES = [12, 16, 24, 48];
 export const SPINNER_APPEARANCES = ['inherit', 'invert'];
 
 /**
@@ -27,7 +27,7 @@ const Spinner = ({
 );
 
 Spinner.propTypes = {
-    /** A pixel diameter: 16, 24 or 48. */
+    /** A pixel diameter: 12, 16, 24 or 48. The first three follow the icon sizes. */
     size: PropTypes.oneOf(SPINNER_SIZES),
     /** `inherit` takes the surrounding text color; `invert` is for a bold or colored background. */
     appearance: PropTypes.oneOf(SPINNER_APPEARANCES),

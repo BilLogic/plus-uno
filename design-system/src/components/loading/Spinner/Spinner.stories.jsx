@@ -39,7 +39,7 @@ export const Sizes = {
     ),
     play: async ({ canvasElement }) => {
         // Each size reads a spinner-size token and keeps its pixel value.
-        const scale = { 16: '--spinner-size-sm', 24: '--spinner-size-md', 48: '--spinner-size-lg' };
+        const scale = { 12: '--icon-sm', 16: '--spinner-size-sm', 24: '--spinner-size-md', 48: '--spinner-size-lg' };
         for (const el of canvasElement.querySelectorAll('.plus-spinner')) {
             const size = Number(el.dataset.size);
             await expect(el.getBoundingClientRect().width, `size ${size}`).toBe(size);
@@ -49,6 +49,8 @@ export const Sizes = {
 };
 
 /** One story per `size` value. */
+export const Size12 = () => <Spinner size={12} />;
+
 export const Size16 = () => <Spinner size={16} />;
 
 export const Size24 = () => <Spinner size={24} />;

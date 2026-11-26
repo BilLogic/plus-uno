@@ -14,7 +14,7 @@ Also asked as: lozenge, pill, state label.
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — ColoredMaterial, Styles, WithCount, TrailingMetricAppearance, IconBefore, Overflow, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — ColoredMaterial, Styles, WithCount, TrailingMetricAppearance, IconBefore, Overflow, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled, WithMenu, MenuRest, MenuHovered, MenuPressed, MenuFocused, MenuOpen, MenuPick, MenuLoading, MenuDisabled, MenuKeyboard, MenuAccessibleName, InteractiveMenu
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 
@@ -23,6 +23,11 @@ Also asked as: lozenge, pill, state label.
 Use `StatusTag` for the condition something is in when that condition can change:
 completed, needs review, missed, in progress. It is the same component whether
 the system calculated the state or a person set it.
+
+Give it a `menu` where a person changes the status in place: attendance,
+engagement or a workflow status in a row. The tag becomes the trigger of a
+`DropdownMenu` and the rows are `ButtonItem`s, the current one `isSelected`.
+Leave `menu` off where nobody changes the status there.
 
 Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 `spacing="spacious"` (`32`) beside a heading.
@@ -40,6 +45,9 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 
 ## Alternatives
 
+- For a status that nobody changes in that place, leave `menu` off: the tag stays a label.
+- For a status inside a form that a Save button submits, use `Select`.
+- For a menu that only reads, with nothing to pick, use `Popup`.
 - For a number on its own, use `CountTag`.
 - For a due or event date, use `DateTag`.
 - For a change over time such as "+3 vs last week", use `ChangeTag`.
@@ -85,18 +93,39 @@ Don't: Two labels that read as unrelated.
 only when the number carries a different meaning from the status, such as a
 success status with a danger count of failures.
 
-### Edit in the field, not on the label. {#edit-in-the-field-not-on-the-label}
+### Add a menu where the status changes in place. {#add-a-menu-where-the-status-changes-in-place}
 
-A Status tag never opens a menu. Where a status can be changed, the field around
-it uses a `Select` whose options are grouped To do · In progress · Complete ·
-Exception · Failed, each group with one appearance (neutral · info · success ·
-warning · danger).
+A row full of `Select` fields is heavy for a value a person mostly reads and
+sometimes flips. Give the tag a `menu` there. Elsewhere, leave it a label.
+
+Do: A menu where the status is flipped in the row.
+Don't: A menu that only reads is a Popup.
+
+### List the other statuses, each one a row. {#list-the-other-statuses-each-one-a-row}
+
+Each row is a `ButtonItem` with the same wording as the tag it stands for, and
+the current one is `isSelected`. Picking one closes the menu.
+
+### Name the tag by field, record and status. {#name-the-tag-by-field-record-and-status}
+
+Do: A name with the field, the record and the status.
+Don't: A name that does not say which field or record.
+
+### Use spacious beside buttons. {#use-spacious-beside-buttons}
+
+Use `spacing="spacious"` so the heights line up with the buttons around the
+tag, and `default` in table rows and lists.
 
 ## Accessibility
 
-- **Read as its text.** A Status tag is a `span` with no role, so a screen reader
+- **Read as its text.** Without a `menu`, a Status tag is a `span` with no role, so a screen reader
   announces its text and nothing suggests it can be pressed. An `onClick` is
   dropped with a development warning.
+- **A button with a menu.** With a `menu` it is a `button` with `aria-haspopup="menu"`
+  and `aria-expanded`. Its name is the `aria-label`, "field, record: status", so
+  a truncated label stays readable through the name and the menu.
+- **Keyboard.** Enter, Space and ArrowDown open the menu, arrows move through the
+  rows, and Escape closes it and returns focus to the tag.
 - **Not a tab stop, unless truncated.** When the label is clipped, the Status tag
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
@@ -109,7 +138,9 @@ warning · danger).
 ## Related
 
 - `CountTag`: use when nesting a metric inside `StatusTag` through `trailingMetric`.
-- `Select`: use when letting a person change a record's status in a form or table cell.
+- `DropdownMenu`: the menu the tag opens. Its rows are `ButtonItem`s.
+- `Select`: use when letting a person change a status in a form that a Save button submits.
+- `Spinner`: the loading ring, `size={'{12}'}` on a default tag and `size={'{16}'}` on a spacious one.
 
 Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` · `TagGroup`
 
@@ -119,15 +150,18 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a 16 `CountTag` nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
+5. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the menu is open.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | The only state. A status that can change is edited in the field around it. |
-| Hovered, pressed | None. It is a label, not a control; the thing around it is what responds. |
-| Focused | None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text. |
-| Disabled | None. A label is never dimmed; a disabled thing is described by the control beside it. |
+| Rest | Without a menu, the only state: a label for the condition something is in. |
+| Hovered, pressed | Without a menu, none: it is a label. With a menu, the tone's hovered and pressed backgrounds. |
+| Focused | Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring. |
+| Open | With a menu only: drawn selected, on the pressed background, with the chevron up. |
+| Loading | With a menu only: the content is hidden at `opacity: 0`, keeping its width, with one spinner centered over it. |
+| Disabled | Without a menu, none: a label is never dimmed. With a menu, the disabled background and text, with no opacity. |
 
 ### Tokens
 
@@ -136,6 +170,10 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 | Padding and gap | `--pad-x-xs` on the leading edge, `--tag-pad-x-end-compact` on the trailing edge, `--tag-gap-compact` between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` leading, `--tag-pad-x-end` trailing, `--tag-gap` between icon and label. |
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
+| With a menu: padding and gap | `--pad-x-xs` on both sides with `--stack-sm` between the label and the chevron; spacious `--pad-x-md` on both sides with `--tag-gap`. |
+| With a menu: chevron and spinner | The chevron is `--icon-sm` (12), or `--icon-md` (16) when spacious. The spinner is `size={12}` (`--icon-sm`), or `size={16}` when spacious. |
+| With a menu: hovered, pressed, open | The tone's `--ds-background-&lt;tone&gt;-hovered` and `-pressed`; open uses the pressed one. |
+| With a menu: disabled | `--ds-background-disabled` and `--ds-text-disabled`, with no opacity. |
 | Neutral | `--ds-background-neutral`, `--ds-text`, edge `--ds-background-neutral-pressed`. |
 | Success, warning, danger | The same three for each: `--ds-background-success`, `--ds-text-success`, edge `--ds-background-success-pressed`. |
 | Info and discovery | `--ds-background-information` and `--ds-background-discovery`, with their text and pressed steps. |
@@ -161,6 +199,12 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
+| `menu` | node | — | The menu's rows, `ButtonItem`s from `@/components`, the current one `isSelected`. With it the tag is a button that opens the menu; without it the tag is a label. Name it with `aria-label`: "Attendance, Hermione Granger: Present". |
+| `isOpen` | bool | — | Controlled open state of the menu. Pair it with `onOpenChange`. The open tag is drawn as selected. |
+| `defaultOpen` | bool | — | Whether an uncontrolled menu starts open. |
+| `onOpenChange` | func | — | Called with the next open state when the menu opens or closes. |
+| `isLoading` | bool | `false` | A change is saving: the content hides, keeping its width, and a spinner draws over the tag. The tag cannot be pressed. |
+| `isDisabled` | bool | `false` | Prevents opening the menu. Drawn in the disabled tokens, never faded. |
 | `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
 | `id` | string | — | The `id` attribute of the tag element. |
 
@@ -178,8 +222,12 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-discovery` · `--ds-background-discovery-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-discovery` · `--ds-text-information` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-danger` · `--ds-background-danger-hovered` · `--ds-background-danger-pressed` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-background-discovery-pressed` · `--ds-background-information` · `--ds-background-information-hovered` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-hovered` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-hovered` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-discovery` · `--ds-text-information` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-hovered` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-control-md` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-x-end` · `--tag-pad-x-end-compact`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
+
+## Figma
+
+- "Status tag" node 20095:99 in file zAecJNRdvJzAUOcjV32tRX
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
