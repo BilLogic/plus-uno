@@ -16,6 +16,7 @@
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "./auth";
+import { geminiCredentialPath } from "./credential";
 import { countedFetch } from "../net";
 import { takesThinkingLevel } from "../agent/gemini-tiers";
 
@@ -45,22 +46,23 @@ interface GenerateContentResponse {
   error?: { code?: number; message?: string };
 }
 
+// The fallback warning fires once per isolate: this runs on every call, and a
+// line per call would bury the one signal it exists to give.
+let warnedFallback = false;
+
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
-  // KEY FIRST (ADR-053, which reverses ADR-018): one credential wins
-  // deterministically, so which auth and billing boundary served a request never
-  // depends on which other secrets happen to exist. The key is the path the
-  // semantic index's embedding model already lives on, and with the region at
-  // "global" the Vertex-only cachedContents path was already inlining, so
-  // choosing it gives up no caching.
-  if (env.GEMINI_API_KEY) return "api-key";
-  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+  // Key first (ADR-053, which reverses ADR-018); the order lives in
+  // ./credential.ts. With the region at "global" the Vertex-only cachedContents
+  // path was already inlining, so choosing the key gives up no caching.
+  const path = geminiCredentialPath(env);
+  if (path === "service-account" && !warnedFallback) {
+    warnedFallback = true;
     // Loud on purpose: the key going missing (rotation, rename, typo) silently
     // shifting traffic to a different auth/billing boundary is the failure mode
     // a single deterministic path exists to catch.
     console.warn("[gemini] GEMINI_API_KEY is not set — falling back to the Vertex service account");
-    return "service-account";
   }
-  return null;
+  return path;
 }
 
 /**

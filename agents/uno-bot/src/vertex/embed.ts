@@ -12,7 +12,8 @@
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "../gemini/auth";
 import { countedFetch } from "../net";
-import { embedModelName } from "./embed-model";
+import { geminiCredentialPath, hasServiceAccount } from "../gemini/credential";
+import { VERTEX_MODEL, embedModelName } from "./embed-model";
 
 export { embedModelName } from "./embed-model";
 export type { EmbedCredentials } from "./embed-model";
@@ -24,10 +25,7 @@ const TIMEOUT_MS = 8000;
 export type EmbedTaskType = "RETRIEVAL_QUERY" | "RETRIEVAL_DOCUMENT";
 
 export function embeddingsConfigured(env: Env): boolean {
-  return Boolean(
-    env.GEMINI_API_KEY ||
-      (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID),
-  );
+  return geminiCredentialPath(env) !== null;
 }
 
 /** Embed one string. Returns the vector, or null on any error (caller falls back). */
@@ -52,19 +50,22 @@ export async function embedText(
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   const model = embedModelName(env, modelOverride);
   try {
-    // ORDER MATTERS: the key wins, as in `geminiConfigured`, because the model
-    // it reaches is the one the live index was built with, and vectors from
-    // different models are NOT comparable. `embedModelName` declares whichever
-    // model this request actually used, with the same precedence, so the query
-    // and the index never disagree.
-    if (env.GEMINI_API_KEY) {
+    // The transport follows the credential predicate, so it agrees with the
+    // model `embedModelName` declares. One exception: the Vertex-only model is
+    // served by Vertex alone, so a request that names it goes to the service
+    // account even when a key is set, and has nowhere to go without one.
+    const path =
+      model === VERTEX_MODEL
+        ? hasServiceAccount(env) ? "service-account" : null
+        : geminiCredentialPath(env);
+    if (path === "api-key") {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`;
       const res = await countedFetch(url, {
         method: "POST",
         // The key rides in a HEADER, not `?key=`: a query string is kept in
         // proxy logs and error reports, and this path is the one a local dev
         // run uses with a personal key.
-        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY! },
         body: JSON.stringify({
           model: `models/${model}`,
           content: { parts: [{ text: t }] },
@@ -77,7 +78,7 @@ export async function embedText(
       const data = (await res.json()) as { embedding?: { values?: number[] } };
       return data.embedding?.values ?? null;
     }
-    if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
+    if (path === "service-account") {
       const token = await getGoogleAccessToken(env);
       const url =
         `https://${EMBED_REGION}-aiplatform.googleapis.com/v1/projects/${env.GEMINI_PROJECT_ID}` +

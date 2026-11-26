@@ -8,17 +8,15 @@
 // to. So it is driven on its own. (Compiling `embed.ts` was never the problem;
 // `tsconfig.test.json` globs `src/**` and types the Workers globals — #595.)
 
+import { geminiCredentialPath } from "../gemini/credential";
+import type { GeminiCredentials } from "../gemini/credential";
+
 /**
  * Only the credential fields the choice depends on, rather than the Worker's
  * whole `Env` — which would drag the runtime types back in and defeat the
  * point of the split. The Worker's `Env` is assignable to this.
  */
-export type EmbedCredentials = {
-  GEMINI_SA_EMAIL?: string;
-  GEMINI_SA_PRIVATE_KEY?: string;
-  GEMINI_PROJECT_ID?: string;
-  GEMINI_API_KEY?: string;
-};
+export type EmbedCredentials = GeminiCredentials;
 
 /** The Vertex service-account path's model. */
 export const VERTEX_MODEL = "text-embedding-005";
@@ -32,7 +30,7 @@ export const VERTEX_MODEL = "text-embedding-005";
  * reachable through BOTH transports and is what the index is built with, so
  * the key path, which now wins whenever the key is set, speaks it.
  */
-export const AISTUDIO_MODEL = "gemini-embedding-001";
+export const GEMINI_API_MODEL = "gemini-embedding-001";
 
 /**
  * Which model `embedText` WOULD use, given this env and an optional override.
@@ -48,10 +46,7 @@ export const AISTUDIO_MODEL = "gemini-embedding-001";
  */
 export function embedModelName(env: EmbedCredentials, override?: string): string {
   if (override) return override;
-  // Same order as `geminiConfigured` (ADR-053): the key wins, so a deployment
-  // holding both credentials embeds with the model the live index holds.
-  if (env.GEMINI_API_KEY) return AISTUDIO_MODEL;
-  return env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID
-    ? VERTEX_MODEL
-    : AISTUDIO_MODEL;
+  // Same predicate as `geminiConfigured` (ADR-053): a deployment holding both
+  // credentials embeds with the model the live index holds.
+  return geminiCredentialPath(env) === "service-account" ? VERTEX_MODEL : GEMINI_API_MODEL;
 }

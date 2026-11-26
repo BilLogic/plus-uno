@@ -6,6 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Env } from "../src/types";
 import { geminiConfigured } from "../src/gemini/client";
+import { geminiCredentialPath, hasServiceAccount } from "../src/gemini/credential";
 import { embedModelName } from "../src/vertex/embed-model";
 
 const SA = {
@@ -39,11 +40,31 @@ test("both credentials set: the API key wins, and nothing warns", () => {
   assert.deepEqual(warned, []);
 });
 
-test("the service account alone is the fallback, and it is loud", () => {
-  const { result, warned } = warnings(() => geminiConfigured(SA as unknown as Env));
+test("the service account alone is the fallback, loud once per isolate", () => {
+  // This is the first service-account-only call in this file, and the warning
+  // is spent by it: the second call, the one after it, stays quiet.
+  const { result, warned } = warnings(() => {
+    const first = geminiConfigured(SA as unknown as Env);
+    geminiConfigured(SA as unknown as Env);
+    return first;
+  });
   assert.equal(result, "service-account");
   assert.equal(warned.length, 1);
   assert.match(warned[0] ?? "", /GEMINI_API_KEY/);
+});
+
+test("the predicate is pure and answers the same order without logging", () => {
+  const { result, warned } = warnings(() => [
+    geminiCredentialPath(KEY),
+    geminiCredentialPath({ ...SA, ...KEY }),
+    geminiCredentialPath(SA),
+    geminiCredentialPath({ GEMINI_PROJECT_ID: "a-project" }),
+    geminiCredentialPath({}),
+  ]);
+  assert.deepEqual(result, ["api-key", "api-key", "service-account", null, null]);
+  assert.deepEqual(warned, []);
+  assert.equal(hasServiceAccount(SA), true);
+  assert.equal(hasServiceAccount({ ...SA, GEMINI_PROJECT_ID: "" }), false);
 });
 
 test("a half-configured service account is no credential at all", () => {
@@ -57,4 +78,5 @@ test("embeddings follow the same order: key, then service account", () => {
   assert.equal(embedModelName(KEY), "gemini-embedding-001");
   assert.equal(embedModelName({ ...SA, ...KEY }), "gemini-embedding-001");
   assert.equal(embedModelName(SA), "text-embedding-005");
+  assert.equal(embedModelName({}), "gemini-embedding-001");
 });
