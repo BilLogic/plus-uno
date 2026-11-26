@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Breadcrumb, DynamicTable, PageHeader, PopupSelect, Sidebar, Tabs } from '@/components';
+import { Breadcrumb, DynamicTable, PageHeader, PopupSelect, SearchField, Sidebar, Tabs } from '@/components';
 import { Card, Page, Section } from '@/templates';
 
 /**
@@ -163,13 +163,22 @@ export const OneTabSystem = () => {
             )}
         >
             {tab === 'overview' ? (
-                <Section title="Overview">
+                <Section title="Overview" isTitleHidden>
                     <Card title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
                 </Section>
             ) : (
                 <Section
                     title="Sessions"
-                    views={<PopupSelect label="Status" options={STATUS_OPTIONS} value={status} onChange={setStatus} isSearchable={false} />}
+                    isTitleHidden
+                    search={<SearchField mode="active" spacing="compact" placeholder="Search sessions" />}
+                    filters={[{
+                        key: 'status',
+                        label: 'Status',
+                        text: STATUS_OPTIONS.find((option) => option.value === status).label,
+                        menu: (trigger) => (
+                            <PopupSelect label="Status" options={STATUS_OPTIONS} value={status} onChange={setStatus} isSearchable={false} placement="bottom-start" trigger={trigger} />
+                        ),
+                    }]}
                 >
                     <SessionsTable status={status} />
                 </Section>

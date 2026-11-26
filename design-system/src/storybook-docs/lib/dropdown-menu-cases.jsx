@@ -52,7 +52,7 @@ export const LiveMenu = ({
                     }}
                     placement="bottom-start"
                     minWidth={minWidth}
-                    trigger={trigger ?? <Button text={label} iconAfter={<Icon name="chevron-down" size={12} />} />}
+                    trigger={trigger ?? <Button text={label} iconAfter={<Icon name="angle-down" size={12} />} />}
                     {...menuProps}
                 >
                     {children}

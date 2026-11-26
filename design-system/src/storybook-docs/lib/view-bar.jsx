@@ -8,7 +8,7 @@ import { typeStyle } from './type-style.js';
  * on, shared by the Section template's stories and every pattern page. Each
  * part is the real PLUS component; only the arrangement lives here.
  *
- *   ViewPills       pill views: a fixed set, one pill even with one view
+ *   ViewPills       pill views: a fixed set of two or more
  *   FormatSwitch    the Table / Cards segmented control
  *   StudentsTable   a Dynamic table of tutoring rows (STUDENTS)
  *   FilterSide      the filter side: "Reset filters" at its top, a count per category
@@ -78,7 +78,7 @@ export const StudentsTable = ({ count = 4, sortable = false, view, checked, rows
 
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 
-/** Pill views: a fixed set the product defines, one pill even with one view. */
+/** Pill views: a fixed set the product defines, two or more; with one view a Section has no views row. */
 export const ViewPills = ({ views, activeView, onViewChange }) => {
     const [uncontrolled, setUncontrolled] = useState(views[0]);
     const active = activeView ?? uncontrolled;

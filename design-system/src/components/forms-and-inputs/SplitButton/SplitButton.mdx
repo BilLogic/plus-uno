@@ -16,7 +16,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 <Meta of={SplitButtonStories} />
 
 <Title />
-A primary action joined to a chevron that opens a menu of related actions.
+A primary action joined to an angle that opens a menu of related actions.
 
 <DocsTabs of={SplitButtonStories}>
 
@@ -33,7 +33,7 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 ## Layout
 
-<ComponentExample of={SplitButtonStories.Overview} title="Default" description="A main action beside a chevron that opens related actions." />
+<ComponentExample of={SplitButtonStories.Overview} title="Default" description="A main action beside an angle that opens related actions." />
 
 <ComponentExample of={SplitButtonStories.Appearances} title="Appearance" description="Match appearance on both children." />
 
@@ -45,7 +45,7 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 ## State
 
-<ComponentExample of={SplitButtonStories.MenuState} title="Menu open" description="The chevron shows the menu is open." />
+<ComponentExample of={SplitButtonStories.MenuState} title="Menu open" description="The angle shows the menu is open." />
 
 <ComponentExample of={SplitButtonStories.States} title="States" description="Selected, disabled and loading." />
 
@@ -110,7 +110,7 @@ Use `SplitButton` when one action is clearly primary and a few related variation
 
 1. **Action.** A Button for the primary action.
 2. **Seam.** The two children meet at a flat edge: inner corners are square, outer corners keep the button radius.
-3. **Menu trigger.** An Icon button with a chevron that opens the related actions.
+3. **Menu trigger.** An Icon button with an angle that opens the related actions.
 
 ### States
 
@@ -151,9 +151,9 @@ Use `SplitButton` when one action is clearly primary and a few related variation
 The primary action and the menu trigger share one outline and one height.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More save options" /></SplitButton>}
     doCaption="One outline around both halves."
-    dontExample={<FigureRow><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></FigureRow>}
+    dontExample={<FigureRow><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More save options" /></FigureRow>}
     dontCaption="Two separate buttons with a gap."
 />
 
@@ -166,35 +166,35 @@ Every menu item is a variation of the primary action: "Save", then "Save as draf
 The half people use most sits on the face; the rarer ones go in the menu.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More save options" /></SplitButton>}
     doCaption={'"Save" on the face.'}
-    dontExample={<SplitButton><Button appearance="primary" text="Save as template" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
+    dontExample={<SplitButton><Button appearance="primary" text="Save as template" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More save options" /></SplitButton>}
     dontCaption={'The rarely used "Save as template" on the face.'}
 />
 
 ### Match appearance and spacing on both children yourself.
 
 `SplitButton` draws the seam but sets no styling of its own. Pass the same
-`appearance` and `spacing` to the `Button` and the chevron `IconButton` so
+`appearance` and `spacing` to the `Button` and the angle `IconButton` so
 the control reads as one piece.
 
 <DoDontPair
-    doExample={<SplitButton><Button appearance="primary" text="Send" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More send options" /></SplitButton>}
+    doExample={<SplitButton><Button appearance="primary" text="Send" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More send options" /></SplitButton>}
     doCaption="Both halves use the primary appearance."
-    dontExample={<SplitButton><Button text="Send" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More send options" /></SplitButton>}
+    dontExample={<SplitButton><Button text="Send" /><IconButton appearance="primary" icon={<Icon name="angle-down" size={12} />} label="More send options" /></SplitButton>}
     dontCaption="The two halves disagree on appearance, so they read as two controls."
 />
 
 ```jsx
 <SplitButton>
     <Button text="Send" onClick={send} appearance="primary" />
-    <IconButton icon={<Icon name="chevron-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
+    <IconButton icon={<Icon name="angle-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
 </SplitButton>
 ```
 
-### Open the menu from the chevron's own click handler.
+### Open the menu from the angle's own click handler.
 
-`SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
+`SplitButton` has no menu logic itself — wire the angle's `onClick` to open
 a `Popup` or `DropdownMenu` positioned under it.
 
 ### Let a `SplitButton` action label longer than its room end in an ellipsis.
@@ -229,7 +229,7 @@ The menu button keeps its size at the seam, and the pair stays inside its slot. 
   assistive technology reads the action and its menu trigger as related. It
   has no name of its own; pass `aria-label` to give it one.
 - **Each child keeps its own accessible name.** The primary action needs its
-  own label; the chevron's `IconButton` needs a label describing what its
+  own label; the angle's `IconButton` needs a label describing what its
   menu holds, not a generic "more."
 
 </div>
@@ -239,8 +239,8 @@ The menu button keeps its size at the seam, and the pair stays inside its slot. 
 ## Related
 
 - `ButtonGroup`: use when grouping peer actions with no single primary.
-- `DropdownMenu`: use when the chevron opens a menu of action items.
-- `Popup`: use when the chevron opens a custom overlay panel.
+- `DropdownMenu`: use when the angle opens a menu of action items.
+- `Popup`: use when the angle opens a custom overlay panel.
 
 </div>
 

@@ -4,9 +4,9 @@ import { clsx } from 'clsx';
 import './SplitButton.scss';
 
 /**
- * Split button: a primary action joined to a chevron that opens a menu of
+ * Split button: a primary action joined to an angle that opens a menu of
  * related actions. Composed from two children — a `Button` for the action and
- * an `IconButton` (chevron) for the menu trigger — each carrying its own
+ * an `IconButton` (angle) for the menu trigger — each carrying its own
  * appearance, spacing and state; `SplitButton` only draws the seam between
  * them and groups them for assistive tech.
  */

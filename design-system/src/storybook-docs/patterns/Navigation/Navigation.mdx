@@ -67,7 +67,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.TierPageTabs} title="Page tabs" description="Views of one record, at the bottom of the page header. Only the selected indicator glides; content swaps in place." />
 
-<ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={'Under page tabs a Section has no pill views: its views become one labeled PopupSelect at the start of the bar ("Status: Upcoming"), picking a view and not a filter.'} />
+<ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={'Under page tabs a Section has no views row. A switch such as Status is a quick filter after Search ("Status: Upcoming").'} />
 
 <ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary in its Section's title row." />
 
@@ -163,12 +163,12 @@ Never on an area page or a multi-step task. It sits above the title in the page 
 
 <RuleTag kind="automatic" />
 
-Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
+Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section has no views row: a switch such as Status is a quick filter after Search, a `FilterButton` that opens a `PopupSelect`.
 
 <DoDontPair
     doExample={<OneTabSystemCase />}
     doCode={CODE.OneTabSystem}
-    doCaption="Under page tabs the Section's views are one labeled PopupSelect at the start of its bar."
+    doCaption="Under page tabs the Section has no views row; Status is a quick filter after Search."
     dontExample={<TwoTabSystemsCase />}
     dontCode={CODE.TwoTabSystems}
     dontCaption="Page tabs and pill views on the same page: two tab systems."
@@ -178,7 +178,7 @@ Either page tabs under the title, or pill views in a Section's bar, never both. 
 
 <RuleTag kind="review" />
 
-Two to five views of the same rows, named by short parallel nouns. Nobody adds or edits views. One pill stays even with one view, so nothing moves when a second arrives.
+Two to five views of the same rows, named by short parallel nouns. Nobody adds or edits views. Views need two or more: with one view the Section has no views row, and no lone pill.
 
 ### Swap content in place between views and tabs.
 

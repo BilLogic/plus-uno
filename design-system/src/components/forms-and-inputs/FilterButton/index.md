@@ -2,7 +2,7 @@
 
 # FilterButton
 
-Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.
+Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and an angle when it opens a menu.
 
 Also asked as: filter chip, filter control.
 
@@ -10,7 +10,7 @@ Also asked as: filter chip, filter control.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 
@@ -64,7 +64,7 @@ Don't: Subject has three values applied but shows no count.
 
 ### Let it hug its label. {#let-it-hug-its-label}
 
-Keep the natural width, so the chevron stays right after the name. Filter
+Keep the natural width, so the angle stays right after the name. Filter
 button has no prop to fill its container; don't stretch it across a wide row
 with your own styles.
 
@@ -81,7 +81,7 @@ Below the desktop breakpoint (`768px`), a row of filter buttons does not fit. Fo
 Do: The label is the filter's name.
 Don't: A verb phrase repeats what the button already does.
 
-### Turn off the chevron only when the button doesn't open a menu. {#turn-off-the-chevron-only-when-the-button-doesn-t-open-a-menu}
+### Turn off the angle only when the button doesn't open a menu. {#turn-off-the-angle-only-when-the-button-doesn-t-open-a-menu}
 
 `hasChevronDown` defaults to `true`. Set it `false` only for a filter that
 toggles directly on click, with nothing to open.
@@ -95,7 +95,7 @@ The name and the count keep their places, and the Tooltip is on only while the v
 - **A real button, unchanged.** `FilterButton` renders a `Button`
   underneath, so focus, activation and disabled/loading states all follow
   `Button`'s own contract.
-- **The chevron is decorative.** It signals that a menu opens, but the
+- **The angle is decorative.** It signals that a menu opens, but the
   accessible name comes from `text` and, when present, the applied count.
 
 ## Related
@@ -151,7 +151,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `text` | string (required) | — | The filter's name, or its value when `label` is set. |
 | `trailingMetric` | number or string | — | The count shown after the name. `0` shows; leave it out to hide it. |
 | `iconBefore` | string or node | — | The icon before the name, passed to Button: a Font Awesome name or a node. |
-| `hasChevronDown` | bool | `true` | The chevron that says a menu opens. |
+| `hasChevronDown` | bool | `true` | The angle that says a menu opens. |
 | `appearance` | enum | `'default'` | — |
 | `spacing` | enum | — | `default` draws 32. `compact` draws 24. |
 | `isSelected` | bool | — | — |

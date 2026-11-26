@@ -403,7 +403,7 @@ const Select = ({
                 />
             )}
             {!isReadOnly && (
-                <Icon name={shown ? 'caret-up' : 'caret-down'} className="plus-select-caret" />
+                <Icon name={shown ? 'angle-up' : 'angle-down'} className="plus-select-caret" />
             )}
         </>
     );

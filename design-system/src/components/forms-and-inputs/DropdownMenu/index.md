@@ -39,7 +39,7 @@ DropdownMenu reads these motion tokens and no literal duration or curve.
 
 - For picking a value in a form field, use `Select`.
 - For picking a single view or filter value from a button, use `PopupSelect`.
-- For one primary action joined to a chevron menu of related actions, use `SplitButton`.
+- For one primary action joined to an angle menu of related actions, use `SplitButton`.
 
 ## Best practices
 
@@ -47,7 +47,7 @@ DropdownMenu reads these motion tokens and no literal duration or curve.
 
 ```jsx
 // Picking "Rename" closes the menu: the common case for an action list.
-<DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+<DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="angle-down" size={12} />} />}>
     <ButtonItem onClick={onRename}>Rename</ButtonItem>
     <ButtonItem onClick={onArchive}>Archive</ButtonItem>
 </DropdownMenu>
@@ -112,7 +112,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Trigger.** Any element that opens the menu, usually a Button with a chevron.
+1. **Trigger.** Any element that opens the menu, usually a Button with an angle.
 2. **Menu.** A floating list 4px from the trigger, on the raised surface.
 3. **Rows.** Button items, Link items or Custom items, 32 tall at default and 24 at compact.
 4. **Section title and separator** (optional). Group related rows.
@@ -158,7 +158,7 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `trigger` | element (required) | — | The element that opens the menu. A `Button` with a chevron is the default pattern. |
+| `trigger` | element (required) | — | The element that opens the menu. A `Button` with an angle is the default pattern. |
 | `children` | node | — | The menu's rows: `Section`, `ButtonItem`, `LinkItem`, `CustomItem`. |
 | `isOpen` | bool | — | Controlled open state. Pair it with `onOpenChange`; leave it out for an uncontrolled menu. |
 | `defaultOpen` | bool | `false` | Whether an uncontrolled menu starts open. |

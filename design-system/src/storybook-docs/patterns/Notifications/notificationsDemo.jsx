@@ -12,7 +12,7 @@ import {
 } from '@/templates';
 import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Notifications pattern's examples, drawn with the real Flag, Banner,
@@ -134,7 +134,7 @@ export const TierPage = () => (
 export const TierSection = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-            <Section title="All students" isTitleHidden views={<ViewPills views={['All students']} />}>
+            <Section title="All students" isTitleHidden>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
                     <StudentsTable count={2} />

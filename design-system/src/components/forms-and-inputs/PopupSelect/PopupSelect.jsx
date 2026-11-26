@@ -20,7 +20,7 @@ export const POPUP_SELECT_SPACINGS = ['default', 'compact'];
  * - **One list, applied on pick.** Picking a row sets the value, the menu
  *   fades out, and focus goes back to the trigger. There is no Apply.
  * - **Two triggers.** With `label` and no `trigger`, the labeled trigger
- *   reads "Status: Upcoming" with a chevron, as the view switch under page
+ *   reads "Status: Upcoming" with an angle, as the view switch under page
  *   tabs. Pass `trigger` for anything else, such as a filter button in a
  *   Section header; a function gets `{ isOpen, option }`.
  * - **Placement follows the trigger's side.** A trigger at the start of a bar

@@ -299,7 +299,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     DropdownMenu: () => (
         <DropdownMenu
             trigger={(
-                <Button iconAfter="chevron-down" spacing="compact" onClick={NOOP}>
+                <Button iconAfter="angle-down" spacing="compact" onClick={NOOP}>
                     Session actions
                 </Button>
             )}
@@ -724,7 +724,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 Save notes
             </Button>
             <IconButton
-                icon="chevron-down"
+                icon="angle-down"
                 label="More save options"
                 appearance="primary"
                 spacing="compact"
@@ -790,7 +790,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
 
     Tabs: ({ step }) => (
         <div style={{ width: '100%' }}>
-            <Tabs activeKey={step === 'landing' ? 'notes' : 'goals'} onSelect={NOOP} spacing="compact">
+            <Tabs activeKey={step === 'landing' ? 'notes' : 'goals'} onSelect={NOOP}>
                 <Tabs.Tab eventKey="goals">Goals</Tabs.Tab>
                 <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
                 <Tabs.Panel eventKey="goals">Compare fractions on a number line.</Tabs.Panel>

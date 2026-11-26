@@ -2,7 +2,7 @@
 
 # SplitButton
 
-Split button: a primary action joined to a chevron that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (chevron) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.
+Split button: a primary action joined to an angle that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (angle) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.
 
 **Import:** `import { SplitButton } from '@/components';`
 
@@ -59,7 +59,7 @@ Don't: The rarely used "Save as template" on the face.
 ### Match appearance and spacing on both children yourself. {#match-appearance-and-spacing-on-both-children-yourself}
 
 `SplitButton` draws the seam but sets no styling of its own. Pass the same
-`appearance` and `spacing` to the `Button` and the chevron `IconButton` so
+`appearance` and `spacing` to the `Button` and the angle `IconButton` so
 the control reads as one piece.
 
 Do: Both halves use the primary appearance.
@@ -68,13 +68,13 @@ Don't: The two halves disagree on appearance, so they read as two controls.
 ```jsx
 <SplitButton>
     <Button text="Send" onClick={send} appearance="primary" />
-    <IconButton icon={<Icon name="chevron-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
+    <IconButton icon={<Icon name="angle-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
 </SplitButton>
 ```
 
-### Open the menu from the chevron's own click handler. {#open-the-menu-from-the-chevron-s-own-click-handler}
+### Open the menu from the angle's own click handler. {#open-the-menu-from-the-angle-s-own-click-handler}
 
-`SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
+`SplitButton` has no menu logic itself — wire the angle's `onClick` to open
 a `Popup` or `DropdownMenu` positioned under it.
 
 ### Let a `SplitButton` action label longer than its room end in an ellipsis. {#let-a-splitbutton-action-label-longer-than-its-room-end-in-an-ellipsis}
@@ -87,14 +87,14 @@ The menu button keeps its size at the seam, and the pair stays inside its slot. 
   assistive technology reads the action and its menu trigger as related. It
   has no name of its own; pass `aria-label` to give it one.
 - **Each child keeps its own accessible name.** The primary action needs its
-  own label; the chevron's `IconButton` needs a label describing what its
+  own label; the angle's `IconButton` needs a label describing what its
   menu holds, not a generic "more."
 
 ## Related
 
 - `ButtonGroup`: use when grouping peer actions with no single primary.
-- `DropdownMenu`: use when the chevron opens a menu of action items.
-- `Popup`: use when the chevron opens a custom overlay panel.
+- `DropdownMenu`: use when the angle opens a menu of action items.
+- `Popup`: use when the angle opens a custom overlay panel.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
@@ -102,7 +102,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 1. **Action.** A Button for the primary action.
 2. **Seam.** The two children meet at a flat edge: inner corners are square, outer corners keep the button radius.
-3. **Menu trigger.** An Icon button with a chevron that opens the related actions.
+3. **Menu trigger.** An Icon button with an angle that opens the related actions.
 
 ### States
 

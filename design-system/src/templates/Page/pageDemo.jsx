@@ -8,8 +8,8 @@ import {
     IconButton,
     PageHeader,
     PopupSelect,
+    SearchField,
     StatusTag,
-    Tabs,
     Heading,
 } from '@/components';
 import { Frame, Card, Section } from '@/templates';
@@ -66,7 +66,7 @@ export const DemoPageHeader = ({ breadcrumb, title, status, description, actions
 export const PageActions = () => (
     <>
         <Button text="Share" onClick={() => {}} />
-        <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />
+        <IconButton icon="ellipsis" label="More" appearance="default" onClick={() => {}} />
     </>
 );
 
@@ -92,53 +92,62 @@ export const SessionCards = ({ items = GROUP_SESSION_CARDS }) => (
 );
 
 /** A Section holding the cards under its own title. */
-export const CardsSection = ({ title, actions, description, items }) => (
-    <Section title={title} description={description} actions={actions}>
+export const CardsSection = ({ title, actions, description, items, isTitleHidden }) => (
+    <Section title={title} description={description} actions={actions} isTitleHidden={isTitleHidden}>
         <SessionCards items={items} />
     </Section>
 );
 
-/** The collection's views: one pill, even with one view. */
-export const StudentViews = () => (
-    <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
-        <Tabs.Tab eventKey="all">All students</Tabs.Tab>
-    </Tabs>
-);
-
-/** The Primary that adds a row: the Section's one action, in its title row. */
-export const AddStudentAction = () => (
-    <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
-);
+/** The Primary that adds a row: the Section's one action, in its title row. An element, not a component, so the Section can fold it to an icon under 768. */
+export const addStudentAction = <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />;
 
 const STATUS_OPTIONS = [
     { value: 'upcoming', label: 'Upcoming' },
     { value: 'past', label: 'Past' },
 ];
 
-/** The views as one labeled PopupSelect in the views row, the form under page tabs. */
-export const ViewSelect = ({ value, defaultValue = 'upcoming', onChange }) => (
-    <PopupSelect
-        label="Status"
-        options={STATUS_OPTIONS}
-        {...(value !== undefined ? { value, onChange } : { defaultValue })}
-        isSearchable={false}
-    />
-);
+/**
+ * Status as a quick filter after Search, the form a switch takes under page
+ * tabs: a `filters` entry whose FilterButton opens a PopupSelect.
+ */
+export const statusFilter = (value = 'upcoming', onChange = () => {}) => ({
+    key: 'status',
+    label: 'Status',
+    text: STATUS_OPTIONS.find((option) => option.value === value)?.label ?? 'Upcoming',
+    menu: (trigger) => (
+        <PopupSelect
+            label="Status"
+            options={STATUS_OPTIONS}
+            value={value}
+            onChange={onChange}
+            isSearchable={false}
+            placement="bottom-start"
+            trigger={trigger}
+        />
+    ),
+});
 
-/** The Section content under `PageTabs` (`overview`, `sessions`, `notes`). */
+/** The compact Search that leads the filters row. */
+export const SessionSearch = () => <SearchField mode="active" spacing="compact" placeholder="Search sessions" />;
+
+/**
+ * The Section content under `PageTabs` (`overview`, `sessions`, `notes`). Each
+ * tab holds one Section with no actions, so its title is hidden; under page
+ * tabs there is no views row, and Status is a quick filter after Search.
+ */
 export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStatusChange, overviewItems = STUDENT_SESSION_CARDS }) => {
     if (tab === 'overview') {
-        return <CardsSection title="Upcoming sessions" items={overviewItems} />;
+        return <CardsSection title="Upcoming sessions" items={overviewItems} isTitleHidden />;
     }
     if (tab === 'notes') {
         return (
-            <Section title="Tutor notes">
+            <Section title="Tutor notes" isTitleHidden>
                 <Card title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
             </Section>
         );
     }
     return (
-        <Section title="Sessions" views={<ViewSelect value={status} onChange={onStatusChange} />}>
+        <Section title="Sessions" isTitleHidden search={<SessionSearch />} filters={[statusFilter(status, onStatusChange)]}>
             <SessionsTable status={status} />
         </Section>
     );

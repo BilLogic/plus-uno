@@ -250,7 +250,7 @@ const RichTextEditor = ({
                                         appearance="subtle"
                                         spacing={toolbarBtnSpacing}
                                         className="plus-rich-text-editor-block-toggle"
-                                        iconAfter={<Icon name="chevron-down" size={12} />}
+                                        iconAfter={<Icon name="angle-down" size={12} />}
                                         isDisabled={isDisabled || isReadOnly}
                                     >
                                         {blockLabel}

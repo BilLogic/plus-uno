@@ -14,11 +14,11 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled, Overflow, OverflowMore
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled, Overflow, OverflowMore, NarrowScroll, NarrowMenu
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
-**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `spatial.fast` · enter `appearance.fast` · exit `appearance.fast` · scroll `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -31,8 +31,11 @@ separately.
 It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 `onSelect`). `alignment` covers left, center, right and `justified`, which
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
-`pill` (a filled, rounded selected tab); `spacing` is `default` (`--control-md`) or
-`compact` (`--control-sm`).
+`pill` (a filled, rounded selected tab). There is one size: a 32 tab
+(`--control-md`). `overflow` is `auto` by default: extra tabs fold into More,
+and on a narrow page (a Frame under 768) an underline strip scrolls sideways
+while a pill strip becomes one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
+`wrap` hold one form at every width.
 
 ## Motion
 
@@ -41,12 +44,15 @@ Tabs reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Switch views | `--ds-motion-spatial-fast` | The indicator glides; both tab bodies slide together toward the chosen tab, no fade. Pill views: the fill glides and the content swaps in place. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Narrow pill views: the selected pill opens the menu of every view, which fades in place with no clip or travel, as DropdownMenu does. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Picking a view, Escape or an outside click closes the menu on the same fade; the pill takes the new view's name at once. |
+| scroll | Scroll to a spot on the page | `--ds-motion-spatial-fast` | Narrow page tabs: when the selection moves, the strip scrolls the selected tab wholly into view, clear of the end fade, on the indicator's clock. On first draw it is placed at once; under reduced motion it jumps. |
 
 ## Alternatives
 
 - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
 - For more options than fit on one strip without wrapping, use `Select`.
-- For a second-level choice inside a view, use `PopupSelect`.
+- For a second-level choice inside a view, use a quick filter after Search that opens a `PopupSelect`.
 - For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
 
 ## Best practices
@@ -105,13 +111,13 @@ Don't: Counts and status in the label.
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip. {#let-a-tab-label-longer-than-its-cap-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. A `justified` strip shares the row and never folds. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. On a narrow page nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
-A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar.
+A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use a quick filter after Search: a `FilterButton` ("Status: Upcoming") that opens a `PopupSelect`.
 
-Do: One strip for the sections; a labeled PopupSelect for the choice inside one.
+Do: One strip for the sections; a quick filter for the choice inside one.
 Don't: A second strip under the first, so two tab systems compete.
 
 ### Swap content in place without sliding. {#swap-content-in-place-without-sliding}
@@ -131,11 +137,18 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
   `activeKey` contention without removing it from the strip's keyboard path.
 - **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
   matching `Tabs.Panel` gets no pointer at all.
+- **Narrow pill views are a menu button.** The selected pill carries
+  `aria-haspopup="menu"` and `aria-expanded`, and is named from the strip's
+  `aria-label` and the selected view ("Views: Active"). It opens from Enter,
+  Space or a click with focus on the checked row; each view is a
+  `menuitemradio` row, the selected one `aria-checked`, and each panel is
+  labeled by the trigger. Underline tabs that scroll stay a tablist, and the focused
+  tab's ring is drawn inside it so the strip's edge never clips it.
 
 ## Related
 
 - `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.
-- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar.
+- `PopupSelect`: use when a quick filter after Search opens a second-level choice inside a tab.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
@@ -161,8 +174,9 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
 | Part | Token |
 | --- | --- |
-| Tab height | `--control-md` (default), `--control-sm` (compact) |
-| Tab padding | `--pad-x-lg`, `--pad-x-md` |
+| Tab height | `--control-md` |
+| Tab padding | `--pad-x-lg` |
+| Narrow | scroll end fade `--inline-3xl`; menu chevron `--icon-sm`, check `--ds-icon-selected` |
 | Ink | `--ds-text-subtle`, selected `--ds-text-selected`, disabled `--ds-text-disabled` |
 | Baseline and bar | `--ds-border`, `--border-width-default`; `--ds-border-selected`, `--border-width-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
@@ -187,8 +201,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | `children` | node | — | `Tabs.Tab` elements, which fill the tablist, and the `Tabs.Panel` elements that follow it. |
 | `alignment` | enum | `'left'` | Horizontal alignment of the tab strip |
 | `appearance` | enum | `'default'` | Underline indicator (default), or a pill-shaped selected fill. |
-| `spacing` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
-| `overflow` | enum | `'collapse'` | `collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds. |
+| `overflow` | enum | `'auto'` | `auto` (default) folds what does not fit into More, and under 768 takes the narrow form: underline scrolls, pill becomes a menu. `collapse`, `scroll`, `menu` and `wrap` hold one form at every width. |
 | `className` | string | `''` | Extra class on the tabs root, beside `plus-tabs`. |
 | `id` | string | — | Id set on the tabs root. |
 | `defaultActiveKey` | string or number | — | The `eventKey` of the tab selected at first, for uncontrolled use. |
@@ -201,9 +214,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 
 **`appearance`** — `default` · `pill`
 
-**`spacing`** — `default` · `compact`
-
-**`overflow`** — `wrap` · `collapse`
+**`overflow`** — `auto` · `collapse` · `wrap` · `scroll` · `menu`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
@@ -232,7 +243,7 @@ Implemented as `Panel`.
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--border-width-default` · `--border-width-selected` · `--control-md` · `--control-sm` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--label-max-width` · `--pad-x-lg` · `--pad-x-md` · `--radius-control-md` · `--radius-control-sm` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--type-weight-medium`
+`--body-default` · `--body-default-tracking` · `--border-width-default` · `--border-width-selected` · `--control-md` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-icon-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-3xl` · `--inline-lg` · `--label-max-width` · `--pad-x-lg` · `--radius-control-md` · `--radius-full` · `--section-stack-sm` · `--stack-md` · `--tab-radius` · `--tabs-edge-fade` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 

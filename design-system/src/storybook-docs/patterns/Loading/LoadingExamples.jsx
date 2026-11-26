@@ -1,5 +1,5 @@
 import React from 'react';
-import { CustomItem, DropdownMenu, IconButton, SearchField, Skeleton, Spinner, Tabs } from '@/components';
+import { CustomItem, DropdownMenu, IconButton, SearchField, Skeleton, Spinner } from '@/components';
 import { Section } from '@/templates';
 
 /**
@@ -24,11 +24,6 @@ export const SkeletonInShape = () => (
     <Section
         title="Students"
         description="Lincoln Middle"
-        views={(
-            <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
-                <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
-            </Tabs>
-        )}
         search={<SearchField mode="active" spacing="compact" placeholder="Search students" />}
     >
         <section aria-label="Students" aria-busy="true">

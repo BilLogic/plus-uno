@@ -88,7 +88,8 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 |  | `circle-info` | Information |
 |  | `arrow-right` | Next or forward |
 |  | `arrow-left` | Back or previous |
-|  | `chevron-down` | Expand or open a menu |
+|  | `angle-down` | Open a list or menu |
+|  | `chevron-down` | Expand content in place |
 |  | `chevron-up` | Collapse |
 |  | `star` | Favorite or rating |
 
@@ -105,6 +106,8 @@ Don't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.
 ### Use 16 by default, 12 sparingly
 
 Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
+
+An angle opens a list or menu; a chevron expands content in place.
 
 Do: A 16 icon leads the label; the trailing chevron is 12.
 

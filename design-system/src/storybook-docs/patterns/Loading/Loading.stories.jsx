@@ -143,7 +143,7 @@ export const KeyUnderOneSecond = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('table'), 'the old rows stay').toBeInTheDocument();
-        await expectSectionHeader(canvasElement, 2);
+        await expectSectionHeader(canvasElement, 1);
         await expect(busy(canvasElement), 'nothing is marked busy yet').toBeNull();
         await expect(bars(canvasElement), 'no skeleton flashes').toHaveLength(0);
         await fitsCanvas(canvasElement);
