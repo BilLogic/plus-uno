@@ -185,6 +185,8 @@ branch. The composite itself takes about 14 seconds; the job around it adds one
 `npm ci` scoped to `agents/uno-bot`, which the Worker's `typecheck` and `test`
 rows need.
 
+`check:cross-repo` compares in CI when `BLUEPRINT_REPO_TOKEN` is configured: the workflow checks out `plus-uno-blueprint` into `.sibling-repos/` and points `BLUEPRINT_REPO` at it. A fork PR or an unconfigured token gets no checkout, and the check reports the blueprint pairings as SKIPPED in a `::warning::` annotation and the job summary. Locally, run `BLUEPRINT_REPO=<path to plus-uno-blueprint> npm run check:cross-repo`, or keep the checkout beside this repo.
+
 `npm run check:harness -- --list` prints what it composes, what it deliberately
 does not, and why. Those reasons are stated once, in `scripts/checks.registry.mjs` —
 the check registry — and add a new `check:*` script to that file's `CHECKS` or
