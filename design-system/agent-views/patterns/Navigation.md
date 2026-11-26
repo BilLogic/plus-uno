@@ -104,16 +104,16 @@ Don't: A breadcrumb on an area page: there is nothing to climb out of.
 
 **Checked:** Automatic
 
-Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
+Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section has no views row: a switch such as Status is a quick filter after Search, a `FilterButton` that opens a `PopupSelect`.
 
-Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
+Do: Under page tabs the Section has no views row; Status is a quick filter after Search.
 Don't: Page tabs and pill views on the same page: two tab systems.
 
 ### Make views a fixed set the product defines. {#make-views-a-fixed-set-the-product-defines}
 
 **Checked:** Review
 
-Two to five views of the same rows, named by short parallel nouns. Nobody adds or edits views. One pill stays even with one view, so nothing moves when a second arrives.
+Two to five views of the same rows, named by short parallel nouns. Nobody adds or edits views. Views need two or more: with one view the Section has no views row, and no lone pill.
 
 ### Swap content in place between views and tabs. {#swap-content-in-place-between-views-and-tabs}
 

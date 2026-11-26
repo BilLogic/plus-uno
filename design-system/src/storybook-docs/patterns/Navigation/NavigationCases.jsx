@@ -47,7 +47,7 @@ export const OpenItemsDoCase = () => <SidebarStage><Example.OpenItemsByTimeAndWh
 /** Don't: an open item that carries everything, so the time it is found by is cut off. */
 export const OpenItemsDontCase = () => <SidebarStage><Example.OpenItemsCarryEverything /></SidebarStage>;
 
-/** Do: under page tabs the Section's views are one labeled PopupSelect at the start of its bar. */
+/** Do: under page tabs the Section has no views row; Status is a quick filter after Search. */
 export const OneTabSystemCase = () => <OnRecordPage><Example.OneTabSystem /></OnRecordPage>;
 
 /** Don't: pill views under page tabs make two tab systems on one page. */

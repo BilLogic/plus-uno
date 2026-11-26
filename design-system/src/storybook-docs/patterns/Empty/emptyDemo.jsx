@@ -221,7 +221,6 @@ export const EmptyTableBoxCase = ({ variant }) => {
                 <Section
                     title="Students"
                     description="Lincoln Middle"
-                    views={<ViewPills views={['All students']} />}
                     filters={categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter)}
                     onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
                     hasNoMatches={!resolved}
@@ -262,7 +261,6 @@ export const EmptyTableBoxCase = ({ variant }) => {
                 title="Students"
                 description="Lincoln Middle"
                 actions={<Button text="Add students" appearance="primary" onClick={() => setResolved(true)} />}
-                views={<ViewPills views={['All students']} />}
             >
                 <StudentsTable
                     count={resolved ? 4 : 0}

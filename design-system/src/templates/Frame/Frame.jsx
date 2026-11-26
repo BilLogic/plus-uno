@@ -8,6 +8,7 @@ import { AreaStage } from '@/lib/navigationMotion';
 import { IconButton } from '@/components';
 import { PanelHostContext } from '../Panel';
 import { SidebarControlContext } from '@/lib/sidebarControl';
+import { PageWidthContext } from '@/lib/pageWidth';
 import { PanelControlContext } from './PanelControl';
 import PanelSplitter from './PanelSplitter';
 import { useOwnWidth } from './useOwnWidth';
@@ -194,6 +195,11 @@ const Frame = ({
     }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, panelKind]);
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
+    // The page width everything inside reads for its narrow form (Tabs, and Section next).
+    const pageWidth = useMemo(() => ({
+        width: frameWidth,
+        narrow: frameWidth < FRAME_LAYOUT.fullWidthBelow,
+    }), [frameWidth]);
     const panelState = layout.panel;
     const panelOverlay = layout.panel === 'overlay';
 
@@ -660,6 +666,7 @@ const Frame = ({
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
+            <PageWidthContext.Provider value={pageWidth}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
                 {collapsed ? (
@@ -716,6 +723,7 @@ const Frame = ({
                 </Dialog.Root>
                 </SidebarControlContext.Provider>
             </PanelControlContext.Provider>
+            </PageWidthContext.Provider>
         </div>
     );
 };
