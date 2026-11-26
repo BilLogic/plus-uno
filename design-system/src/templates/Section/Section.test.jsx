@@ -370,6 +370,27 @@ describe('Section header rows', () => {
         expect(onOpenFilters).toHaveBeenCalled();
     });
 
+    it('keeps the Primary\'s other props when it folds under 768', async () => {
+        const { Button } = await import('@/components');
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            const actions = (
+                <>
+                    <Button text="Add students" iconBefore="plus" appearance="primary" href="/students/new" data-testid="add" aria-describedby="hint" />
+                </>
+            );
+            render(<Section title="Students" actions={actions}>Body</Section>);
+            const add = screen.getByTestId('add');
+            expect(add).toHaveAttribute('href', '/students/new');
+            expect(add).toHaveAttribute('aria-describedby', 'hint');
+            expect(add).toHaveAccessibleName('Add students');
+            expect(add).not.toHaveTextContent('Add students');
+        } finally {
+            window.innerWidth = before;
+        }
+    });
+
     it('draws a filterMenu after Search in place of the triggers', () => {
         render(<Section title="Sessions" search={<div data-testid="search" />} filters={filters} filterMenu={<button type="button">Filters</button>}>Body</Section>);
         expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();

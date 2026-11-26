@@ -12661,7 +12661,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Actions slot, aligned to the end of the title row: More (an IconButton at `appearance=\"default\"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, so the title row stays one row.",
+          "description": "Actions slot, aligned to the end of the title row: More (an IconButton at `appearance=\"default\"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly here, or inside a Fragment; a component that renders one is not folded.",
           "deprecated": null
         },
         {

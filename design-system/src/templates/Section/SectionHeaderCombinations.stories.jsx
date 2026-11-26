@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { Button, DynamicTable, FilterMenu, Heading, IconButton, SearchField, Tabs } from '@/components';
 import { Section } from '@/templates';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader, PageTabs } from '../Page/pageDemo.jsx';
 
 /**
@@ -45,25 +46,30 @@ const pageTabs = (active = 'all') => (
     <PageTabs active={active} labels={[['all', 'All students'], ['requests', 'Roster requests']]} aria-label="Student pages" />
 );
 
-/** One page: the page header (with page tabs when asked) and the Sections under it. Docs geometry, not a design value. */
+/**
+ * One page: the page header (with page tabs when asked) and the Sections under
+ * it, laid out at its own `width` and scaled to fit a narrower canvas, so a wide
+ * case keeps its wide layout at any viewport. Docs geometry, not a design value.
+ */
 const DemoPage = ({ withTabs = false, tab, width = 1000, children }) => (
-    <div
-        style={{
-            inlineSize: width,
-            maxInlineSize: '100%',
-            boxSizing: 'border-box',
-            padding: 'var(--page-pad)',
-            background: 'var(--ds-surface)',
-            border: '1px solid var(--ds-border)',
-            borderRadius: 'var(--card-radius)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--page-stack-md)',
-        }}
-    >
-        <DemoPageHeader title="Students" tabs={withTabs ? pageTabs(tab) : undefined} />
-        {children}
-    </div>
+    <FitStage width={width} reflow={false}>
+        <div
+            style={{
+                inlineSize: width,
+                boxSizing: 'border-box',
+                padding: 'var(--page-pad)',
+                background: 'var(--ds-surface)',
+                border: 'var(--border-width-default) solid var(--ds-border)',
+                borderRadius: 'var(--card-radius)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--page-stack-md)',
+            }}
+        >
+            <DemoPageHeader title="Students" tabs={withTabs ? pageTabs(tab) : undefined} />
+            {children}
+        </div>
+    </FitStage>
 );
 
 const Second = () => <Section title="Everyone else">{table}</Section>;
@@ -122,6 +128,9 @@ export const Catalog = {
             const box = canvasElement.querySelector(`[data-case="${item.id}"]`);
             const section = box.querySelector('.plus-template-section');
             const has = (selector) => Boolean(section.querySelector(selector));
+            if (item.id !== 'M3') {
+                await expect(section.offsetWidth, `${item.id}: keeps its wide layout at any viewport`).toBeGreaterThanOrEqual(768);
+            }
             await expect(has('.plus-template-section-title-row'), `${item.id}: title row`).toBe(Boolean(item.rows.title));
             await expect(has('.plus-section-row--views'), `${item.id}: views row`).toBe(Boolean(item.rows.views));
             await expect(has('.plus-section-row--filters'), `${item.id}: search and filters row`).toBe(Boolean(item.rows.filters));

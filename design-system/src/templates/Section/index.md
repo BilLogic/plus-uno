@@ -195,7 +195,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |
 | `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |
-| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, so the title row stays one row. |
+| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
@@ -235,7 +235,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `id` | string | — | — |
 | `title` | node | — | Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section |
 | `description` | node | — | Optional description under the title, Body/default |
-| `actions` | node | — | Actions slot, aligned to the end of the title row: More (an IconButton at `appearance="default"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, so the title row stays one row. |
+| `actions` | node | — | Actions slot, aligned to the end of the title row: More (an IconButton at `appearance="default"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly here, or inside a Fragment; a component that renders one is not folded. |
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
 | `type` | enum | — | Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. |
 | `views` | node | — | Row 2, at the start: the views, Tabs in the pill appearance, two or more of them; with one view leave the slot empty. Under page tabs there is no views row: a switch such as Status is a quick filter after Search. It scrolls sideways when it does not fit. |

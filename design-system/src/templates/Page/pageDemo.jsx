@@ -98,10 +98,8 @@ export const CardsSection = ({ title, actions, description, items, isTitleHidden
     </Section>
 );
 
-/** The Primary that adds a row: the Section's one action, in its title row. */
-export const AddStudentAction = () => (
-    <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
-);
+/** The Primary that adds a row: the Section's one action, in its title row. An element, not a component, so the Section can fold it to an icon under 768. */
+export const addStudentAction = <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />;
 
 const STATUS_OPTIONS = [
     { value: 'upcoming', label: 'Upcoming' },

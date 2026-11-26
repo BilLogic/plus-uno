@@ -21,7 +21,7 @@ import {
     RecordTabSection,
     SessionSearch,
     SessionsTable,
-    AddStudentAction,
+    addStudentAction,
     statusFilter,
 } from './pageDemo.jsx';
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -308,7 +308,7 @@ export const ScenarioArea = {
     render: () => (
         <PageStage scrollable>
             <DemoPageHeader title="Students" />
-            <Section title="Student list" actions={<AddStudentAction />} search={<SearchField mode="active" spacing="compact" placeholder="Search students" />}>
+            <Section title="Student list" actions={addStudentAction} search={<SearchField mode="active" spacing="compact" placeholder="Search students" />}>
                 <StudentsTable count={4} />
             </Section>
         </PageStage>

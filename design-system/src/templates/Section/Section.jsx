@@ -86,29 +86,22 @@ export const SECTION_VISIBLE_FILTERS = 3;
 
 /**
  * Under 768, the Primary in the actions slot becomes an icon-only primary
- * IconButton named by its text. Only a primary Button with an `iconBefore`
- * folds: without an icon there is nothing to draw, so it keeps its label.
+ * IconButton named by its text, keeping every other prop (`href`, `type`,
+ * `aria-*`, `data-*`, `tooltip`, handlers). The Primary must be a `Button`
+ * placed directly in `actions`, or inside a Fragment there; a component that
+ * renders a Button is not looked into. Only a primary Button with an
+ * `iconBefore` folds: without an icon there is nothing to draw, so it keeps its
+ * label.
  */
 const foldPrimary = (node) => {
     if (!React.isValidElement(node)) return node;
     if (node.type === React.Fragment) {
         return <React.Fragment key={node.key}>{React.Children.map(node.props.children, foldPrimary)}</React.Fragment>;
     }
-    const { appearance, iconBefore, text, onClick, isDisabled, isLoading, id, className } = node.props;
-    if (node.type !== Button || appearance !== 'primary' || !iconBefore || !text) return node;
-    return (
-        <IconButton
-            key={node.key}
-            id={id}
-            className={className}
-            icon={iconBefore}
-            label={text}
-            appearance="primary"
-            onClick={onClick}
-            isDisabled={isDisabled}
-            isLoading={isLoading}
-        />
-    );
+    if (node.type !== Button) return node;
+    const { appearance, iconBefore, iconAfter: _iconAfter, text, children: _children, ...rest } = node.props;
+    if (appearance !== 'primary' || !iconBefore || !text) return node;
+    return <IconButton key={node.key} {...rest} icon={iconBefore} label={text} appearance="primary" />;
 };
 
 /**
@@ -558,7 +551,7 @@ Section.propTypes = {
      * @ds-context Used in: Section.description (ds guide section)
      */
     description: PropTypes.node,
-    /** Actions slot, aligned to the end of the title row: More (an IconButton at `appearance="default"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, so the title row stays one row.
+    /** Actions slot, aligned to the end of the title row: More (an IconButton at `appearance="default"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly here, or inside a Fragment; a component that renders one is not folded.
      * @ds-context Used in: Section.actions (ds guide section)
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
