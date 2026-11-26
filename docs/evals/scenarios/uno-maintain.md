@@ -4,7 +4,7 @@ summary: uno-maintain — eval scenarios
 
 # uno-maintain — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-maintain.md -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see `git show 7b0cea5ef:docs/knowledge/archive/eval-runs/`. Rubric: docs/evals/rubrics/uno-maintain.md -->
 
 ## S1 — Direct fix: small, safe, committed
 - **Trigger:** "typo in the onboarding doc" (or a dead link, a stale date)

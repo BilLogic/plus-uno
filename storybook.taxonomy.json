@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": 2,
-  "$comment": "Single source of truth for the Storybook IA. After editing, run: node scripts/sync-storybook-sort.mjs — that regenerates the storySort literal between IA-SORT markers in .storybook/preview.jsx (Storybook requires a static literal; do not hand-edit the sort there). Grammar: docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md",
+  "$comment": "Single source of truth for the Storybook IA. After editing, run: node scripts/sync-storybook-sort.mjs — that regenerates the storySort literal between IA-SORT markers in .storybook/preview.jsx (Storybook requires a static literal; do not hand-edit the sort there). Grammar: git show 7b0cea5ef:docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md",
   "titlePrefixes": [
     "Get started/",
     "Foundations/",

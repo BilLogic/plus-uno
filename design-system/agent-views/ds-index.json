@@ -46905,16 +46905,8 @@
 				"why": "a decision record keeps the words it decided in"
 			},
 			{
-				"path": "docs/knowledge/archive/",
-				"why": "the graveyard records old words as history"
-			},
-			{
 				"path": "docs/knowledge/changelog.md",
 				"why": "a changelog names what was renamed"
-			},
-			{
-				"path": "docs/plans/",
-				"why": "a plan keeps the words it was written in"
 			},
 			{
 				"path": "design-system/figma/",
@@ -46923,13 +46915,6 @@
 					"component",
 					"prop",
 					"token"
-				]
-			},
-			{
-				"path": "todos/",
-				"why": "working notes keep the words they were written in",
-				"kinds": [
-					"spelling"
 				]
 			},
 			{

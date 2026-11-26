@@ -17,6 +17,7 @@ Each shape the bot's Slack output takes, and which bot skill produces it. The ru
 | Result table, chart, answer cards, ⚠️ line | any skill answering from a lookup (`present`, `roadmap_query` with `as_table`) |
 | Sources box | code, from the links an answer used |
 | Render paths | the Worker, on every reply |
+| Review pop-up | the Worker, from the draft's tool |
 | Figma messages | the Worker's own code |
 
 ## Share-out post
@@ -158,6 +159,31 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 </details>
 
 *(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
+
+## The Review pop-up
+
+Every Review draft is built from the same five zones, in this order. A tool supplies the content of each zone; the zones decide the blocks. `agents/uno-bot/src/slack/review-anatomy.ts` builds them.
+
+1. **What this does, and where.** A `header` with the action in a person's words ("Share for feedback", "Comment on and close #688"). Under it one `rich_text` line naming the destination and the people it reaches, as native elements: a `channel` element for a channel, `user` elements for whoever it pings or DMs, a `link` element for a repo, page or database. The destination appears here and nowhere else.
+2. **What needs attention.** One `alert` per caveat: `warning` for the bundle audit, a public repo, missing open questions or a cut-off rerun; `info` for a private repo, a recoverable archive or a read-only view. At most two; a refused edit's `error` alert stays first. Alerts are plain text under 200 characters.
+3. **The thing itself.** A `card` for the object being shared or touched: title, subtitle, a body of 200 characters or fewer, and an Open button (`url`). A longer summary goes in a `section` under a card with no body.
+4. **The content**, by kind:
+   - short facts (fidelity, round, status, pillar, branch) as `section` `fields`, with Edit fields as the accessory when its selects can be edited;
+   - questions, criteria and link lists as `rich_text` lists under a bold label;
+   - text that goes out verbatim and is not edited here (a shared note) as a `rich_text_quote`;
+   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint (every value editable in the pop-up, plus the share-out's summary, questions, "not looking for" and deadline, and an issue follow-up's comment); required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
+   - a round reads "Round 1", capitalized, with its word;
+   - before/after as `notion_update` draws it (Current content, Issue, New content input).
+
+   Body headings become bold `rich_text` lines; `header` is kept for zone 1, so a PRD's five sections read as one page.
+5. **The decision.** A `divider`, then the radio and the note. Each option's `description` says what it does on this card ("Posts it now and pings 1 reviewer", "Nothing posts"). A card with its own answers uses each answer's `decided` words as that answer's description, and the input is labeled "Your answer".
+
+Around the draft:
+
+- **Title.** Per tool, at most 24 characters: "Review share-out", "Review new issue", "Review issue update", "Review Roadmap card", "Review decision", "Review archive", "Review workflow run", "Review 2 DMs", "Figma tidy-up", "Review DS intake", "Review shared note", "Review Dev Mode links".
+- **Read-only.** An `info` alert at the top names who can decide; zones 1 to 4 follow, with no zone 5 and no Submit.
+- **States.** Every one-line state (approved, rejected, sent back, expired, superseded, being revised) is an `alert` with the outcome and one `section` saying what happens next.
+- **Hidden everywhere.** `place`, `channel` (the raw input), `surface`, raw user ids, page and file ids, `file_key`, `check`, `introduce`, block ids, `cards`, and any input key as a label. A value a person needs is shown once, in its zone: a channel as a `channel` element, a person as a `user` element, a page or repo as a `link` or an Open button.
 
 <!-- ide-only -->
 ## Figma messages

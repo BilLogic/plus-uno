@@ -63,7 +63,7 @@ crons = ["0 10,11 * * MON-FRI", "0 13,14 * * MON-FRI"]
 [vars]
 # ── Four features that are BUILT and OFF ─────────────────────────────────────
 # Each one is off for a different specific reason, and each has a check that
-# would let it default on. Full reasoning: docs/plans/2026-08-07-004.
+# would let it default on. Full reasoning: `git show 7b0cea5ef:docs/plans/2026-08-07-004-feat-uno-bot-consolidated-roadmap-plan.md`.
 #
 # Streamed replies (chat.startStream), on every surface. The note here used to
 # say Slack had been rejecting our arguments since r34; the answer path was in

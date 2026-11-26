@@ -28,23 +28,11 @@
     "check:cross-repo": {
       "skip": [
         {
-          "at": "docs/plans/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
           "at": "docs/adr/",
           "reason": "History keeps the words it was written in."
         },
         {
-          "at": "docs/knowledge/archive/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
           "at": "docs/evals/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
-          "at": "todos/",
           "reason": "History keeps the words it was written in."
         },
         {
@@ -348,19 +336,11 @@
           "reason": "A build output is not authored."
         },
         {
-          "at": "docs/plans/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
           "at": "docs/knowledge/",
           "reason": "History keeps the words it was written in."
         },
         {
           "at": "docs/adr/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
-          "at": "todos/",
           "reason": "History keeps the words it was written in."
         },
         {
@@ -388,10 +368,6 @@
     "check:knowledge-disposition": {
       "excluded": [
         {
-          "at": "archive/",
-          "reason": "The archive is a destination: a note there has been disposed of and is kept as it was written."
-        },
-        {
           "at": "INDEX.md",
           "reason": "It governs the folder, so it is the contract and not a note staged in it."
         },
@@ -404,19 +380,7 @@
     "check:bot-skills": {
       "history": [
         {
-          "at": "docs/plans/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
-          "at": "docs/knowledge/archive/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
           "at": "docs/adr/",
-          "reason": "History keeps the words it was written in."
-        },
-        {
-          "at": "todos/",
           "reason": "History keeps the words it was written in."
         },
         {
@@ -445,10 +409,6 @@
     },
     "check:storybook-categories": {
       "history": [
-        {
-          "at": "docs/plans/",
-          "reason": "History keeps the folder names it was written with."
-        },
         {
           "at": "docs/adr/",
           "reason": "History keeps the folder names it was written with."
@@ -482,16 +442,6 @@
         {
           "at": "agents/uno-bot/slack-app-manifest.yaml",
           "reason": "The Slack app's own declared config — 3 command URLs, the OAuth redirect, and the events and interactivity request URLs. NOT scripted: `pkce_enabled` permanently disables apps.manifest.update for this app, so every push path fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record and the rollback point; applying it means pasting into the App Manifest web editor, then confirming with `npm run slack:diff`, which reads the live app. That makes it the slowest step of the #288 cutover, not the easiest."
-        }
-      ],
-      "history": [
-        {
-          "at": "docs/knowledge/archive/",
-          "reason": "Recorded history, which must NOT be rewritten when the host changes: a recorded run says which Worker it scored, and editing that to the new host would falsify the record."
-        },
-        {
-          "at": "docs/plans/",
-          "reason": "Recorded history, which must NOT be rewritten when the host changes: a plan says which Worker it meant, and editing that to the new host would falsify the record."
         }
       ]
     },

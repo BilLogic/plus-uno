@@ -1,7 +1,7 @@
 import { cardTtlMs } from "../src/card-expiry";
 // The Review pop-up around the draft: a batch, the read-only view, a decided
 // card opened from View, and the states after a decision or once a card has
-// closed (`docs/plans/2026-10-15-review-modal-redesign.md` § 2, § 9, § 14 and
+// closed (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § 2, § 9, § 14 and
 // Decision 5).
 //
 // Driven at the review door on the in-memory ThreadState and a views client

@@ -32,15 +32,14 @@ this repo* is `coded-build.md`, not this.)
   settings as pass/fail checks; the tool verifies its own output, regenerates
   once on failure. The loop travels inside the spec — no UNO-side runtime.
 
-**Where the spec lives.** Write it to
-`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/engineering/coding.md`) and give the designer the path plus
-the ready-to-paste text. The file is what `uno-review` receives with the
-manifest.
+**Where the spec lives.** Put it in the prototype's GitHub issue, in the body
+or a comment, and give the designer the issue link plus the ready-to-paste
+text. The Notion PRD may link it. The issue is what `uno-review` receives with
+the manifest.
 
 ## Handoff
 
 Golden example: `skills/uno-prototype/examples/interactive-spec.md`. Before handing off, run
-`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` on a local draft of the spec (scratch file; the issue holds the posted copy). Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
 Offer the paste-back re-check against the same block. Exit per method §5:
 DS-lens at the artifact's rigor · manifest line · uno-review.

@@ -53,7 +53,7 @@ describe("the eval corpus is withheld from the bot", () => {
       "agents/uno-bot/AGENT.md",
       "docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md",
       "docs/connectors/figma/overview.md",
-      "docs/plans/2026-07-07-001-harness-six-skill-revision-plan.md",
+      "docs/engineering/coding.md",
     ]) {
       assert.equal(isWithheldRepoPath(path), false, path);
     }

@@ -2,7 +2,7 @@
 // (`review-anatomy.ts`): a Roadmap card (`prd`, `intake`), a decision, a
 // Marketplace row, or a page on any other surface.
 //
-// THE ZONES, for a create (`docs/plans/2026-10-15-review-modal-redesign.md`
+// THE ZONES, for a create (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md`
 // § 6 and § 7):
 //   1. What it makes ("New PRD card", "Log a decision"), and one line naming
 //      the database it lands in, linked where the Worker knows its address; a

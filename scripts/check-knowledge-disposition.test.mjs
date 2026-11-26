@@ -47,26 +47,26 @@ test('a note dispositioned to a rule that resolves passes', () => {
   }
 });
 
-test('a note with no disposition fails, and is told the four outcomes', () => {
+test('a note with no disposition fails, and is told the three outcomes', () => {
   const r = repo({ 'docs/knowledge/undecided.md': '# A thing I learned\n' });
   try {
     const found = messages(r.root);
     assert.equal(found.length, 1);
     assert.match(found[0], /docs\/knowledge\/undecided\.md/);
     assert.match(found[0], /no disposition/);
-    assert.match(found[0], /Deleting is the fourth outcome/);
+    assert.match(found[0], /Deleting is the third outcome/);
   } finally {
     r.done();
   }
 });
 
-test('a disposition outside the three fails and names the three', () => {
+test('a disposition outside the two fails and names them', () => {
   const r = repo({ 'docs/knowledge/lesson.md': note({ disposition: 'later' }) });
   try {
     const found = messages(r.root);
     assert.equal(found.length, 1);
     assert.match(found[0], /disposition: later/);
-    assert.match(found[0], /rule \| adr \| archive/);
+    assert.match(found[0], /rule \| adr/);
   } finally {
     r.done();
   }
@@ -99,20 +99,8 @@ test('a target that does not resolve fails — the cheapest way to fake a decisi
   }
 });
 
-test('`disposition: archive` on a note still sitting outside archive/ fails', () => {
-  const r = repo({ 'docs/knowledge/lesson.md': note({ disposition: 'archive' }) });
-  try {
-    const found = messages(r.root);
-    assert.equal(found.length, 1);
-    assert.match(found[0], /archiving is a destination, not a label/);
-  } finally {
-    r.done();
-  }
-});
-
-test('archive/ is out of scope, and so are the two files that govern the folder', () => {
+test('the two files that govern the folder are out of scope', () => {
   const r = repo({
-    'docs/knowledge/archive/old.md': '# Superseded\n',
     'docs/knowledge/INDEX.md': '# The contract\n',
     'docs/knowledge/changelog.md': '# The ledger\n',
   });

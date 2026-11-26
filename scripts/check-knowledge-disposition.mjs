@@ -10,18 +10,14 @@
  * The rule and its rationale live in docs/knowledge/INDEX.md; this file is only
  * the enforcement. Frontmatter:
  *
- *   disposition: rule | adr | archive
- *   disposition-target: <repo path>   (required for rule and adr; must resolve)
+ *   disposition: rule | adr
+ *   disposition-target: <repo path>   (must resolve)
  *
- * Two structural exclusions, both deliberate and both narrow:
- *
- *  - docs/knowledge/archive/ — superseded docs that something live still cites
- *    as a decision trail. Archiving IS a disposition, so its contents do not
- *    need to declare one; a doc nothing cites is deleted rather than kept here.
- *  - INDEX.md and changelog.md — the folder's contract and its ledger. They
- *    govern the folder rather than sitting in it. Named here rather than
- *    exempted by a frontmatter value, so the exemption cannot spread to the next
- *    note that would rather not decide.
+ * One structural exclusion, deliberate and narrow: INDEX.md and changelog.md —
+ * the folder's contract and its ledger. They govern the folder rather than
+ * sitting in it. Named in the exceptions list rather than exempted by a
+ * frontmatter value, so the exemption cannot spread to the next note that would
+ * rather not decide.
  *
  * Usage:
  *   node scripts/check-knowledge-disposition.mjs
@@ -41,16 +37,10 @@ const RELATIVE_ROOT = 'docs/knowledge';
 
 /**
  * What the check leaves out of the folder, from the `excluded` list of this check in
- * `scripts/exceptions.json`: a name ending in `/` is a directory directly below the
- * folder, any other is a file directly in it.
+ * `scripts/exceptions.json`: files directly in the folder.
  */
-const excluded = () => {
-  const entries = loadExceptions('check:knowledge-disposition', 'excluded').map((e) => e.at);
-  return { dirs: entries.filter((at) => at.endsWith('/')), files: entries.filter((at) => !at.endsWith('/')) };
-};
-const DISPOSITIONS = ['rule', 'adr', 'archive'];
-/** `archive` names a destination inside the folder, so it needs no separate target. */
-const TARGET_REQUIRED = ['rule', 'adr'];
+const excluded = () => loadExceptions('check:knowledge-disposition', 'excluded').map((e) => e.at);
+const DISPOSITIONS = ['rule', 'adr'];
 
 export const REMEDY =
   '  The contract is docs/knowledge/INDEX.md. Work leaves behind a rule, an ADR,\n' +
@@ -58,14 +48,9 @@ export const REMEDY =
 
 /** Files in scope: everything below docs/knowledge/ that is not excluded. */
 function inScope(root = REPO_ROOT) {
-  const { dirs, files } = excluded();
+  const files = excluded();
   return documents(RELATIVE_ROOT, { root, ext: null })
-    .filter((rel) => {
-      const within = rel.slice(RELATIVE_ROOT.length + 1);
-      return within.includes('/')
-        ? !dirs.includes(within.slice(0, within.indexOf('/') + 1))
-        : !files.includes(within);
-    })
+    .filter((rel) => !files.includes(rel.slice(RELATIVE_ROOT.length + 1)))
     .map((rel) => path.join(root, rel));
 }
 
@@ -110,9 +95,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     if (!fm || !fm.disposition) {
       failures.push(
         `${name}\n    no disposition. Decide what this note became and record it:\n` +
-          `      disposition: rule | adr | archive\n` +
+          `      disposition: rule | adr\n` +
           `      disposition-target: <path the content now lives at>\n` +
-          `    Deleting is the fourth outcome and usually the right one — git keeps the trail.`,
+          `    Deleting is the third outcome and usually the right one — git keeps the trail.`,
       );
       continue;
     }
@@ -121,20 +106,6 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       failures.push(`${name}\n    disposition: ${fm.disposition} — expected one of ${DISPOSITIONS.join(' | ')}`);
       continue;
     }
-
-    // `archive` names a destination inside this folder, so it needs no target — but
-    // it does need to be true. A live note declaring `archive` while sitting outside
-    // archive/ is the cheapest way to pass this check without deciding anything,
-    // which is exactly what the folder became sediment by doing.
-    if (fm.disposition === 'archive') {
-      failures.push(
-        `${name}\n    disposition: archive, but the file is not under docs/knowledge/archive/.` +
-          '\n    Move it there — archiving is a destination, not a label.',
-      );
-      continue;
-    }
-
-    if (!TARGET_REQUIRED.includes(fm.disposition)) continue;
 
     const target = fm['disposition-target'];
     if (!target) {
@@ -155,7 +126,7 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   if (!exists) return 'docs/knowledge/ does not exist — nothing to check';
   return (
     `${files.length} in-scope file(s) under docs/knowledge/, all dispositioned` +
-    ` (${excluded().dirs.join(' + ')} excluded; ${excluded().files.join(' + ')} govern the folder)`
+    ` (${excluded().join(' + ')} govern the folder)`
   );
 }
 

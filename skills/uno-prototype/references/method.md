@@ -184,7 +184,7 @@ Before any artifact leaves the skill:
 2. **DS-lens validation pass** — a conformance check at the artifact's own
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
    Major findings loop back to the route decision (§2).
-3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
+3. **Artifact manifest** — one line: fidelity · tools used · PRD link · issue link, plus
    any unresolved check failures. A coded build adds the `ds check`
    (`check:ds-usage`) result (clean, or escapes by rule). Review's
    mandatory input; **every path exit produces it**.

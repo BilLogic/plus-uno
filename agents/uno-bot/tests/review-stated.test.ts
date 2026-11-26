@@ -1,6 +1,6 @@
 // The Worker's own cards in the Review pop-up's shared anatomy: the Figma
 // tidy-up, the Dev Mode links, the DS precedence intake and the sweep's shared
-// note (`docs/plans/2026-10-15-review-modal-redesign.md` § 10–13).
+// note (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § 10–13).
 //
 // Each proposal is the one its real stager writes, so the facts the pop-up
 // draws are the stager's own (`PendingProposal.facts`). Each view is held to

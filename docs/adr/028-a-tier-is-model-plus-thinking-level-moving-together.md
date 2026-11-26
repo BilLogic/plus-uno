@@ -25,7 +25,7 @@ backup model that takes the dial, and drops to none on a 2.x model that does
 not. The attribution rule is **change one tier at a time**: a regression after
 a tier change is attributed to that tier's configuration as a whole.
 
-This reverses the 2026-08-07 decision (`docs/plans/2026-08-07-006-feat-gemini-tiers-and-routing-plan.md`)
+This reverses the 2026-08-07 decision (`git show 7b0cea5ef:docs/plans/2026-08-07-006-feat-gemini-tiers-and-routing-plan.md`)
 to hold the dial constant at `medium` on every tier so that the model was the
 only variable. — Bill, Sep 2026 (#417)
 
@@ -112,6 +112,6 @@ so a fallback re-derives the dials for any model of generation 3 or later. That
 gate is the reason for the change: a prefix test would have sent Argon no
 level at all. `GEMINI_GRIND_MODEL` still swaps the model without a deploy.
 
-`docs/plans/2026-08-07-006` stays as written; it is the record of the decision
+That plan (in git history) stays as written; it is the record of the decision
 this one reverses, and the "one dial, held constant" reasoning in it is the
 reasoning this ADR answers.

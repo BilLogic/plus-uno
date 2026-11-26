@@ -45,15 +45,6 @@ export const HOST = new URL(DEFAULT_WORKER_ORIGIN).host;
 export const allowedPlaces = () =>
   new Map(loadExceptions("check:worker-host", "allowed").map((e) => [e.at, e.reason]));
 
-/**
- * Recorded history, which must NOT be rewritten when the host changes: the `history` list
- * of `check:worker-host` in `scripts/exceptions.json`, as path prefixes.
- *
- * A recorded run says which Worker it scored. Editing that to the new
- * host would be falsifying the record — the run really did hit the old one.
- */
-const historyRoots = () => loadExceptions("check:worker-host", "history").map((e) => e.at);
-
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 
 /**
@@ -121,17 +112,12 @@ export function findStrays(root = REPO_ROOT, host = HOST) {
   // Asking about a foreign host is a cutover audit, not the invariant check.
   const auditing = host !== HOST;
   const allowed = allowedPlaces();
-  const history = historyRoots();
   const strays = [];
   for (const rel of rels) {
     if (!TEXT.test(rel)) continue;
     if (rel.split(path.sep).some((seg) => SKIP_DIRS.has(seg))) continue;
     const abs = path.join(root, rel);
-    if (auditing) {
-      if (history.some((prefix) => rel.startsWith(prefix))) continue;
-    } else if (allowed.has(rel) || history.some((prefix) => rel.startsWith(prefix))) {
-      continue;
-    }
+    if (!auditing && allowed.has(rel)) continue;
     let text;
     try {
       text = readFileSync(abs, "utf8");
