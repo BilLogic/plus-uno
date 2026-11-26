@@ -8,6 +8,7 @@
 :root {
 
     /* Frame */
+    --frame-head-band: var(--type-line-height-225); /* 36: the top band the Sidebar logo row and the page's first line share */
     --frame-sidebar-width: var(--width-1500);
     --frame-sidebar-pad: var(--space-075); /* the Sidebar pads 12 on every side */
     --frame-sidebar-row-gap: var(--space-0125); /* two Sidebar rows sit 2 apart */

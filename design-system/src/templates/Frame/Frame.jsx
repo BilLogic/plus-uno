@@ -732,7 +732,7 @@ Frame.propTypes = {
     id: PropTypes.string,
     /** Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`. */
     areaKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.
+    /** The Page's header row, the top band (36 high, y 24 to 60), level with the logo row: the breadcrumb. While the Sidebar is closed it follows the toggle.
      * @ds-context Used in: Frame.header (ds guide frame)
      */
     header: PropTypes.node,

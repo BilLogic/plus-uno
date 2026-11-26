@@ -157,7 +157,7 @@ const offset = (frame, el) => ({ x: rect(el).left - rect(frame).left, y: rect(el
 const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
 /**
- * The toggle sits on the logo row's center line (y 28): closed, at the Page's
+ * The toggle sits on the logo row's center line (y 42, the top band): closed, at the Page's
  * top left on the icon column (x 32); open, at the end of the Sidebar's logo
  * row on the trailing column (x 208).
  */
@@ -166,7 +166,7 @@ const expectToggleHome = async (frame, toggle) => {
     const r = rect(toggle);
     const open = toggle.getAttribute('aria-label') === 'Close sidebar';
     await expect(at.x + r.width / 2, open ? 'toggle on the trailing column' : 'toggle on the icon column').toBeCloseTo(open ? 208 : 32, 0);
-    await expect(at.y + r.height / 2, 'toggle on the logo row\'s center line').toBeCloseTo(28, 0);
+    await expect(at.y + r.height / 2, 'toggle on the logo row\'s center line').toBeCloseTo(42, 0);
     await expect(r.height, 'toggle height').toBeCloseTo(tokenLength(frame, '--control-md'), 0);
 };
 
@@ -2958,3 +2958,42 @@ export const MultiStepExampleFooterAt1440 = { ...exampleFooterAt(1440), name: 'L
 
 /** 1280: the printed multi-step example's footer is 52 under its hairline. */
 export const MultiStepExampleFooterAt1280 = { ...exampleFooterAt(1280), name: 'Layout: Multi-step example footer at 1280' };
+
+/**
+ * The top band: the Sidebar's logo row and the page's first line share one band
+ * (y 24 to 60), so their centers meet at y 42 with a breadcrumb and without one.
+ */
+const topBand = (crumbs) => ({
+    name: crumbs ? 'Layout: Top band with a breadcrumb' : 'Layout: Top band without a breadcrumb',
+    render: () => (
+        <InAppFrame breadcrumbs={crumbs} height={HEIGHT}>
+            <Page title="Dashboard" />
+        </InAppFrame>
+    ),
+    parameters: { layout: 'fullscreen', docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const frame = canvasElement.querySelector('.plus-frame');
+        const band = tokenLength(frame, '--frame-head-band');
+        const centerY = (el) => rect(el).top + rect(el).height / 2 - rect(frame).top;
+        const logoRow = await waitFor(() => {
+            const el = canvasElement.querySelector('.plus-template-sidebar__logo-row');
+            expect(el).not.toBeNull();
+            return el;
+        });
+        const first = crumbs
+            ? canvasElement.querySelector('.plus-frame__head')
+            : canvasElement.querySelector('.plus-template-page-title');
+        await expect(rect(logoRow).height, 'the logo row is the band tall').toBeCloseTo(band, 0);
+        await expect(rect(first).height, 'the first line is the band tall').toBeCloseTo(band, 0);
+        await expect(rect(logoRow).top - rect(frame).top, 'the band starts at the page pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
+        await expect(centerY(logoRow), 'logo row center equals the first line center').toBeCloseTo(centerY(first), 0);
+        await expect(centerY(logoRow)).toBeCloseTo(42, 0);
+        if (crumbs) {
+            await expect(centerY(canvasElement.querySelector('.plus-frame__head nav')), 'the breadcrumb sits on the band center').toBeCloseTo(42, 0);
+        }
+    }),
+});
+
+export const TopBandWithoutBreadcrumb = topBand(null);
+
+export const TopBandWithBreadcrumb = topBand(RECORD_CRUMBS);

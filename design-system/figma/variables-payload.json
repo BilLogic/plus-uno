@@ -364,6 +364,13 @@
       "name": "spacing / templates",
       "variables": [
         {
+          "name": "Frame/head-band",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-head-band)"
+          }
+        },
+        {
           "name": "Frame/sidebar-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

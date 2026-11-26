@@ -1,6 +1,9 @@
 /**
  * Sidebar (Components/Navigation/Navigation system). One grid holds every part: the Sidebar
- * pads 12, so rows run from x 12 to 228; a row pads 4, its 24 icon slot sits
+ * pads 12, so rows run from x 12 to 228. The logo row is the top band the page's
+ * first line shares: it starts at the page pad (y 24, a margin of the page pad minus
+ * the Sidebar pad) and is the band tall (36), so its center is y 42 and the nav
+ * starts at y 72; a row pads 4, its 24 icon slot sits
  * 4 in (x 20 to 44, center 32), the label follows 4 later (x 48), and the
  * trailing slot ends 4 before the row's end (center 208). Section titles start
  * on x 20, the slot's left edge, and so does the logo's mark. Every length is
@@ -44,7 +47,8 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    height: var(--control-md);
+    height: var(--frame-head-band);
+    margin-top: calc(var(--page-pad) - var(--frame-sidebar-pad));
     padding-inline-start: calc(2 * var(--pad-x-xs));
 }
 
