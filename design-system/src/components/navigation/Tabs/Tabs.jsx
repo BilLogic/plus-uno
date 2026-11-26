@@ -10,8 +10,8 @@
  * `defaultValue` / `onValueChange`; `Accordion` makes the same choice.
  * `isDisabled` is per tab.
  *
- * `overflow="auto"` (the default) folds extra tabs into More, and under 768,
- * measured on the row the strip sits in, takes the narrow form: an underline
+ * `overflow="auto"` (the default) folds extra tabs into More, and on a narrow
+ * page (under 768, read from the Frame) takes the narrow form: an underline
  * strip scrolls sideways, and a pill strip shows only its selected pill, which
  * opens a menu of every view.
  */
@@ -21,6 +21,7 @@ import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { animate } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from '@/lib/motionPreference';
+import { usePageNarrow } from '@/lib/pageWidth';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { ButtonItem } from '@/lib/menu';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
@@ -38,32 +39,17 @@ const labelText = (children) => React.Children.toArray(children).filter((child) 
 
 export const TAB_OVERFLOWS = ['auto', 'collapse', 'wrap', 'scroll', 'menu'];
 
-/*
- * Under this width the row an `auto` strip sits in is narrow: the Frame's
- * full-width breakpoint (`FRAME_LAYOUT.fullWidthBelow`), restated here because
- * a component does not import a template.
- */
-export const TABS_NARROW_BELOW = 768;
-
 /**
  * The form a strip takes: `collapse` folds into More, `wrap` flows onto more
  * rows, `scroll` scrolls sideways and `menu` shows the selected pill as a menu
- * trigger. `auto` is `collapse`, or under 768 `scroll` for an underline strip
- * and `menu` for a pill strip. A justified strip shares the row, so it always wraps.
+ * trigger. `auto` is `collapse`, or on a narrow page `scroll` for an underline
+ * strip and `menu` for a pill strip. A justified strip shares the row, so it always wraps.
  */
 const resolveMode = ({ overflow, alignment, appearance, isNarrow }) => {
     if (alignment === 'justified') return 'wrap';
     if (overflow !== 'auto') return overflow;
     if (!isNarrow) return 'collapse';
     return appearance === 'pill' ? 'menu' : 'scroll';
-};
-
-/** The room a strip has: the content width of the row it sits in. 0 when unknown. */
-const roomFor = (el) => {
-    const row = el?.parentElement;
-    if (!row) return 0;
-    const style = getComputedStyle(row);
-    return row.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
 };
 
 /**
@@ -282,43 +268,16 @@ const Tabs = ({
     const modeRef = useRef(null);
     const reduced = useMotionReduced();
 
-    /*
-     * An `auto` strip reads the width of the row it sits in and, under
-     * `TABS_NARROW_BELOW`, takes its narrow form. A width of 0 is unmeasured
-     * (no layout yet), never narrow.
-     */
-    const watchesWidth = overflow === 'auto' && alignment !== 'justified';
-    const [isNarrow, setIsNarrow] = useState(false);
-    const mode = resolveMode({ overflow, alignment, appearance, isNarrow: watchesWidth && isNarrow });
+    // An `auto` strip takes its narrow form on a narrow page: the Frame's width,
+    // not the strip's own box. Outside a Frame the page counts as wide.
+    const pageNarrow = usePageNarrow();
+    const mode = resolveMode({ overflow, alignment, appearance, isNarrow: pageNarrow });
     const collapses = mode === 'collapse';
     const scrolls = mode === 'scroll';
     const isMenu = mode === 'menu';
     // Every form but wrap holds the selection here: a tab folded into More or
     // listed in the view menu is selected by name, which no Base UI tab is.
     const managed = mode !== 'wrap';
-
-    useLayoutEffect(() => {
-        const rootEl = rootRef.current;
-        if (!watchesWidth || !rootEl) return undefined;
-        const read = () => {
-            const room = roomFor(rootRef.current);
-            const next = room > 0 && room < TABS_NARROW_BELOW;
-            setIsNarrow((prev) => (prev === next ? prev : next));
-        };
-        read();
-        const row = rootEl.parentElement;
-        if (!row || typeof ResizeObserver === 'undefined') return undefined;
-        let frame = 0;
-        const observer = new ResizeObserver(() => {
-            cancelAnimationFrame(frame);
-            frame = requestAnimationFrame(read);
-        });
-        observer.observe(row);
-        return () => {
-            cancelAnimationFrame(frame);
-            observer.disconnect();
-        };
-    }, [watchesWidth]);
 
     useLayoutEffect(() => {
         const rootEl = rootRef.current;
@@ -698,7 +657,7 @@ Tabs.propTypes = {
     alignment: PropTypes.oneOf(['left', 'center', 'right', 'justified']),
     /** Underline indicator (default) or a pill-shaped selected background. */
     appearance: PropTypes.oneOf(['default', 'pill']),
-    /** `auto` (default) folds what does not fit into More, and when the row the strip sits in is under 768 takes the narrow form: an underline strip scrolls sideways with the selected tab in view, and a pill strip shows only the selected pill, which opens a menu of every view. The other values hold one form at every width: `collapse` (More), `scroll`, `menu`, or `wrap`, which flows tabs onto more rows. A `justified` strip shares the row and never folds or narrows. */
+    /** `auto` (default) folds what does not fit into More, and on a narrow page (a Frame under 768, read through `usePageNarrow`) takes the narrow form: an underline strip scrolls sideways with the selected tab in view, and a pill strip shows only the selected pill, which opens a menu of every view. The other values hold one form at every width: `collapse` (More), `scroll`, `menu`, or `wrap`, which flows tabs onto more rows. A `justified` strip shares the row and never folds or narrows. Outside a Frame the page counts as wide. */
     overflow: PropTypes.oneOf(TAB_OVERFLOWS),
     /** Extra class on the tabs root, beside `plus-tabs`. */
     className: PropTypes.string,

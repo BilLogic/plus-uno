@@ -7,6 +7,7 @@ import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { CountTag } from '@/components';
+import { PageWidthContext } from '@/lib/pageWidth';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
@@ -153,7 +154,7 @@ export const Appearance = () => (
     <div style={col}>
         <section>
             <DemoLabel>DEFAULT (UNDERLINE)</DemoLabel>
-            <Tabs overflow="collapse" defaultActiveKey="1">
+            <Tabs defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
                 <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
@@ -161,7 +162,7 @@ export const Appearance = () => (
         </section>
         <section>
             <DemoLabel>PILL</DemoLabel>
-            <Tabs appearance="pill" overflow="collapse" defaultActiveKey="1">
+            <Tabs appearance="pill" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
                 <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
@@ -207,7 +208,7 @@ export const WithCount = {
         <div style={col}>
             <section>
                 <DemoLabel>UNDERLINE</DemoLabel>
-                <Tabs overflow="collapse" defaultActiveKey="1">
+                <Tabs defaultActiveKey="1">
                     <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                     <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
                     <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
@@ -215,7 +216,7 @@ export const WithCount = {
             </section>
             <section>
                 <DemoLabel>PILL</DemoLabel>
-                <Tabs appearance="pill" overflow="collapse" defaultActiveKey="1">
+                <Tabs appearance="pill" defaultActiveKey="1">
                     <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                     <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
                     <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
@@ -325,9 +326,8 @@ Interactive.args = {
 
 /* ------------------------------------------------------------------- states */
 
-// The states are the wide strip's: held at `collapse`, so a narrow canvas does not swap in the narrow form.
 const StateTabs = (props) => (
-    <Tabs overflow="collapse" defaultActiveKey="1" {...props}>
+    <Tabs defaultActiveKey="1" {...props}>
         <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
         <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
         <Tabs.Tab eventKey="3" isDisabled>Reports</Tabs.Tab>
@@ -420,7 +420,7 @@ export const Disabled = {
 export const Overflow = {
     render: () => (
         <div style={{ width: '360px' /* demo frame */ }}>
-            <Tabs overflow="collapse" defaultActiveKey="one">
+            <Tabs defaultActiveKey="one">
                 <Tabs.Tab eventKey="one">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="two">{LONG_TOPIC}</Tabs.Tab>
             </Tabs>
@@ -449,7 +449,7 @@ const TOPICS = ['Overview', 'Sessions', 'Progress', 'Reflections', 'Feedback', '
 export const OverflowMore = {
     render: () => (
         <div style={{ width: '440px' /* demo frame */ }}>
-            <Tabs overflow="collapse" defaultActiveKey="Overview">
+            <Tabs defaultActiveKey="Overview">
                 {TOPICS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
                 {TOPICS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} view</Tabs.Panel>)}
             </Tabs>
@@ -485,7 +485,7 @@ export const OverflowMore = {
 OverflowMore.parameters = {
     docs: {
         description: {
-            story: 'The strip keeps one row (`overflow="collapse"`, and `auto` from 768 up): the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
+            story: 'The strip keeps one row (`overflow="collapse"`, and `auto` on a wide page): the tabs that fit show, and the rest fold into a More tab that names how many it holds and opens a menu of them.'
         }
     }
 };
@@ -494,8 +494,14 @@ OverflowMore.parameters = {
 
 const PAGE_TABS = ['Overview', 'Sessions', 'Students', 'Notes', 'Reflections', 'Feedback', 'Schedule'];
 const VIEWS = ['Active', 'Inactive', 'All'];
-// A phone-width row: under 768, so a collapsing strip takes its narrow form.
+// A phone-width page: the provider stands in for a Frame under 768, which an `auto` strip reads.
 const narrowRow = { width: '360px' /* demo frame */ };
+const NARROW_PAGE = { narrow: true };
+const OnNarrowPage = ({ children }) => (
+    <PageWidthContext.Provider value={NARROW_PAGE}>
+        <div style={narrowRow}>{children}</div>
+    </PageWidthContext.Provider>
+);
 
 /**
  * Narrow page tabs: under 768 an underline strip keeps its bar and scrolls
@@ -504,12 +510,12 @@ const narrowRow = { width: '360px' /* demo frame */ };
  */
 export const NarrowScroll = {
     render: () => (
-        <div style={narrowRow}>
+        <OnNarrowPage>
             <Tabs defaultActiveKey="Overview" aria-label="Student pages">
                 {PAGE_TABS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
                 {PAGE_TABS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} page</Tabs.Panel>)}
             </Tabs>
-        </div>
+        </OnNarrowPage>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -547,12 +553,12 @@ export const NarrowScroll = {
  */
 export const NarrowMenu = {
     render: () => (
-        <div style={narrowRow}>
+        <OnNarrowPage>
             <Tabs appearance="pill" defaultActiveKey="Active">
                 {VIEWS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
                 {VIEWS.map((name) => <Tabs.Panel key={name} eventKey={name}>{name} students</Tabs.Panel>)}
             </Tabs>
-        </div>
+        </OnNarrowPage>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);

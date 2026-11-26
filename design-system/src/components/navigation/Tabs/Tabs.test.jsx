@@ -11,6 +11,9 @@ import { render, screen, fireEvent, within, waitFor } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Tabs from './Tabs';
+import Dialog from '@/components/messaging/Dialog';
+import Frame from '@/templates/Frame/Frame';
+import { PageWidthContext } from '@/lib/pageWidth';
 
 const renderTabs = (props = {}) =>
     render(
@@ -358,57 +361,77 @@ describe('Tabs — narrow', () => {
         expect(screen.queryByRole('tab', { name: /^More/ })).toBeNull();
     });
 
-    describe('auto (the default), measured on the row it sits in', () => {
-        let restore;
-        beforeEach(() => {
-            const client = Object.getOwnPropertyDescriptor(Element.prototype, 'clientWidth');
-            Object.defineProperty(Element.prototype, 'clientWidth', {
-                configurable: true,
-                get() {
-                    const room = this.dataset?.room;
-                    return room ? Number(room) : 0;
-                },
-            });
-            restore = () => {
-                if (client) Object.defineProperty(Element.prototype, 'clientWidth', client);
-                else delete Element.prototype.clientWidth;
-            };
-        });
-        afterEach(() => restore());
-
-        const inRow = (room, props) => render(
-            <div data-room={room}>
+    describe('auto (the default), read from the page width', () => {
+        const onPage = (narrow, props) => render(
+            <PageWidthContext.Provider value={narrow === undefined ? null : { narrow }}>
                 <Tabs defaultActiveKey="Active" {...props}>
                     {VIEWS.map((k) => <Tabs.Tab key={k} eventKey={k}>{k}</Tabs.Tab>)}
                 </Tabs>
-            </div>,
+            </PageWidthContext.Provider>,
         );
 
-        it('auto, under 768: a pill strip becomes the view menu', () => {
-            inRow(600, { appearance: 'pill' });
+        it('on a narrow page, a pill strip becomes the view menu', () => {
+            onPage(true, { appearance: 'pill' });
             expect(screen.queryByRole('tablist')).toBeNull();
             expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute('aria-haspopup', 'menu');
         });
 
-        it('auto, under 768: an underline strip scrolls', () => {
-            const { container } = inRow(600, {});
+        it('on a narrow page, an underline strip scrolls', () => {
+            const { container } = onPage(true, {});
             expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--scroll');
             expect(screen.getAllByRole('tab')).toHaveLength(3);
         });
 
-        it('from 768 up it folds into More, as collapse does', () => {
-            const { container } = inRow(1024, { appearance: 'pill' });
+        it('on a wide page, and outside a Frame, it folds into More, as collapse does', () => {
+            const { container, unmount } = onPage(false, { appearance: 'pill' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
+            unmount();
+            const outside = onPage(undefined, { appearance: 'pill' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            expect(outside.container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
+        });
+
+        it('does not narrow a justified strip, or one whose overflow is set', () => {
+            const { unmount } = onPage(true, { appearance: 'pill', alignment: 'justified' });
+            expect(screen.getByRole('tablist')).toBeInTheDocument();
+            unmount();
+            const { container } = onPage(true, { appearance: 'pill', overflow: 'collapse' });
             expect(screen.getByRole('tablist')).toBeInTheDocument();
             expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
         });
 
-        it('does not narrow a justified strip, or one whose overflow is set', () => {
-            const { unmount } = inRow(600, { appearance: 'pill', alignment: 'justified' });
-            expect(screen.getByRole('tablist')).toBeInTheDocument();
-            unmount();
-            const { container } = inRow(600, { appearance: 'pill', overflow: 'collapse' });
-            expect(screen.getByRole('tablist')).toBeInTheDocument();
-            expect(container.querySelector('.plus-tabs')).toHaveClass('plus-tabs--collapse');
+        describe('inside a Frame', () => {
+            let innerWidth;
+            beforeEach(() => { innerWidth = window.innerWidth; });
+            afterEach(() => { window.innerWidth = innerWidth; });
+            // jsdom has no layout, so the Frame keeps the window width it starts from.
+            const atWidth = (width, ui) => {
+                window.innerWidth = width;
+                return render(<Frame>{ui}</Frame>);
+            };
+            const dialogTabs = [
+                { key: 'details', label: 'Details', content: <p>Details panel</p> },
+                { key: 'students', label: 'Students', content: <p>Students panel</p> },
+            ];
+
+            it("a Dialog's tabs stay wide inside a wide Frame", () => {
+                const { container } = atWidth(1280, <Dialog title="Session settings" tabs={dialogTabs} defaultActiveTab="details" />);
+                const strip = container.querySelector('.plus-dialog-tabs');
+                expect(strip).toHaveClass('plus-tabs--collapse');
+                expect(strip).not.toHaveClass('plus-tabs--scroll');
+                expect(screen.getByRole('tab', { name: 'Students' })).toBeInTheDocument();
+            });
+
+            it('a pill strip becomes the view menu inside a Frame under 768', () => {
+                atWidth(600, (
+                    <Tabs appearance="pill" defaultActiveKey="Active">
+                        {VIEWS.map((k) => <Tabs.Tab key={k} eventKey={k}>{k}</Tabs.Tab>)}
+                    </Tabs>
+                ));
+                expect(screen.queryByRole('tablist')).toBeNull();
+                expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute('aria-haspopup', 'menu');
+            });
         });
     });
 });

@@ -33,8 +33,8 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 `pill` (a filled, rounded selected tab). There is one size: a 32 tab
 (`--control-md`). `overflow` is `auto` by default: extra tabs fold into More,
-and under 768 an underline strip scrolls sideways while a pill strip becomes
-one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
+and on a narrow page (a Frame under 768) an underline strip scrolls sideways
+while a pill strip becomes one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
 `wrap` hold one form at every width.
 
 ## Motion
@@ -111,7 +111,7 @@ Don't: Counts and status in the label.
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip. {#let-a-tab-label-longer-than-its-cap-end-in-an-ellipsis-with-a-tooltip}
 
-The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. Under 768 nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. On a narrow page nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 

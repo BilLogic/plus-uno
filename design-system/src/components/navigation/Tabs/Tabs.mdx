@@ -75,7 +75,7 @@ A tab strip that switches between panels of related content on one page.
 
 ## Narrow
 
-Under 768, measured on the row the strip sits in, a strip with the default <code>overflow="auto"</code> takes its narrow form. Page tabs and Section views get it without a prop.
+On a narrow page, a Frame under 768, a strip with the default <code>overflow="auto"</code> takes its narrow form. It reads the page's width, not its own box, through <code>usePageNarrow()</code> from <code>@/lib/pageWidth</code>, so page tabs and Section views get it without a prop, and a strip outside a Frame stays wide. A story stages a narrow page with a Frame at narrow width or <code>{'<PageWidthContext.Provider value={{ narrow: true }}>'}</code>.
 
 <ComponentExample of={TabsStories.NarrowScroll} title="Underline: scroll" description={<>Page tabs keep the underline bar and scroll sideways, the end fading while more lies past it. The selected tab scrolls into view, and nothing folds into More. <code>overflow="scroll"</code> holds this form at every width.</>} />
 
@@ -145,8 +145,8 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 `pill` (a filled, rounded selected tab). There is one size: a 32 tab
 (`--control-md`). `overflow` is `auto` by default: extra tabs fold into More,
-and under 768 an underline strip scrolls sideways while a pill strip becomes
-one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
+and on a narrow page (a Frame under 768) an underline strip scrolls sideways
+while a pill strip becomes one pill that opens a menu of every view. `collapse`, `scroll`, `menu` and
 `wrap` hold one form at every width.
 
 </div>
@@ -260,7 +260,7 @@ Each label is one or two words naming a view of the same subject: Overview, Sess
 The underline suits a strip that sits above page content. The pill suits a strip inside a card or toolbar, where a filled selected tab reads as a control.
 
 <DoDontPair
-    doExample={<FigureBox tone="surface"><Tabs defaultActiveKey="0" appearance="pill" overflow="collapse"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></FigureBox>}
+    doExample={<FigureBox tone="surface"><Tabs defaultActiveKey="0" appearance="pill"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></FigureBox>}
     doCaption="A pill strip inside a card reads as a control."
     dontExample={<FigureBox tone="surface"><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></FigureBox>}
     dontCaption="The page-level underline inside a card, where it reads as a stray rule."
@@ -279,7 +279,7 @@ A label names a view. A count or status in it changes the name and breaks the pa
 
 ### Let a tab label longer than its cap end in an ellipsis with a Tooltip.
 
-The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. Under 768 nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
+The Tooltip is on only while the label is clipped. Tabs that do not fit fold into a More tab that opens a menu of them; `overflow="wrap"` lets them flow onto more rows instead. On a narrow page nothing folds: underline tabs scroll and pill views become one menu. A `justified` strip shares the row and never folds or narrows. See [Overflow](?path=/docs/patterns-states-overflow--docs).
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice.
 
@@ -288,7 +288,7 @@ A `pill` strip is a fixed set of views of one subject, decided when the page is 
 <DoDontPair
     doExample={<FigureStack><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs><PopupSelect label="Status" defaultValue="upcoming" options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]} /></FigureStack>}
     doCaption="One strip for the sections; a labeled PopupSelect for the choice inside one."
-    dontExample={<FigureStack><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs><Tabs defaultActiveKey="0" appearance="pill" overflow="collapse"><Tabs.Tab eventKey="0">Upcoming</Tabs.Tab><Tabs.Tab eventKey="1">Past</Tabs.Tab></Tabs></FigureStack>}
+    dontExample={<FigureStack><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs><Tabs defaultActiveKey="0" appearance="pill"><Tabs.Tab eventKey="0">Upcoming</Tabs.Tab><Tabs.Tab eventKey="1">Past</Tabs.Tab></Tabs></FigureStack>}
     dontCaption="A second strip under the first, so two tab systems compete."
 />
 

@@ -78,13 +78,8 @@ export const StudentsTable = ({ count = 4, sortable = false, view, checked, rows
 
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 
-/**
- * Pill views: a fixed set the product defines, one pill even with one view.
- * A pattern picture is a desktop screen drawn on a small stage, so its views
- * keep the wide strip (`overflow="collapse"`) rather than take the narrow menu
- * the stage's width would give them; pass `overflow="auto"` to show that.
- */
-export const ViewPills = ({ views, activeView, onViewChange, overflow = 'collapse' }) => {
+/** Pill views: a fixed set the product defines, one pill even with one view. */
+export const ViewPills = ({ views, activeView, onViewChange }) => {
     const [uncontrolled, setUncontrolled] = useState(views[0]);
     const active = activeView ?? uncontrolled;
     const handleSelect = (next) => {
@@ -92,7 +87,7 @@ export const ViewPills = ({ views, activeView, onViewChange, overflow = 'collaps
         onViewChange?.(next);
     };
     return (
-        <TabsComponent appearance="pill" overflow={overflow} activeKey={active} onSelect={handleSelect} aria-label="Views">
+        <TabsComponent appearance="pill" activeKey={active} onSelect={handleSelect} aria-label="Views">
             {views.map((view) => <TabsComponent.Tab key={view} eventKey={view}>{view}</TabsComponent.Tab>)}
         </TabsComponent>
     );
