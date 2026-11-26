@@ -5241,6 +5241,7 @@
         "EmptyHiddenByFilter",
         "EmptyNothingToCreate",
         "Widths",
+        "NarrowPage",
         "Selection",
         "StickyHeaderAndFrozenColumn",
         "SortableHeadCells",

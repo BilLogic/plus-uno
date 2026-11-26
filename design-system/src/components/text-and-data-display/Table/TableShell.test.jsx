@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TableShell } from './TableParts';
 
 const head = (
@@ -141,4 +141,103 @@ describe('TableShell', () => {
         expect(screen.getByRole('table')).toBeInTheDocument();
     });
 
+});
+
+describe('TableShell scroll region', () => {
+    /** Box sizes for the scroll region; any other element measures 0. */
+    let size;
+    let observers;
+
+    const measure = (name) => function measured() {
+        return this.classList?.contains('plus-table-shell-scroll') ? size[name] : 0;
+    };
+
+    beforeEach(() => {
+        size = { scrollWidth: 400, clientWidth: 400, scrollHeight: 200, clientHeight: 200 };
+        observers = [];
+        for (const name of Object.keys(size)) {
+            vi.spyOn(HTMLElement.prototype, name, 'get').mockImplementation(measure(name));
+        }
+        vi.stubGlobal('ResizeObserver', class {
+            constructor(callback) { this.callback = callback; observers.push(this); }
+            observe() {}
+            disconnect() {}
+        });
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    const resize = (next) => {
+        Object.assign(size, next);
+        act(() => observers.forEach((observer) => observer.callback([])));
+    };
+
+    const scrollRegion = (container) => container.querySelector('.plus-table-shell-scroll');
+
+    it('takes no tab stop, role or name while the table fits', () => {
+        const { container } = render(
+            <TableShell tableProps={{ 'aria-label': 'Members' }}>{head}{body}</TableShell>
+        );
+        const region = scrollRegion(container);
+        expect(region).not.toHaveAttribute('tabindex');
+        expect(region).not.toHaveAttribute('role');
+        expect(region).not.toHaveAttribute('aria-label');
+    });
+
+    it('is a named, focusable region while the table overflows sideways', () => {
+        size.scrollWidth = 720;
+        const { container } = render(
+            <TableShell tableProps={{ 'aria-label': 'Members' }}>{head}{body}</TableShell>
+        );
+        const region = screen.getByRole('region', { name: 'Members' });
+        expect(region).toBe(scrollRegion(container));
+        expect(region).toHaveAttribute('tabindex', '0');
+    });
+
+    it('takes the name from the caption when the table has no label', () => {
+        size.scrollWidth = 720;
+        render(<TableShell><caption>Roster</caption>{head}{body}</TableShell>);
+        expect(screen.getByRole('region', { name: 'Roster' })).toHaveAttribute('tabindex', '0');
+    });
+
+    it('points at the same label as the table when another element labels it', () => {
+        size.scrollWidth = 720;
+        const { container } = render(
+            <>
+                <h2 id="members-title">Members</h2>
+                <TableShell tableProps={{ 'aria-labelledby': 'members-title' }}>{head}{body}</TableShell>
+            </>
+        );
+        expect(scrollRegion(container)).toHaveAttribute('aria-labelledby', 'members-title');
+        expect(screen.getByRole('region', { name: 'Members' })).toBe(scrollRegion(container));
+    });
+
+    it('counts height overflow only when maxHeight bounds the region', () => {
+        size.scrollHeight = 600;
+        const { container, rerender } = render(
+            <TableShell tableProps={{ 'aria-label': 'Members' }}>{head}{body}</TableShell>
+        );
+        expect(scrollRegion(container)).not.toHaveAttribute('tabindex');
+        rerender(<TableShell maxHeight={200} tableProps={{ 'aria-label': 'Members' }}>{head}{body}</TableShell>);
+        expect(screen.getByRole('region', { name: 'Members' })).toHaveAttribute('tabindex', '0');
+        expect(scrollRegion(container)).toHaveStyle({ maxHeight: '200px' });
+    });
+
+    it('drops the tab stop, role and name when a resize makes the table fit', () => {
+        size.scrollWidth = 720;
+        const { container } = render(
+            <TableShell stickyColumn tableProps={{ 'aria-label': 'Members' }}>{head}{body}</TableShell>
+        );
+        expect(scrollRegion(container)).toHaveAttribute('tabindex', '0');
+        resize({ clientWidth: 800, scrollWidth: 800 });
+        const region = scrollRegion(container);
+        expect(region).not.toHaveAttribute('tabindex');
+        expect(region).not.toHaveAttribute('role');
+        expect(region).not.toHaveAttribute('aria-label');
+        resize({ clientWidth: 375 });
+        expect(screen.getByRole('region', { name: 'Members' })).toHaveAttribute('tabindex', '0');
+    });
 });
