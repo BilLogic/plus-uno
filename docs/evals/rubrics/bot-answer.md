@@ -33,6 +33,6 @@ summary: The rubric a uno-bot answer is scored against, reconstructed from the t
 
 # bot-answer rubric (D1–D9)
 
-Reconstructed from the three eval-round commits so the repo finally records what "good" means for a bot answer — previously this lived only in commit messages (plan 2026-07-07-001 §5). D1 and D4 were never written down anywhere recoverable (they pre-dated the gap-closing commit), so their definitions here are **inferred and now canonical** (conventions are repo-canonical). If a future find contradicts them, revise via uno-maintain.
+Reconstructed from the three eval-round commits so the repo finally records what "good" means for a bot answer — previously this lived only in commit messages (plan 2026-07-07-001 §5). D1 and D4 were never written down anywhere recoverable (they pre-dated the gap-closing commit), so their definitions here are **inferred, and the repo is now their record**. If a future find contradicts them, revise via uno-maintain.
 
 Read by the Worker's draft judge (`agents/uno-bot/src/agent/draft-judge.ts`), which condenses it; `agents/uno-bot/tests/draft-judge-rubric.test.ts` keeps the two in step.
