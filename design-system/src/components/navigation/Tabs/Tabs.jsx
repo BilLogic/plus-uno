@@ -15,7 +15,7 @@
  * strip scrolls sideways, and a pill strip shows only its selected pill, which
  * opens a menu of every view.
  */
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { animate } from 'motion/react';
@@ -357,7 +357,11 @@ const Tabs = ({
         }
         // The strip may have been scrolled by hand since: start from where the old tab is now.
         if (scrolls && prev.el.isConnected && !rootEl.dataset.gliding) prev = readBox(prev.el, listEl.scrollLeft);
-        if (reduced) {
+        // A glide from a tab scrolled out of view would draw the bar past the
+        // strip's edge and over the fade: the bar moves at once instead.
+        const outOfView = scrolls && (prev.x < listEl.offsetLeft - 0.5
+            || prev.x + prev.width > listEl.offsetLeft + listEl.clientWidth + 0.5);
+        if (reduced || outOfView) {
             animRef.current?.stop?.();
             delete rootEl.dataset.gliding;
             lastTabRef.current = next;
@@ -435,13 +439,42 @@ const Tabs = ({
             return;
         }
         if (Math.abs(target - listEl.scrollLeft) < 0.5) return;
-        scrollAnimRef.current = animate(listEl.scrollLeft, target, {
+        const anim = animate(listEl.scrollLeft, target, {
             ...SPRINGS['spatial.fast'].productive,
             onUpdate: (value) => { listEl.scrollLeft = value; },
         });
+        scrollAnimRef.current = anim;
+        Promise.resolve(anim.finished).then(() => {
+            if (scrollAnimRef.current === anim) scrollAnimRef.current = null;
+        });
     }, [scrolls, selectedKey, tabKeys, reduced]);
 
-    // The end fade shows while there is more of the strip past its end.
+    /*
+     * The view menu opens on the checked row, so the arrow keys start from the
+     * selected view. Its rows are ButtonItems with their own roving focus, not
+     * Base UI Menu items, so focus is placed here once the popup has mounted.
+     */
+    const triggerId = useId();
+    const viewMenuId = useId();
+    useEffect(() => {
+        if (!isMenu || !menuOpen) return undefined;
+        let frame = 0;
+        let tries = 0;
+        const place = () => {
+            const row = document.getElementById(viewMenuId)?.querySelector('[role="menuitemradio"][aria-checked="true"]');
+            if (row) {
+                row.focus();
+                if (row.ownerDocument.activeElement === row || tries > 8) return;
+            }
+            tries += 1;
+            if (tries <= 10) frame = requestAnimationFrame(place);
+        };
+        place();
+        return () => cancelAnimationFrame(frame);
+    }, [isMenu, menuOpen, viewMenuId]);
+
+    // The end fade shows while there is more of the strip past its end. On a
+    // resize the selected tab is placed again, so it never ends under the fade.
     useLayoutEffect(() => {
         const rootEl = rootRef.current;
         const listEl = listRef.current;
@@ -450,9 +483,14 @@ const Tabs = ({
             if (listEl.scrollLeft + listEl.clientWidth < listEl.scrollWidth - 1) rootEl.dataset.overflowEnd = '';
             else delete rootEl.dataset.overflowEnd;
         };
+        const resize = () => {
+            const activeEl = listEl.querySelector('[role="tab"][aria-selected="true"]');
+            if (activeEl && !scrollAnimRef.current) listEl.scrollLeft = scrollTargetFor(listEl, activeEl);
+            update();
+        };
         update();
         listEl.addEventListener('scroll', update, { passive: true });
-        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
         observer?.observe(listEl);
         return () => {
             listEl.removeEventListener('scroll', update);
@@ -561,6 +599,19 @@ const Tabs = ({
 
     const listClasses = ['plus-tabs-list', alignmentClass(alignment)].filter(Boolean).join(' ');
 
+    /*
+     * In menu mode there is no tablist to carry the strip's name, so it moves
+     * onto the trigger ("Views: Active") rather than sit on a root with no
+     * role, and each panel is labeled by the trigger.
+     */
+    const { 'aria-label': stripLabel, ...rootProps } = props;
+    const selectedLabel = labelText(selectedTab?.props.children) || String(selectedTab?.props.eventKey ?? '');
+    const panels = isMenu
+        ? rest.map((child) => (React.isValidElement(child) && child.type === Panel
+            ? React.cloneElement(child, { 'aria-labelledby': triggerId })
+            : child))
+        : rest;
+
     return (
         <BaseTabs.Root
             ref={rootRef}
@@ -570,7 +621,7 @@ const Tabs = ({
                 : { defaultValue: defaultActiveKey, value: activeKey })}
             onValueChange={(value, eventDetails) => (managed ? select(value, eventDetails) : onSelect?.(value, eventDetails))}
             className={rootClasses}
-            {...props}
+            {...(isMenu ? rootProps : props)}
         >
             <span ref={indicatorRef} className="plus-tabs-indicator" aria-hidden="true" />
             {isMenu ? (
@@ -579,7 +630,15 @@ const Tabs = ({
                 <DropdownMenu
                     isOpen={menuOpen}
                     onOpenChange={setMenuOpen}
-                    trigger={<ViewMenuTrigger>{selectedTab?.props.children}</ViewMenuTrigger>}
+                    id={viewMenuId}
+                    trigger={(
+                        <ViewMenuTrigger
+                            id={triggerId}
+                            aria-label={stripLabel ? `${stripLabel}: ${selectedLabel}` : undefined}
+                        >
+                            {selectedTab?.props.children}
+                        </ViewMenuTrigger>
+                    )}
                 >
                     {tabs.map((tab) => menuRow(tab, { hasCheck: true }))}
                 </DropdownMenu>
@@ -627,7 +686,7 @@ const Tabs = ({
                     </span>
                 </div>
             )}
-            {rest}
+            {panels}
         </BaseTabs.Root>
     );
 };

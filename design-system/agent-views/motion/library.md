@@ -190,8 +190,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Suggestion | component | enter | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Tabs | component | change | Switch views | `--ds-motion-spatial-fast` |  |
-| Tabs | component | open | Open and close an overlay | `--ds-motion-appearance-fast` |  |
-| Tabs | component | close | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Tabs | component | enter | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Tabs | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Tabs | component | scroll | Scroll to a spot on the page | `--ds-motion-spatial-fast` |  |
 | TagInput | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TextArea | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |

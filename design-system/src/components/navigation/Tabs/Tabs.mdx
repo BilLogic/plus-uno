@@ -332,9 +332,11 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
 - **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
   matching `Tabs.Panel` gets no pointer at all.
 - **Narrow pill views are a menu button.** The selected pill carries
-  `aria-haspopup="menu"` and `aria-expanded`; it opens from Enter, Space or
-  a click, and each view is a `menuitemradio` row, the selected one
-  `aria-checked`. Underline tabs that scroll stay a tablist, and the focused
+  `aria-haspopup="menu"` and `aria-expanded`, and is named from the strip's
+  `aria-label` and the selected view ("Views: Active"). It opens from Enter,
+  Space or a click with focus on the checked row; each view is a
+  `menuitemradio` row, the selected one `aria-checked`, and each panel is
+  labeled by the trigger. Underline tabs that scroll stay a tablist, and the focused
   tab's ring is drawn inside it so the strip's edge never clips it.
 
 </div>

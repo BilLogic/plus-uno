@@ -18,7 +18,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
-**Motion:** change `spatial.fast` · open `appearance.fast` · close `appearance.fast` · scroll `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `spatial.fast` · enter `appearance.fast` · exit `appearance.fast` · scroll `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -44,8 +44,8 @@ Tabs reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Switch views | `--ds-motion-spatial-fast` | The indicator glides; both tab bodies slide together toward the chosen tab, no fade. Pill views: the fill glides and the content swaps in place. |
-| open | Open and close an overlay | `--ds-motion-appearance-fast` | Narrow pill views: the selected pill opens the menu of every view, which fades in place with no clip or travel, as DropdownMenu does. From the keyboard it opens with no animation. |
-| close | Open and close an overlay | `--ds-motion-appearance-fast` | Picking a view, Escape or an outside click closes the menu on the same fade; the pill takes the new view's name at once. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Narrow pill views: the selected pill opens the menu of every view, which fades in place with no clip or travel, as DropdownMenu does. From the keyboard it opens with no animation. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Picking a view, Escape or an outside click closes the menu on the same fade; the pill takes the new view's name at once. |
 | scroll | Scroll to a spot on the page | `--ds-motion-spatial-fast` | Narrow page tabs: when the selection moves, the strip scrolls the selected tab wholly into view, clear of the end fade, on the indicator's clock. On first draw it is placed at once; under reduced motion it jumps. |
 
 ## Alternatives
@@ -138,9 +138,11 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
 - **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
   matching `Tabs.Panel` gets no pointer at all.
 - **Narrow pill views are a menu button.** The selected pill carries
-  `aria-haspopup="menu"` and `aria-expanded`; it opens from Enter, Space or
-  a click, and each view is a `menuitemradio` row, the selected one
-  `aria-checked`. Underline tabs that scroll stay a tablist, and the focused
+  `aria-haspopup="menu"` and `aria-expanded`, and is named from the strip's
+  `aria-label` and the selected view ("Views: Active"). It opens from Enter,
+  Space or a click with focus on the checked row; each view is a
+  `menuitemradio` row, the selected one `aria-checked`, and each panel is
+  labeled by the trigger. Underline tabs that scroll stay a tablist, and the focused
   tab's ring is drawn inside it so the strip's edge never clips it.
 
 ## Related

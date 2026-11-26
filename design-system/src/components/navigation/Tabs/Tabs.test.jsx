@@ -324,12 +324,31 @@ describe('Tabs — narrow', () => {
         expect(screen.getByText('Inactive list')).toBeInTheDocument();
     });
 
-    it('menu: opens from the keyboard', async () => {
+    it('menu: opens from the keyboard on the checked row, and ArrowDown then Enter picks the next view', async () => {
+        const onSelect = vi.fn();
         const user = userEvent.setup();
-        renderViews({ overflow: 'menu' });
+        renderViews({ overflow: 'menu', onSelect });
         screen.getByRole('button', { name: 'Active' }).focus();
         await user.keyboard('{Enter}');
-        expect(await screen.findAllByRole('menuitemradio')).toHaveLength(3);
+        const rows = await screen.findAllByRole('menuitemradio');
+        expect(rows).toHaveLength(3);
+        await waitFor(() => expect(rows[0]).toHaveFocus());
+        await user.keyboard('{ArrowDown}');
+        expect(rows[1]).toHaveFocus();
+        await user.keyboard('{Enter}');
+        expect(onSelect).toHaveBeenCalledWith('Inactive', undefined);
+        await waitFor(() => expect(screen.queryAllByRole('menuitemradio')).toHaveLength(0));
+        expect(screen.getByRole('button', { name: 'Inactive' })).toBeInTheDocument();
+        expect(screen.getByText('Inactive list')).toBeInTheDocument();
+    });
+
+    it('menu: names the trigger from the strip label and labels the panel with it', () => {
+        const { container } = renderViews({ overflow: 'menu', 'aria-label': 'Views' });
+        const trigger = screen.getByRole('button', { name: 'Views: Active' });
+        expect(container.firstChild).not.toHaveAttribute('aria-label');
+        const panel = screen.getByText('Active list');
+        expect(panel.getAttribute('aria-labelledby')).toBe(trigger.id);
+        expect(document.getElementById(panel.getAttribute('aria-labelledby'))).toBe(trigger);
     });
 
     it('scroll: keeps every tab in one row with no More', () => {
