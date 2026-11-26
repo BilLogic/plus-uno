@@ -89,7 +89,7 @@ Finished work leaves a **rule** in the doc that owns the subject, an **ADR** und
 | Product / in-app UI copy (labels, errors, empty states) | `design-system/guidelines/foundations/content/` — what a tutor reads inside the app |
 | Component architecture questions | `docs/engineering/local-components.md` |
 | Product context, users, or domain terms | `docs/product-and-service/*.md` (foundation) + uno-blueprint (live truth) |
-| New teammate orientation | `docs/product-and-service/onboarding.md` |
+| New teammate orientation | `SETUP.md` |
 
 ## Agent skills
 

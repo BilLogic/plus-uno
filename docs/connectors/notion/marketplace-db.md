@@ -9,7 +9,7 @@ Status: **LIVE** — Design HQ · Prototype Marketplace.
 - Database `397b7cca-4982-8002-826c-c45e2baa8e4f` — https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f
 - Data source `397b7cca-4982-80d8-9967-000b69521ce9`
 
-**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook only. The Vibe app and the Full Demo Walkthrough (id `1028`) are on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Experiments use branch Deploy Previews / standalone Netlify.
+**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook only (`prototypes/README.md`). Experiments use branch Deploy Previews / standalone Netlify.
 
 ## Why Notion (vs. the old JS marketplace UI)
 
