@@ -9642,7 +9642,8 @@
         "--frame-head-band",
         "--inline-lg",
         "--page-header-gap",
-        "--page-header-stack"
+        "--page-header-stack",
+        "--stack-md"
       ]
     },
     {
