@@ -65,7 +65,7 @@ Scored by `docs/evals/rubrics/uno-review.md`: recall ≥80% and precision ≥80%
 
 - **Never edits the artifact, never offers to fix** — 0 tolerance. Fixes are explicit, separate asks: artifact → `uno-prototype`, harness/DS/docs → `uno-maintain`.
 - One artifact per review; product-direction questions ("should this exist?") escalate to Bill.
-- Skill-definition quality audits are **not** this skill — that path lives in `uno-maintain` (`skills/uno-maintain/references/skill-quality/`).
+- Skill-definition quality audits are **not** this skill — that path lives in `uno-maintain` (`skills/uno-maintain/references/sweeps.md`).
 
 ## Re-entry
 
