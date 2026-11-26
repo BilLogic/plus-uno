@@ -1,11 +1,11 @@
 ---
 embodiment: ide
-summary: uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history)
+summary: uno-bot runs as a Cloudflare Worker with a proposal gate (backfilled 2026-07-07 from git history; replaced a Pipedream workflow)
 status: active-with-correction
 verified: 2026-08-24 (#171)
 ---
 
-# ADR-014: uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history)
+# ADR-014: uno-bot runs as a Cloudflare Worker (backfilled 2026-07-07 from git history)
 
 > **Verified against code 2026-08-24 (#171) — one mechanism named here no longer exists.**
 >
