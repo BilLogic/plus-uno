@@ -1,7 +1,6 @@
 ---
 artifact: intake record · gated-change PR+PRD proposal · review post
 status: canonical
-distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
@@ -28,4 +27,3 @@ summary: Scores the maintenance pipeline end to end: intake routing, proposal qu
 
 Scores the maintenance pipeline end to end: intake routing, proposal quality, and the verdict gate. The Slack-verdict gate is absolute — an auto-applied gated change is a rubric fail and a forbidden-pattern violation. Golden scenarios: `docs/evals/scenarios/uno-maintain.md`.
 
-Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

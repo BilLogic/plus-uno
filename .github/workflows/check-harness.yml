@@ -210,7 +210,7 @@ jobs:
       - name: npm run check:harness
         env:
           # Absent checkout: the pointer names nothing and the check skips the
-          # blueprint pairings out loud. Never a silent pass.
+          # blueprint pairings out loud.
           BLUEPRINT_REPO: ${{ github.workspace }}/.sibling-repos/plus-uno-blueprint
         run: npm run check:harness
 

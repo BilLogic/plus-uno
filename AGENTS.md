@@ -16,6 +16,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `GLOSSARY.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
+- Why uno-bot is a self-hosted Worker, before proposing a managed or hosted Slack agent: ADR-027.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
 
 ## Skills — what humans invoke
@@ -49,17 +50,19 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 <!-- /ide-only -->
 
 1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`; a component absent from `design-system/agent-views/components/index.md` does not exist, so propose creating it rather than asserting it, and check the index before creating one.
+2. **Props are read from source** (`read-source-first`, `no-hallucinated-props`): open the component's source before using a prop, and use only the props it declares.
+3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands`.
 4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs exact-match what the database already offers; a value that does not exist is a question for the requester.
 5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037). Drag uses Pragmatic drag and drop (ADR-046). Non-interactive markup is PLUS components and `--ds-*` tokens, Storybook docs chrome included; PLUS ships no Bootstrap (ADR-042).
 
 <!-- ide-only -->
 ### Code authoring — IDE only
 
-2, 3, 6, 10. **Escapes** are caught by `npm run check:ds-usage` (rules: `docs/engineering/ds-usage-rules.md`): props read from source (`read-source-first`, `no-hallucinated-props`), Font Awesome Free icons (`FA-Free-only`), tokens for every color, space, type, radius and elevation value (`tokens-over-literals`), public components imported from the `@/components` barrel (`no-deep-imports`).
+6, 10. **Escapes** are caught by `npm run check:ds-usage` (rules: `docs/engineering/ds-usage-rules.md`): tokens for every color, space, type, radius and elevation value (`tokens-over-literals`), public components imported from the `@/components` barrel (`no-deep-imports`).
 7. **Templates** (`templates-first`): a screen starts from a template and each choice on it from its pattern, built in stages: `design-system/guidelines/overview.md`.
 8. **Figma input** (`Figma-registries-are-law`) means registries first, then the implement-design workflow: `design-system/guidelines/figma/registry-load-gate.md`, then `design-system/guidelines/figma/mcp-guide.md`.
 9. **Packages** (`never-install-without-approval`) are the user's call: ask before installing one.
-11. **Generated files** (`no-hand-edited-generated-files`) are regenerated from their source; `npm run check:harness` names the stale one.
+11. **Generated files** (`no-hand-edited-generated-files`) are regenerated from their source; `npm run check:harness` names the stale one (`docs/engineering/setup.md` § The harness gate).
 12. **Storybook** (`Storybook-validation`) validates a component behavior change — the story and its tests, not just the build: `docs/connectors/storybook-mcp.md`.
 13. **Large or risky edits** get the plan and the touched files confirmed first.
 14. **Intake** runs one step per message when the hook points at the brief card: `skills/uno-prototype/references/intake.md` § One step per turn.

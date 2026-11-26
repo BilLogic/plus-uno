@@ -110,6 +110,18 @@ test('a partial supersession stays active-with-correction, and a dated "Supersed
   }
 });
 
+test('a partial supersession ("Superseded for motion") is not flagged under any live status', () => {
+  const r = repo({
+    '099-a.md': adr('active', '- **Status**: Superseded for motion by [ADR-041](041-x.md)'),
+    '098-b.md': adr('active-with-correction', '> **Superseded in part by [ADR-041](041-x.md).**'),
+  });
+  try {
+    assert.deepEqual(messages(r.root), []);
+  } finally {
+    r.done();
+  }
+});
+
 test('overview.md and the missing folder are out of scope', () => {
   const r = repo({ 'overview.md': '# Architecture decisions\n\nSuperseded is a status.\n' });
   const empty = repo();
