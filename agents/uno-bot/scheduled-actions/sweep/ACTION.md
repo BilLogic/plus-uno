@@ -7,8 +7,6 @@ description: the end-of-day sweep's drift reports and decision cards — read be
 
 # The end-of-day sweep
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `sweep` · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751, #764 and #795; moved 2026-10-14 out of docs/connectors/ into the scheduled-actions folder, its commitment reminders and card follow-ups to `follow-through` and its Figma comment decisions to `figma-comments` · the code is agents/uno-bot/src/sweep/, src/dm-sweep/, src/figma-drift/ and src/dm-watch/capture.ts. -->
-
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a card in a report until a person approves it in Review. Every write waits for that Approve.
 
 ## What it reads

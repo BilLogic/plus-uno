@@ -5,8 +5,6 @@ summary: Figma's connector overview, always loaded — what uno-bot can reach ov
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09 · became the folder's overview 2026-10-14, with the REST reach table. -->
-
 ## What uno-bot can reach in Figma
 
 uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Figma MCP needs a browser login, so it is the IDE's. Figma's published REST API has no operation that creates a file, frame, shape, text or wireframe, so a canvas change is a person's or the IDE's.

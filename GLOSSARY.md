@@ -5,8 +5,6 @@ summary: Use these terms consistently across all design system work, prototypes,
 
 # PLUS Terminology
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 1 in uno-bot's prompt (its constitution section), read on demand in the IDE · distilled 2026-07-07 · applied by every agent naming a product, organization, estate or harness term. -->
-
 For component, pattern, token, motion or sound terms, read `docs/conventions/design-system-glossary.md` (uno-bot: `read_reference` name `docs/conventions/design-system-glossary`); product, organization, estate and harness terms are defined below.
 
 ## Language
@@ -114,7 +112,7 @@ Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow 
 _Avoid_: "spec" for a draft
 
 **Product screen**:
-A coded copy of one PLUS screen, built from design-system components. The Specs set is kept on the `archive/legacy-ds` branch until its rebuild.
+A coded copy of one PLUS screen, built from design-system components. The Specs set is out of `main` until its rebuild (`prototypes/README.md`).
 _Avoid_: bare "spec", "page" for the coded screen
 
 **Prompt-spec**:
@@ -174,7 +172,7 @@ The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for 
 _Avoid_: "Spec file"
 
 **Vibe app**:
-The coded prototype of PLUS built from **Product screen**s, kept on the `archive/legacy-ds` branch; its URLs redirect to Storybook.
+The coded prototype of PLUS built from **Product screen**s, retired from `main` (`prototypes/README.md`).
 _Avoid_: "live app", "the app"
 
 **Production app / QA app**:

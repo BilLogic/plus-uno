@@ -9,9 +9,8 @@ summary: One intake per finding (evidence + suggested severity), through the nor
 
 One intake per finding (evidence + suggested severity), through the normal pipeline in `method.md`. A direct fix only for pure path/date/link rot; anything touching skills, persona, DS, or requirements is a gated change.
 
-## A. Canonicality headers (conventions are repo-canonical — ADR-017)
+## A. Legacy Notion pages (conventions are repo-canonical — ADR-017)
 
-- [ ] Every `docs/conventions/*.md` opens with the ADR-017 header comment: `<!-- canonical per ADR-017 (docs/adr/) · Tier N · <lineage> · applied by <who>. -->`. Prose headers, `<!-- Tier: N -->`-only headers, and missing lineage all fail.
 - [ ] No conventions file still carries a "prefer Notion on conflict" rule line.
 - [ ] Legacy Notion playbook pages duplicating a conventions file carry a superseded banner pointing at the repo — missing banner → intake for writers/notion.
 

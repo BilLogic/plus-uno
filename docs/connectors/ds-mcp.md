@@ -5,8 +5,6 @@ summary: The design-system lookup — the `ds` command, the local `plus-ds` MCP 
 
 # Design-system lookup: `ds` and the `plus-ds` MCP
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-11-07 · load to look up a PLUS name, prop, token, guideline or rule without reading files. -->
-
 One lookup with two doors. `npm run ds -- <tool> …` answers in a shell; the `plus-ds` MCP server answers the same five tools over stdio. It is registered in `.mcp.json` beside `storybook`, so Claude Code and Cursor start it on demand from the checkout, and it always matches the branch being edited. Both are thin adapters on `scripts/lib/ds-lookup.mjs`, which reads the DS facts module (`scripts/lib/ds-facts.mjs`). uno-bot asks the hosted door below first and falls back to the same facts built into its bundle (§ uno-bot).
 
 ## The order

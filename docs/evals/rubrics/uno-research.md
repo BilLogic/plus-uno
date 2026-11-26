@@ -1,7 +1,6 @@
 ---
 artifact: research output (study guide + preliminary analysis + SME identification)
 status: canonical
-distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
@@ -23,4 +22,3 @@ summary: Scores the research skill's outputs
 
 Scores the research skill's outputs. Scored 1–5 per dimension by one human reviewer (two at the annual calibration run). Golden scenarios: `docs/evals/scenarios/uno-research.md`.
 
-Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

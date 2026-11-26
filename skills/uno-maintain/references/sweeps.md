@@ -12,11 +12,10 @@ summary: the standing sweeps (Figma hygiene · conventions integrity · comment 
   registers the automated ones. The auditor inspects and files intakes;
   writers fix.
 - Integrity sweep checklist:
-  [`references/staleness-sweep.md`](staleness-sweep.md) (canonicality headers +
+  [`references/staleness-sweep.md`](staleness-sweep.md) (legacy Notion banners +
   agents↔docs cross-references + path integrity).
 - Scored audits (rubric against an artifact) → summon
   `reviewers/rubric-applier`.
-- Skill-quality audit (a skill is the target artifact): run
-  [`references/skill-quality/audit-workflow.md`](skill-quality/audit-workflow.md)
-  with [`references/skill-quality/checklist.md`](skill-quality/checklist.md) as
-  criteria; report per `output-template.md`.
+- Skill-quality audit (a skill is the target artifact): load the
+  `writing-for-agents` skill (upstream) and audit the skill against it, one
+  finding per violated lever with the line it sits on.

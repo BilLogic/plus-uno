@@ -8,7 +8,7 @@ summary: The front page — what plus-uno is, every surface it ships (Storybook,
 
 The agentic design-ops workspace of the [PLUS](https://tutors.plus/) design team. PLUS is a nonprofit tutoring program: 500+ college tutors working with 3,000+ K-12 students. One repo holds the design system, the prototypes built from it, and **uno**, the agent that researches, prototypes, reviews and maintains that work, in the IDE and in Slack.
 
-It is a prototype estate, not a production app.
+It is a prototype estate, not a production app. The stack is React built with Vite, documented in Storybook, styled with SCSS and design tokens; new interactive behavior is built on Base UI (`@base-ui/react`, ADR-037), with Highcharts for data visualization and Motion for animation. uno-bot is TypeScript on Cloudflare Workers. Versions live in `package.json`.
 
 | | |
 |---|---|
@@ -23,7 +23,7 @@ People ask for work in **skills**. Skills summon **agents**. Agents follow **con
 
 | Surface | What it is | Where it lives | Docs |
 |---|---|---|---|
-| Design system | React components, patterns, AI UI, data-viz charts and tokens | `design-system/` | [Storybook](https://plus-uno.netlify.app/storybook/) · [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) |
+| Design system | React components, patterns, AI UI, data-viz charts and tokens; the generated [component index](design-system/agent-views/components/index.md) is the count and the existence law | `design-system/` | [Storybook](https://plus-uno.netlify.app/storybook/) · [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) |
 | Design-system lookup | One lookup with three doors: the `ds` CLI, a local MCP server, a hosted MCP endpoint | `scripts/ds.mjs`, `scripts/ds-mcp.mjs`, `netlify/functions/ds-mcp/` | [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) |
 | Prototypes and marketplace | Branch experiments on Deploy Previews, cataloged in Notion | `prototypes/`, `skills/uno-publish/` | [`prototypes/README.md`](prototypes/README.md) · [`docs/connectors/notion/marketplace-db.md`](docs/connectors/notion/marketplace-db.md) |
 | uno skills and agents | Six IDE workflows and the agents they summon | `skills/`, `agents/` | [`skills/README.md`](skills/README.md) · [`agents/README.md`](agents/README.md) |
@@ -102,7 +102,7 @@ uno is the PLUS design team's agent. In the IDE (Claude Code, Cursor, any tool t
 | `uno-review` | review against the design system, product intent and accessibility; run Design QA |
 | `uno-maintain` | file an intake, fix drift, and keep the docs and estates in sync |
 
-Each skill is `skills/<name>/SKILL.md` over its `references/method.md`. The agents a skill summons are in `agents/`: **researchers** gather, **reviewers** judge, **writers** write to Notion, Figma and the blueprint. [`AGENTS.md`](AGENTS.md) is the constitution every agent loads first: identity, the skill routing table, the loading contract and the hard rules.
+Each skill is `skills/<name>/SKILL.md` over its `references/method.md`. The agents a skill summons are in `agents/`: **researchers** gather, **reviewers** judge, **writers** write to Notion, Figma and the blueprint. [`AGENTS.md`](AGENTS.md) is the constitution every agent loads first: identity, the skill routing table, the conventions and the hard rules.
 
 ## uno-bot
 
@@ -119,39 +119,51 @@ The source of truth for how the PLUS service runs today: phases, scenarios, step
 
 ## Prototypes and the marketplace
 
-`main` hosts Storybook and holds only the current design system. The old Specs screens, the Vibe app and the Full Demo Walkthrough live on the `archive/legacy-ds` branch; their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook. Everything else is an experiment:
+`main` hosts Storybook and holds only the current design system ([`prototypes/README.md`](prototypes/README.md) says where the retired screens went). Everything else is an experiment:
 
 1. Scaffold one on a feature branch (`bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`) and build with design-system components.
 2. Open a PR; the Netlify deploy preview is the prototype's URL.
 3. Run `uno-publish` to register it in the [Prototype Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f), the Notion catalog with that deploy URL (PLUS workspace access).
 4. When accepted, fold what it proves into the design system. One-off experiments are not merged to `main`.
 
-## Repository layout
-
-```
-plus-uno/
-├── AGENTS.md            the constitution: identity, skills, hard rules
-├── design-system/       components, patterns, data viz, tokens, guidelines
-│   ├── agent-views/     generated indexes agents read (regenerate, never hand-edit)
-│   └── figma/           Figma registries and alignment runbooks
-├── prototypes/          the experiment ritual (no prototype lives on main)
-├── skills/              the six uno skills
-├── agents/              researchers/, reviewers/, writers/, and uno-bot/ (the Worker)
-├── docs/                connectors/, engineering/, conventions/, adr/, evals/, knowledge/
-├── netlify/functions/   the hosted DS MCP and the Storybook docs assistant
-└── scripts/             generators, the ds CLI and MCP, and the check:* gates
-```
-
 ## Deployment
 
-Netlify hosts the site. Every PR gets a free deploy preview at `deploy-preview-<PR>--plus-uno.netlify.app`. A merge to `main` does not publish: production deploys only when a release is called, by running [`netlify-production-deploy.yml`](.github/workflows/netlify-production-deploy.yml) by hand. uno-bot deploys separately, on every push to `main` (above).
+Netlify hosts the site, configured in `netlify.toml`. Every PR gets a free deploy preview at `deploy-preview-<PR>--plus-uno.netlify.app`. A merge to `main` does not publish: production deploys only when a release is called, by running [`netlify-production-deploy.yml`](.github/workflows/netlify-production-deploy.yml) by hand.
+
+| Target | URL | Built from |
+|--------|-----|------------|
+| **Storybook** | [plus-uno.netlify.app/storybook](https://plus-uno.netlify.app/storybook/) (also the site root) | `npm run build:all` into `dist/storybook/` |
+| **Hosted DS MCP** | `plus-uno.netlify.app/mcp/ds` (team key) | `netlify/functions/ds-mcp/` |
+| **uno-blueprint app** | [plus-uno.netlify.app/blueprint](https://plus-uno.netlify.app/blueprint/) | its own Netlify site (`plus-uno-blueprint`), proxied by a forced rewrite in `netlify.toml` |
+| **Experiments** | deploy previews or standalone Netlify sites | feature branches, cataloged in the Prototype Marketplace |
+
+uno-bot deploys separately, on every push to `main` (above). Deploy notes for publishing: [`skills/uno-publish/references/deployment-guide.md`](skills/uno-publish/references/deployment-guide.md).
+
+## Integrations
+
+| Integration | Purpose |
+|---|---|
+| Storybook MCP | component docs and story previews from a running Storybook ([`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md)) |
+| `plus-ds` MCP | the design-system lookup, local and hosted ([`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md)) |
+| Figma MCP | design-to-code and the write-back gate ([`design-system/guidelines/figma/`](design-system/guidelines/figma/)) |
+| Notion | Roadmap cards, PRDs, the Prototype Marketplace ([`docs/connectors/notion/`](docs/connectors/notion/)) |
+| Supabase | uno-blueprint, the current service journey ([`docs/connectors/supabase/`](docs/connectors/supabase/)) |
+| GitHub Actions | the PR gate (`check-harness.yml`), uno-bot deploys, Figma snapshot refreshes, the release deploy |
+
+## Team
+
+| Role | People |
+|---|---|
+| Design Lead | Bill |
+| Designers | Ashley, Victor, Bryan + rotating semester designers |
+| Product | Shiv (lead), Suraj (PM) |
+| Engineering | Jose, Ishan, Max, Zach, Cindy |
 
 ## Documentation
 
 | Read | For |
 |---|---|
-| [`SETUP.md`](SETUP.md) | running the repo and finding your way around |
-| [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | a new teammate's first day |
+| [`SETUP.md`](SETUP.md) | running the repo, finding your way around, a new teammate's first week |
 | [`AGENTS.md`](AGENTS.md) | how every agent here is told to work |
 | [`INDEX.md`](INDEX.md) | every document, routed by task |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | the PLUS product: users, features, flows |

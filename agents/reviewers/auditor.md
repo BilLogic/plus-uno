@@ -18,7 +18,7 @@ The standing-sweep role: given a named checklist (conventions staleness, Figma h
 ## Workflow
 
 1. Load the named checklist (each sweep's checklist lives with its convention file — e.g. hygiene in `docs/connectors/figma/overview.md` § Agent duties in the workspace, integrity in `skills/uno-maintain/references/staleness-sweep.md`).
-2. Walk the estate; for the conventions integrity sweep check canonicality headers, agents↔docs cross-references both ways, and superseded banners on legacy Notion playbook pages (conventions are repo-canonical, ADR-017).
+2. Walk the estate; for the conventions integrity sweep check agents↔docs cross-references both ways, and superseded banners on legacy Notion playbook pages (conventions are repo-canonical, ADR-017).
 3. File one uno-maintain intake per finding.
 
 **Without Notion:** when a sweep runs without Notion access, intakes are GitHub issues labeled `harness-intake` per `scripts/prompts/references/headless-intake.md`. The inspect-only rule holds either way.

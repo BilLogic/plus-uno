@@ -5,8 +5,6 @@ summary: The escape rules `check:ds-usage` holds consumer code to — one sectio
 
 # Design-system usage rules
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-11-06 · reached from a `check:ds-usage` finding's `see` link; ADR-039 records why one checker owns these. -->
-
 An **escape** is one place where code in `prototypes/` or `src/` leaves the design system. `npm run check:ds-usage` finds them from the generated manifests (`design-system/agent-views/components.json`, `tokens.json`), so a rule here is only as current as `npm run generate:agent` left those files.
 
 The motion rule also checks component and template styles under `design-system/src/`. Positive MDX code blocks and stories tagged `reference-screen` use the same checker.

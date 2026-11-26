@@ -25,7 +25,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the design-system lookup, the prototypes, uno skills, uno-bot), and where each one's docs live. |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
-| [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
+| [`AGENTS.md`](AGENTS.md) | The constitution — identity, skill routing, conventions, and hard rules for every embodiment. |
 | [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |
 
 ## Skills — what humans invoke
@@ -92,7 +92,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/mcp-guide.md`](design-system/guidelines/figma/mcp-guide.md) | The registry load gate is design-system/guidelines/figma/registry-load-gate.md — MANDATORY, registries first, not restated here |
 | [`design-system/guidelines/figma/overview.md`](design-system/guidelines/figma/overview.md) | Machine-readable contracts and human runbooks so Cursor prototypes, Storybook, and the Figma design system stay aligned on tokens and components |
 | [`design-system/guidelines/figma/page-documentation.md`](design-system/guidelines/figma/page-documentation.md) | The page standard for the BS4 Foundation Figma library — one Section per documented component, the variant matrix and reading order, the 80 px gap and reflow, annotations on the Docs frame's instances, the Docs frame and its seven sections, naming, what a page must not hold, tokens, and the done test. |
-| [`design-system/guidelines/figma/parity-2026-07.md`](design-system/guidelines/figma/parity-2026-07.md) | Full-inventory sweep across both Figma files and the Storybook docs after the IA overhaul and BS4 library publish |
 | [`design-system/guidelines/figma/registry-load-gate.md`](design-system/guidelines/figma/registry-load-gate.md) | Agents MUST read both files below before |
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/content/language.md`](design-system/guidelines/foundations/content/language.md) | Words, people, sentences and mechanics for product copy |
@@ -122,9 +121,7 @@ Adding a doc changes this file; editing this file changes nothing.
 |-----|---------|
 | [`docs/product-and-service/features.md`](docs/product-and-service/features.md) | The in-session workspace |
 | [`docs/product-and-service/flows.md`](docs/product-and-service/flows.md) | The core workflow — what happens before, during, and after every tutoring session |
-| [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | New designer, PM, developer, or intern: this page + the six skills are all you memorize |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | AI is rewriting our economy, but global K-12 math proficiency is at a historic low due to lack of content mastery and emotional support |
-| [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo as a product — who runs it, what it deploys where, and what it connects to; the surface map itself is README.md |
 | [`docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md`](docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md) | The system around uno-bot: where it sits relative to GitHub Actions, Slack, Notion, Figma, and the model provider |
 | [`docs/product-and-service/users.md`](docs/product-and-service/users.md) | PLUS Users & Stakeholders |
 
@@ -143,9 +140,9 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half and retired in full by ADR-042, which removes Bootstrap |
 | [`docs/adr/010-three-tier-context-loading-architecture.md`](docs/adr/010-three-tier-context-loading-architecture.md) | Three-tier context loading architecture |
 | [`docs/adr/011-doc-splitting-by-task-context.md`](docs/adr/011-doc-splitting-by-task-context.md) | Doc splitting by task context (Index + Modules pattern) |
-| [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps |
+| [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps — retired; the manifest never landed |
 | [`docs/adr/013-harness-ia-one-constitution-dual-face-skills-derived.md`](docs/adr/013-harness-ia-one-constitution-dual-face-skills-derived.md) | Harness IA — one constitution, dual-face skills, derived agent roster (2026-07-07) |
-| [`docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md`](docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md) | uno-bot v2 — Pipedream → Cloudflare Worker (backfilled 2026-07-07 from git history) |
+| [`docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md`](docs/adr/014-uno-bot-v2-pipedream-cloudflare-worker.md) | uno-bot runs as a Cloudflare Worker with a proposal gate (backfilled 2026-07-07 from git history; replaced a Pipedream workflow) |
 | [`docs/adr/015-uno-blueprint-on-supabase-as-the-product-source.md`](docs/adr/015-uno-blueprint-on-supabase-as-the-product-source.md) | uno-blueprint on Supabase as the product source of truth (backfilled 2026-07-07 from git history) |
 | [`docs/adr/016-the-six-skill-pivot.md`](docs/adr/016-the-six-skill-pivot.md) | The six-skill pivot (backfilled 2026-07-07) |
 | [`docs/adr/017-conventions-are-canonical-in-the-repo-notion-playbook.md`](docs/adr/017-conventions-are-canonical-in-the-repo-notion-playbook.md) | Conventions are canonical in the repo; Notion playbook material obsoleted (2026-07-07) |
@@ -214,6 +211,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-143 routable documents. Staged notes (`docs/knowledge/`) and
+140 routable documents. Staged notes (`docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

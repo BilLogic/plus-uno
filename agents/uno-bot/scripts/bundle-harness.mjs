@@ -129,7 +129,7 @@ export const REPO_ROOT = path.resolve(here, "../../.."); // two levels above age
 
 /**
  * Char budgets, in chars because these files have paragraph-length lines. The
- * contract they enforce is stated in `AGENTS.md` § The loading contract; this is
+ * contract they enforce is stated in `docs/engineering/setup.md` § What AGENTS.md carries; this is
  * the assertion of it, so an edit that blows a budget fails the build instead of
  * being noticed months later by whoever re-measures — except the constitution's,
  * which is SOFT: an overrun warns, names the file and the distance, and ships.
@@ -927,7 +927,7 @@ export function assemble({ repoRoot = REPO_ROOT } = {}) {
           )
           .join("\n") +
         "\n  -> Tier 1 loads on every request. Trim it back: a glossary row REPLACES the row it" +
-        "\n     supersedes rather than sitting beside it (AGENTS.md § The loading contract).",
+        "\n     supersedes rather than sitting beside it (`docs/engineering/setup.md` § What AGENTS.md carries, and what the bundle takes).",
       severity: "warning",
     });
   }

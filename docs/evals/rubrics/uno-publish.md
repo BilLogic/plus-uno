@@ -1,7 +1,6 @@
 ---
 artifact: share-out bundle (feedback rail) · handoff package (handoff rail) · marketplace entry
 status: canonical
-distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
@@ -29,4 +28,3 @@ summary: Scores both rails
 
 Scores both rails. Bundle completeness is a hard gate in the skill itself — an incomplete bundle never posts; this rubric audits that the gate held. Golden scenarios: `docs/evals/scenarios/uno-publish.md`.
 
-Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

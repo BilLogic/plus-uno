@@ -9,7 +9,7 @@ summary: PLUS Uno production (plus-uno.netlify.app) ships
 
 PLUS Uno production (`plus-uno.netlify.app`) ships **Storybook** at `/storybook/` (site landing).
 
-The old Vibe app (`/home`, `/app`) and Full Demo Walkthrough (`/demo`) are on the `archive/legacy-ds` branch; their URLs redirect to Storybook.
+Where the retired Vibe app and Full Demo Walkthrough went: `prototypes/README.md`.
 
 Individual experiments are **not** added to `main` as numeric routes. They ship as preview URLs and are cataloged in Notion.
 

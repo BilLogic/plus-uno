@@ -849,9 +849,8 @@
   to = "/storybook/:splat"
   status = 200
 
-# Removed from main (2026-11-09): the Vibe app (/home, /app), the Full Demo
-# Walkthrough (/demo) and the prototypes built on the old Specs code. Their
-# code is on the archive/legacy-ds branch; their old links land on Storybook.
+# Removed from main (2026-11-09): /home, /app and /demo land on Storybook
+# (prototypes/README.md says what they were).
 [[redirects]]
   from = "/home"
   to = "/storybook/"

@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,949 chars from 9 files**, against an assembled budget of 175,500 (68,551 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,565 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **101,199 chars from 9 files**, against an assembled budget of 175,500 (74,301 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 80,815 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,815 (−6,838 ide-only) | 9,815 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,207 | 28,051 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 49,527 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,173 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,421 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,115 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,901 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,075 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,543 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,120 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,093 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,949 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 5,795 (−4,521 ide-only) | 5,795 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 23,774 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 45,250 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,896 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 48,144 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 53,477 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 64,906 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 85,859 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,962 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 95,539 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 100,343 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 101,199 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,29 +42,29 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,391 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 165,548 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
-| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 4,291 |
+| `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 4,088 |
 | `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,730 |
-| `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 3,515 |
-| `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
-| `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
-| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 27,035 |
+| `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 3,255 |
+| `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,349 |
+| `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,437 |
+| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 26,854 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,575 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,564 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,472 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,307 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
-| `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
-| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 9,103 |
+| `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,967 |
+| `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 8,820 |
 | `file-a-ticket` | [`agents/uno-bot/skills/file-a-ticket/SKILL.md`](../../agents/uno-bot/skills/file-a-ticket/SKILL.md) | 3,416 |
 | `find-the-right-person` | [`agents/uno-bot/skills/find-the-right-person/SKILL.md`](../../agents/uno-bot/skills/find-the-right-person/SKILL.md) | 2,606 |
-| `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 13,154 |
+| `follow-through` | [`agents/uno-bot/scheduled-actions/follow-through/ACTION.md`](../../agents/uno-bot/scheduled-actions/follow-through/ACTION.md) | 12,861 |
 | `prepare-the-call` | [`agents/uno-bot/skills/prepare-the-call/SKILL.md`](../../agents/uno-bot/skills/prepare-the-call/SKILL.md) | 2,202 |
 | `relay-a-message` | [`agents/uno-bot/skills/relay-a-message/SKILL.md`](../../agents/uno-bot/skills/relay-a-message/SKILL.md) | 1,462 |
 | `share-out` | [`agents/uno-bot/skills/share-out/SKILL.md`](../../agents/uno-bot/skills/share-out/SKILL.md) | 2,627 |
-| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,868 |
+| `sweep` | [`agents/uno-bot/scheduled-actions/sweep/ACTION.md`](../../agents/uno-bot/scheduled-actions/sweep/ACTION.md) | 23,383 |
 
 ## The assembled prompt
 
@@ -78,31 +78,19 @@ everything the bot can be told.
 
 # plus-uno — Agent Constitution
 
-<!-- Tier: 1 — the only always-loaded doc. Everything else loads on demand or is retrieved live; the contract is § The loading contract below. -->
-
 The one identity, roster, and routing document for every agent working in this repo — the in-IDE agent and the uno-bot Slack Worker (which bakes this file into its bundle at build time).
 
-**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.**
-Users remember six skills; agents point at the conventions they enforce and never restate them. In Slack, bot skills call the Worker's tools instead.
+**The interaction contract (IDE): humans speak in skills · skills summon agents · agents obey conventions.** Agents point at a convention and never restate it; in Slack, bot skills call the Worker's tools instead.
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`); `main` holds only the current design system. The old Specs code, the Vibe app and the Full Demo Walkthrough (entry id `1028`) live on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work in plus-uno, the design-system + prototyping workspace for the PLUS tutoring platform. Production on `main` hosts **Storybook** (`/storybook/`).
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
-- uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
 - The blueprint and the Notion Roadmap speak **different vocabularies** — service-blueprint vs project-management. Speak each estate's own words, and route a question by its frame words: `GLOSSARY.md` § Two vocabularies is the law (ratified in ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or from a cited estate, so escalate rather than fill the gap.
+- Why uno-bot is a self-hosted Worker, before proposing a managed or hosted Slack agent: ADR-027.
 - Embodiment deltas live in `agents/` — e.g. `agents/uno-bot/AGENT.md` holds only what differs in Slack.
-
-## Harness components
-
-| Component | What | Where |
-|---|---|---|
-| `uno` | the design agent, all embodiments | this repo |
-| `uno-bot` | Slack embodiment | `agents/uno-bot/` — definition (AGENT.md) + body (Worker) |
-| `uno-blueprint` | source of truth for the **current** service journey | Supabase, Tier 3 (`docs/connectors/supabase/overview.md`) |
-| `uno-storybook` | design-system source of truth | `design-system/` stories + MDX → plus-uno.netlify.app/storybook |
 
 ## Skills — what humans invoke
 
@@ -110,43 +98,32 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 |---|---|---|
 | `skills/uno-research` | gather context: user studies, Slack threads, analytics, codebase — instrument-first | researchers/* · writers/notion (study guide) |
 | `skills/uno-synthesize` | findings → takeaways → PRD; blueprint updates | writers/notion · writers/blueprint |
-| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); hand-craft bypasses the skill and re-joins at review; **PRD required at entry** — no PRD → `skills/uno-synthesize` first (hook-enforced where a hook runtime exists; the sequence itself binds every runtime) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
+| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); hand-craft re-joins at review; **PRD required at entry** — no PRD → `skills/uno-synthesize` first (hook-enforced where a hook runtime exists, binding every runtime) | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
 | `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
-Routing: match intent to the Use-when column; if ambiguous, ask which capability is meant. These six are **uno skills**, IDE workflows: `SKILL.md` loads `references/method.md` on invocation. uno-bot runs its own **bot skills** under `agents/uno-bot/skills/`, named for what the bot does, each ending in an **exit** — answer, file or hand off (a ready-to-paste IDE prompt naming an uno skill); a bot skill's description is its always-loaded pointer and its body is read by name through `read_reference`. What goes in which file, for both, is `skills/README.md`.
-
-**A skill's IDE discovery surface is generated.** Claude Code and Cursor read `.claude/skills/`, and `npm run generate:skill-surfaces` publishes a stub there from the canonical frontmatter — so edit `skills/<name>/SKILL.md` and regenerate; `npm run check:skill-surfaces` fails the harness gate on drift. What is generated where: `docs/engineering/setup.md` § Generated skill surfaces.
+Match intent to the Use-when column; if ambiguous, ask which capability is meant. `skills/README.md` settles uno skills (IDE) against bot skills (Slack) and what goes in which file.
 
 ## Agents — what skills summon
 
-`agents/` holds three plain kinds plus the embodiment: **researchers/** (gather), **reviewers/** (judge), **writers/** (notion · figma · blueprint — the IDE's only estate writers; uno-bot writes through ✅-gated tools and one ungated @uno Figma reply: `docs/connectors/figma/overview.md`). Roster, anatomy, and the creation rule: `agents/README.md`.
+**researchers/** gather, **reviewers/** judge, **writers/** (notion · figma · blueprint) are the IDE's only estate writers; uno-bot writes through ✅-gated tools (`docs/connectors/figma/overview.md`). Roster and creation rule: `agents/README.md`.
 
 ## Conventions — what agents obey
 
-Authored protocol is normative and lives in three places: `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase), `docs/conventions/writing.md` (long-form and findings pages). **Membership in the uno-bot bundle is a property of the document**: each doc declares `embodiment: all | ide | uno-bot` in its own frontmatter and `agents/uno-bot/scripts/bundle-harness.mjs` globs for it — no list here or anywhere else decides it. Conventions are **canonical in this repo** (ADR-017; the Notion playbooks they were distilled from are superseded) — every header carries the ADR-017 canonical line + `distilled:` lineage; on conflict with a legacy page, the repo wins and the page gets a superseded banner via uno-maintain.
+Authored protocol is normative and lives in `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase) and `docs/conventions/writing.md` (long-form and findings pages). Conventions are **canonical in this repo** (ADR-017); on conflict with a legacy Notion page, the repo wins and the page gets a superseded banner via uno-maintain. Bundle membership and its checks: `docs/engineering/setup.md` § The harness gate.
 
-**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint · DS truth ← uno-storybook · team conventions ← `docs/conventions/` (canonical here). **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
-
-## The loading contract
-
-**Tier 1 — always loaded.** This file, and nothing else. Soft char budget (`BUDGETS.constitution`): an overrun warns rather than fails, and a tier that bloats still defeats the tier.
-
-**Tier 3 — retrieved live, never cached.** Product truth from `uno-blueprint` (`writers/blueprint` / `search_blueprint`); design-system truth from `uno-storybook` (read the source and stories). Team conventions are *not* Tier 3 — they are canonical in-repo (ADR-017) and load as plain files.
-
-**uno-bot's Tier 2 is `read_reference`.** A doc that declares `disclosure: reference` leaves the always-loaded bundle for a map baked beside it, and the Worker reads it by name — `draft-a-prd` — on the turns whose pointer fires; the text lasts the turn and a later turn re-reads it in one call. Everything else in the bundle is always in context.
-
+**Placement rule:** content lives with its consumer; many-consumer content lives in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint (`writers/blueprint` / `search_blueprint`) · DS truth ← uno-storybook · team conventions ← `docs/conventions/`. **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages — the losing artifact gets a uno-maintain intake (source: 📐 System Overview).
 
 ## Hard rules
 
 Every embodiment, including Slack.
 
-1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`, then load only what the task needs (e.g. `design-system/agent-views/components/index.md`, `design-system/agent-views/tokens/tokens.md`). A component absent from the index does not exist — propose creating it rather than asserting it, and check the index before creating one so you do not duplicate what is there.
-2. **Read the source for every name you use** (`read-source-first`, `no-hallucinated-props`). Props, variants and types come from the component `.jsx` / `.stories.jsx` — or from `docs-show` on the Storybook MCP endpoint (`docs/connectors/storybook-mcp.md`) — before you write them.
-3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands` — including the brand glyphs (`fa-brands fa-notion`, `fa-brands fa-figma`). Pro families and Pro-only names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-grid-2`) are not licensed here and render as blanks.
-4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs are exact-matched against what the database already offers; a value that does not exist is a question for the requester. Safety is the gate + schema match, not a hardcoded database fence.
-5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037, widening ADR-036). Drag uses Pragmatic drag and drop ([ADR-046](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md)). Non-interactive markup is PLUS components and `--ds-*` tokens; PLUS ships no Bootstrap (ADR-042). The Storybook docs chrome is styled on the same tokens as the app, with no other framework.
+1. **The design system's generated index is the existence law** (`DS-knowledge-is-law`, `no-duplicate-components`). Start at `design-system/guidelines/overview.md`; a component absent from `design-system/agent-views/components/index.md` does not exist, so propose creating it rather than asserting it, and check the index before creating one.
+2. **Props are read from source** (`read-source-first`, `no-hallucinated-props`): open the component's source before using a prop, and use only the props it declares.
+3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands`.
+4. **Notion writes follow `docs/connectors/notion/`** — the convention surfaces and the ✅-gated tools. Select options, pillars, features and OKRs exact-match what the database already offers; a value that does not exist is a question for the requester.
+5. **PLUS components first; interactive behavior built on Base UI** (`PLUS-components-first`): reach for a PLUS component before any other framework, and build any new interactive behavior — open/closed state, focus, keyboard — on `@base-ui/react`, headless, styled on `--ds-*` tokens (ADR-037). Drag uses Pragmatic drag and drop (ADR-046). Non-interactive markup is PLUS components and `--ds-*` tokens, Storybook docs chrome included; PLUS ships no Bootstrap (ADR-042).
 
 
 ## Knowledge
@@ -160,8 +137,6 @@ Finished work leaves a **rule** in the doc that owns the subject, an **ADR** und
 <!-- GLOSSARY.md -->
 
 # PLUS Terminology
-
-<!-- canonical per ADR-017 (docs/adr/) · Tier 1 in uno-bot's prompt (its constitution section), read on demand in the IDE · distilled 2026-07-07 · applied by every agent naming a product, organization, estate or harness term. -->
 
 For component, pattern, token, motion or sound terms, read `docs/conventions/design-system-glossary.md` (uno-bot: `read_reference` name `docs/conventions/design-system-glossary`); product, organization, estate and harness terms are defined below.
 
@@ -270,7 +245,7 @@ Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow 
 _Avoid_: "spec" for a draft
 
 **Product screen**:
-A coded copy of one PLUS screen, built from design-system components. The Specs set is kept on the `archive/legacy-ds` branch until its rebuild.
+A coded copy of one PLUS screen, built from design-system components. The Specs set is out of `main` until its rebuild (`prototypes/README.md`).
 _Avoid_: bare "spec", "page" for the coded screen
 
 **Prompt-spec**:
@@ -330,7 +305,7 @@ The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for 
 _Avoid_: "Spec file"
 
 **Vibe app**:
-The coded prototype of PLUS built from **Product screen**s, kept on the `archive/legacy-ds` branch; its URLs redirect to Storybook.
+The coded prototype of PLUS built from **Product screen**s, retired from `main` (`prototypes/README.md`).
 _Avoid_: "live app", "the app"
 
 **Production app / QA app**:
@@ -698,8 +673,6 @@ At most ONE plain sentence before a tool call, written for the requester and abo
 
 # Figma Workspace Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · supersedes the Notion 🎨 Figma Workspace Playbook · distilled 2026-07-07, rewritten 2026-10-01 to the team's How We Fig guide from #881's probe of the six teams and #891 · applied by writers/figma · annotation categories consolidated 2026-10-09 · became the folder's overview 2026-10-14, with the REST reach table. -->
-
 ## What uno-bot can reach in Figma
 
 uno-bot reaches Figma over REST alone, through one client (`src/figma/`); the Figma MCP needs a browser login, so it is the IDE's. Figma's published REST API has no operation that creates a file, frame, shape, text or wireframe, so a canvas change is a person's or the IDE's.
@@ -774,8 +747,6 @@ The hygiene checklist covers every file outside MISC and `/ Marketing /`:
 <!-- docs/connectors/notion/overview.md -->
 
 # Notion Conventions
-
-<!-- canonical per ADR-017 (docs/adr/): this folder IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · split 2026-10-14 into this overview and page-writing.md · applied by writers/notion. -->
 
 
 ## Access paths — reads vs writes (uno-bot Worker)
@@ -878,8 +849,6 @@ Useful context for grounding via `notion_search` catalog scopes (or Notion MCP i
 <!-- docs/connectors/slack/overview.md -->
 
 # Slack Conventions
-
-<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · split 2026-10-14 into this overview and shapes.md · applied by agents/uno-bot. -->
 
 
 ## Channels
@@ -1021,8 +990,6 @@ Scenario and project *names* (Goal Setting, Warm-Up, Session Sign Up) stay `*bol
 <!-- docs/connectors/supabase/blueprint-navigation.md -->
 
 # uno-blueprint — Answering Guide
-
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (bundled) · cut to voice 2026-09-05 (#412). Shape, status vocabulary and retrieval modes: `blueprint.md` beside this file, its schema `blueprint-schema.md`, both vendored from plus-uno-blueprint, which owns every such claim. SQL and PostgREST recipes: `blueprint-direct-access.md`. This file is uno-bot's voice. -->
 
 Query the **database**; the Netlify front end is the human viewer. Cite its URL to readers (`https://plus-uno.netlify.app/blueprint/`) while grounding in rows.
 
@@ -1169,8 +1136,6 @@ Every table and column in the catalog's own comments, and the tables only a serv
 
 # Supabase / uno-blueprint Conventions
 
-<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 📐 System Overview + Flow 4 doc for conventions. Distilled 2026-07-07 · applied by writers/blueprint. -->
-
 ## The contract
 
 - **uno-blueprint (Supabase) is the source of truth for the CURRENT service journey.** Ground every current-state product claim in a blueprint read (`search_blueprint` / PostgREST) with lane/actor attribution; cite what you found. Notion is a mixed estate — stale docs *and* legitimate future state — so authority is routed by claim type (§ Two sources, one time axis), not by a single "blueprint always wins" rule.
@@ -1216,8 +1181,6 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 <!-- reference: blueprint-upkeep -->
 
 # Blueprint upkeep
-
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `blueprint-upkeep` · the code is agents/uno-bot/src/blueprint-upkeep/; the writer it stages is ADR-034's. -->
 
 Each end of day the `blueprint-shipped-N` jobs read the Roadmap cards that reached `Design Status: Shipped` or `Dev Status: Deployed` since the last run and weigh each through the service-change gate: a judgment that the card or its PRD changes who does what, or when, AND a confident `search_blueprint` match. A card failing either gets nothing. A card passing both gets one **blueprint revision** for every `scenario › path` matched, each drafted on the grind tier by the `blueprint-draft-N` jobs, and is weighed once per status. A deploy whose design hand-off was drafted promotes those cells instead, `planned` or `built` to `live`, then drafts the same path again against the card's words as they are now and adds any cell that differs to the same promotion. Work left over at the end of a night waits for the next.
 
@@ -1279,8 +1242,6 @@ Empty severity sections drop out. How the critique renders, and how a long one s
 
 # DM watch
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `dm-watch` · built 2026-10-14 from ADR-032, which is the law it keeps, and the headers of agents/uno-bot/src/dm-watch/ · the code is agents/uno-bot/src/dm-watch/. -->
-
 DM watch reads a person's own DMs, with their own Slack token, for promises, and reminds that person alone in their DM with uno-bot. Nobody else is ever told. ADR-032 is the rule: opt-in per purpose, the person's own token with its live scopes checked, output only to them, and nothing of the message kept.
 
 ## The switches
@@ -1312,8 +1273,6 @@ A `dm_commitments` row holds the permalink, when it is due, its state and the co
 
 # Figma annotation category labels
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · Tooltip folded into Content 2026-11-03 · moved out of the overview 2026-10-14, read on demand. -->
-
 Every annotation carries exactly one category label. There are five:
 
 | Label | Color | What it holds |
@@ -1338,8 +1297,6 @@ The first four are Figma's presets, kept at their preset colors; `Logic / data` 
 <!-- reference: docs/connectors/notion/page-writing -->
 
 # Writing a Notion page
-
-<!-- canonical per ADR-017 (docs/adr/) · split 2026-10-14 out of the Notion connector doc, whose always-loaded half is overview.md beside this file; the hub sections, comments and quirks were IDE-only until then · applied by uno-bot and writers/notion. -->
 
 ## Writing a body — bot tools (`notion_create`, `notion_update`)
 
@@ -1407,8 +1364,6 @@ Suggestions *about* existing content (including the agent's own) go in **comment
 <!-- reference: docs/connectors/slack/shapes -->
 
 # Slack output shapes
-
-<!-- canonical per ADR-017 (docs/adr/) · split 2026-10-14 out of the Slack connector doc, whose always-loaded half is overview.md beside this file · applied by agents/uno-bot. -->
 
 Each shape the bot's Slack output takes, and which bot skill produces it. The rules every message follows — the dialect, mentions, threading, writing style — are the overview's (`overview.md`, always loaded).
 
@@ -2041,8 +1996,6 @@ These exist and a service key reads them. What each is for:
 
 # Design-system glossary
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 · split from GLOSSARY.md 2026-11-13 -->
-
 ## Language
 
 ### Design system: structure
@@ -2473,8 +2426,6 @@ _Avoid_: "error buzz", "failure sound"
 
 # Automations Registry
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference: the Worker reads it through read_reference as `docs/engineering/operations`, the IDE opens it on demand · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
-
 THE standing-automation registry. An automation absent from the table below is undocumented by definition.
 
 ## Rules
@@ -2561,8 +2512,6 @@ Every line traces to the PRD, the conversation or a design-system read.
 
 # DS precedence check
 
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `ds-precedence` · moved 2026-10-14 out of docs/connectors/figma/uno-bot-access.md · the code is agents/uno-bot/src/ds-precedence/; its copy follows docs/connectors/slack/shapes.md § Figma messages. -->
-
 Monday's end-of-day `ds-precedence-check` (the run at Monday 06:00 ET, dated the Friday before) compares the component index and registry props with the library; DS precedence says the library side takes each fix. Its report goes up as a section of Monday morning's sweep message, three hours later, in #plus-universal (`agents/uno-bot/scheduled-actions/sweep/ACTION.md` § One message a place), on the shared decision card: a line tagging the week's DS owner and saying how many components disagree, then one card per component (Review · Code · Figma). The DS owners take a week each, in `DS_OWNER_USER_IDS` order (`agents/uno-bot/wrangler.toml`); one not active on Team Members is skipped for the next, and with nobody active the line tags nobody. It tags a DS owner, not the library file's creator (#1361). It stays on one message: past ten, the line says how many show, and the rest come back with the next week's check. Approve adds that component to the week's one `harness-intake`: the week's first Approve files it, each later one comments on it, one at a time through ThreadState, which remembers the week's intake (closed or not). Needs changes puts the person's note on that intake as a dispute. Reject leaves the difference as deliberate. A clean week posts nothing. Every one of these messages follows the copy in `docs/connectors/slack/shapes.md` § Figma messages.
 
 Each card is decided in its own Review, with nothing to type: a typed ✅ or ⛔ in the thread of the message carrying it gets the one review-only line and runs nothing. An approved card reads "Approved by" who decided, a card Needs changes noted "Noted by" who sent it, a rejected one "Rejected by" who decided, and one whose 24 weekday hours pass undecided "Expired with no decision". Each keeps its finding. View on any of them opens the finding as it was decided, read-only, under what the decision did: the intake number the Approve's write returned, or the note.
@@ -2574,8 +2523,6 @@ Each card is decided in its own Review, with nothing to type: a typed ✅ or ⛔
 <!-- reference: figma-comments -->
 
 # Figma comments
-
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `figma-comments` · moved 2026-10-14 out of the sweep's doc (#900) and docs/connectors/figma/uno-bot-access.md (#903) · the code is agents/uno-bot/src/figma-comments/ and src/figma-ask/. -->
 
 Three things happen to a comment in a subscribed team's file: the end-of-day `sweep-figma-comments` job reads it for a decision or an open question, the morning `sweep-figma-post` job hands what it found to the sweep's morning message, and an @uno in it is answered as soon as Figma's notification arrives.
 
@@ -2686,8 +2633,6 @@ An access answer leads with the admin, then the request in a quote block, then t
 <!-- reference: follow-through -->
 
 # Follow-through
-
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `follow-through` · moved 2026-10-14 out of the sweep's doc (distilled 2026-09-29 from #742, #749, #750, #751, #764 and #795) · the code is agents/uno-bot/src/commitments/ and src/follow-through/. -->
 
 Follow-through holds people to what they said they would do. The end-of-day `card-follow-through` job and the sweep's own read find the work; the morning `commitment-nudge` job asks about it.
 
@@ -2839,8 +2784,6 @@ Search results, one line each, the first 25 when there are more:
 <!-- reference: sweep -->
 
 # The end-of-day sweep
-
-<!-- canonical per ADR-017 (docs/adr/) · a scheduled action, read through read_reference as `sweep` · distilled 2026-09-29 from #742 (both amendments), #749, #750, #751, #764 and #795; moved 2026-10-14 out of docs/connectors/ into the scheduled-actions folder, its commitment reminders and card follow-ups to `follow-through` and its Figma comment decisions to `figma-comments` · the code is agents/uno-bot/src/sweep/, src/dm-sweep/, src/figma-drift/ and src/dm-watch/capture.ts. -->
 
 The **sweep** is uno-bot's end-of-day read of the design channels for **drift**: a thread settled something (a date, an owner, a scope, a status) that a Notion page it links still states the old way. uno-bot drafts the in-place fix and holds it on a card in a report until a person approves it in Review. Every write waits for that Approve.
 

@@ -95,60 +95,16 @@ The full behavioral contract (voice, grounding rules, gate protocol, Slack etiqu
 
 ## Layout
 
-```
-uno-bot/
-├── AGENT.md              Persona delta (constitution is repo-root AGENTS.md)
-├── tool-definitions.json Local tool schemas (source of truth; joined to the tool table in
-│                      src/agent/tools.ts, which is what the model's roster is built from)
-├── wrangler.toml         Worker + Durable Objects + KV + vars/secrets config (+ free-tier constraints)
-├── package.json / tsconfig.json / .dev.vars.example
-└── src/
-    ├── index.ts          Fetch handler — verify, route, export the Durable Objects: /health ·
-    │                     /slack/{events,commands,interactive} · /figma/events · /oauth/slack/{start,callback} ·
-    │                     everything diagnostic → src/diagnostics — plus the cron scheduled() handler
-    ├── diagnostics/      Every probe, behind one token gate and one report envelope: the public
-    │                     /health/blueprint contract probe + twelve /debug/* probes (routes.ts is
-    │                     the route table; probes/ holds the bodies)
-    ├── agent/            loop.ts (THE agent loop) · model-provider.ts (the ModelProvider
-    │                     seam) · providers/ (gemini · claude · fake) · loop-policy.ts (the
-    │                     loop's dials and strings) · run-agent.ts (the one public entry:
-    │                     Env → the loop's ports, adapter choice, read-only tool dispatch) ·
-    │                     routing.ts (tier routing, no model ids) · skills.ts (bundled-harness assembly) ·
-    │                     tool-table.ts (one row per tool: standing + roster columns) ·
-    │                     tool-bodies.ts (one body per row, paired by type) · tools.ts (the
-    │                     join, with the schemas) · preflight · draft-judge
-    ├── gemini/           Google auth (Vertex SA / API key) + Gemini REST client
-    ├── vertex/           claude.ts — Claude-on-Vertex rawPredict client (reuses gemini/auth)
-    ├── slack/            Events · proposal gate · signature verify · mrkdwn · Web-API wrappers
-    ├── tools/            Local tool implementations (dispatcher + one file per tool family)
-    ├── integrations/     notion · figma · blueprint (Supabase) · github · gmail · ds-components
-    ├── oauth/            Slack OAuth (static client) — the user token slack_search needs
-    ├── figma/            The one Figma client: every REST call, paced per rate-limit
-    │                     tier and backed off on a 429; the shared in-memory fake
-    ├── figma-poll.ts     End-of-day job: notices a new published DS-library version
-    ├── figma-library/    A publish starts the repo snapshot's refresh until it lands
-    ├── figma-notify/     POST /figma/events: Figma's notifications, passcode-checked,
-    │                     queued once on the figma/events runner, noted in KV as ids
-    │                     and times; the subscription setup figma-subscriptions.yml runs;
-    │                     the nightly backstop (end of day) queues what none reported
-    ├── ds-precedence/    Weekly check (Monday end of day): code vs the library under
-    │                     DS precedence → a card per component, one intake a week
-    ├── thread-state/     ThreadState: ONE typed interface for everything a turn
-    │                     remembers (history · proposals · assistant context · cancel ·
-    │                     the run lease), its timings, and three adapters — Durable
-    │                     Object (production, via `threadStateFor(env)`), in-memory
-    │                     (tests), and one conformance suite over both
-    ├── thread-state.ts   The Durable Object class itself: storage behind the RPC
-    │                     methods that ARE the interface above. No HTTP routes
-    ├── agent-runner.ts   Durable Object: runs the agent turn in an alarm — outlives the ~30s
-    │                     waitUntil() cancellation window that killed long runs
-    ├── runner/           The runner's scheduling over a storage port: one job per alarm, the
-    │                     deferred retry, a scheduled run's order and idempotency (+ in-memory runner)
-    ├── scheduled/        The morning (09:00 ET) and end-of-day (06:00 ET, dated to the day
-    │                     it sweeps) runs the cron enqueues, their job bodies, and the
-    │                     /debug/sweep dry run
-    └── version.ts        BUILD string returned by /health
-```
+`src/` has one directory per concern; `ls src/` is the map. What the names do not say:
+
+- `src/index.ts` is the fetch handler: it verifies, routes `/health`, `/slack/{events,commands,interactive}`, `/figma/events` and `/oauth/slack/{start,callback}`, hands every diagnostic to `src/diagnostics/`, and carries the cron `scheduled()` handler.
+- `tool-definitions.json` holds the local tool schemas and is the source of truth; `src/agent/tools.ts` joins it to the tool table the model's roster is built from.
+- `src/agent/loop.ts` is the agent loop, behind the `ModelProvider` seam (`providers/`: gemini, claude, fake); `run-agent.ts` is its one public entry.
+- `src/thread-state/` is one typed interface for everything a turn remembers, with a Durable Object adapter (production, via `threadStateFor(env)`), an in-memory one (tests) and one conformance suite over both. `thread-state.ts` is the Durable Object class itself.
+- `src/agent-runner.ts` runs the agent turn in a Durable Object alarm, so a long run outlives the ~30s `waitUntil()` cancellation window; `src/runner/` schedules one job per alarm.
+- `src/scheduled/` holds the morning (09:00 ET) and end-of-day (06:00 ET, dated to the day it sweeps) runs the cron enqueues.
+- `src/figma/` is the one Figma client; `src/figma-notify/`, `figma-library/`, `figma-poll.ts` and `ds-precedence/` are the notification, publish-refresh, end-of-day poll and weekly code-vs-library check described above.
+- `wrangler.toml` carries the Worker, Durable Objects, KV, vars and the free-tier constraints.
 
 Every module seam here — Turn, Gate, ThreadState, the stop doors — keeps one pattern: dependencies arrive by name, `Env` stops at the Slack envelope that builds them, and the Node suite drives the module rather than matching its source. Turn's Slack caller (`agents/uno-bot/src/slack/turn-adapter.ts`) builds its request and dependencies through `agents/uno-bot/src/turn/request.ts` and `agents/uno-bot/src/turn/env-deps.ts`, so a second caller supplies only what genuinely differs.
 

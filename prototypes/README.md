@@ -2,9 +2,9 @@
 
 No prototype lives on `main`; it hosts Storybook only.
 
-The Vibe app, the Full Demo Walkthrough and the prototypes built on the old
-Specs code are on the `archive/legacy-ds` branch. Their old URLs (`/home`,
-`/app`, `/demo`) redirect to Storybook.
+The old Specs screens, the Vibe app, the Full Demo Walkthrough (id `1028`) and
+the prototypes built on the old Specs code are on the `archive/legacy-ds`
+branch. Their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook.
 
 ## Ritual
 

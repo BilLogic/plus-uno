@@ -1,7 +1,6 @@
 ---
 artifact: findings doc + PRD (+ paired blueprint write)
 status: canonical
-distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
@@ -29,4 +28,3 @@ summary: Scores synthesis outputs
 
 Scores synthesis outputs. Faithfulness is the spine: one invented finding fails the run regardless of other scores. Golden scenarios: `docs/evals/scenarios/uno-synthesize.md`.
 
-Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.

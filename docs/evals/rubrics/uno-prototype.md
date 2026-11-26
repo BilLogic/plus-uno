@@ -1,7 +1,6 @@
 ---
 artifact: prototype (any fidelity tier) + its prompt-spec
 status: canonical
-distilled: 2026-07-07 — from the Notion 📊 Evals doc (https://app.notion.com/p/396b7cca498281ff8a4ad0e63c621a4c), superseded per ADR-017
 applied_by: agents/reviewers/rubric-applier
 scale: 1-5 per dimension; hard gates are pass/fail and override the score
 dimensions:
@@ -27,7 +26,5 @@ summary: Scores prototypes per fidelity tier
 # uno-prototype rubric
 
 Scores prototypes per fidelity tier. The two gates are the skill's reason to exist: ask when context is missing, escalate when the design system has a gap — never silently invent. Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
-
-Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.
 
 **ds-compliance, coded tier.** Run `npm run check:ds-usage -- prototypes/<project> --json` before the judge. Any fail-level escape caps the dimension at 2, whatever else is true; with none, the judge scores sourcing from the build's retrieval proof.

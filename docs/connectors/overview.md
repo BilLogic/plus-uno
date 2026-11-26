@@ -5,8 +5,6 @@ summary: One row per connected tool: where its conventions live, what touches it
 
 # Integrations Index
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand, ~150 tokens) · distilled 2026-07-07 · load when deciding which tool or integration path to use. -->
-
 One row per connected tool: where its conventions live, what touches it. Concrete sync scripts/env vars for the Figma pipeline: `design-system/guidelines/figma/overview.md` § Quick commands.
 
 | Tool | Conventions | Primary access | Written by |
@@ -17,7 +15,7 @@ One row per connected tool: where its conventions live, what touches it. Concret
 | Supabase (`uno-blueprint`) | `docs/connectors/supabase/overview.md` | `search_blueprint` / PostgREST | `writers/blueprint` only |
 | Storybook (`uno-storybook`) | `docs/connectors/storybook-mcp.md`; source of truth in `design-system/` stories, setup `.storybook/main.js` | MCP `storybook` at `http://localhost:4200/mcp` while `npm run storybook` runs | skills (component work) |
 | Design-system lookup | `docs/connectors/ds-mcp.md` | MCP `plus-ds` (stdio, `.mcp.json`) · `npm run ds` | read-only |
-| Netlify | deploy notes: `docs/product-and-service/plus-uno.md` + `skills/uno-publish/references/deployment-guide.md` | MCP `netlify` · `netlify.toml` | uno-publish |
+| Netlify | deploy notes: `README.md` § Deployment + `skills/uno-publish/references/deployment-guide.md` | MCP `netlify` · `netlify.toml` | uno-publish |
 | Cloudflare | — | MCP `cloudflare` (`https://mcp.cloudflare.com/mcp`, OAuth) | maintain / deploy |
 | GitHub | — | MCP `github` | skills / maintain |
 | Amplitude | — | MCP `Amplitude` (OAuth) | research |

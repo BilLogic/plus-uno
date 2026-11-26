@@ -232,6 +232,14 @@ export const CHECKS = [
     guards: "one rule, one home: no line in both an uno skill's method and its SKILL.md, nor in two docs the Worker reads.",
   },
   {
+    name: 'check:adr-status',
+    script: 'node scripts/check-adr-status.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-adr-status.mjs',
+    guards: 'an ADR whose body says it is superseded carrying `status: superseded`, and a superseded ADR naming what replaced it.',
+  },
+  {
     name: 'check:knowledge-disposition',
     script: 'node scripts/check-knowledge-disposition.mjs',
     pkg: 'root',

@@ -5,8 +5,6 @@ summary: The reuse ladder (use, arrange, local component, core candidate) and wh
 
 # Local components and the reuse ladder
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · reached from `design-system/guidelines/overview.md` § Pieces. -->
-
 ## The reuse ladder
 
 Take the lowest rung that does the job. Each rung is allowed; none needs permission:

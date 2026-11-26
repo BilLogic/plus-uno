@@ -5,8 +5,6 @@ summary: Slack's connector overview, always loaded — channels, the pillar → 
 
 # Slack Conventions
 
-<!-- canonical per ADR-017 (docs/adr/); supersedes the Notion 🧭 Flow 3/5 docs + 🧩 Templates #4 for conventions. Distilled 2026-07-07 · split 2026-10-14 into this overview and shapes.md · applied by agents/uno-bot. -->
-
 <!-- ide-only -->
 This folder is Slack's connector: this overview ships in uno-bot's prompt, and [`shapes.md`](shapes.md) — the share-out post, the result table, charts, answer cards, the ⚠️ line, the render paths and the Figma message copy — is disclosed, read through `read_reference` by the name `docs/connectors/slack/shapes`.
 <!-- /ide-only -->

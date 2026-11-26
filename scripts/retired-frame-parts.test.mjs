@@ -23,7 +23,6 @@ const HISTORY = [
   'scripts/baselines/figma-node-types.json',
   'design-system/figma/node-types.json',
   'design-system/figma/registry-audit.md',
-  'docs/knowledge/figma-clipping-audit-2026-11-12.md',
 ];
 
 const trackedFiles = () =>

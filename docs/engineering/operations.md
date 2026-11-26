@@ -6,8 +6,6 @@ summary: THE standing-automation registry — every cron, scheduled Worker job, 
 
 # Automations Registry
 
-<!-- canonical per ADR-017 (docs/adr/) · disclosed reference: the Worker reads it through read_reference as `docs/engineering/operations`, the IDE opens it on demand · distilled 2026-07-07 from 📓 playbook §6, now superseded · applied by uno-maintain. -->
-
 THE standing-automation registry. An automation absent from the table below is undocumented by definition.
 
 ## Rules

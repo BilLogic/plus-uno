@@ -5,8 +5,6 @@ summary: Notion's connector overview, always loaded — the one credential and t
 
 # Notion Conventions
 
-<!-- canonical per ADR-017 (docs/adr/): this folder IS the convention; the legacy Notion 📓 Doc-Management Playbook is superseded and loses on conflict. Distilled 2026-07-07 · Decisions DB + New Project hub aligned 2026-07-13 · read-radar catalog scopes 2026-07-13 · split 2026-10-14 into this overview and page-writing.md · applied by writers/notion. -->
-
 <!-- ide-only -->
 This folder is Notion's connector: this overview ships in uno-bot's prompt, and [`page-writing.md`](page-writing.md) — the body dialect, attribution, the project-hub golden sections, the comments protocol and the API's markdown quirks — is disclosed, read through `read_reference` by the name `docs/connectors/notion/page-writing`.
 <!-- /ide-only -->

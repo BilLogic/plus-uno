@@ -5,8 +5,6 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 
 # Coding Conventions
 
-<!-- canonical per ADR-017 (docs/adr/) · Tier 2 (on demand) · distilled 2026-07-07 · applied by every agent writing code in this repo. -->
-
 ## File naming
 
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `SectionMessage/SectionMessage.scss`)
@@ -107,21 +105,7 @@ Token legality, literal bans, motion rules and placement checks are enforced by 
 
 ## Token workflow
 
-```
-Figma export (manual) → npm run generate:tokens → commit SCSS; the token ladder and motion (ADR-038) generate code → Figma instead, via npm run generate:design-tokens
-```
-
-- Edit the token source and regenerate: every token file is generated output except `_fonts.scss`, the hand-authored fallback faces and base heading and body type
-- Token source is Figma, not the SCSS files — for every family except the
-  code-owned color set below
-
-```
-scripts/lib/color/plans/plan-*.json → npm run generate:color-tokens → design-system/src/tokens/color/ → Figma (figma-spec.json)
-```
-
-- The color set (`--ds-*` global roles, `--chart-*`, `--skeleton-subtle` and `--palette-*`) runs the other way: the plan files
-  are the source, and Figma is downstream, pushed from the generated
-  `figma-spec.json` (ADR-035)
+The token workflow lives in `docs/engineering/setup.md` § Token Workflow: sources, generators, and the code-owned color set.
 
 ## Git
 

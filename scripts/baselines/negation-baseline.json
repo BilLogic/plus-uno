@@ -29,7 +29,7 @@
     "bundled": {
       "entries": {
         "AGENTS.md": {
-          "count": 4
+          "count": 2
         },
         "GLOSSARY.md": {
           "count": 4
@@ -87,9 +87,6 @@
         },
         "skills/uno-maintain/references/method.md": {
           "count": 11
-        },
-        "skills/uno-maintain/references/skill-quality/audit-examples.md": {
-          "count": 1
         },
         "skills/uno-maintain/references/staleness-sweep.md": {
           "count": 1
@@ -154,7 +151,7 @@
       "direction": "grow-only",
       "entries": {
         "docs": {
-          "count": 59
+          "count": 53
         }
       }
     },
