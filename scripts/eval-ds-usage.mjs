@@ -121,7 +121,7 @@ export const CHECKER_REMOVED = ['scripts/check-ds-usage.test.mjs', 'scripts/lib/
 /**
  * The control arm's AGENTS.md: the title and the Identity section, without
  * the lines that route design-system claims. Everything after Identity (the
- * skills, agents, conventions, loading contract, hard rules and loading table)
+ * skills, agents, conventions, hard rules and loading table)
  * is the harness, and the control arm has none.
  */
 export function controlAgents(text) {
