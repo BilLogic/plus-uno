@@ -2,7 +2,7 @@
 
 # Typography
 
-Heading, Body, Metric and Code are the text styles for all work.
+Heading, Body, Metric, Label and Code are the text styles for all work.
 
 **Kind:** Foundation
 
@@ -10,7 +10,7 @@ Heading, Body, Metric and Code are the text styles for all work.
 
 ## Overview
 
-PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Every heading is regular (400), so size alone carries rank; metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Headings from 16 up and every metric are regular (400), so size alone carries rank; the two smallest headings (14 and 12) are medium (500) to hold up as table heads, card titles and group labels; body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -24,7 +24,7 @@ letter-spacing: var(--metric-lg-tracking);
 font-variant-numeric: tabular-nums;
 ```
 
-Figma holds `Heading/*`, `Body/*`, `Metric/*` and `Code/default`, bound to the typography variables (Tokens: Typography).
+Figma holds `Heading/*`, `Body/*`, `Metric/*`, `Label/eyebrow` and `Code/small`, and code adds `Code/default`, bound to the typography variables (Tokens: Typography).
 
 ## Type scale
 
@@ -36,6 +36,8 @@ Every text style binds to a typography variable (family, weight, size, line heig
 - **Body/default (14/20):** default interface text and control labels (sets the 24, 32 and 40 control heights). Do not use heading styles inside components; use body with a heavier weight instead.
 - **Body/small (12/16):** secondary meta text, tags, statuses, counts and tooltips.
 - **Metric (large, medium, small):** featured numbers such as session counts or scores.
+- **Label/eyebrow (12/16, medium, uppercase, +4%):** the label that names a group of rows or a stat. Use it for a menu group title, a select-list group row, a Sidebar section title, and the stat label above a metric. Type the text in sentence case; the style sets the capitals.
+- **Code/small (12/16, regular, Google Sans Code, tabular figures):** machine values the reader scans or compares: a position in a recording ("22:48"), a range in a recording ("0:30 – 5:10", with an en dash, never "to" or "at"), and a model, prompt or rule-set version ("v14", "gemini-2.5-pro"). A clock time stays in sans with am or pm ("4:05 pm").
 - **Paragraph spacing:** space blocks with Section and stack tokens (Spacing), never a paragraph-spacing style.
 
 | Style | Size/line | Weight | Role | Sample |
@@ -56,22 +58,23 @@ Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--hea
 | `--type-family-body` | Google Sans Flex | Body text |
 | `--type-family-code` | Google Sans Code | Code |
 | `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |
-| `--type-weight-regular` | 400 | Body text and every heading |
-| `--type-weight-medium` | 500 | Metrics, labels and icon-paired text |
+| `--type-weight-regular` | 400 | Body text, headings 16 and up, and metrics |
+| `--type-weight-medium` | 500 | Headings 14 and 12, eyebrow labels and icon-paired text |
 | `--type-weight-semibold` | 600 | Inline bold only: strong in running text, never a component or text style |
-| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |
+| `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` · `-wide` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% · +4% | The letter-spacing steps the companions below read |
 | `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |
 | `--heading-lg-tracking` | −2% | Heading 24 |
 | `--heading-md-tracking` | −2% | Heading 20 |
-| `--heading-sm-tracking` | −2% | Heading 16 |
+| `--heading-sm-tracking` | −0.5% | Heading 16 |
 | `--heading-xs-tracking` | 0 | Heading 14 |
 | `--heading-xxs-tracking` | +1% | Heading 12 |
 | `--body-lg-tracking` · `--body-default-tracking` · `--body-sm-tracking` | 0 · +0.5% · +1% | Body 16, 14 and 12 |
-| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −1% · −1% · 0 | Metrics 28, 24 and 16 |
+| `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −2% · −2% · −0.5% | Metrics 28, 24 and 16 |
+| `--label-eyebrow-tracking` | +4% | Eyebrow label 12 |
 
 ### Text-style classes
 
-Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`), which set `font` and `letter-spacing` together. The metric classes also set tabular figures. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.
+Markup without its own stylesheet can use the generated utility classes (`.heading-xxl` to `.heading-xxs`, `.body-lg`, `.body-default`, `.body-sm`, `.metric-lg` to `.metric-sm`, `.label-eyebrow`, `.code-sm`), which set `font` and `letter-spacing` together. The metric classes and `.code-sm` also set tabular figures, and `.label-eyebrow` sets uppercase. Component stylesheets use `font: var(--…)` directly, add `letter-spacing: var(--…-tracking)` beside it, and add `font-variant-numeric: tabular-nums` to a metric.
 
 ```jsx
 <p className="body-default">Helper text</p>
@@ -89,7 +92,8 @@ Headings step down one size per nesting level; containers use a fixed title size
 | Subsection title | Heading/small · 16 · h3 |
 | Modal title | Heading/medium · 20 · the modal's h1, named by aria-labelledby |
 | Card, popup and flag title | Heading/xsmall · 14 · one level below its section |
-| Group label (menu group, table head) | Heading/xxsmall · 12 · a group or head cell, never a heading tag |
+| Table head | Heading/xxsmall · 12 · a head cell, never a heading tag |
+| Group label (menu group, select-list group, Sidebar section, stat label) | Label/eyebrow · 12 · uppercase, never a heading tag |
 
 Every page has one `h1` (visually hidden when a tab strip replaces a visible page header). Card titles take the heading tag one level below their section.
 
@@ -103,7 +107,7 @@ Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 ## Code
 
-`Code/default` (12/16, Google Sans Code) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
+`Code/small` (12/16, Google Sans Code, tabular figures) sets positions and ranges in a recording and model, prompt and rule-set versions; `Code/default` sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
 ## Truncate and wrap
 
@@ -143,13 +147,13 @@ Don't: An h3 straight after the h1 skips the h2.
 
 ### Headings
 
-Headings are Google Sans Flex at 400 at every size; size, not weight, carries rank. Headings from 16 up track at −2%. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Headings are Google Sans Flex. From 20 up they are 400 and track at −2%, so size, not weight, carries rank; Heading/small (16) is 400 and tracks at −0.5%; Heading/xsmall and Heading/xxsmall (14 and 12) are 500, because they style table heads, card titles, accordion triggers, message titles and group labels. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
-Text styles use only 400 and 500, and headings only 400. Do not add a 500, 600 or 700 weight to a heading.
+Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading, and do not change a heading's weight from the one its style sets.
 
 ### Numbers
 
-Metric styles are Google Sans Flex 500 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
+Metric styles are Google Sans Flex 400 with tabular figures; the large and medium sizes track at −2% and the small at −0.5%. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A clock time or duration ("3:30 – 4:30 pm", "12 min") takes the body or heading style of its context, never mono. A stat label above a metric uses `Label/eyebrow`.
 
 Do: Metric/large for the figure.
 
@@ -157,7 +161,7 @@ Don't: Heading/medium for a number.
 
 ### Mono
 
-Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
+Google Sans Code is for code, token names, property values and machine IDs such as a session ID or a URL. `Code/small` also sets positions and ranges in a recording and model, prompt and rule-set versions. Never use it for metrics, clock times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
 
 Do: Metric/large for the count, mono for the session ID.
 Don't: Mono for the count.

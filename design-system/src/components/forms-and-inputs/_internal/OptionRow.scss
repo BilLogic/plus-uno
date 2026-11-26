@@ -133,8 +133,9 @@
 .plus-option-row--group {
     min-height: 0;
     color: var(--ds-text-subtle);
-    font: var(--heading-xxs);
-    letter-spacing: var(--heading-xxs-tracking);
+    font: var(--label-eyebrow);
+    letter-spacing: var(--label-eyebrow-tracking);
+    text-transform: uppercase;
     cursor: default;
 
     @include plus-state(

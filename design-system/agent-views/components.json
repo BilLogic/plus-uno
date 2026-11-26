@@ -14418,6 +14418,8 @@
         "--icon-sm",
         "--inline-lg",
         "--inline-sm",
+        "--label-eyebrow",
+        "--label-eyebrow-tracking",
         "--pad-x-lg",
         "--pad-x-md",
         "--pad-x-sm",

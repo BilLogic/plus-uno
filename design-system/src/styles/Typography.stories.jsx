@@ -22,7 +22,8 @@ const LEVELS = [
     ['Subsection title', '--heading-sm', 'Heading/small · 16 · h3'],
     ['Modal title', '--heading-md', 'Heading/medium · 20 · the modal’s h1, named by aria-labelledby'],
     ['Card, popup and flag title', '--heading-xs', 'Heading/xsmall · 14 · one level below its section'],
-    ['Group label', '--heading-xxs', 'Heading/xxsmall · 12 · a menu group or a head cell, never a heading'],
+    ['Table head', '--heading-xxs', 'Heading/xxsmall · 12 · a head cell, never a heading'],
+    ['Group label', '--label-eyebrow', 'Label/eyebrow · 12 · a menu group, a select-list group, a Sidebar section or a stat label, never a heading'],
 ];
 
 /** Which style each kind of title takes. */
@@ -30,7 +31,7 @@ export const HeadingLevels = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         {LEVELS.map(([name, token, note]) => (
             <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <span style={{ font: `var(${token})`, color: 'var(--ds-text)' }}>{name}</span>
+                <span style={{ font: `var(${token})`, letterSpacing: `var(${token}-tracking)`, textTransform: token === '--label-eyebrow' ? 'uppercase' : undefined, color: 'var(--ds-text)' }}>{name}</span>
                 <span style={meta}>{note}</span>
             </div>
         ))}
@@ -41,6 +42,13 @@ export const HeadingLevels = () => (
 export const CodeStyle = () => (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
         Pad a card with <C>--card-pad</C>: the code span takes 0.875em of the text around it, in Google Sans Code.
+    </p>
+);
+
+/** Code/small sets a position or range in a recording and a version. */
+export const CodeSmallStyle = () => (
+    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+        Flag at <span className="code-sm">22:48</span>, range <span className="code-sm">0:30 – 5:10</span>, model <span className="code-sm">gemini-2.5-pro</span>.
     </p>
 );
 
