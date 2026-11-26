@@ -32,10 +32,26 @@ confusion:
 
 | Thing | Where | What it is |
 |-------|-------|------------|
-| **Design system** | `design-system/src/` | The components, patterns and tokens. Published as Storybook. |
+| **Design system** | `design-system/src/` | Components, templates, data visualizations (`src/dataviz/`) and tokens (`src/tokens/`, generated, never hand-edited), with guidelines in `design-system/guidelines/`. Published as Storybook. |
 | **Prototypes** | `prototypes/` | Standalone Vite apps, one per idea. `skills/uno-prototype/scripts/scaffold-prototype.sh` writes a new one. |
 | **The harness** | `AGENTS.md`, `skills/`, `agents/`, `docs/` | What agents read. Not shipped to users. |
 | **uno-bot** | `agents/uno-bot/` | The Slack embodiment — a Cloudflare Worker, deployed separately. |
+
+## Where things live
+
+- **Product truth** is uno-blueprint (Supabase); ask through a skill rather than trusting a stale doc.
+- **Design-system truth** is Storybook plus the `design-system/` source.
+- **Team conventions** are `docs/conventions/` in this repo; legacy Notion playbook pages are superseded.
+- **Project docs** are each project's Notion hub (TLDR, People, Now/Next/Blocked).
+- **This repo's history** is `docs/adr/` for decisions, and git history plus closed GitHub issues for everything that landed.
+
+## Your first week
+
+You talk to **uno** in the IDE, or as `@le goat` in Slack, and either name a skill or describe the task; the agent routes. The six skills are in [`README.md`](README.md) § uno skills, and skills summon the agents in `agents/`, so you never invoke an agent directly.
+
+The MCP servers the agent uses are Figma (required for design work), Notion, Slack (through uno-bot) and Supabase; each tool's setup is its row in `docs/connectors/overview.md`. The compound-engineering skills (`/ce:plan`, `/ce:work`, `/ce:review`, `/ce:compound`) help with repo development.
+
+If you cannot self-serve from a project's Notion hub plus this page, that is a documentation bug: file it through `uno-maintain`.
 
 ## Working on the design system
 
@@ -56,9 +72,4 @@ first. Changes to what agents read go through `skills/uno-maintain`.
 
 ## Deploying
 
-A PR gets a Netlify deploy preview; a merge to `main` does not publish. The
-app and Storybook reach production only when a release is called, through
-`.github/workflows/netlify-production-deploy.yml` run by hand. uno-bot deploys
-separately, on every push to `main`: `.github/workflows/uno-bot-deploy.yml`
-runs `npm run deploy` in `agents/uno-bot/`, which runs its checks, tests and
-the harness bake before it ships anything.
+A PR gets a Netlify deploy preview; production publishes only on a release. Targets and workflows: [`README.md`](README.md) § Deployment.
