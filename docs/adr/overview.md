@@ -28,6 +28,7 @@ Four of 22 needed more than a move:
 
 - **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md), and retired in full (2026-11-11) by [ADR-042](042-plus-ships-no-bootstrap.md), which removes Bootstrap.** Its Tailwind ban holds again since Tailwind was removed (2026-11-09).
 - **[ADR-038](038-every-size-type-and-motion-family-is-a-repo-plan.md) — superseded for motion (2026-11-12) by [ADR-041](041-motion-is-springs-on-four-tiers.md).** Its duration and easing roles give way to springs; space, size and type stand; the Blanket naming, Drawer retirement and Radius 2.0 are recorded as corrections in ADR-044 and ADR-045.
+- **[ADR-018](018-gemini-access-is-vertex-only-in-production-ai.md) — superseded (2026-11-26) by [ADR-053](053-gemini-api-key-is-the-canonical-gemini-credential.md).** The credential order reverses (the Gemini API key wins, the Vertex service account is the loud fallback); the one-deterministic-path lesson stands.
 - **[ADR-012](012-declarative-route-manifest-over-parallel-maps.md) — unverifiable.** No route manifest exists under any name searched.
 - **[ADR-014](014-uno-bot-v2-pipedream-cloudflare-worker.md) — corrected.** Skills are no longer raw-fetched from GitHub at runtime; the harness is baked at build time.
 - **[ADR-010](010-three-tier-context-loading-architecture.md) — superseded.** The paths it names were dissolved in #171.
@@ -48,6 +49,7 @@ Worker source, the guard script, the OAuth handler — and carry the same
 - [ADR-050](050-an-empty-table-is-replaced-by-its-empty-state.md): empty and no-results tables in the Table template and `DynamicTable` replace the whole table with `EmptyState`.
 - [ADR-051](051-a-page-header-title-is-the-page-h1.md): `PageHeader` renders its title as the page's `h1` at `Heading` `large` (`24/28`) by default, with `titleAs="h2"` for subordinate headers.
 - [ADR-052](052-dimensions-is-the-one-ladder-and-layout-owns-it.md): Dimensions is the one rem ladder every gap, size, radius and stroke reads from; the Layout foundation (Dimensions, Spacing, Grid) owns it.
+- [ADR-053](053-gemini-api-key-is-the-canonical-gemini-credential.md): uno-bot's Gemini adapter authenticates with the Gemini API key whenever it is set and falls back to the Vertex service account loudly; supersedes ADR-018.
 
 ## Writing a new one
 
