@@ -32,7 +32,7 @@ the manifest.
 ## Handoff
 
 Golden example: `skills/uno-prototype/examples/flow-map-spec.md`. Before handing off, run
-`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` — a [MISS] means
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` on a local draft of the spec (scratch file; the issue holds the posted copy) — a [MISS] means
 fill the section, not ship anyway. Deliver the spec ready-to-paste. Offer the paste-back: designer brings the
 generated result here, UNO re-checks it against the same self-check block.
 Exit per method §5: DS-lens pass at sketch rigor (no token nits on a flow

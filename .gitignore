@@ -71,6 +71,7 @@ public/prototype-previews/
 # Source material for the public case study; kept off the remote deliberately.
 docs/knowledge/uno-bot-build-recap.md
 docs/knowledge/uno-bot-build-guide.md
+docs/plans/2026-07-11-001-slack-bot-setup-skill-plan.md
 docs/knowledge/research/2026-07-12-field-scan-improvements.md
 docs/knowledge/research/2026-07-12-request-corpus-expansion.md
 docs/knowledge/research/2026-07-12-uno-bot-cost-analysis.md

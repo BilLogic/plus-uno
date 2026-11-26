@@ -48,7 +48,7 @@ structure rather than interactive or functional behavior (interactive flows
 belong in `deliverables/interactive.md`). End with the embedded self-check
 block (brief card + the five dial settings as pass/fail checks). Golden
 example: `skills/uno-prototype/examples/wireframe-spec.md`; check with
-`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Offer the
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` on a local draft of the spec (scratch file; the issue holds the posted copy). Offer the
 paste-back re-check.
 
 **Where the spec lives.** Put it in the prototype's GitHub issue, in the body

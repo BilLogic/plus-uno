@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,218 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,362 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -51,7 +51,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 3,515 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
-| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 26,891 |
+| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 27,035 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
 | `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,575 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
@@ -1572,7 +1572,7 @@ Every Review draft is built from the same five zones, in this order. A tool supp
    - short facts (fidelity, round, status, pillar, branch) as `section` `fields`, with Edit fields as the accessory when its selects can be edited;
    - questions, criteria and link lists as `rich_text` lists under a bold label;
    - text that goes out verbatim and is not edited here (a shared note) as a `rich_text_quote`;
-   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint; required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
+   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint (every value editable in the pop-up, plus the share-out's summary, questions, "not looking for" and deadline, and an issue follow-up's comment); required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
    - a round reads "Round 1", capitalized, with its word;
    - before/after as `notion_update` draws it (Current content, Issue, New content input).
 

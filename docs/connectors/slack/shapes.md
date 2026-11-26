@@ -171,7 +171,7 @@ Every Review draft is built from the same five zones, in this order. A tool supp
    - short facts (fidelity, round, status, pillar, branch) as `section` `fields`, with Edit fields as the accessory when its selects can be edited;
    - questions, criteria and link lists as `rich_text` lists under a bold label;
    - text that goes out verbatim and is not edited here (a shared note) as a `rich_text_quote`;
-   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint; required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
+   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint (every value editable in the pop-up, plus the share-out's summary, questions, "not looking for" and deadline, and an issue follow-up's comment); required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
    - a round reads "Round 1", capitalized, with its word;
    - before/after as `notion_update` draws it (Current content, Issue, New content input).
 

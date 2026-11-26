@@ -40,6 +40,6 @@ the manifest.
 ## Handoff
 
 Golden example: `skills/uno-prototype/examples/interactive-spec.md`. Before handing off, run
-`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>`. Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
+`bash skills/uno-prototype/scripts/validate-spec.sh <spec.md>` on a local draft of the spec (scratch file; the issue holds the posted copy). Spec ready-to-paste, usable with at most one regeneration (the rubric's bar).
 Offer the paste-back re-check against the same block. Exit per method §5:
 DS-lens at the artifact's rigor · manifest line · uno-review.
