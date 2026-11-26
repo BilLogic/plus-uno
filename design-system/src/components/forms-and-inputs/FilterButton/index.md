@@ -10,7 +10,7 @@ Also asked as: filter chip, filter control.
 
 **Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Overflow (`ds guide overflow`)
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 

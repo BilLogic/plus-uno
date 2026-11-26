@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, CountTag, DynamicTable, EmptyState, Facts, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
+import { Button, Checkbox, CountTag, DynamicTable, EmptyState, Facts, FilterMenu, IconButton, SearchField, SegmentedControl, Sidebar, StatusTag, Tabs, TextField } from '@/components';
 import { Card, Frame, PanelBody, PanelCloseAction, PanelContainer, PanelDownAction, PanelFooter, PanelHeader, PanelSubheader, PanelUpAction, Section, usePanelControl } from '@/templates';
 
 /**
@@ -71,7 +71,7 @@ export const TitleRowAboveHeaderRows = () => (
         description="Lincoln Middle · 24 students"
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -85,7 +85,7 @@ export const TitleInViewsRow = () => (
     <Section
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -106,7 +106,7 @@ export const ActionsInTitleRow = () => (
         description="Lincoln Middle · 24 students"
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -134,7 +134,7 @@ export const RightSideInOrder = () => (
         description="This term"
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="New session" iconBefore="plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -163,6 +163,7 @@ export const RightSideCrowded = () => (
         views={(
             <Tabs appearance="pill" defaultActiveKey="Upcoming" aria-label="Views">
                 <Tabs.Tab eventKey="Upcoming">Upcoming</Tabs.Tab>
+                <Tabs.Tab eventKey="Past">Past</Tabs.Tab>
             </Tabs>
         )}
         format={formatSwitch}
@@ -274,14 +275,14 @@ const studentColumns = ['Name', 'Grade', 'Group', 'Sessions'];
 
 const signUpActions = (
     <>
-        <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+        <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
         <Button text="Sign up" iconBefore="plus" appearance="primary" onClick={() => {}} />
     </>
 );
 
 const addStudentActions = (
     <>
-        <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+        <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
         <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
     </>
 );
@@ -371,25 +372,38 @@ export const TitleHidden = () => (
     </Section>
 );
 
-export const ManyFilters = () => (
-    <Section
-        {...fullHeader}
-        filters={[...termFilters, { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} }]}
-        onMoreFilters={() => {}}
-    >
-        <TermTable />
-    </Section>
-);
+const termCategories = [
+    { id: 'status', label: 'Status', options: ['Upcoming', 'Done', 'Called off'] },
+    { id: 'group', label: 'Group', options: ['Whitaker', 'Lincoln', 'Roosevelt'] },
+    { id: 'date', label: 'Date', options: ['This week', 'This month', 'This term'] },
+    { id: 'grade', label: 'Grade', options: ['Grade 6', 'Grade 7', 'Grade 8'] },
+];
+
+/** Four or more categories: one Filter menu after Search, never three triggers and More filters. */
+export const ManyFilters = () => {
+    const [value, setValue] = useState({});
+    const applied = Object.values(value).flat().length;
+    return (
+        <Section
+            {...fullHeader}
+            filters={undefined}
+            filterMenu={<FilterMenu categories={termCategories} value={value} onApply={setValue} />}
+            count={applied > 0 ? '3 of 12' : undefined}
+            onClearAll={() => setValue({})}
+        >
+            <TermTable />
+        </Section>
+    );
+};
 
 export const WrappedFilters = () => (
     <Section
         {...fullHeader}
         filters={[
-            ...termFilters,
-            { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
-            { key: 'tutor', label: 'Tutor', text: 'Any', onClick: () => {} },
+            { key: 'status', label: 'Status', text: 'Upcoming and called off', onClick: () => {} },
+            { key: 'group', label: 'Group', text: 'Whitaker, Lincoln and Roosevelt', onClick: () => {} },
+            { key: 'date', label: 'Date', text: 'All time', onClick: () => {} },
         ]}
-        onMoreFilters={() => {}}
     >
         <TermTable />
     </Section>
@@ -431,14 +445,9 @@ export const SideAtEnd = () => (
         title="Lincoln Middle"
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
-        )}
-        views={(
-            <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
-                <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
-            </Tabs>
         )}
         layout="split"
         side={(
@@ -485,7 +494,7 @@ export const SectionAnatomy = () => (
         description="Optional supporting description for this section."
         actions={(
             <>
-                <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                 <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
@@ -548,7 +557,7 @@ export const ListType = () => {
             title="Students"
             actions={(
                 <>
-                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                     <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
                 </>
             )}
@@ -622,11 +631,6 @@ export const ReflectionQueue = () => {
         <Frame sidebar={<Sidebar user="tutor" activeTabId="home" account={accountRow} />} panel={panel} panelLabel="Reflection" panelOpen={isPanelOpen} onPanelOpenChange={setIsPanelOpen}>
             <Section
                 title="Reflections to review"
-                views={(
-                    <Tabs appearance="pill" defaultActiveKey="To review" aria-label="Views">
-                        <Tabs.Tab eventKey="To review">To review</Tabs.Tab>
-                    </Tabs>
-                )}
             >
                 <DynamicTable
                     label="Reflections to review"
@@ -782,6 +786,7 @@ const NoStudentsMatch = ({ onReset }) => (
 const filterSideViews = (
     <Tabs appearance="pill" defaultActiveKey="All students" aria-label="Views">
         <Tabs.Tab eventKey="All students">All students</Tabs.Tab>
+        <Tabs.Tab eventKey="Needs follow-up">Needs follow-up</Tabs.Tab>
     </Tabs>
 );
 
@@ -800,7 +805,7 @@ export const FilterSideStudents = () => {
             description={studentsTitle(matching.length)}
             actions={(
                 <>
-                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                     {addStudentsPrimary}
                 </>
             )}
@@ -835,7 +840,7 @@ export const FilterSideStudentsCompact = () => {
             description={studentsTitle(matching.length)}
             actions={(
                 <>
-                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                     {addStudentsPrimary}
                 </>
             )}
@@ -876,7 +881,7 @@ export const FilterSideStudentsNarrow = () => {
             description={studentsTitle(matching.length)}
             actions={(
                 <>
-                    <IconButton icon="ellipsis" label="More section actions" onClick={() => {}} />
+                    <IconButton icon="ellipsis" label="More section actions" appearance="default" onClick={() => {}} />
                     <IconButton icon="user-plus" label="Add students" appearance="primary" onClick={() => {}} />
                 </>
             )}

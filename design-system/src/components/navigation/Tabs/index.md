@@ -52,7 +52,7 @@ Tabs reads these motion tokens and no literal duration or curve.
 
 - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
 - For more options than fit on one strip without wrapping, use `Select`.
-- For a second-level choice inside a view, use `PopupSelect`.
+- For a second-level choice inside a view, use a quick filter after Search that opens a `PopupSelect`.
 - For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
 
 ## Best practices
@@ -115,9 +115,9 @@ The Tooltip is on only while the label is clipped. Tabs that do not fit fold int
 
 ### Keep one tab system per page and use `PopupSelect` for a second-level choice. {#keep-one-tab-system-per-page-and-use-popupselect-for-a-second-level-choice}
 
-A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use the labeled trigger of `PopupSelect` ("Status: Upcoming") in the view's toolbar.
+A `pill` strip is a fixed set of views of one subject, decided when the page is designed, so it has no add-view control and people cannot create, rename, reorder or remove a tab. A strip that must grow with the data is a list or a `Select`, not tabs. A page has one tab system: the underline strip under the page header switches the page's sections, and a pill strip inside a card switches that card's views, without stacking two strips of the same kind. For a second-level choice inside a view, use a quick filter after Search: a `FilterButton` ("Status: Upcoming") that opens a `PopupSelect`.
 
-Do: One strip for the sections; a labeled PopupSelect for the choice inside one.
+Do: One strip for the sections; a quick filter for the choice inside one.
 Don't: A second strip under the first, so two tab systems compete.
 
 ### Swap content in place without sliding. {#swap-content-in-place-without-sliding}
@@ -148,7 +148,7 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
 ## Related
 
 - `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.
-- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar.
+- `PopupSelect`: use when a quick filter after Search opens a second-level choice inside a tab.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 

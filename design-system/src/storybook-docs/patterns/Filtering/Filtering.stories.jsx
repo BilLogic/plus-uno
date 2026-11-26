@@ -8,7 +8,7 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
-import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
+import { FilteredStudents, STAGE } from './filteringDemo.jsx';
 
 /**
  * Filtering: the pattern page's examples, run in the Storybook tests. Each
@@ -320,28 +320,26 @@ export const NoMatches = {
     },
 };
 
-/** Under page tabs: the view picker at the bar's start picks a view; the filters stay at its end. */
+/** Under page tabs: no views row; the view switch is a quick filter, first in row 3, beside the other quick filters. */
 export const UnderPageTabs = {
     name: 'Under page tabs',
     render: () => staged(
         <FilteredStudents
-            tier="2b"
+            tier="1"
             categories={['grade', 'school']}
             initial={{ grade: ['Grade 7'] }}
             openMenu="view"
             pageTabs
-            start={(mount, { activeView, onViewChange, open, onOpenChange }) => (
-                <ViewPicker open={open} onOpenChange={onOpenChange} mount={mount} value={activeView} onChange={onViewChange} />
-            )}
         />,
     ),
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const p = parts(canvasElement);
+        await expect(p.bar.querySelector('.plus-section-row--views'), 'no views row under page tabs').toBeNull();
         const picker = p.canvas.getByRole('button', { name: /^View/ });
-        await expect(rect(picker).left, 'the view picker sits at the bar\'s start').toBeCloseTo(rect(p.bar).left, 0);
-        await expectInRow3(canvasElement, [p.filterIcon()]);
+        await expect(picker.closest('.plus-section-row--filters'), 'the switch is a quick filter in row 3').not.toBeNull();
+        await expect(rect(picker).left, 'first in the row').toBeCloseTo(rect(p.bar).left, 0);
         await expectHungFrom(canvasElement, picker, 'start');
 
         await expect(p.status()).toHaveTextContent('3 of 8 students');

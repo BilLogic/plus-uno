@@ -4,7 +4,7 @@ import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, Progress
 import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
 import { Section } from '@/templates';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
-import { StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { StudentsTable, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { typeStyle } from '../../lib/type-style.js';
 
 /**
@@ -91,7 +91,7 @@ const WaitFlag = ({ title, children }) => (
  */
 export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
     <div style={stack}>
-        <Section title="Students" description="Lincoln Middle" views={<ViewPills views={['All students']} />} search={<HeaderSearch />}>
+        <Section title="Students" description="Lincoln Middle" search={<HeaderSearch />}>
             <LoadThenReveal
                 as="section"
                 aria-label="Students"

@@ -119,8 +119,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Appearance | When to use |
 | --- | --- |
-| Default | Most icon buttons: an action with a clear, familiar glyph. Example: Edit page. |
-| Subtle | Toolbars, table rows and headers where items already read as interactive. Example: More actions in a row. |
+| Default | Most icon buttons: an action with a clear, familiar glyph. Examples: Edit page; the More (…) button in a page, Section or Card header. |
+| Subtle | Toolbars and table rows, where items already read as interactive. Example: More actions in a table row. Not a header's More, which is default. |
 | Primary | The main action of a small area when space allows no label. Use sparingly. Example: Send comment. |
 | Discovery | The call to action for a new experience. Example: Try the new view. |
 

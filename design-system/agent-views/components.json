@@ -12661,7 +12661,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Actions slot, aligned to the end of the title row",
+          "description": "Actions slot, aligned to the end of the title row: More (an IconButton at `appearance=\"default\"`), then the labeled Primary, last. Actions live only here, so a Section with actions shows its title row. Under 768 a primary Button with an `iconBefore` draws as an icon-only primary IconButton named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly here, or inside a Fragment; a component that renders one is not folded.",
           "deprecated": null
         },
         {
@@ -12691,7 +12691,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
+          "description": "Row 2, at the start: the views, Tabs in the pill appearance, two or more of them; with one view leave the slot empty. Under page tabs there is no views row: a switch such as Status is a quick filter after Search. It scrolls sideways when it does not fit.",
           "deprecated": null
         },
         {
@@ -12718,7 +12718,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
+          "description": "Row 3, after Search: one to three `{ key, label, text, isSelected, onClick, menu }` triggers, each drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select, so the same button opens the list and keeps its selected state. Four or more categories belong in `filterMenu`; given four or more here, they fold into one Filter button that calls `onOpenFilters`, never three and a \"More filters\". Under 768 two or more fold the same way. When they do not fit beside Search they wrap to their own row, end-aligned.",
+          "deprecated": null
+        },
+        {
+          "name": "filterMenu",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, after Search, in place of `filters`: one `FilterMenu`, for four or more filter categories. Its Filter icon button is the one trigger at every width. The Section cannot see what the menu applies, so pass `count` once a value is applied: the row then ends with the count and Reset filters.",
           "deprecated": null
         },
         {
@@ -12749,21 +12758,12 @@
           "deprecated": null
         },
         {
-          "name": "onMoreFilters",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs when \"More filters\" is pressed.",
-          "deprecated": null
-        },
-        {
           "name": "onOpenFilters",
           "type": "func",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Runs when the Filter button of a narrow Section is pressed.",
+          "description": "Runs when the one Filter button is pressed: a narrow Section's, or the fold of four or more `filters`.",
           "deprecated": null
         },
         {
@@ -12899,7 +12899,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Hides the title visually and keeps it as the Section's heading and accessible name. A page with one Section already has its page title, so the Section starts at its header rows; a page with several Sections keeps their titles shown.",
+          "description": "Hides the title visually and keeps it as the Section's heading and accessible name. Set it when the page (or the active page tab) has one Section with no actions: the page title is enough, so the Section starts at the rows it needs. Several Sections, or a Section with actions, show the title row.",
           "deprecated": null
         },
         {

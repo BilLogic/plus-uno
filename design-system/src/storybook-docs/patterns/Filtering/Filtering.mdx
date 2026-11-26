@@ -83,7 +83,7 @@ The control that holds a filter shows it: the FilterButton's count, or the Filte
 
 ## Key cases
 
-<ComponentExample of={FilteringStories.UnderPageTabs} title="Under page tabs" description="The view picker at the header's start picks a view, not a filter, and its menu meets the trigger's start edge. The filters stay at the end, where a menu meets its trigger's end edge. Both hang 4 below their trigger." />
+<ComponentExample of={FilteringStories.UnderPageTabs} title="Under page tabs" description="Under page tabs a Section has no views row. The view switch is a quick filter, first in the third row, and its menu meets the trigger's start edge, 4 below it." />
 
 <DocsInteractivePlayground of={FilteringStories.NarrowWidth} description="Below 768, the tier 1 triggers fold into one Filter button, which carries every count and opens the filters. Drag the Section's width." />
 
@@ -119,7 +119,7 @@ A one-list menu is auto: at least the trigger, 160 to 320, truncating with a too
 
 ## Usage
 
-Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: "Field: value" triggers, then More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine.
+Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: one to three "Field: value" triggers, or, for four or more categories, one Filter menu (the Section's `filterMenu` slot), never three triggers and More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine. Under page tabs a Section has no views row, so a switch such as Status is a quick filter after Search.
 
 <DocsTable>
 <thead>
@@ -154,7 +154,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 
 <RuleTag kind="automatic" />
 
-Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the header, and the header's order: <a target="_top" href="./?path=/docs/templates-section--docs#order-the-header-actions-then-views-and-format-then-search-and-filters">Section › Order the header</a>.
+Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, at four or more categories, all of its filters move into the one menu, the Section's `filterMenu` slot. Where the filters sit in the header, and the header's order: <a target="_top" href="./?path=/docs/templates-section--docs#order-the-header-actions-then-views-and-format-then-search-and-filters">Section › Order the header</a>.
 
 <DoDontPair
     doExample={<OneTierCase />}

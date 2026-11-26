@@ -56,7 +56,7 @@ export const AddInTitleRow = () => <InDocs><Example.AddInTitleRow /></InDocs>;
 /** The same Primary twice: in the page header and in the Section's title row. */
 export const AddTwice = () => <InDocs><Example.AddTwice /></InDocs>;
 
-/** Under page tabs the Section's views are one labeled PopupSelect at the start of its bar. */
+/** Under page tabs the Section has no views row; Status is a quick filter after Search. */
 export const OneTabSystem = () => <InDocs><Example.OneTabSystem /></InDocs>;
 
 /** Pill views under page tabs: two tab systems on one page. */

@@ -97,7 +97,7 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
 /** No access: the same slot names who can help and offers no action the person cannot take. */
 export const NoAccess = () => (
     <div style={pad}>
-        <Section title="Session notes" description="Lincoln Middle" views={<ViewPills views={['All notes']} />} search={<HeaderSearch label="Search notes" />}>
+        <Section title="Session notes" description="Lincoln Middle" search={<HeaderSearch label="Search notes" />}>
             <EmptyState
                 spacing="compact"
                 icon="lock"

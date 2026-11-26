@@ -23,7 +23,6 @@ import {
     PanelHeader,
 } from '@/templates';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
 export default {
     title: 'Templates/Page/Reference screens',
@@ -55,7 +54,7 @@ export const ListWithFilters = {
                 >
                     <Table
                         title="Sessions"
-                        views={<ViewPills views={['All sessions']} />}
+                        isTitleHidden
                         search={<SearchField mode="active" spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
                         filters={[{
                             key: 'status',

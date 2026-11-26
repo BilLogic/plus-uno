@@ -5,6 +5,10 @@ import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import Section from './Section';
 import * as SectionModule from './Section';
 import * as Cases from './SectionCases.jsx';
+import { PageWidthContext } from '@/lib/pageWidth';
+
+/** A Section on a narrow page: the Frame's page width, under 768. */
+const onNarrowPage = (ui) => <PageWidthContext.Provider value={{ narrow: true }}>{ui}</PageWidthContext.Provider>;
 
 vi.mock('@storybook/addon-docs/blocks', () => ({
     ArgTypes: () => null,
@@ -358,12 +362,71 @@ describe('Section header rows', () => {
         expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
     });
 
-    it('shows three filters and folds the rest into More filters with a count', () => {
-        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All' }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
-        render(<Section title="Sessions" search={<div />} filters={many}>Body</Section>);
-        expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
-        expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+    it('folds four or more filters into one Filter button, never three and More filters', () => {
+        const onOpenFilters = vi.fn();
+        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All', isSelected: true }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
+        render(<Section title="Sessions" search={<div />} filters={many} onOpenFilters={onOpenFilters}>Body</Section>);
+        expect(screen.queryByRole('button', { name: 'Date: All time' })).toBeNull();
+        expect(screen.queryByRole('button', { name: /More filters/ })).toBeNull();
+        const trigger = screen.getByRole('button', { name: /^Filter/ });
+        expect(trigger).toHaveTextContent('1');
+        trigger.click();
+        expect(onOpenFilters).toHaveBeenCalled();
+    });
+
+    it('keeps the Primary\'s other props when it folds on a narrow page', async () => {
+        const { Button } = await import('@/components');
+        const actions = (
+            <>
+                <Button text="Add students" iconBefore="plus" appearance="primary" href="/students/new" data-testid="add" aria-describedby="hint" />
+            </>
+        );
+        render(onNarrowPage(<Section title="Students" actions={actions}>Body</Section>));
+        const add = screen.getByTestId('add');
+        expect(add).toHaveAttribute('href', '/students/new');
+        expect(add).toHaveAttribute('aria-describedby', 'hint');
+        expect(add).toHaveAccessibleName('Add students');
+        expect(add).not.toHaveTextContent('Add students');
+    });
+
+    it('draws a filterMenu after Search in place of the triggers', () => {
+        render(<Section title="Sessions" search={<div data-testid="search" />} filters={filters} filterMenu={<button type="button">Filters</button>}>Body</Section>);
+        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Date: All time' })).toBeNull();
+    });
+
+    it('ends a filterMenu row with the count and Reset filters once a count is given', () => {
+        const menu = <button type="button">Filters</button>;
+        const { rerender } = render(<Section title="Sessions" search={<div />} filterMenu={menu} onClearAll={() => {}}>Body</Section>);
+        expect(screen.queryByRole('button', { name: 'Reset filters' })).toBeNull();
+        rerender(<Section title="Sessions" search={<div />} filterMenu={menu} count="3 of 12" onClearAll={() => {}}>Body</Section>);
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
+    });
+
+    it('keeps the labeled Primary on a wide page and folds it to an icon-only primary on a narrow one', async () => {
+        const { Button } = await import('@/components');
+        const actions = <Button text="Add students" iconBefore="plus" appearance="primary" onClick={() => {}} />;
+        const { unmount } = render(<Section title="Students" actions={actions}>Body</Section>);
+        expect(screen.getByRole('button', { name: 'Add students' }), 'outside a Frame the page counts as wide').toHaveTextContent('Add students');
+        unmount();
+        render(onNarrowPage(<Section title="Students" actions={actions}>Body</Section>));
+        const icon = screen.getByRole('button', { name: 'Add students' });
+        expect(icon).not.toHaveTextContent('Add students');
+        expect(icon.className).toMatch(/primary/);
+    });
+
+    it('follows the page width, not its own box: a narrow window outside a Frame stays wide', async () => {
+        const { Button } = await import('@/components');
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            render(<Section title="Students" search={<div />} filters={filters} actions={<Button text="Add students" iconBefore="plus" appearance="primary" />}>Body</Section>);
+            expect(screen.getByRole('button', { name: 'Add students' })).toHaveTextContent('Add students');
+            expect(screen.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+        } finally {
+            window.innerWidth = before;
+        }
     });
 
     it('hands a filter entry\'s trigger to its menu, so the same button opens it', () => {
@@ -375,30 +438,18 @@ describe('Section header rows', () => {
         expect(trigger).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('keeps the count and Reset filters under 768', () => {
-        const before = window.innerWidth;
-        window.innerWidth = 600;
-        try {
-            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>);
-            expect(screen.getByText('3 of 12')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
-        } finally {
-            window.innerWidth = before;
-        }
+    it('keeps the count and Reset filters on a narrow page', () => {
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+        render(onNarrowPage(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>));
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
     });
 
-    it('folds the triggers into one Filter button with the applied count under 768', () => {
-        const before = window.innerWidth;
-        window.innerWidth = 600;
-        try {
-            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<Section title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</Section>);
-            expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
-            expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
-        } finally {
-            window.innerWidth = before;
-        }
+    it('folds the triggers into one Filter button with the applied count on a narrow page', () => {
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+        render(onNarrowPage(<Section title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</Section>));
+        expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
+        expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
     });
 });
 
@@ -406,7 +457,7 @@ describe('Section retired header props', () => {
     it('no longer exports the toolbar, the tabs or the Add view props', () => {
         expect(SectionModule.SectionToolbar).toBeUndefined();
         expect(Section.Toolbar).toBeUndefined();
-        ['tabs', 'toolbar', 'onAddView', 'addViewLabel'].forEach((name) => expect(Section.propTypes[name], name).toBeUndefined());
+        ['tabs', 'toolbar', 'onAddView', 'addViewLabel', 'onMoreFilters'].forEach((name) => expect(Section.propTypes[name], name).toBeUndefined());
     });
 
     it('stays quiet for the three-row slots', async () => {
