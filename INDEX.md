@@ -122,7 +122,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/product-and-service/features.md`](docs/product-and-service/features.md) | The in-session workspace |
 | [`docs/product-and-service/flows.md`](docs/product-and-service/flows.md) | The core workflow — what happens before, during, and after every tutoring session |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | AI is rewriting our economy, but global K-12 math proficiency is at a historic low due to lack of content mastery and emotional support |
-| [`docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md`](docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md) | The system around uno-bot: where it sits relative to GitHub Actions, Slack, Notion, Figma, and the model provider |
 | [`docs/product-and-service/users.md`](docs/product-and-service/users.md) | PLUS Users & Stakeholders |
 
 ## Decisions
@@ -211,6 +210,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-140 routable documents. Staged notes (`docs/knowledge/`) and
+139 routable documents. Staged notes (`docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
