@@ -126,20 +126,7 @@ test("the documented exceptions are exempt, and only they are", () => {
   });
 });
 
-test("recorded runs are left alone — rewriting them would falsify the record", () => {
-  // A run artifact says which Worker it scored. That run really did hit the old
-  // one; editing it to the new host would be a lie about history.
-  withRepo("docs/knowledge/archive/eval-runs/2026-08-19-baseline.json", `{"worker":"https://${HOST}"}\n`, (root) => {
-    assert.deepEqual(findStrays(root), []);
-  });
-  withRepo("docs/plans/2026-08-19-001-plan.md", `curl https://${HOST}/health\n`, (root) => {
-    assert.deepEqual(findStrays(root), []);
-  });
-
-  // ...but the exemption is those two prefixes, NOT docs/ at large. Live
-  // documentation has to be updated on cutover like anything else, and a
-  // broader pattern here would swallow it silently. Caught by mutation: relaxing
-  // HISTORY to /^docs\// left every other case in this file green.
+test("documentation is not exempt — it is updated on cutover like anything else", () => {
   withRepo("docs/connectors/slack.md", `The Worker is at https://${HOST}.\n`, (root) => {
     assert.deepEqual(findStrays(root), ["docs/connectors/slack.md"]);
   });
@@ -217,11 +204,6 @@ test("--host asks about a FOREIGN host, and the allowed list does not apply ther
     assert.deepEqual(findStrays(root, OLD), ["agents/uno-bot/wrangler.toml"]);
     // ...and the same file is still exempt for the host it is allowed to hold.
     assert.deepEqual(findStrays(root), []);
-  });
-
-  // Recorded history stays exempt in both modes: those runs really did hit it.
-  withRepo("docs/knowledge/archive/eval-runs/2026-08-19.json", `{"worker":"https://${OLD}"}\n`, (root) => {
-    assert.deepEqual(findStrays(root, OLD), []);
   });
 });
 

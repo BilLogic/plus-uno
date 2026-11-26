@@ -7,7 +7,7 @@
  * #504 exist to delete: a second link grammar beside the corpus's. The two had
  * already drifted once — the shell had a hard `rg` dependency and silently
  * no-opped on machines without it, so the guard reported nothing for weeks
- * (docs/plans/2026-07-07-001 § 6) — and a repo with two link readers gets two
+ * (`git show 7b0cea5ef:docs/plans/2026-07-07-001-harness-six-skill-revision-plan.md` § 6) — and a repo with two link readers gets two
  * answers to "is this link broken?". Extraction now comes from
  * `scripts/lib/corpus.mjs`, the one reader, and every pass below keeps the
  * findings and the wording it had as shell.

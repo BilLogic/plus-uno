@@ -100,10 +100,7 @@ test('the retired-face guard finds the old vocabulary in live files and skips hi
     {},
     {
       'agents/uno-bot/AGENT.md': '# Persona\n\nRead the Worker face in skills/uno-review/bot.md.\n',
-      'docs/plans/old-plan.md': 'The bot.md faces were the plan.\n',
-      'docs/knowledge/archive/old.md': 'Each Worker face was 7k.\n',
       'docs/adr/013-old.md': 'Six dual-face skills: SKILL.md + bot.md.\n',
-      'todos/001-old.md': 'Trim each bot.md.\n',
       'agents/uno-bot/harness-bundle.md': 'A regenerated copy naming bot.md.\n',
       'agents/uno-bot/src/generated/harness.ts': 'export const HARNESS = "bot.md";\n',
       'docs/connectors/slack.md': '# Slack\n\nNothing retired here; docs/evals/rubrics/uno-bot.md is another file.\n',

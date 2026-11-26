@@ -4,7 +4,7 @@
 // Driven at the review door, as `tests/review-shareout.test.ts` drives the
 // share-out: the in-memory ThreadState, the recording Delivery and a views
 // client that refuses what Slack refuses. The drafts are the doc's samples
-// (`docs/plans/2026-10-15-review-modal-redesign.md` § 6 and § 7). Each case
+// (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § 6 and § 7). Each case
 // asserts what Slack was handed, or what Approve ran.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";

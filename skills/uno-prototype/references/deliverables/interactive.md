@@ -32,11 +32,10 @@ this repo* is `coded-build.md`, not this.)
   settings as pass/fail checks; the tool verifies its own output, regenerates
   once on failure. The loop travels inside the spec — no UNO-side runtime.
 
-**Where the spec lives.** Write it to
-`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md` (repo date-prefix
-convention, `docs/engineering/coding.md`) and give the designer the path plus
-the ready-to-paste text. The file is what `uno-review` receives with the
-manifest.
+**Where the spec lives.** Put it in the prototype's GitHub issue, in the body
+or a comment, and give the designer the issue link plus the ready-to-paste
+text. The Notion PRD may link it. The issue is what `uno-review` receives with
+the manifest.
 
 ## Handoff
 

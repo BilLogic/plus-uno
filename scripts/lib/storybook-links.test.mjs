@@ -33,7 +33,6 @@ test('each link carries its 1-based line', () => {
 });
 
 test('records and fixtures are not linked to the live Storybook', () => {
-  assert.equal(isLinkable('docs/plans/2026-10-24-001-storybook-url-migration.json'), false);
   assert.equal(isLinkable('docs/adr/001-x.md'), false);
   assert.equal(isLinkable('agents/uno-bot/tests/figma-links.test.ts'), false);
   assert.equal(isLinkable('scripts/lib/storybook-links.test.mjs'), false);

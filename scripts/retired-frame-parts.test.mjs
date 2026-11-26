@@ -1,5 +1,5 @@
 // The Frame has no top bar and no focused type. This sweep keeps both words out of every
-// live doc and source file; history (decisions, plans, archives, Figma measurements) keeps them.
+// live doc and source file; history (decisions, Figma measurements) keeps them.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -18,9 +18,7 @@ const ROOTS = ['design-system', 'docs', 'scripts', 'agents', 'GLOSSARY.md'];
 /** Left as written: records of what was decided or measured, and pages another change owns. */
 const HISTORY = [
   'docs/adr/',
-  'docs/plans/',
   'docs/evals/',
-  'docs/knowledge/archive/',
   'scripts/figma-component-snapshot.json',
   'scripts/baselines/figma-node-types.json',
   'design-system/figma/node-types.json',

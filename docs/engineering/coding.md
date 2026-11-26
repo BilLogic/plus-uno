@@ -12,8 +12,8 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `SectionMessage/SectionMessage.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
 - **Prototypes**: kebab-case directories (e.g., `onboarding-flow`)
-- **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
-- **Prompt-specs**: same folder, same date prefix, `-spec` suffix (`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
+- **Docs**: kebab-case (e.g., `local-components.md`)
+- **Prompt-specs**: the prototype's GitHub issue holds them, in the body or a comment. `uno-prototype`'s spec-handoff deliverables are text handed to an external design tool, not code, so nothing builds them.
 
 ## Stories and tests
 
@@ -132,10 +132,10 @@ scripts/lib/color/plans/plan-*.json → npm run generate:color-tokens → design
 ## Docs pipeline
 
 ```
-docs/plans/ → implementation → a rule, an ADR, or nothing
+GitHub issue (spec, tickets) → implementation → a rule, an ADR, or nothing
 ```
 
-- **Plans**: `YYYY-MM-DD-NNN-type-slug-plan.md` — actionable implementation plans
+- **Specs and tickets** live in GitHub Issues; finished work lives in git history and closed issues.
 - **What a finished piece of work leaves behind** is one of three things, and `docs/knowledge/INDEX.md` § The disposition rule is the contract: a **rule** in the doc that already owns the subject (this file, `setup.md`, a `docs/connectors/*.md`, a design-system guideline), an **ADR** under `docs/adr/` when the call is hard to reverse, or **nothing** — git keeps the trail and most findings are worth less than the context they cost. A note staged under `docs/knowledge/` carries its `disposition:` in frontmatter from the moment it is written; `npm run check:knowledge-disposition` fails the build otherwise.
 
 ## Renames

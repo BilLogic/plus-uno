@@ -21,4 +21,4 @@ verified: 2026-08-24 (#171)
 - **Status**: Active
 - **Context**: Sidebar navigation required maintaining 3 parallel maps (`pathToTab`, `pathToUserType`, inline `onTabClick` if-chain). Every navigation change required code changes in 3+ locations.
 - **Decision**: Single declarative route manifest that drives routing, sidebar state, breadcrumbs, and user type. Dynamic sub-items register/unregister at runtime. Adding a new route requires only a manifest entry.
-- **Source**: docs/plans/2026-03-17-001-feat-toolkit-ia-revision-plan.md
+- **Source**: `git show 7b0cea5ef:docs/plans/2026-03-17-001-feat-toolkit-ia-revision-plan.md`

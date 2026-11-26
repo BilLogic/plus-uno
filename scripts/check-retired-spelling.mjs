@@ -15,9 +15,8 @@
  * glossary, agents/, skills/, docs/ (minus history), the design-system
  * guidelines, the headless prompts and the workflows. What it leaves alone is the
  * retirement list's allowed places for a spelling (`design-system/agent-views/_inventions.json`):
- * plans and `todos/` (a plan keeps the words it was written in), decision
- * records, the knowledge archive (the graveyard), the generated bundle and the
- * Worker's source, and every `_Avoid_:` line, which names the old spelling
+ * decision records (a record keeps the words it was written in), the
+ * changelog, the generated bundle and the Worker's source, and every `_Avoid_:` line, which names the old spelling
  * precisely so this sweep has something to point at.
  *
  * THE SPELLINGS ARE THE LIST'S. This check holds no list of retired shapes and

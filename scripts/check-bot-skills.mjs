@@ -22,8 +22,8 @@
 // THE RETIRED-FACE GUARD: the uno skills once carried a second, Slack-side file
 // each, and the bot skills replaced them. A live file that still names that
 // file or its old role name is describing a harness that no longer exists, so
-// each such line is a finding. History is left as written — plans, ADRs, todos
-// and the archive — and so are generated files, which regenerate from the
+// each such line is a finding. History is left as written — ADRs and the
+// changelog — and so are generated files, which regenerate from the
 // sources this guard already reads. The glossary's `_Avoid_:` lines are where a
 // retired word is meant to be named, so they are the one exemption. `--retired-faces` prints the hits alone.
 //

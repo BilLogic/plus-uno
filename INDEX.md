@@ -213,6 +213,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-142 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+142 routable documents. Staged notes (`docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

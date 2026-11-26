@@ -1,7 +1,7 @@
 // The Review pop-up's readings, in the shared anatomy, of the gated writes
 // that touch something already there or start something: the Notion archive,
 // the GitHub issue follow-up, the workflow run, and the new issue
-// (`docs/plans/2026-10-15-review-modal-redesign.md` § 3, 4, 5 and 8).
+// (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § 3, 4, 5 and 8).
 //
 // WHAT THE CARD RESOLVED, READ BACK. The turn resolves where each of these
 // lands before the card is posted — the archived page's title and database,

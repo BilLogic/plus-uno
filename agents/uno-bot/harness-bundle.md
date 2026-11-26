@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,983 chars from 9 files**, against an assembled budget of 175,500 (68,517 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,599 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,949 chars from 9 files**, against an assembled budget of 175,500 (68,551 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,565 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,849 (−6,838 ide-only) | 9,849 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,207 | 28,085 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 49,561 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,207 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,455 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,149 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,935 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,109 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,577 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,154 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,127 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,983 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,815 (−6,838 ide-only) | 9,815 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,207 | 28,051 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 49,527 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,173 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,421 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,115 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,901 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,075 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,543 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,120 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,093 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,949 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,881 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,218 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -51,7 +51,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 3,515 |
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
-| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
+| `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 26,891 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
 | `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,575 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
@@ -151,7 +151,7 @@ Every embodiment, including Slack.
 
 ## Knowledge
 
-Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, an **archive** entry in `docs/knowledge/archive/` while something live cites it, or **nothing** (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
+Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, or **nothing** — git history and closed issues keep the trail (`docs/knowledge/INDEX.md`, enforced by `npm run check:knowledge-disposition` via `skills/uno-maintain`).
 
 
 
@@ -1418,6 +1418,7 @@ Each shape the bot's Slack output takes, and which bot skill produces it. The ru
 | Result table, chart, answer cards, ⚠️ line | any skill answering from a lookup (`present`, `roadmap_query` with `as_table`) |
 | Sources box | code, from the links an answer used |
 | Render paths | the Worker, on every reply |
+| Review pop-up | the Worker, from the draft's tool |
 | Figma messages | the Worker's own code |
 
 ## Share-out post
@@ -1559,6 +1560,31 @@ Until then this file mandated Slack **mrkdwn** (`*single*` bold, literal `•`, 
 </details>
 
 *(This section read "No tables. Ever." for about an hour on 2026-08-22. That was a bad inference: a probe message's **stored text** contained no table, so the table looked deleted. It was not — Slack keeps it as a block and only the plain-text fallback omits it. Corrected by looking at the rendered message. The lesson: **a Slack message's stored text is not what a reader sees** — verify rendering by looking at it.)*
+
+## The Review pop-up
+
+Every Review draft is built from the same five zones, in this order. A tool supplies the content of each zone; the zones decide the blocks. `agents/uno-bot/src/slack/review-anatomy.ts` builds them.
+
+1. **What this does, and where.** A `header` with the action in a person's words ("Share for feedback", "Comment on and close #688"). Under it one `rich_text` line naming the destination and the people it reaches, as native elements: a `channel` element for a channel, `user` elements for whoever it pings or DMs, a `link` element for a repo, page or database. The destination appears here and nowhere else.
+2. **What needs attention.** One `alert` per caveat: `warning` for the bundle audit, a public repo, missing open questions or a cut-off rerun; `info` for a private repo, a recoverable archive or a read-only view. At most two; a refused edit's `error` alert stays first. Alerts are plain text under 200 characters.
+3. **The thing itself.** A `card` for the object being shared or touched: title, subtitle, a body of 200 characters or fewer, and an Open button (`url`). A longer summary goes in a `section` under a card with no body.
+4. **The content**, by kind:
+   - short facts (fidelity, round, status, pillar, branch) as `section` `fields`, with Edit fields as the accessory when its selects can be edited;
+   - questions, criteria and link lists as `rich_text` lists under a bold label;
+   - text that goes out verbatim and is not edited here (a shared note) as a `rich_text_quote`;
+   - every text a confirmer would fix as a prefilled input with a label and, where the field is not self-explanatory, a hint; required inputs follow `review-fields.ts`'s `required`, and optional ones say what clearing them does;
+   - a round reads "Round 1", capitalized, with its word;
+   - before/after as `notion_update` draws it (Current content, Issue, New content input).
+
+   Body headings become bold `rich_text` lines; `header` is kept for zone 1, so a PRD's five sections read as one page.
+5. **The decision.** A `divider`, then the radio and the note. Each option's `description` says what it does on this card ("Posts it now and pings 1 reviewer", "Nothing posts"). A card with its own answers uses each answer's `decided` words as that answer's description, and the input is labeled "Your answer".
+
+Around the draft:
+
+- **Title.** Per tool, at most 24 characters: "Review share-out", "Review new issue", "Review issue update", "Review Roadmap card", "Review decision", "Review archive", "Review workflow run", "Review 2 DMs", "Figma tidy-up", "Review DS intake", "Review shared note", "Review Dev Mode links".
+- **Read-only.** An `info` alert at the top names who can decide; zones 1 to 4 follow, with no zone 5 and no Submit.
+- **States.** Every one-line state (approved, rejected, sent back, expired, superseded, being revised) is an `alert` with the outcome and one `section` saying what happens next.
+- **Hidden everywhere.** `place`, `channel` (the raw input), `surface`, raw user ids, page and file ids, `file_key`, `check`, `introduce`, block ids, `cards`, and any input key as a label. A value a person needs is shown once, in its zone: a channel as a `channel` element, a person as a `user` element, a page or repo as a `link` or an Open button.
 
 
 

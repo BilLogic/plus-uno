@@ -2,7 +2,7 @@
 # docs/knowledge/ — the disposition rule
 
 This folder is a staging area, not a library. Work that produces a durable
-finding leaves behind **a rule, an ADR, an archive entry, or nothing**, and a file that lands here
+finding leaves behind **a rule, an ADR, or nothing**, and a file that lands here
 is a note in transit between those states.
 
 It reads as sediment when nobody says which. Before #172 it held 15 live files
@@ -11,39 +11,32 @@ into `docs/adr/` months earlier, a preferences file every line of which was
 already an AGENTS.md hard rule or an ADR, and four "compounding" lesson files
 last touched in April. The re-read cost more than every entry was worth.
 
-## The three dispositions
+## The dispositions
 
 | Disposition | When | Where it lands |
 |---|---|---|
 | **rule** | An agent would behave differently knowing it. That is the whole test — a rule that restates the model's default is noise, and it is re-read on every turn that loads its doc. | The doc that already owns the subject: `docs/engineering/coding.md`, `docs/engineering/setup.md`, a `docs/connectors/*.md`, a design-system guideline. Never a new rules file. |
 | **adr** | Hard to reverse · surprising without the context · a real trade-off. All three, not one. | `docs/adr/NNN-slug.md`, per `docs/adr/overview.md`. |
-| **archive** | A superseded doc that something live still cites as its decision trail. | `docs/knowledge/archive/`. |
 
-**Deleting is the fourth outcome and the most common one.** It needs no
-frontmatter because it leaves no file. Git keeps the trail; a finding worth less
-than the context it costs is worth deleting, and promoting something marginal to
-avoid the delete is how the folder filled up the first time.
+**Deleting is the third outcome and the most common one.** It needs no
+frontmatter because it leaves no file. Deleted work lives in git history, and
+specs and tickets live in GitHub Issues; a finding worth less than the context
+it costs is worth deleting, and promoting something marginal to avoid the delete
+is how the folder filled up the first time.
 
 ## What the check enforces
 
 `npm run check:knowledge-disposition` fails when a file under `docs/knowledge/`
-carries no `disposition:`. Two exclusions, both structural:
-
-- **`docs/knowledge/archive/`** is out of scope. It holds a superseded doc only
-  while a live doc, ADR or code comment cites it as its decision trail; once
-  nothing does, the doc is deleted. Archiving *is* a disposition; the archive's
-  own contents do not need one. The same test clears `docs/plans/` and `todos/`:
-  a plan, todo or archived doc whose work has landed or been abandoned is
-  deleted once nothing live cites it.
-- **This file and `changelog.md`** govern the folder rather than sitting in it.
-  They are named in the script, not exempted by a magic frontmatter value, so
-  the exemption cannot spread.
+carries no `disposition:`. One exclusion, structural: **this file and
+`changelog.md`** govern the folder rather than sitting in it. They are named in
+the script, not exempted by a magic frontmatter value, so the exemption cannot
+spread.
 
 Everything else declares, in frontmatter, where its content went:
 
 ```yaml
 ---
-disposition: rule            # rule | adr | archive
+disposition: rule            # rule | adr
 disposition-target: docs/engineering/coding.md   # must resolve
 ---
 ```

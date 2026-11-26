@@ -105,7 +105,7 @@ test('over the tracked agent-read docs, the Gemini lane row has no false positiv
 });
 
 test('the shared allowed places cover history, and a place may keep only some kinds', () => {
-  for (const file of ['docs/adr/037-x.md', 'docs/knowledge/archive/old.md', 'docs/knowledge/changelog.md', 'docs/evals/ds-usage-ledger.jsonl']) {
+  for (const file of ['docs/adr/037-x.md', 'docs/knowledge/changelog.md', 'docs/evals/ds-usage-ledger.jsonl']) {
     assert.equal(retirement.allowed(file), true, file);
     assert.equal(retirement.allowed(file, 'word'), true, file);
   }

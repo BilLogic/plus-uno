@@ -4,7 +4,7 @@ summary: uno-publish — eval scenarios
 
 # uno-publish — eval scenarios
 
-<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see docs/knowledge/archive/eval-runs/. Rubric: docs/evals/rubrics/uno-publish.md · Decisions DB scenario added 2026-07-13 -->
+<!-- written 2026-07-07 (evals-first, before the body rewrite); verified against the rewritten bodies by the 2026-07-08 golden runs — see `git show 7b0cea5ef:docs/knowledge/archive/eval-runs/`. Rubric: docs/evals/rubrics/uno-publish.md · Decisions DB scenario added 2026-07-13 -->
 
 ## S1 — feedback rail: the complete bundle
 - **Trigger:** "share the coach-dashboard prototype for feedback"

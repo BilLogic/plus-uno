@@ -3,7 +3,7 @@
 // Driven at the review door, as `tests/proposal-edit.test.ts` drives it: the
 // in-memory ThreadState, the recording Delivery and a views client that
 // refuses what Slack refuses. The card is the one Bill opened on 2026-10-15
-// (`docs/plans/2026-10-15-review-modal-redesign.md` § 1): a hi-fi prototype
+// (`git show 7b0cea5ef:docs/plans/2026-10-15-review-modal-redesign.md` § 1): a hi-fi prototype
 // shared in a named channel, three questions, one reviewer, a deadline and the
 // bundle caveat. Each case asserts what Slack was handed, or what Approve ran.
 import { describe, it } from "node:test";
