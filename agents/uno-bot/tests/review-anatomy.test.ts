@@ -5,8 +5,7 @@
 // Pure where it can be — the builders, the titles, the card's fallback — and
 // through the real `views.update` over a stubbed fetch for the one rung that
 // only Slack can trip: a `card` refused with `invalid_blocks`.
-// `docs/plans/2026-10-15-review-modal-redesign.md` § The shared anatomy is the
-// spec.
+// `docs/connectors/slack/shapes.md` § The Review pop-up is the spec.
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
