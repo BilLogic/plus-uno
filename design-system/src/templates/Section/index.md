@@ -195,7 +195,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |
 | `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |
-| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |
+| `actions` on a narrow page | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |

@@ -5,7 +5,7 @@ import { Button, FilterButton, Icon, IconButton, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
-import { useOwnWidth } from '../Frame/useOwnWidth';
+import { usePageNarrow } from '@/lib/pageWidth';
 import Card from '../Card/Card';
 import './Section.scss';
 
@@ -45,9 +45,11 @@ import './Section.scss';
  * own row, end-aligned. A Section with no views drops row 2 and the format
  * switch moves to the end of row 3; nothing to search or filter drops row 3.
  *
- * NARROW. Under 768 the Primary in `actions` (a primary Button with an
- * `iconBefore`) draws as an icon-only primary IconButton named by its text, so
- * the title row stays one row.
+ * NARROW. Narrow follows the page width, not the Section's own box: the
+ * Frame's `PageWidthContext` (`usePageNarrow`), under 768. Outside a Frame the
+ * page counts as wide. On a narrow page the Primary in `actions` (a primary
+ * Button with an `iconBefore`) draws as an icon-only primary IconButton named
+ * by its text, so the title row stays one row, and the filter triggers fold.
  *
  * LEVEL. The title is one heading level below what holds it, and one size
  * smaller: a section on a page is an h2 at Heading/medium 20, a section
@@ -359,8 +361,8 @@ const Section = ({
     ].filter(Boolean).join(' ');
 
     const rootRef = useRef(null);
-    const ownWidth = useOwnWidth(rootRef);
-    const narrow = ownWidth < FRAME_LAYOUT.fullWidthBelow;
+    // Narrow follows the page, not the Section's own box: under 768 inside a Frame. Outside a Frame the page counts as wide.
+    const narrow = usePageNarrow();
     const hasRows = Boolean(views || format || search || filterMenu || (filters && filters.length));
 
     const type = typeProp ?? inferType({ header });

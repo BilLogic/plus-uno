@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { Button, DynamicTable, FilterMenu, Heading, IconButton, SearchField, Tabs } from '@/components';
 import { Section } from '@/templates';
+import { PageWidthContext } from '@/lib/pageWidth';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader, PageTabs } from '../Page/pageDemo.jsx';
 
@@ -97,7 +98,7 @@ const HEADER_CASES = [
     { group: 'Modifiers' },
     { id: 'M1', label: 'Filtered: the count and Reset filters at the row end', rows: { title: true, filters: true }, node: <DemoPage><Section title="Needs a check-in" actions={actions()} search={search} filters={[quick('School', 'Lincoln Middle', true), quick('Grade', 'All')]} count="12 of 340 students" onClearAll={() => {}}>{table}</Section><Second /></DemoPage> },
     { id: 'M2', label: 'Four or more categories: one Filter menu', rows: { title: true, filters: true }, node: <DemoPage><Section title="Needs a check-in" actions={actions()} search={search} filterMenu={<FilterMenu categories={categories} value={{}} onApply={() => {}} layout="stacked" />}>{table}</Section><Second /></DemoPage> },
-    { id: 'M3', label: 'Narrow, 375: the Primary is icon-only and the filters fold into one Filter button', rows: { title: true, views: true, filters: true }, node: <DemoPage width={375}><Section title="Needs a check-in" actions={actions()} views={views} search={search} filters={filters}>{table}</Section></DemoPage> },
+    { id: 'M3', label: 'Narrow page, 375: the Primary is icon-only and the filters fold into one Filter button', rows: { title: true, views: true, filters: true }, node: <PageWidthContext.Provider value={{ width: 375, narrow: true }}><DemoPage width={375}><Section title="Needs a check-in" actions={actions()} views={views} search={search} filters={filters}>{table}</Section></DemoPage></PageWidthContext.Provider> },
 ];
 
 export default {

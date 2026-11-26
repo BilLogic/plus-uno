@@ -5,6 +5,10 @@ import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import Section from './Section';
 import * as SectionModule from './Section';
 import * as Cases from './SectionCases.jsx';
+import { PageWidthContext } from '@/lib/pageWidth';
+
+/** A Section on a narrow page: the Frame's page width, under 768. */
+const onNarrowPage = (ui) => <PageWidthContext.Provider value={{ narrow: true }}>{ui}</PageWidthContext.Provider>;
 
 vi.mock('@storybook/addon-docs/blocks', () => ({
     ArgTypes: () => null,
@@ -370,25 +374,19 @@ describe('Section header rows', () => {
         expect(onOpenFilters).toHaveBeenCalled();
     });
 
-    it('keeps the Primary\'s other props when it folds under 768', async () => {
+    it('keeps the Primary\'s other props when it folds on a narrow page', async () => {
         const { Button } = await import('@/components');
-        const before = window.innerWidth;
-        window.innerWidth = 600;
-        try {
-            const actions = (
-                <>
-                    <Button text="Add students" iconBefore="plus" appearance="primary" href="/students/new" data-testid="add" aria-describedby="hint" />
-                </>
-            );
-            render(<Section title="Students" actions={actions}>Body</Section>);
-            const add = screen.getByTestId('add');
-            expect(add).toHaveAttribute('href', '/students/new');
-            expect(add).toHaveAttribute('aria-describedby', 'hint');
-            expect(add).toHaveAccessibleName('Add students');
-            expect(add).not.toHaveTextContent('Add students');
-        } finally {
-            window.innerWidth = before;
-        }
+        const actions = (
+            <>
+                <Button text="Add students" iconBefore="plus" appearance="primary" href="/students/new" data-testid="add" aria-describedby="hint" />
+            </>
+        );
+        render(onNarrowPage(<Section title="Students" actions={actions}>Body</Section>));
+        const add = screen.getByTestId('add');
+        expect(add).toHaveAttribute('href', '/students/new');
+        expect(add).toHaveAttribute('aria-describedby', 'hint');
+        expect(add).toHaveAccessibleName('Add students');
+        expect(add).not.toHaveTextContent('Add students');
     });
 
     it('draws a filterMenu after Search in place of the triggers', () => {
@@ -406,19 +404,26 @@ describe('Section header rows', () => {
         expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
     });
 
-    it('keeps the labeled Primary at full width and folds it to an icon-only primary under 768', async () => {
+    it('keeps the labeled Primary on a wide page and folds it to an icon-only primary on a narrow one', async () => {
         const { Button } = await import('@/components');
         const actions = <Button text="Add students" iconBefore="plus" appearance="primary" onClick={() => {}} />;
         const { unmount } = render(<Section title="Students" actions={actions}>Body</Section>);
-        expect(screen.getByRole('button', { name: 'Add students' })).toHaveTextContent('Add students');
+        expect(screen.getByRole('button', { name: 'Add students' }), 'outside a Frame the page counts as wide').toHaveTextContent('Add students');
         unmount();
+        render(onNarrowPage(<Section title="Students" actions={actions}>Body</Section>));
+        const icon = screen.getByRole('button', { name: 'Add students' });
+        expect(icon).not.toHaveTextContent('Add students');
+        expect(icon.className).toMatch(/primary/);
+    });
+
+    it('follows the page width, not its own box: a narrow window outside a Frame stays wide', async () => {
+        const { Button } = await import('@/components');
         const before = window.innerWidth;
         window.innerWidth = 600;
         try {
-            render(<Section title="Students" actions={actions}>Body</Section>);
-            const icon = screen.getByRole('button', { name: 'Add students' });
-            expect(icon).not.toHaveTextContent('Add students');
-            expect(icon.className).toMatch(/primary/);
+            render(<Section title="Students" search={<div />} filters={filters} actions={<Button text="Add students" iconBefore="plus" appearance="primary" />}>Body</Section>);
+            expect(screen.getByRole('button', { name: 'Add students' })).toHaveTextContent('Add students');
+            expect(screen.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
         } finally {
             window.innerWidth = before;
         }
@@ -433,30 +438,18 @@ describe('Section header rows', () => {
         expect(trigger).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('keeps the count and Reset filters under 768', () => {
-        const before = window.innerWidth;
-        window.innerWidth = 600;
-        try {
-            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>);
-            expect(screen.getByText('3 of 12')).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
-        } finally {
-            window.innerWidth = before;
-        }
+    it('keeps the count and Reset filters on a narrow page', () => {
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+        render(onNarrowPage(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>));
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
     });
 
-    it('folds the triggers into one Filter button with the applied count under 768', () => {
-        const before = window.innerWidth;
-        window.innerWidth = 600;
-        try {
-            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<Section title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</Section>);
-            expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
-            expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
-        } finally {
-            window.innerWidth = before;
-        }
+    it('folds the triggers into one Filter button with the applied count on a narrow page', () => {
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+        render(onNarrowPage(<Section title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</Section>));
+        expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
+        expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
     });
 });
 

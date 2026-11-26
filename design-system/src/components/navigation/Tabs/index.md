@@ -52,7 +52,7 @@ Tabs reads these motion tokens and no literal duration or curve.
 
 - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
 - For more options than fit on one strip without wrapping, use `Select`.
-- For a second-level choice inside a view, use `PopupSelect`.
+- For a second-level choice inside a view, use a quick filter after Search that opens a `PopupSelect`.
 - For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
 
 ## Best practices
@@ -148,7 +148,7 @@ Switching tabs is a frequent action. The selected marker transitions quickly, an
 ## Related
 
 - `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.
-- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar.
+- `PopupSelect`: use when a quick filter after Search opens a second-level choice inside a tab.
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 

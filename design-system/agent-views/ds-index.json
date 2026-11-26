@@ -28574,7 +28574,7 @@
 					"| `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |\n",
 					"| `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |\n",
 					"| `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |\n",
-					"| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
+					"| `actions` on a narrow page | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
 					"| `id` · `className` · `style` | Passed to the Section's root. |\n",
 					"| `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |\n",
 					"| `children` | The body: a Table, a card grid, a list, a form or subsections. |\n",
@@ -34384,7 +34384,7 @@
 					"\n",
 					"- For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.\n",
 					"- For more options than fit on one strip without wrapping, use `Select`.\n",
-					"- For a second-level choice inside a view, use `PopupSelect`.\n",
+					"- For a second-level choice inside a view, use a quick filter after Search that opens a `PopupSelect`.\n",
 					"- For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.\n",
 					"\n",
 					"## Best practices\n",
@@ -34480,7 +34480,7 @@
 					"## Related\n",
 					"\n",
 					"- `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.\n",
-					"- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar.\n",
+					"- `PopupSelect`: use when a quick filter after Search opens a second-level choice inside a tab.\n",
 					"\n",
 					"Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`\n",
 					"\n",
@@ -34690,7 +34690,7 @@
 				"related": {
 					"$lines": [
 						"- `PageHeader`: use when placing a page-level `Tabs` strip in the header's `bottomBar` slot.\n",
-						"- `PopupSelect`: use when adding a second-level view choice inside a tab's toolbar."
+						"- `PopupSelect`: use when a quick filter after Search opens a second-level choice inside a tab."
 					]
 				}
 			}
@@ -43972,7 +43972,7 @@
 					"\n",
 					"The title row shows when the page, or the active page tab, has several Sections, or when the Section has actions, since actions live only in the title row. The title then names the collection. A lone Section with no actions sets `isTitleHidden` and keeps only the rows it needs, or no header at all. Views need two or more: one view is no view, so a Section never shows a lone pill. Under page tabs there is no views row; a switch such as Status is a quick filter after Search.\n",
 					"\n",
-					"Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Reset filters. A Section with Search and no filters ends the row with the `count` alone. One to three categories are \"Field: value\" triggers; four or more go in one Filter menu, the `filterMenu` slot, never three triggers and More filters. Under 768 the Primary becomes an icon-only primary Icon button named by its text, so the title row stays one row; Search takes its row and, with more than one trigger, the triggers fold into one Filter button with a count (a lone trigger stays as it is); the count and Reset filters stay at the end of the Search row. When the triggers no longer fit beside Search they wrap to their own row, end-aligned. A trigger can open a list: give its `filters` entry a `menu` that hands the trigger to a Popup select.\n",
+					"Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Reset filters. A Section with Search and no filters ends the row with the `count` alone. One to three categories are \"Field: value\" triggers; four or more go in one Filter menu, the `filterMenu` slot, never three triggers and More filters. Under 768 the Primary becomes an icon-only primary Icon button named by its text, so the title row stays one row; Search takes its row and, with more than one trigger, the triggers fold into one Filter button with a count (a lone trigger stays as it is); the count and Reset filters stay at the end of the Search row. When the triggers no longer fit beside Search they wrap to their own row, end-aligned. \"Under 768\" is the page width, from the Frame, not the Section's own box; outside a Frame the page counts as wide. A trigger can open a list: give its `filters` entry a `menu` that hands the trigger to a Popup select.\n",
 					"\n",
 					"- **Full.** Title and actions, views and the format switch, then Search and three triggers.\n",
 					"- **Filters applied.** Applied triggers take the selected state; the row ends with the count and Reset filters.\n",
@@ -44027,7 +44027,7 @@
 					"| `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |\n",
 					"| `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |\n",
 					"| `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |\n",
-					"| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
+					"| `actions` on a narrow page | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
 					"| `id` · `className` · `style` | Passed to the Section's root. |\n",
 					"| `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |\n",
 					"| `children` | The body: a Table, a card grid, a list, a form or subsections. |\n",
@@ -44154,7 +44154,7 @@
 					"| `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |\n",
 					"| `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |\n",
 					"| `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |\n",
-					"| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
+					"| `actions` on a narrow page | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
 					"| `id` · `className` · `style` | Passed to the Section's root. |\n",
 					"| `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |\n",
 					"| `children` | The body: a Table, a card grid, a list, a form or subsections. |\n",
@@ -63616,7 +63616,7 @@
 				"| `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |\n",
 				"| `hasNoMatches` | True while the content is a No matches empty state that offers its own Reset filters; the header hides its button so one control remains. |\n",
 				"| `onClearAll` · `onOpenFilters` | Reset filters, and the one Filter button: a narrow Section's, or the fold of four or more `filters`. |\n",
-				"| `actions` under 768 | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
+				"| `actions` on a narrow page | A primary `Button` with an `iconBefore` draws as an icon-only primary `IconButton` named by its text, keeping its other props, so the title row stays one row. The Primary must be a `Button` placed directly in `actions`, or inside a Fragment there. |\n",
 				"| `id` · `className` · `style` | Passed to the Section's root. |\n",
 				"| `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |\n",
 				"| `children` | The body: a Table, a card grid, a list, a form or subsections. |\n",

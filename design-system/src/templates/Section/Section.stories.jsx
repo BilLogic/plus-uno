@@ -1,5 +1,6 @@
 import React from 'react';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { PageWidthContext } from '@/lib/pageWidth';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
@@ -957,13 +958,15 @@ export const RowsSelected = {
     },
 };
 
-/** Narrow, at 600 wide: Search fills row 3 and the triggers fold into one Filter button with a count. */
+/** Narrow, on a page 600 wide: narrow follows the page width, so the stage hands its Sections a narrow page. Search fills row 3 and the triggers fold into one Filter button with a count. */
 export const Narrow = {
     name: 'Narrow',
     render: () => (
-        <div data-probe="stage" style={{ inlineSize: 600 }}>
-            <Example.NarrowHeader />
-        </div>
+        <PageWidthContext.Provider value={{ width: 600, narrow: true }}>
+            <div data-probe="stage" style={{ inlineSize: 600 }}>
+                <Example.NarrowHeader />
+            </div>
+        </PageWidthContext.Provider>
     ),
     parameters: codeOf('NarrowHeader'),
     play: async ({ canvasElement }) => {

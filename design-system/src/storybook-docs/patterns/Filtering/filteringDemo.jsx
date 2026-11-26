@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, EmptyState, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
+import { PageWidthContext } from '@/lib/pageWidth';
 import { Page, Card, Section, SECTION_DETAIL_FLOOR, FRAME_LAYOUT, useOwnWidth } from '@/templates';
 import { PageTabs, SessionsTable } from '@/storybook-docs/lib/sessions-demo.jsx';
 import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
@@ -256,7 +257,9 @@ export const FilteredStudents = ({
         }
     }
 
+    // The picture stands in for a Frame: its width is the page width, which the Section reads to take its narrow form.
     return (
+        <PageWidthContext.Provider value={{ width, narrow: width < FRAME_LAYOUT.fullWidthBelow }}>
         <div ref={ref}>
             <div
                 ref={setMount}
@@ -297,6 +300,7 @@ export const FilteredStudents = ({
                 </Page>
             </div>
         </div>
+        </PageWidthContext.Provider>
     );
 };
 

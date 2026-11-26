@@ -24,7 +24,7 @@ authored half, counted rather than assumed.
 - **[Tabs](Tabs/index.md)** — Use `Tabs` for the tab bar that switches between sibling views on the same page — a student's Overview / Sessions / Progress, or the sections of an admin page. Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel` alongside each one when the tab's content should be owned by the component rather than rendered separately.
   - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
   - For more options than fit on one strip without wrapping, use `Select`.
-  - For a second-level choice inside a view, use `PopupSelect`.
+  - For a second-level choice inside a view, use a quick filter after Search that opens a `PopupSelect`.
   - For filtering a list rather than switching between views, use `FilterMenu` or `RadioGroup`.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
