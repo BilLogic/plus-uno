@@ -9,16 +9,23 @@
  * `isSelected` (a tab cannot select itself) or Base UI's `value` /
  * `defaultValue` / `onValueChange`; `Accordion` makes the same choice.
  * `isDisabled` is per tab.
+ *
+ * `overflow="auto"` (the default) folds extra tabs into More, and on a narrow
+ * page (under 768, read from the Frame) takes the narrow form: an underline
+ * strip scrolls sideways, and a pill strip shows only its selected pill, which
+ * opens a menu of every view.
  */
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import { animate } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { useMotionReduced } from '@/lib/motionPreference';
+import { usePageNarrow } from '@/lib/pageWidth';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { ButtonItem } from '@/lib/menu';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
+import Icon from '../../images-and-icons/Icon';
 import CountTag from '../../labels/CountTag';
 import './Tabs.scss';
 
@@ -30,7 +37,35 @@ const alignmentClass = (alignment) =>
 // The words of a tab's label, which can be clipped; a count or icon beside them never is.
 const labelText = (children) => React.Children.toArray(children).filter((child) => typeof child === 'string').join('');
 
-export const TAB_OVERFLOWS = ['wrap', 'collapse'];
+export const TAB_OVERFLOWS = ['auto', 'collapse', 'wrap', 'scroll', 'menu'];
+
+/**
+ * The form a strip takes: `collapse` folds into More, `wrap` flows onto more
+ * rows, `scroll` scrolls sideways and `menu` shows the selected pill as a menu
+ * trigger. `auto` is `collapse`, or on a narrow page `scroll` for an underline
+ * strip and `menu` for a pill strip. A justified strip shares the row, so it always wraps.
+ */
+const resolveMode = ({ overflow, alignment, appearance, isNarrow }) => {
+    if (alignment === 'justified') return 'wrap';
+    if (overflow !== 'auto') return overflow;
+    if (!isNarrow) return 'collapse';
+    return appearance === 'pill' ? 'menu' : 'scroll';
+};
+
+/**
+ * Where a scrolling list's `scrollLeft` must go for `el` to be wholly in view,
+ * clear of the end fade; where it is when `el` already is.
+ */
+const scrollTargetFor = (listEl, el) => {
+    const fade = parseFloat(getComputedStyle(listEl).getPropertyValue('--tabs-edge-fade')) || 0;
+    const start = el.offsetLeft - listEl.offsetLeft;
+    const end = start + el.offsetWidth;
+    const max = Math.max(0, listEl.scrollWidth - listEl.clientWidth);
+    let target = listEl.scrollLeft;
+    if (start < target) target = start;
+    else if (end > target + listEl.clientWidth - fade) target = end - listEl.clientWidth + fade;
+    return Math.min(max, Math.max(0, target));
+};
 
 /*
  * The measured members of a collapsing strip. The strip draws only the tabs
@@ -164,13 +199,40 @@ MoreTab.propTypes = {
     className: PropTypes.string
 };
 
+/**
+ * The selected pill of a narrow pill strip, with a chevron: the trigger of a
+ * menu of every view. It is a menu button, not a tab, so it carries no
+ * `aria-selected`; `data-selected` draws it as the selected pill.
+ */
+// DropdownMenu hands its trigger `isSelected: open`; the pill is always drawn selected.
+const ViewMenuTrigger = React.forwardRef(({ children, isSelected: _open, className = '', ...props }, ref) => (
+    <button
+        ref={ref}
+        type="button"
+        data-selected=""
+        data-active=""
+        className={`plus-tab plus-tab--menu ${className}`}
+        {...props}
+    >
+        {React.Children.map(children, (child) => (
+            typeof child === 'string' ? <span className="plus-tab-label">{child}</span> : child
+        ))}
+        <Icon name="angle-down" iconStyle="solid" size={12} className="plus-tab-chevron" />
+    </button>
+));
+ViewMenuTrigger.displayName = 'ViewMenuTrigger';
+ViewMenuTrigger.propTypes = {
+    children: PropTypes.node,
+    isSelected: PropTypes.bool,
+    className: PropTypes.string
+};
+
 /** A tab strip with its panels. Tabs go into the tablist and every other child, usually Panels, renders after it. */
 const Tabs = ({
     children,
     alignment = 'left',
     appearance = 'default',
-    spacing = 'default',
-    overflow = 'collapse',
+    overflow = 'auto',
     className = '',
     defaultActiveKey,
     activeKey,
@@ -192,9 +254,8 @@ const Tabs = ({
     });
 
     /*
-     * Appearance and spacing both have a value called `default`, so each
-     * modifier names its prop: a bare `plus-tabs--default` once meant either,
-     * and a default-spacing pill picked up the underline strip's baseline.
+     * The root's appearance modifier names its prop (`plus-tabs--appearance-default`),
+     * so a bare `plus-tabs--default` can never be read as anything else.
      */
     const rootRef = useRef(null);
     const listRef = useRef(null);
@@ -202,21 +263,42 @@ const Tabs = ({
     const mountedRef = useRef(false);
     const lastTabRef = useRef(null);
     const animRef = useRef(null);
+    const scrollAnimRef = useRef(null);
+    const placedRef = useRef(false);
+    const modeRef = useRef(null);
     const reduced = useMotionReduced();
+
+    // An `auto` strip takes its narrow form on a narrow page: the Frame's width,
+    // not the strip's own box. Outside a Frame the page counts as wide.
+    const pageNarrow = usePageNarrow();
+    const mode = resolveMode({ overflow, alignment, appearance, isNarrow: pageNarrow });
+    const collapses = mode === 'collapse';
+    const scrolls = mode === 'scroll';
+    const isMenu = mode === 'menu';
+    // Every form but wrap holds the selection here: a tab folded into More or
+    // listed in the view menu is selected by name, which no Base UI tab is.
+    const managed = mode !== 'wrap';
 
     useLayoutEffect(() => {
         const rootEl = rootRef.current;
         const listEl = listRef.current;
         const indicatorEl = indicatorRef.current;
+        // A new form draws new tabs: the indicator starts over rather than glide from the old ones.
+        if (modeRef.current !== mode) {
+            modeRef.current = mode;
+            mountedRef.current = false;
+        }
         if (!rootEl || !listEl || !indicatorEl) return undefined;
         const activeEl = listEl.querySelector('[role="tab"][aria-selected="true"]');
         if (!activeEl) {
             lastTabRef.current = null;
             return undefined;
         }
-        const readBox = (el) => ({
+        // A scrolling strip is read where it is about to scroll to, so the
+        // indicator lands with the tab rather than where the tab was.
+        const readBox = (el, scrollLeft = scrolls ? scrollTargetFor(listEl, el) : 0) => ({
             el,
-            x: listEl.offsetLeft + el.offsetLeft,
+            x: listEl.offsetLeft + el.offsetLeft - scrollLeft,
             y: listEl.offsetTop + el.offsetTop,
             width: el.offsetWidth,
             height: el.offsetHeight,
@@ -226,13 +308,19 @@ const Tabs = ({
             lastTabRef.current = readBox(activeEl);
             return undefined;
         }
-        const prev = lastTabRef.current;
+        let prev = lastTabRef.current;
         const next = readBox(activeEl);
         if (!prev || prev.el === activeEl) {
             if (!rootEl.dataset.gliding) lastTabRef.current = next;
             return undefined;
         }
-        if (reduced) {
+        // The strip may have been scrolled by hand since: start from where the old tab is now.
+        if (scrolls && prev.el.isConnected && !rootEl.dataset.gliding) prev = readBox(prev.el, listEl.scrollLeft);
+        // A glide from a tab scrolled out of view would draw the bar past the
+        // strip's edge and over the fade: the bar moves at once instead.
+        const outOfView = scrolls && (prev.x < listEl.offsetLeft - 0.5
+            || prev.x + prev.width > listEl.offsetLeft + listEl.clientWidth + 0.5);
+        if (reduced || outOfView) {
             animRef.current?.stop?.();
             delete rootEl.dataset.gliding;
             lastTabRef.current = next;
@@ -262,21 +350,16 @@ const Tabs = ({
             if (animRef.current !== anim) return;
             animRef.current = null;
             delete rootEl.dataset.gliding;
-            lastTabRef.current = readBox(activeEl);
+            lastTabRef.current = readBox(activeEl, listEl.scrollLeft);
         });
         return undefined;
     });
 
-    useLayoutEffect(() => () => { animRef.current?.stop?.(); }, []);
+    useLayoutEffect(() => () => {
+        animRef.current?.stop?.();
+        scrollAnimRef.current?.stop?.();
+    }, []);
 
-    // A justified strip shares the row equally and truncates, so it never folds.
-    const collapses = overflow === 'collapse' && alignment !== 'justified';
-
-    /*
-     * Collapse keeps one row. The selection is held here so a hidden tab can be
-     * selected from the More menu, which no Base UI tab is; the Root is
-     * controlled by it in this mode only.
-     */
     const firstKey = tabs.find((tab) => !tab.props.isDisabled)?.props.eventKey;
     const [ownKey, setOwnKey] = useState(defaultActiveKey ?? firstKey);
     const selectedKey = activeKey !== undefined ? activeKey : ownKey;
@@ -291,6 +374,89 @@ const Tabs = ({
     const visibleCount = collapses ? Math.min(shown, tabs.length) : tabs.length;
     const hiddenTabs = tabs.slice(visibleCount);
     const holdsSelection = hiddenTabs.some((tab) => tab.props.eventKey === selectedKey);
+    const selectedTab = tabs.find((tab) => tab.props.eventKey === selectedKey) ?? tabs[0];
+
+    /*
+     * A scrolling strip keeps the selected tab in view, clear of the end fade.
+     * It is placed at once when the strip first scrolls, and scrolls on
+     * spatial.fast when the selection moves; under reduced motion it jumps.
+     */
+    useLayoutEffect(() => {
+        const listEl = listRef.current;
+        if (!scrolls || !listEl) {
+            placedRef.current = false;
+            return;
+        }
+        const activeEl = listEl.querySelector('[role="tab"][aria-selected="true"]');
+        if (!activeEl) return;
+        const target = scrollTargetFor(listEl, activeEl);
+        scrollAnimRef.current?.stop?.();
+        scrollAnimRef.current = null;
+        if (!placedRef.current || reduced) {
+            placedRef.current = true;
+            listEl.scrollLeft = target;
+            return;
+        }
+        if (Math.abs(target - listEl.scrollLeft) < 0.5) return;
+        const anim = animate(listEl.scrollLeft, target, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: (value) => { listEl.scrollLeft = value; },
+        });
+        scrollAnimRef.current = anim;
+        Promise.resolve(anim.finished).then(() => {
+            if (scrollAnimRef.current === anim) scrollAnimRef.current = null;
+        });
+    }, [scrolls, selectedKey, tabKeys, reduced]);
+
+    /*
+     * The view menu opens on the checked row, so the arrow keys start from the
+     * selected view. Its rows are ButtonItems with their own roving focus, not
+     * Base UI Menu items, so focus is placed here once the popup has mounted.
+     */
+    const triggerId = useId();
+    const viewMenuId = useId();
+    useEffect(() => {
+        if (!isMenu || !menuOpen) return undefined;
+        let frame = 0;
+        let tries = 0;
+        const place = () => {
+            const row = document.getElementById(viewMenuId)?.querySelector('[role="menuitemradio"][aria-checked="true"]');
+            if (row) {
+                row.focus();
+                if (row.ownerDocument.activeElement === row || tries > 8) return;
+            }
+            tries += 1;
+            if (tries <= 10) frame = requestAnimationFrame(place);
+        };
+        place();
+        return () => cancelAnimationFrame(frame);
+    }, [isMenu, menuOpen, viewMenuId]);
+
+    // The end fade shows while there is more of the strip past its end. On a
+    // resize the selected tab is placed again, so it never ends under the fade.
+    useLayoutEffect(() => {
+        const rootEl = rootRef.current;
+        const listEl = listRef.current;
+        if (!scrolls || !rootEl || !listEl) return undefined;
+        const update = () => {
+            if (listEl.scrollLeft + listEl.clientWidth < listEl.scrollWidth - 1) rootEl.dataset.overflowEnd = '';
+            else delete rootEl.dataset.overflowEnd;
+        };
+        const resize = () => {
+            const activeEl = listEl.querySelector('[role="tab"][aria-selected="true"]');
+            if (activeEl && !scrollAnimRef.current) listEl.scrollLeft = scrollTargetFor(listEl, activeEl);
+            update();
+        };
+        update();
+        listEl.addEventListener('scroll', update, { passive: true });
+        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
+        observer?.observe(listEl);
+        return () => {
+            listEl.removeEventListener('scroll', update);
+            observer?.disconnect();
+            delete rootEl.dataset.overflowEnd;
+        };
+    }, [scrolls, tabKeys]);
 
     // The widest "More" for this strip: every digit an 8, so the count never
     // flips between two values as one more tab folds in.
@@ -358,69 +524,110 @@ const Tabs = ({
         }
     };
 
+    // One menu row per tab: a radio row, checked while its tab is selected.
+    const menuRow = (tab, { hasCheck = false } = {}) => {
+        const checked = tab.props.eventKey === selectedKey;
+        return (
+            <ButtonItem
+                key={tab.props.eventKey}
+                role="menuitemradio"
+                aria-checked={checked}
+                isSelected={checked}
+                isDisabled={tab.props.isDisabled}
+                elemAfter={hasCheck && checked ? <Icon name="check" size={16} className="plus-tabs-menu-check" /> : undefined}
+                onClick={() => {
+                    select(tab.props.eventKey);
+                    // A radio row is not one DropdownMenu closes on its own.
+                    setMenuOpen(false);
+                }}
+            >
+                {labelText(tab.props.children) || String(tab.props.eventKey)}
+            </ButtonItem>
+        );
+    };
+
     const rootClasses = [
         'plus-tabs',
         collapses && 'plus-tabs--collapse',
+        scrolls && 'plus-tabs--scroll',
+        isMenu && 'plus-tabs--menu',
         `plus-tabs--appearance-${appearance}`,
-        `plus-tabs--spacing-${spacing}`,
         alignment === 'justified' && 'plus-tabs--justified',
         className
     ].filter(Boolean).join(' ');
 
     const listClasses = ['plus-tabs-list', alignmentClass(alignment)].filter(Boolean).join(' ');
 
+    /*
+     * In menu mode there is no tablist to carry the strip's name, so it moves
+     * onto the trigger ("Views: Active") rather than sit on a root with no
+     * role, and each panel is labeled by the trigger.
+     */
+    const { 'aria-label': stripLabel, ...rootProps } = props;
+    const selectedLabel = labelText(selectedTab?.props.children) || String(selectedTab?.props.eventKey ?? '');
+    const panels = isMenu
+        ? rest.map((child) => (React.isValidElement(child) && child.type === Panel
+            ? React.cloneElement(child, { 'aria-labelledby': triggerId })
+            : child))
+        : rest;
+
     return (
         <BaseTabs.Root
             ref={rootRef}
             id={id}
-            {...(collapses
+            {...(managed
                 ? { value: selectedKey }
                 : { defaultValue: defaultActiveKey, value: activeKey })}
-            onValueChange={(value, eventDetails) => (collapses ? select(value, eventDetails) : onSelect?.(value, eventDetails))}
+            onValueChange={(value, eventDetails) => (managed ? select(value, eventDetails) : onSelect?.(value, eventDetails))}
             className={rootClasses}
-            {...props}
+            {...(isMenu ? rootProps : props)}
         >
             <span ref={indicatorRef} className="plus-tabs-indicator" aria-hidden="true" />
-            {/* `activateOnFocus`: arrow keys move selection immediately;
-                Base UI's own default waits for Enter/Space. */}
-            <BaseTabs.List
-                ref={listRef}
-                className={listClasses}
-                activateOnFocus
-                onKeyDownCapture={collapses ? handleListKeyDown : undefined}
-            >
-                {collapses ? tabs.slice(0, visibleCount) : tabs}
-                {collapses && hiddenTabs.length > 0 && (
-                    <DropdownMenu
-                        isOpen={menuOpen}
-                        onOpenChange={setMenuOpen}
-                        trigger={(
-                            <MoreTab
-                                ref={moreRef}
-                                count={hiddenTabs.length}
-                                holdsSelection={holdsSelection}
-                            />
-                        )}
-                    >
-                        {hiddenTabs.map((tab) => (
-                            <ButtonItem
-                                key={tab.props.eventKey}
-                                role="menuitemradio"
-                                aria-checked={tab.props.eventKey === selectedKey}
-                                isSelected={tab.props.eventKey === selectedKey}
-                                isDisabled={tab.props.isDisabled}
-                                onClick={() => {
-                                    select(tab.props.eventKey);
-                                    // A radio row is not one DropdownMenu closes on its own.
-                                    setMenuOpen(false);
-                                }}
-                            >
-                                {labelText(tab.props.children) || String(tab.props.eventKey)}
-                            </ButtonItem>
-                        ))}
-                    </DropdownMenu>
-                )}
-            </BaseTabs.List>
+            {isMenu ? (
+                // Narrow pill views: the selected pill alone, a menu button
+                // whose menu lists every view with the selected one checked.
+                <DropdownMenu
+                    isOpen={menuOpen}
+                    onOpenChange={setMenuOpen}
+                    id={viewMenuId}
+                    trigger={(
+                        <ViewMenuTrigger
+                            id={triggerId}
+                            aria-label={stripLabel ? `${stripLabel}: ${selectedLabel}` : undefined}
+                        >
+                            {selectedTab?.props.children}
+                        </ViewMenuTrigger>
+                    )}
+                >
+                    {tabs.map((tab) => menuRow(tab, { hasCheck: true }))}
+                </DropdownMenu>
+            ) : (
+                /* `activateOnFocus`: arrow keys move selection immediately;
+                   Base UI's own default waits for Enter/Space. */
+                <BaseTabs.List
+                    ref={listRef}
+                    className={listClasses}
+                    activateOnFocus
+                    onKeyDownCapture={collapses ? handleListKeyDown : undefined}
+                >
+                    {collapses ? tabs.slice(0, visibleCount) : tabs}
+                    {collapses && hiddenTabs.length > 0 && (
+                        <DropdownMenu
+                            isOpen={menuOpen}
+                            onOpenChange={setMenuOpen}
+                            trigger={(
+                                <MoreTab
+                                    ref={moreRef}
+                                    count={hiddenTabs.length}
+                                    holdsSelection={holdsSelection}
+                                />
+                            )}
+                        >
+                            {hiddenTabs.map((tab) => menuRow(tab))}
+                        </DropdownMenu>
+                    )}
+                </BaseTabs.List>
+            )}
             {collapses && (
                 // Hidden copies of the whole row, read for widths only: the
                 // strip draws just the tabs that fit.
@@ -438,7 +645,7 @@ const Tabs = ({
                     </span>
                 </div>
             )}
-            {rest}
+            {panels}
         </BaseTabs.Root>
     );
 };
@@ -450,9 +657,7 @@ Tabs.propTypes = {
     alignment: PropTypes.oneOf(['left', 'center', 'right', 'justified']),
     /** Underline indicator (default) or a pill-shaped selected background. */
     appearance: PropTypes.oneOf(['default', 'pill']),
-    /** `default` is 32px tabs; `compact` is 24px. */
-    spacing: PropTypes.oneOf(['default', 'compact']),
-    /** `collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds. */
+    /** `auto` (default) folds what does not fit into More, and on a narrow page (a Frame under 768, read through `usePageNarrow`) takes the narrow form: an underline strip scrolls sideways with the selected tab in view, and a pill strip shows only the selected pill, which opens a menu of every view. The other values hold one form at every width: `collapse` (More), `scroll`, `menu`, or `wrap`, which flows tabs onto more rows. A `justified` strip shares the row and never folds or narrows. Outside a Frame the page counts as wide. */
     overflow: PropTypes.oneOf(TAB_OVERFLOWS),
     /** Extra class on the tabs root, beside `plus-tabs`. */
     className: PropTypes.string,

@@ -15553,27 +15553,18 @@
           "deprecated": null
         },
         {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`default` is a 32px tab; `compact` is 24px.",
-          "deprecated": null
-        },
-        {
           "name": "overflow",
           "type": "enum",
           "required": false,
-          "default": "'collapse'",
+          "default": "'auto'",
           "values": [
+            "auto",
+            "collapse",
             "wrap",
-            "collapse"
+            "scroll",
+            "menu"
           ],
-          "description": "`collapse` (default) keeps one row, shows as many tabs as fit and folds the rest into a More tab whose menu lists them by name; `wrap` lets tabs that do not fit flow onto more rows. A `justified` strip shares the row and never folds.",
+          "description": "`auto` (default) folds what does not fit into More, and under 768 takes the narrow form: underline scrolls, pill becomes a menu. `collapse`, `scroll`, `menu` and `wrap` hold one form at every width.",
           "deprecated": null
         },
         {
@@ -15640,7 +15631,9 @@
         "SelectedPill",
         "Disabled",
         "Overflow",
-        "OverflowMore"
+        "OverflowMore",
+        "NarrowScroll",
+        "NarrowMenu"
       ],
       "tokens": [
         "--body-default",
@@ -15648,7 +15641,6 @@
         "--border-width-default",
         "--border-width-selected",
         "--control-md",
-        "--control-sm",
         "--ds-background-neutral",
         "--ds-background-neutral-hovered",
         "--ds-background-neutral-pressed",
@@ -15657,22 +15649,25 @@
         "--ds-border",
         "--ds-border-focused",
         "--ds-border-selected",
+        "--ds-icon-selected",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-text",
         "--ds-text-disabled",
         "--ds-text-selected",
         "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--inline-3xl",
         "--inline-lg",
         "--label-max-width",
         "--pad-x-lg",
-        "--pad-x-md",
         "--radius-control-md",
-        "--radius-control-sm",
         "--radius-full",
         "--section-stack-sm",
         "--stack-md",
         "--tab-radius",
+        "--tabs-edge-fade",
         "--type-weight-medium"
       ],
       "subComponents": [
