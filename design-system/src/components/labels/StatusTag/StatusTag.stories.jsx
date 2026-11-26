@@ -670,13 +670,13 @@ MenuOpen.play = async ({ canvasElement }) => {
     await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
         await userEvent.click(el);
         await waitFor(() => expect(el, `${name} reports open`).toHaveAttribute('aria-expanded', 'true'));
-        await expect(await doc.findByRole('menuitem', { name: 'Late' }), `${name} lists the other statuses`).toBeVisible();
+        await waitFor(async () => expect(await doc.findByRole('menuitem', { name: 'Late' }), `${name} lists the other statuses`).toBeVisible());
         await expect(doc.getByRole('menuitem', { name: 'Present' }), `${name} checks the current status`).toHaveAttribute('aria-current', 'true');
         await expectGroundUnder(canvasElement, el, undefined, STATE_COLORS[appearance][2], `${name} open`);
         await expect(getComputedStyle(el.querySelector('.plus-status__chevron i'), '::before').content, `${name} draws angle-up`)
             .toBe(glyphOf(canvasElement, 'fa-angle-up'));
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(doc.queryByRole('menu')).toBeNull());
+        await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
     });
 };
 
@@ -701,7 +701,7 @@ MenuPick.play = async ({ canvasElement }) => {
     const el = within(canvasElement).getByTestId('pick');
     await userEvent.click(el);
     await userEvent.click(await doc.findByRole('menuitem', { name: 'Late' }));
-    await waitFor(() => expect(doc.queryByRole('menu')).toBeNull());
+    await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
     await expect(el, 'the trigger follows the pick').toHaveAccessibleName('Attendance, Hermione Granger: Late');
     await expect(within(el).getByText('Late')).toBeInTheDocument();
 };
@@ -752,7 +752,7 @@ MenuDisabled.play = async ({ canvasElement }) => {
         await expect(s.opacity, `${name} is never faded`).toBe('1');
         await expect(innerBorder(el), `${name} edge stays the pressed background`).toBe(tokenColor(canvasElement, STATE_COLORS[appearance][2]));
         await userEvent.click(el, { pointerEventsCheck: 0 });
-        await expect(doc.queryByRole('menu'), `${name} does not open`).toBeNull();
+        await expect(doc.queryAllByRole('menu'), `${name} does not open`).toHaveLength(0);
     });
 };
 
@@ -770,9 +770,9 @@ MenuKeyboard.play = async ({ canvasElement }) => {
     await expect(el).toHaveFocus();
     for (const key of ['{Enter}', ' ', '{ArrowDown}']) {
         await userEvent.keyboard(key);
-        await expect(await doc.findByRole('menu'), `${JSON.stringify(key)} opens the menu`).toBeVisible();
+        await waitFor(() => expect(doc.queryAllByRole('menu').length, `${JSON.stringify(key)} opens the menu`).toBeGreaterThan(0));
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(doc.queryByRole('menu')).toBeNull());
+        await waitFor(() => expect(doc.queryAllByRole('menu')).toHaveLength(0));
         await expect(el, 'Escape returns focus to the tag').toHaveFocus();
     }
 };

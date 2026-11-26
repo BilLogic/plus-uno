@@ -427,7 +427,7 @@ CalendarOpen.play = async ({ canvasElement }) => {
     await eachMenuTag(canvasElement, async (el, appearance, size, name) => {
         await userEvent.click(el);
         await waitFor(() => expect(el, `${name} reports open`).toHaveAttribute('aria-expanded', 'true'));
-        await expect(await doc.findByRole('dialog'), `${name} opens a popup`).toBeVisible();
+        await waitFor(async () => expect(await doc.findByRole('dialog'), `${name} opens a popup`).toBeVisible());
         await expect(doc.getByRole('button', { name: /November 27/ }), `${name} shows the current day picked`).toHaveAttribute('aria-pressed', 'true');
         await expectGroundUnder(canvasElement, el, undefined, '--ds-background-neutral-subtle-pressed', `${name} open`);
         await expect(getComputedStyle(el.querySelector('.plus-date-tag__chevron i'), '::before').content, `${name} draws angle-up`)
@@ -499,7 +499,7 @@ CalendarKeyboard.play = async ({ canvasElement }) => {
     await expect(el).toHaveFocus();
     for (const key of ['{Enter}', ' ']) {
         await userEvent.keyboard(key);
-        await expect(await doc.findByRole('dialog'), `${JSON.stringify(key)} opens the popup`).toBeVisible();
+        await waitFor(async () => expect(await doc.findByRole('dialog'), `${JSON.stringify(key)} opens the popup`).toBeVisible());
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(doc.queryByRole('dialog')).toBeNull());
         await expect(el, 'Escape returns focus to the tag').toHaveFocus();
