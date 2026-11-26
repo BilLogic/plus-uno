@@ -63,9 +63,9 @@ _Avoid_: "the debug routes"
 | Adapter | `agents/uno-bot/src/agent/providers/gemini.ts` — `GEMINI_MODEL` (`gemini-3.8-flash`) | `agents/uno-bot/src/agent/providers/claude.ts` — tiered `claude-*` on Vertex (`sonnet` default; "think hard" → `opus`; confirm/cancel → `haiku`) |
 | Web grounding | `googleSearch` + `urlContext` (Google built-ins) | Claude `web_search` (needs the GCP org policy `constraints/vertexai.allowedPartnerModelFeatures`) |
 | Prompt caching | Gemini implicit caching | Anthropic prompt caching on the cached system prefix |
-| Auth / billing | Vertex service account (canonical — ADR-018; AI-Studio `GEMINI_API_KEY` is a local-dev fallback only) → GCP | **Same** Vertex service account → GCP (Claude via Model Garden) |
+| Auth / billing | `GEMINI_API_KEY` (canonical, ADR-053; the Vertex service account is the loud fallback) → Gemini API | Vertex service account → GCP (Claude via Model Garden; the API key cannot reach it) |
 
-Both adapters are **local tools only** (no hosted MCP), and run the same agent loop — so the tool roster, the gate protocol, `/stop`, the iteration cap (16) and the output-token cap (16384) are one implementation rather than two matching ones. Auth for both is the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`), so Claude usage bills to the same GCP project as Gemini. Smoke-test both with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
+Both adapters are **local tools only** (no hosted MCP), and run the same agent loop — so the tool roster, the gate protocol, `/stop`, the iteration cap (16) and the output-token cap (16384) are one implementation rather than two matching ones. Gemini authenticates with `GEMINI_API_KEY` whenever it is set and falls back to the Vertex service account (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `GEMINI_PROJECT_ID`) with a loud warning; Claude on Vertex always uses the service account, so its usage bills to the GCP project. Smoke-test both with `GET /debug/gemini` and `GET /debug/vertex-claude` (both auth-gated by `DEBUG_TOKEN`).
 
 ### One loop, behind the ModelProvider seam
 
@@ -179,7 +179,8 @@ curl http://localhost:8787/health
 | `SLACK_SIGNING_SECRET` | Verify incoming Slack request signatures |
 | `SLACK_BOT_TOKEN` | `xoxb-…` for `chat.postMessage`, `reactions.add`, `conversations.replies` |
 | `SLACK_MCP_CLIENT_SECRET` | Secret for the static Slack OAuth client (the `slack_search` user token) |
-| `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — powers BOTH the Gemini and Vertex-Claude adapters (billed to the GCP project). Canonical credential, wins whenever fully set (ADR-018); `GEMINI_API_KEY` (AI Studio) is a local-dev fallback for Gemini only — never set it on the Worker |
+| `GEMINI_API_KEY` | Gemini API key — the canonical model credential (ADR-053), and the one the query embeddings use; wins whenever set. Cannot reach Claude |
+| `GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY` | Vertex service account — optional: the Gemini adapter's loud fallback, and required only for the opt-in `vertex-claude` lane (billed to the GCP project) |
 | `GITHUB_TOKEN` | PAT for `repository_dispatch` (the Figma snapshot refresh), `github_read`, the intake duplicate check (`github_intake_search`), issue creation and follow-ups (`github_issue_create`, `github_issue_update` — need Issues: write on each listed repo) and workflow runs (`github_workflow_run` — needs Actions: Read and write on each repo whose `GITHUB_REPOS` entry lists workflows) |
 | `NOTION_API_KEY` | Notion integration token (`notion_create` / `notion_update` / `notion_archive` + catalog reads) |
 | `FIGMA_ACCESS_TOKEN` | Figma personal token, used only through the Figma client (`src/figma/`) — frame reads and renders, the library poll, the DS precedence check and the drift check |

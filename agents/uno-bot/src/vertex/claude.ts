@@ -22,7 +22,7 @@ import { countedFetch } from "../net";
 export const ANTHROPIC_VERTEX_VERSION = "vertex-2023-10-16";
 
 /** True when the Vertex service-account credentials + project are present.
- *  Claude-on-Vertex requires the SA path (an AI-Studio GEMINI_API_KEY cannot
+ *  Claude-on-Vertex requires the SA path (a GEMINI_API_KEY cannot
  *  reach Claude — only Vertex hosts the Anthropic partner models). */
 export function claudeVertexConfigured(env: Env): boolean {
   return Boolean(env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID);

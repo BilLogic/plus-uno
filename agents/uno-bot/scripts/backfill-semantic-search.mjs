@@ -35,8 +35,8 @@
 //   SUPABASE_URL                e.g. https://osybxeojvsqcwxkgnalm.supabase.co
 //   SUPABASE_SERVICE_ROLE_KEY   service-role key (bypasses RLS; keep it secret)
 //   and ONE embedding credential for the provider this pass uses:
-//     google — GEMINI_PROJECT_ID, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY
-//              (Vertex SA; PREFERRED when both exist) …or GEMINI_API_KEY
+//     google — GEMINI_API_KEY (PREFERRED when both exist) …or the Vertex SA:
+//              GEMINI_PROJECT_ID, GEMINI_SA_EMAIL, GEMINI_SA_PRIVATE_KEY
 //     openai — OPENAI_API_KEY
 // Optional:
 //   EMBED_MODEL    the model to embed with. Default: whatever index_meta names
@@ -102,11 +102,11 @@ function providerFor(model) {
   return "google";
 }
 
-// SA first — the Vertex path; the AI Studio key only when no SA exists. Never
-// mix embedding models in one set: vectors from two models are not comparable,
-// and because every model here is 768-dim, nothing in the stack can tell by
-// looking.
-const USE_API_KEY = !(GEMINI_SA_EMAIL && GEMINI_SA_PRIVATE_KEY && GEMINI_PROJECT_ID) && Boolean(GEMINI_API_KEY);
+// Key first, as in the Worker (ADR-053); the Vertex SA only when no key is set.
+// Never mix embedding models in one set: vectors from two models are not
+// comparable, and because every model here is 768-dim, nothing in the stack can
+// tell by looking.
+const USE_API_KEY = Boolean(GEMINI_API_KEY);
 
 const SCHEMA = "semantic_search";
 const EMBED_DIM = 768;
@@ -171,7 +171,7 @@ async function getGoogleToken() {
 // ── Text embeddings (batched) — one function per provider ────────────────────
 async function embedWithGoogle(token, texts, model) {
   if (USE_API_KEY) {
-    // AI Studio (generativelanguage) batchEmbedContents — one simple key.
+    // Gemini API (generativelanguage) batchEmbedContents — one simple key.
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:batchEmbedContents`;
     const res = await fetch(url, {
       method: "POST",

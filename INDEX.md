@@ -184,6 +184,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/050-an-empty-table-is-replaced-by-its-empty-state.md`](docs/adr/050-an-empty-table-is-replaced-by-its-empty-state.md) | Empty and no-results tables in the Table template and DynamicTable replace the whole table (headers, caption, footer and pagination included) with EmptyState, matching the Empty pattern. |
 | [`docs/adr/051-a-page-header-title-is-the-page-h1.md`](docs/adr/051-a-page-header-title-is-the-page-h1.md) | PageHeader renders its title as the page's single h1 at Heading large (24/28) by default, following the ambient heading level unless overridden with titleAs. |
 | [`docs/adr/052-dimensions-is-the-one-ladder-and-layout-owns-it.md`](docs/adr/052-dimensions-is-the-one-ladder-and-layout-owns-it.md) | Dimensions is the one rem ladder that every gap, size, radius and stroke reads from; the Layout foundation (Dimensions, Spacing, Grid) owns it. |
+| [`docs/adr/053-gemini-api-key-is-the-canonical-gemini-credential.md`](docs/adr/053-gemini-api-key-is-the-canonical-gemini-credential.md) | uno-bot's Gemini adapter uses the Gemini API key whenever it is set; the Vertex service account is the loud fallback. Supersedes ADR-018. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -213,6 +214,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-142 routable documents. Staged notes (`docs/knowledge/`) and
+143 routable documents. Staged notes (`docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,362 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 168,391 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -54,7 +54,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 27,035 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
 | `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,575 |
-| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
+| `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,564 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
 | `figma-comments` | [`agents/uno-bot/scheduled-actions/figma-comments/ACTION.md`](../../agents/uno-bot/scheduled-actions/figma-comments/ACTION.md) | 9,103 |
@@ -2483,7 +2483,7 @@ THE standing-automation registry. An automation absent from the table below is u
 - **Every automation that judges names its agent in its home.** One that asks a model to judge with no agent named is unowned by definition. A deterministic automation — scripts, REST, diffs, an embedding call — names none, and its Owner answers for it.
 - **An automation invokes a skill's method; it never embeds its own copy of the logic.** Migrate opportunistically as each is next touched.
 - **Every automation is a loop, and declares its loop mechanics.** Stop condition, caps and trigger cadence go in its home (its job code or its workflow file); the procedure itself stays in the skill's method. Portable by construction: any model can execute the written loop. *(rule added 2026-07-16)*
-- **Every automation names where it runs and who pays.** A Worker job runs on the CF Worker, and its model calls are Gemini on Vertex, billed to GCP `hcii-plus` through the uno-bot service account (ADR-018). A GitHub Actions workflow runs scripts and calls no model. Every model in scheduled automation is Gemini, routed by the Worker's tier table (ADR-028). *(rule added 2026-07-16)*
+- **Every automation names where it runs and who pays.** A Worker job runs on the CF Worker, and its model calls are Gemini, authenticated with the Worker's `GEMINI_API_KEY` and billed to the key's project under its spend cap (ADR-053). A GitHub Actions workflow runs scripts and calls no model. Every model in scheduled automation is Gemini, routed by the Worker's tier table (ADR-028). *(rule added 2026-07-16)*
 
 **The Worker's scheduled runs.** Two wrangler crons (`agents/uno-bot/wrangler.toml` `[triggers]`) start two runs each weekday: the **end-of-day run** at 06:00 ET and the **morning run** at 09:00 ET, both Monday to Friday. The end-of-day run is dated to the workday before it; Monday's is dated Friday and reads from where Friday's run left off, so it covers Friday and the weekend. The handler only enqueues; the AgentRunner runs one job per alarm. `agents/uno-bot/src/scheduled/runs.ts` plans which job kinds each run holds, and `src/scheduled/jobs.ts` pairs each kind with its body. Every kind but `noop` (which proves the path and is planned in no run) is named in a row below. A family whose posts people reply to has its own doc in `agents/uno-bot/scheduled-actions/`; the rest have a row alone. Rehearse a run with `GET /debug/sweep?dry_run=1`; it writes nothing.
 

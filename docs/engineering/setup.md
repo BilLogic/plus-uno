@@ -418,7 +418,7 @@ npx vitest run --project=storybook -t "Name"  # one story, for triage
 
 ## Docs AI agent (Netlify function)
 
-The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemini on Vertex AI, service account only (ADR-018), with no API-key path. Set these in the Netlify site's environment variables; none of them reaches the browser bundle.
+The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemini on Vertex AI, service account only (ADR-053 left it out of the key switch), with no API-key path. Set these in the Netlify site's environment variables; none of them reaches the browser bundle.
 
 | Variable | Value |
 |---|---|

@@ -19,7 +19,6 @@
  * @typedef {object} Secret
  * @property {string} name
  * @property {boolean} required  the Worker cannot do its job without it
- * @property {boolean} [forbidden] it must NOT be set on the Worker
  * @property {boolean} [multiline] the value spans lines (a PEM), so it is piped
  *   from a file rather than typed at a prompt that cannot echo it back
  * @property {string} why  what breaks, in one line, for whoever is setting it
@@ -63,13 +62,18 @@ export const SECRETS = [
     why: "Notion internal integration token — notion_create/update/archive plus every notion_search catalog read. Each database must also be shared with the integration.",
   },
   {
-    name: "GEMINI_SA_EMAIL",
+    name: "GEMINI_API_KEY",
     required: true,
-    why: "Vertex service-account client_email. Canonical model credential per ADR-018, and shared by BOTH the Gemini-Vertex and Vertex-Claude lanes — unset, the bot cannot think.",
+    why: "the Gemini API key, the canonical model credential (ADR-053): it wins whenever set, for generation and for the query embeddings the semantic index is read with. Unset, the bot falls back to the Vertex service account below, loudly — and with neither, it cannot think.",
+  },
+  {
+    name: "GEMINI_SA_EMAIL",
+    required: false,
+    why: "Vertex service-account client_email. The Gemini adapter's fallback, and the credential the opt-in vertex-claude adapter needs, since the API key cannot reach Claude. Unset, that adapter degrades to Gemini.",
   },
   {
     name: "GEMINI_SA_PRIVATE_KEY",
-    required: true,
+    required: false,
     multiline: true,
     why: "the matching private_key, full PEM including the BEGIN/END lines and its newlines. The half of the pair that is easiest to paste wrong.",
   },
@@ -93,12 +97,6 @@ export const SECRETS = [
     required: false,
     why: "password of the uno-bot Auth user (SUPABASE_WRITE_EMAIL in [vars]) on the uno-blueprint project, an rpc_writer: it signs in for a one-hour JWT that opens the authoring RPCs and no table. Set it with scripts/blueprint-writer-wizard.sh. Unset, the bot cannot write the blueprint and reads are unaffected.",
   },
-  {
-    name: "GEMINI_API_KEY",
-    required: false,
-    forbidden: true,
-    why: "AI Studio key — must NOT be set on the Worker (ADR-018, 2026-07-16). The Vertex SA above is canonical and takes precedence whenever fully set; this key is a local-dev fallback for the Gemini lane only and cannot reach Claude at all.",
-  },
 ];
 
 /** @returns {string[]} declared names, in declaration order. */
@@ -110,7 +108,7 @@ export const secretNames = () => SECRETS.map((s) => s.name);
  * @param {string[]} liveNames from `wrangler secret list` — names only; Cloudflare
  *   does not return values to anyone.
  * @returns {{present: string[], missing: string[], optionalUnset: string[],
- *   undeclared: string[], forbidden: string[]}}
+ *   undeclared: string[]}}
  */
 export function classify(liveNames) {
   const live = new Set(liveNames);
@@ -119,15 +117,8 @@ export function classify(liveNames) {
   const present = [];
   const missing = [];
   const optionalUnset = [];
-  const forbidden = [];
 
   for (const s of SECRETS) {
-    if (s.forbidden) {
-      // Set-when-it-must-not-be is the finding. Absent is the pass, and it is
-      // not "optionally unset" — nobody should ever be prompted for it.
-      if (live.has(s.name)) forbidden.push(s.name);
-      continue;
-    }
     if (live.has(s.name)) present.push(s.name);
     else if (s.required) missing.push(s.name);
     else optionalUnset.push(s.name);
@@ -138,7 +129,7 @@ export function classify(liveNames) {
   // copied to the new account by anyone working from the list (#288).
   const undeclared = liveNames.filter((n) => !byName.has(n)).sort();
 
-  return { present, missing, optionalUnset, undeclared, forbidden };
+  return { present, missing, optionalUnset, undeclared };
 }
 
 /**
@@ -320,7 +311,7 @@ export function expectedBlock() {
     return out;
   };
   for (const s of SECRETS) {
-    const tag = s.forbidden ? " [DO NOT SET]" : s.required ? "" : " [optional]";
+    const tag = s.required ? "" : " [optional]";
     lines.push(`#   ${s.name}${tag}`);
     for (const l of wrap(s.why, "#       ")) lines.push(`#       ${l}`);
   }

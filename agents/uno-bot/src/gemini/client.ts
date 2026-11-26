@@ -1,16 +1,13 @@
 // Minimal Gemini client for the provider adapter (phase 1, 2026-07-10).
 //
-// Supports BOTH access paths, auto-selected by which credential is present:
-//   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
-//                                 an OAuth token minted in ./auth.ts. THE
-//                                 CANONICAL PATH — always wins when configured
-//                                 (rule set 2026-07-16 after the Vertex-vs-AI-
-//                                 Studio key mixup; docs/adr/
-//                                 ADR-018).
+// Supports BOTH access paths, picked by which credential is present, in a
+// fixed order (docs/adr/053):
 //   • GEMINI_API_KEY            → Gemini Developer API (generativelanguage.
-//                                 googleapis.com) — plain key header. Emergency
-//                                 fallback only; do NOT set this secret on the
-//                                 deployed Worker.
+//                                 googleapis.com) — plain key header. THE
+//                                 CANONICAL PATH — always wins when set.
+//   • GEMINI_SA_* service acct  → Vertex AI (aiplatform.googleapis.com) with
+//                                 an OAuth token minted in ./auth.ts. The
+//                                 fallback, and loud when traffic lands on it.
 //
 // Phase 1 scope: non-streaming generateContent with a system prompt and plain
 // text — enough for the /debug/gemini smoke test and the delegate-subagent
@@ -19,6 +16,7 @@
 
 import type { Env } from "../types";
 import { getGoogleAccessToken } from "./auth";
+import { geminiCredentialPath } from "./credential";
 import { countedFetch } from "../net";
 import { takesThinkingLevel } from "../agent/gemini-tiers";
 
@@ -48,30 +46,28 @@ interface GenerateContentResponse {
   error?: { code?: number; message?: string };
 }
 
+// The fallback warning fires once per isolate: this runs on every call, and a
+// line per call would bury the one signal it exists to give.
+let warnedFallback = false;
+
 export function geminiConfigured(env: Env): "api-key" | "service-account" | null {
-  // SA FIRST (flipped 2026-07-16, live incident; ADR-018): the service account
-  // carries the GCP project's real Vertex quota and matches the credential used
-  // everywhere else (the Claude adapter, embeddings, backfill). An AI-Studio
-  // GEMINI_API_KEY used to take precedence — free-tier keys have small daily
-  // caps, and when one is set on the Worker it starved EVERY turn with 429s
-  // (bot down in Slack + the whole eval run). API key remains the fallback for
-  // deployments without an SA — and only ever local-dev, never the Worker.
-  if (env.GEMINI_SA_EMAIL && env.GEMINI_SA_PRIVATE_KEY && env.GEMINI_PROJECT_ID) {
-    return "service-account";
+  // Key first (ADR-053, which reverses ADR-018); the order lives in
+  // ./credential.ts. With the region at "global" the Vertex-only cachedContents
+  // path was already inlining, so choosing the key gives up no caching.
+  const path = geminiCredentialPath(env);
+  if (path === "service-account" && !warnedFallback) {
+    warnedFallback = true;
+    // Loud on purpose: the key going missing (rotation, rename, typo) silently
+    // shifting traffic to a different auth/billing boundary is the failure mode
+    // a single deterministic path exists to catch.
+    console.warn("[gemini] GEMINI_API_KEY is not set — falling back to the Vertex service account");
   }
-  if (env.GEMINI_API_KEY) {
-    // Loud on purpose: the SA config going missing (rotation, rename, typo)
-    // silently shifting traffic to a different auth/billing boundary is the
-    // failure mode ADR-018 exists to catch.
-    console.warn("[gemini] Vertex SA not fully configured — falling back to the AI Studio key (emergency path)");
-    return "api-key";
-  }
-  return null;
+  return path;
 }
 
 /**
  * Vertex project/region/host + auth headers, or null when this deployment is on
- * the AI-Studio key path (which has no cachedContents surface).
+ * the API-key path (which has no cachedContents surface).
  *
  * Shared with ./cache.ts so the cache and the generateContent call can never
  * drift onto different projects or regions — a cachedContents resource is

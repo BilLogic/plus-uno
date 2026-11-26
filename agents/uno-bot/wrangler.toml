@@ -171,7 +171,7 @@ SUPABASE_URL = "https://osybxeojvsqcwxkgnalm.supabase.co"
 SUPABASE_WRITE_EMAIL = "uno-bot@uno-blueprint.local"
 # blueprint_search engine: "on" (default) = semantic (vector) search over the
 # semantic_search.corpus_chunks index, with keyword search as the fallback;
-# "off" = keyword only. Vector needs an embedding credential (the Vertex SA, same
+# "off" = keyword only. Vector needs an embedding credential (GEMINI_API_KEY, same
 # as the model lane) + the semantic_search schema exposed to the API.
 SEMANTIC_SEARCH = "on"
 # Fused blueprint retrieval: "on" (default) = ONE call to
@@ -316,20 +316,22 @@ SLACK_SEARCH_PRIVATE_ALLOWLIST = "C03DVDS4LN9,C07PZJD3HD5,C09EPEJEQ9K,C07LU2K8DQ
 #                   GET /debug/vertex-claude before flipping.
 MODEL_PROVIDER = "gemini"
 # Vertex service-account path (project the SA belongs to; region "global").
-# Shared by BOTH the Gemini-Vertex and the Vertex-Claude lanes.
+# The Gemini adapter's fallback when no GEMINI_API_KEY is set (ADR-053), and the
+# only path the Vertex-Claude adapter uses.
 GEMINI_PROJECT_ID = "hcii-plus"
 GEMINI_REGION = "global"
 # ⚠️ One consequence of "global": Vertex context caching (`cachedContents`) is a
-# REGIONAL resource, so on the global endpoint the Gemini lane cannot cache its
-# system prompt and re-sends the ~40k-token harness on every loop iteration
-# (src/gemini/cache.ts explains the mechanism; GET /debug/gemini-cache reports
-# which side of this the deployment is on, and the `cached_in=` field on the
-# [uno-bot] log line shows whether Google's implicit caching is covering it
-# anyway). Setting a region — e.g. "us-central1" — turns explicit caching on for
-# free. It is NOT a free switch: this var is shared with the Vertex-CLAUDE lane
-# (src/vertex/claude.ts), and regional endpoints carry different model
-# availability, so smoke-test BOTH /debug/gemini and /debug/vertex-claude after
-# changing it. Decision left to Bill; the code handles either value.
+# REGIONAL resource, and the API-key path has none at all, so the Gemini adapter
+# cannot cache its system prompt and re-sends the ~40k-token harness on every
+# loop iteration (src/gemini/cache.ts explains the mechanism; GET
+# /debug/gemini-cache reports which side of this the deployment is on, and the
+# `cached_in=` field on the [uno-bot] log line shows whether Google's implicit
+# caching is covering it anyway). Explicit caching returns only on the Vertex
+# fallback with a region set, e.g. "us-central1". That is NOT a free switch: this
+# var is shared with the Vertex-CLAUDE adapter (src/vertex/claude.ts), and regional
+# endpoints carry different model availability, so smoke-test BOTH /debug/gemini
+# and /debug/vertex-claude after changing it. Decision left to Bill; the code
+# handles either value.
 # Active Gemini model. A/B trial verdict (2026-07-10): gemini-3.1-flash-lite
 # fabricated grounding on multi-source answers — disqualifying for a
 # grounding-first bot. gemini-3.8-flash is the intended default since 2026-09-04
@@ -422,11 +424,18 @@ DS_OWNER_USER_IDS = "U03FYQJRQHX,U09E652SJ02,U0A6UTECM5Y"
 #       Notion internal integration token — notion_create/update/archive
 #       plus every notion_search catalog read. Each database must also be
 #       shared with the integration.
-#   GEMINI_SA_EMAIL
-#       Vertex service-account client_email. Canonical model credential
-#       per ADR-018, and shared by BOTH the Gemini-Vertex and
-#       Vertex-Claude lanes — unset, the bot cannot think.
-#   GEMINI_SA_PRIVATE_KEY
+#   GEMINI_API_KEY
+#       the Gemini API key, the canonical model credential (ADR-053): it
+#       wins whenever set, for generation and for the query embeddings the
+#       semantic index is read with. Unset, the bot falls back to the
+#       Vertex service account below, loudly — and with neither, it cannot
+#       think.
+#   GEMINI_SA_EMAIL [optional]
+#       Vertex service-account client_email. The Gemini adapter's
+#       fallback, and the credential the opt-in vertex-claude adapter
+#       needs, since the API key cannot reach Claude. Unset, that adapter
+#       degrades to Gemini.
+#   GEMINI_SA_PRIVATE_KEY [optional]
 #       the matching private_key, full PEM including the BEGIN/END lines
 #       and its newlines. The half of the pair that is easiest to paste
 #       wrong.
@@ -447,11 +456,6 @@ DS_OWNER_USER_IDS = "U03FYQJRQHX,U09E652SJ02,U0A6UTECM5Y"
 #       one-hour JWT that opens the authoring RPCs and no table. Set it
 #       with scripts/blueprint-writer-wizard.sh. Unset, the bot cannot
 #       write the blueprint and reads are unaffected.
-#   GEMINI_API_KEY [DO NOT SET]
-#       AI Studio key — must NOT be set on the Worker (ADR-018,
-#       2026-07-16). The Vertex SA above is canonical and takes precedence
-#       whenever fully set; this key is a local-dev fallback for the
-#       Gemini lane only and cannot reach Claude at all.
 # END GENERATED SECRETS
 
 # Durable Object — per-thread conversation state + pending tool-call proposals.

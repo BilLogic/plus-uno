@@ -1,11 +1,13 @@
 ---
 embodiment: ide
 summary: Gemini access is Vertex-only in production; AI Studio key is never deployed (2026-07-16)
-status: active
-verified: 2026-08-24 (#171)
+status: superseded
+verified: 2026-11-26
 ---
 
 # ADR-018: Gemini access is Vertex-only in production; AI Studio key is never deployed (2026-07-16)
+
+> **Superseded (2026-11-26) by [ADR-053](053-gemini-api-key-is-the-canonical-gemini-credential.md).** The key now wins and the service account is the loud fallback. What stands from this ADR is its lesson: one credential path wins deterministically.
 
 **Decision.** uno-bot's Gemini lane always authenticates via the Vertex AI service-account pair (`GEMINI_SA_EMAIL` + `GEMINI_SA_PRIVATE_KEY`, project `hcii-plus`, region `global`). The AI Studio `GEMINI_API_KEY` must never be set as a Worker secret — it exists only as a local-dev emergency fallback. Code enforces the precedence (SA wins whenever set, `src/gemini/client.ts`) and warns loudly when it ever resolves to the API-key path.
 

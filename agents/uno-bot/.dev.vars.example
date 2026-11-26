@@ -17,17 +17,14 @@ SLACK_BOT_TOKEN=
 SLACK_MCP_CLIENT_SECRET=
 
 # --- Model providers (which one runs is wrangler.toml MODEL_PROVIDER) ---
-# Two lanes: "gemini" (default) and "vertex-claude". Both can run on the SAME
-# Vertex service-account pair below; Claude bills to the GCP project. Set the
-# service account (Vertex) — this is what production and Vertex-Claude use.
-# RULE (2026-07-16, ADR-018): the Vertex SA is canonical and takes precedence
-# whenever fully set (email + key + project id).
+# Two providers: "gemini" (default) and "vertex-claude".
+# RULE (ADR-053): GEMINI_API_KEY is canonical and wins whenever set. It cannot
+# reach Claude, so the vertex-claude adapter also needs the service-account pair
+# (email + key + project id), which the Gemini adapter falls back to, loudly, when
+# no key is set.
+GEMINI_API_KEY=
 GEMINI_SA_EMAIL=
 GEMINI_SA_PRIVATE_KEY=
-# …OR, for the Gemini lane only, an AI Studio key — local-dev emergency
-# fallback ONLY, never set on the Worker; it CANNOT reach Claude (only the
-# Vertex SA path can) and only applies when the SA is not fully configured:
-GEMINI_API_KEY=
 
 # --- GitHub ---
 # github.com/settings/tokens -> Generate new (classic) with `repo` scope, OR
