@@ -6,7 +6,7 @@ import { Modal, Card, Section, Page } from '@/templates';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
- * nesting: the page's one h1 is --heading-lg 24, a section's h2 is
+ * nesting: the page's one h1 is --heading-xxl 32, a section's h2 is
  * --heading-md 20, a subsection's h3 is --heading-sm 16.
  *
  * Container titles are fixed whatever level they sit at, and each is
@@ -14,7 +14,7 @@ import { Modal, Card, Section, Page } from '@/templates';
  * names it), and a card's, a popup's and a flag's are 14. A card's title sits
  * over a 14 description, and its tag is one level below its section.
  *
- * Group labels are 12 medium and are not headings: a menu's label names a
+ * Group labels are 12 regular and are not headings: a menu's label names a
  * group, and a table's labels are column headers.
  */
 export default {
@@ -30,11 +30,11 @@ const expectStyle = async (element, name, [size, lineHeight, weight]) => {
     await expect(style.fontWeight, `${name} font weight`).toBe(String(weight));
 };
 
-const HEADING_LG = [24, 28, 400];
-const HEADING_MD = [20, 24, 500];
-const HEADING_SM = [16, 20, 500];
-const HEADING_XS = [14, 20, 500];
-const HEADING_XXS = [12, 16, 500];
+const HEADING_XXL = [32, 36, 400];
+const HEADING_MD = [20, 24, 400];
+const HEADING_SM = [16, 20, 400];
+const HEADING_XS = [14, 20, 400];
+const HEADING_XXS = [12, 16, 400];
 const BODY_DEFAULT = [14, 20, 400];
 
 const headingNamed = (canvas, level, name) => canvas.getByRole('heading', { level, name });
@@ -53,7 +53,7 @@ export const PageSectionSubsection = () => (
 PageSectionSubsection.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    await expectStyle(headingNamed(canvas, 1, 'Sessions'), 'page', HEADING_LG);
+    await expectStyle(headingNamed(canvas, 1, 'Sessions'), 'page', HEADING_XXL);
     await expectStyle(headingNamed(canvas, 2, 'This week'), 'section', HEADING_MD);
     await expectStyle(headingNamed(canvas, 3, 'Monday'), 'subsection', HEADING_SM);
     await expectStyle(canvas.getByText('Every session you tutor from Monday to Sunday.'), 'section description', BODY_DEFAULT);

@@ -10,7 +10,7 @@ Heading, Body, Metric and Code are the text styles for all work.
 
 ## Overview
 
-PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Every heading is regular (400), so size alone carries rank; metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -56,14 +56,15 @@ Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--hea
 | `--type-family-body` | Google Sans Flex | Body text |
 | `--type-family-code` | Google Sans Code | Code |
 | `--type-family-brand-heading` · `--type-family-brand-body` | Google Sans Flex | Marketing and docs heroes only, never the product |
-| `--type-weight-regular` | 400 | Body text and headings xxl, xl and lg |
-| `--type-weight-medium` | 500 | Headings md to xxs, metrics, labels and icon-paired text |
+| `--type-weight-regular` | 400 | Body text and every heading |
+| `--type-weight-medium` | 500 | Metrics, labels and icon-paired text |
 | `--type-weight-semibold` | 600 | Inline bold only: strong in running text, never a component or text style |
 | `--type-tracking-tighter` · `-close` · `-tight` · `-snug` · `-none` · `-open` · `-loose` | −2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1% | The letter-spacing steps the companions below read |
 | `--heading-xxl-tracking` · `--heading-xl-tracking` | −2% | Headings 32 and 28 |
-| `--heading-lg-tracking` | −1.5% | Heading 24 |
-| `--heading-md-tracking` | −0.5% | Heading 20 |
-| `--heading-sm-tracking` · `--heading-xs-tracking` | 0 | Headings 16 and 14 |
+| `--heading-lg-tracking` | −2% | Heading 24 |
+| `--heading-md-tracking` | −2% | Heading 20 |
+| `--heading-sm-tracking` | −2% | Heading 16 |
+| `--heading-xs-tracking` | 0 | Heading 14 |
 | `--heading-xxs-tracking` | +1% | Heading 12 |
 | `--body-lg-tracking` · `--body-default-tracking` · `--body-sm-tracking` | 0 · +0.5% · +1% | Body 16, 14 and 12 |
 | `--metric-lg-tracking` · `--metric-md-tracking` · `--metric-sm-tracking` | −1% · −1% · 0 | Metrics 28, 24 and 16 |
@@ -83,7 +84,7 @@ Headings step down one size per nesting level; containers use a fixed title size
 
 | Level | Style |
 | --- | --- |
-| Page title | Heading/large · 24 · the page's one h1 |
+| Page title | Heading/xxlarge · 32 · the page's one h1 |
 | Section title | Heading/medium · 20 · h2 |
 | Subsection title | Heading/small · 16 · h3 |
 | Modal title | Heading/medium · 20 · the modal's h1, named by aria-labelledby |
@@ -142,9 +143,9 @@ Don't: An h3 straight after the h1 skips the h2.
 
 ### Headings
 
-Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Headings are Google Sans Flex at 400 at every size; size, not weight, carries rank. Headings from 16 up track at −2%. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
-Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.
+Text styles use only 400 and 500, and headings only 400. Do not add a 500, 600 or 700 weight to a heading.
 
 ### Numbers
 

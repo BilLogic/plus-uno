@@ -38,11 +38,11 @@ const rem = (px) => `${px / 16}rem`;
 const STYLES = [
   ['Heading/xxlarge', 'heading', 32, 36, 400, -2],
   ['Heading/xlarge', 'heading', 28, 32, 400, -2],
-  ['Heading/large', 'heading', 24, 28, 400, -1.5],
-  ['Heading/medium', 'heading', 20, 24, 500, -0.5],
-  ['Heading/small', 'heading', 16, 20, 500, 0],
-  ['Heading/xsmall', 'heading', 14, 20, 500, 0],
-  ['Heading/xxsmall', 'heading', 12, 16, 500, 1],
+  ['Heading/large', 'heading', 24, 28, 400, -2],
+  ['Heading/medium', 'heading', 20, 24, 400, -2],
+  ['Heading/small', 'heading', 16, 20, 400, -2],
+  ['Heading/xsmall', 'heading', 14, 20, 400, 0],
+  ['Heading/xxsmall', 'heading', 12, 16, 400, 1],
   ['Body/large', 'body', 16, 24, 400, 0],
   ['Body/default', 'body', 14, 20, 400, 0.5],
   ['Body/small', 'body', 12, 16, 400, 1],
@@ -86,6 +86,13 @@ test('every text style resolves to its size, line height, weight and family', ()
       `${weight} ${rem(size)} / ${rem(lineHeight)} ${STACKS[family]}`,
       cssName(style),
     );
+  }
+});
+
+test('headings are regular and 16px and up track at -2%', () => {
+  for (const [style, , size, , weight, tracking] of STYLES.filter(([name]) => name.startsWith('Heading/'))) {
+    assert.equal(weight, 400, style);
+    if (size >= 16) assert.equal(tracking, -2, style);
   }
 });
 

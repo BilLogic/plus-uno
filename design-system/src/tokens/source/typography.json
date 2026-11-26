@@ -580,7 +580,7 @@
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -1.5
+        "value": -2
       }
     },
     {
@@ -591,11 +591,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:102",
         "lineHeight": "VariableID:19364:108",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": -0.5
+        "value": -2
       }
     },
     {
@@ -606,11 +606,11 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:101",
         "lineHeight": "VariableID:19364:107",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
-        "value": 0
+        "value": -2
       }
     },
     {
@@ -621,7 +621,7 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:100",
         "lineHeight": "VariableID:19364:107",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",
@@ -636,7 +636,7 @@
         "fontFamily": "VariableID:19364:112",
         "fontSize": "VariableID:19364:99",
         "lineHeight": "VariableID:19364:106",
-        "fontWeight": "VariableID:19364:115"
+        "fontWeight": "VariableID:19364:114"
       },
       "letterSpacing": {
         "unit": "PERCENT",

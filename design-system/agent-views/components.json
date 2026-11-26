@@ -9526,8 +9526,8 @@
       "tokens": [
         "--ds-surface",
         "--ds-text",
-        "--heading-lg",
-        "--heading-lg-tracking",
+        "--heading-xxl",
+        "--heading-xxl-tracking",
         "--page-pad",
         "--page-stack-md"
       ]
@@ -9546,7 +9546,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
+          "description": "The page title. Drawn as an `xxl` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
           "deprecated": null
         },
         {
@@ -13071,14 +13071,14 @@
         "--ds-text",
         "--ds-text-subtle",
         "--grid-gutter",
-        "--heading-lg",
-        "--heading-lg-tracking",
         "--heading-md",
         "--heading-md-tracking",
         "--heading-sm",
         "--heading-sm-tracking",
         "--heading-xs",
         "--heading-xs-tracking",
+        "--heading-xxl",
+        "--heading-xxl-tracking",
         "--inline-md",
         "--section-min-width-main",
         "--section-min-width-side",

@@ -32,7 +32,7 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 
 <FoundationSection title="Overview">
 
-PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Large headings (32, 28 and 24) are regular (400); smaller headings and metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+PLUS is all sans. Every heading, metric and body style is Google Sans Flex with rounded ends and automatic optical sizing, and Google Sans Code is for code. Every heading is regular (400), so size alone carries rank; metrics are medium (500); body is regular. Each style carries its own letter spacing, tighter as the size grows and looser as it shrinks. Pick a style by its role on the page, never by how big it looks. Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
 
 ```css
 font: var(--heading-md);
@@ -90,14 +90,15 @@ Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--hea
         [<C>--type-family-body</C>, 'Google Sans Flex', 'Body text'],
         [<C>--type-family-code</C>, 'Google Sans Code', 'Code'],
         [<><C>--type-family-brand-heading</C> · <C>--type-family-brand-body</C></>, 'Google Sans Flex', 'Marketing and docs heroes only, never the product'],
-        [<C>--type-weight-regular</C>, '400', 'Body text and headings xxl, xl and lg'],
-        [<C>--type-weight-medium</C>, '500', 'Headings md to xxs, metrics, labels and icon-paired text'],
+        [<C>--type-weight-regular</C>, '400', 'Body text and every heading'],
+        [<C>--type-weight-medium</C>, '500', 'Metrics, labels and icon-paired text'],
         [<C>--type-weight-semibold</C>, '600', 'Inline bold only: strong in running text, never a component or text style'],
         [<><C>--type-tracking-tighter</C> · <C>-close</C> · <C>-tight</C> · <C>-snug</C> · <C>-none</C> · <C>-open</C> · <C>-loose</C></>, '−2% · −1.5% · −1% · −0.5% · 0 · +0.5% · +1%', 'The letter-spacing steps the companions below read'],
         [<><C>--heading-xxl-tracking</C> · <C>--heading-xl-tracking</C></>, '−2%', 'Headings 32 and 28'],
-        [<C>--heading-lg-tracking</C>, '−1.5%', 'Heading 24'],
-        [<C>--heading-md-tracking</C>, '−0.5%', 'Heading 20'],
-        [<><C>--heading-sm-tracking</C> · <C>--heading-xs-tracking</C></>, '0', 'Headings 16 and 14'],
+        [<C>--heading-lg-tracking</C>, '−2%', 'Heading 24'],
+        [<C>--heading-md-tracking</C>, '−2%', 'Heading 20'],
+        [<C>--heading-sm-tracking</C>, '−2%', 'Heading 16'],
+        [<C>--heading-xs-tracking</C>, '0', 'Heading 14'],
         [<C>--heading-xxs-tracking</C>, '+1%', 'Heading 12'],
         [<><C>--body-lg-tracking</C> · <C>--body-default-tracking</C> · <C>--body-sm-tracking</C></>, '0 · +0.5% · +1%', 'Body 16, 14 and 12'],
         [<><C>--metric-lg-tracking</C> · <C>--metric-md-tracking</C> · <C>--metric-sm-tracking</C></>, '−1% · −1% · 0', 'Metrics 28, 24 and 16'],
@@ -128,7 +129,7 @@ Headings step down one size per nesting level; containers use a fixed title size
 <RefTable
     head={['Level', 'Style']}
     rows={[
-        ['Page title', 'Heading/large · 24 · the page\'s one h1'],
+        ['Page title', 'Heading/xxlarge · 32 · the page\'s one h1'],
         ['Section title', 'Heading/medium · 20 · h2'],
         ['Subsection title', 'Heading/small · 16 · h3'],
         ['Modal title', 'Heading/medium · 20 · the modal\'s h1, named by aria-labelledby'],
@@ -215,9 +216,9 @@ Don't: An h3 straight after the h1 skips the h2.
 
 <FoundationSubsection title="Headings">
 
-Headings are Google Sans Flex: 400 at 32, 28 and 24, then 500 from 20 down so they hold their place over body text. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
+Headings are Google Sans Flex at 400 at every size; size, not weight, carries rank. Headings from 16 up track at −2%. Size, line height and tracking step down together (sizes are in the type scale above, tracking in the tokens table, and the level for each role in Heading levels).
 
-Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading.
+Text styles use only 400 and 500, and headings only 400. Do not add a 500, 600 or 700 weight to a heading.
 
 </FoundationSubsection>
 
