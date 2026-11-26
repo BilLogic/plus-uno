@@ -45,7 +45,7 @@ const SECTIONS = [
 const NOT_ROUTABLE = [
   'docs/knowledge', 'docs/evals/fixtures', 'docs/evals/scenarios/ds-usage',
   'skills/uno-prototype/examples', 'skills/uno-review/examples',
-  'skills/uno-publish/examples', 'skills/uno-maintain/references/skill-quality/examples',
+  'skills/uno-publish/examples',
 ];
 
 /** Reading paths — the one part of this file that is a judgment, not a glob. */
