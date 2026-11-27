@@ -73,7 +73,7 @@ import {
   type ThreadState,
   type ThreadStateDeps,
 } from "./store";
-import type { AssistantContext } from "../slack/types";
+import type { AssistantContext } from "./store";
 
 interface HistoryRecord {
   turns: HistoryTurn[];

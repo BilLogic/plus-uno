@@ -6,18 +6,10 @@
 
 import type { FigmaEventJob } from "../figma-notify/event";
 import type { DevLinksWriteJob } from "../figma-links/run";
+import type { AssistantContext, SlackEventFile } from "../thread-state/store";
 
-/** Slack file attachment metadata as delivered on message/app_mention events.
- *  Only the fields the vision path reads — everything else is ignored. */
-export interface SlackEventFile {
-  id?: string;
-  name?: string;
-  filetype?: string;
-  mimetype?: string;
-  permalink?: string;
-  url_private?: string;
-  size?: number;
-}
+// Defined by the state layer, which stores them; re-exported for Slack importers.
+export type { AssistantContext, SlackEventFile };
 
 export interface SlackMessageEvent {
   type: "message";
@@ -51,15 +43,6 @@ export interface SlackMessageEvent {
    *  with a BOT token (assistant.search.context). Optional: not every event
    *  carries one, and nothing else in the Worker needs it. */
   action_token?: string;
-}
-
-/** The surface the user has open in the workspace while chatting in the assistant
- *  panel — delivered on assistant_thread_started and every context change. All
- *  fields optional: the user may have no channel focused. */
-export interface AssistantContext {
-  channel_id?: string;
-  team_id?: string;
-  enterprise_id?: string;
 }
 
 /** Shared payload for the two assistant-panel lifecycle events (identical wire

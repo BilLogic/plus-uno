@@ -130,7 +130,7 @@ import {
   type RunClaim,
   type ThreadRef,
 } from "./thread-state/store";
-import type { AssistantContext } from "./slack/types";
+import type { AssistantContext } from "./thread-state/store";
 import {
   outageOnFailure,
   outageOnRelease,

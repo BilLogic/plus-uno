@@ -31,7 +31,7 @@
 // sleeping for twenty minutes. Production passes `Date.now`.
 
 import { charge } from "../net";
-import type { AssistantContext } from "../slack/types";
+import type { AssistantContext } from "./store";
 import type { ThreadState as ThreadStateDurableObject } from "../thread-state";
 import type { OutageStore } from "../turn/capacity-outage";
 import type {
