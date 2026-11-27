@@ -180,7 +180,7 @@ const contactFields = (
 );
 
 /** A form's Save and Cancel: at the start under the last field, Primary first. */
-const formActions = (
+export const formActions = (
     <div style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
         <Button text="Save" appearance="primary" onClick={() => {}} />
         <Button text="Cancel" appearance="subtle" onClick={() => {}} />

@@ -759,10 +759,7 @@ export const TypeForm = {
                 <TextField label="Guardian name" defaultValue="Dana Thompson" />
                 <TextField label="Phone" defaultValue="(412) 555-0148" />
             </div>
-            <div style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
-                <Button text="Save" appearance="primary" onClick={() => {}} />
-                <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-            </div>
+            {Example.formActions}
         </Section>
     ),
 };
