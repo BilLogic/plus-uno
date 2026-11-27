@@ -59251,7 +59251,7 @@
 				"\n",
 				"## In code\n",
 				"\n",
-				"Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.\n",
+				"Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm` or `--icon-md` (Iconography). Never hardcode a font size, family or weight.\n",
 				"\n",
 				"### Family, weight and tracking tokens\n",
 				"\n",
