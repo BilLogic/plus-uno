@@ -56,6 +56,30 @@ export interface AssistantContext {
   enterprise_id?: string;
 }
 
+/** The largest raw context, in JSON characters, the store will look at. */
+const ASSISTANT_CONTEXT_MAX_CHARS = 2048;
+const SLACK_ID_RE = /^[A-Z][A-Z0-9]{1,31}$/;
+
+/** The whitelisted shape of whatever Slack (or anything else) handed us as the
+ *  assistant's context: `channel_id`, `team_id` and `enterprise_id`, each only
+ *  when it is a Slack id; every other key is dropped. Returns null for input
+ *  that is not a plain object or is oversized, so the caller drops the write. */
+export function sanitizeAssistantContext(raw: unknown): AssistantContext | null {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
+  try {
+    if (JSON.stringify(raw).length > ASSISTANT_CONTEXT_MAX_CHARS) return null;
+  } catch {
+    return null;
+  }
+  const source = raw as Record<string, unknown>;
+  const out: AssistantContext = {};
+  for (const key of ["channel_id", "team_id", "enterprise_id"] as const) {
+    const value = source[key];
+    if (typeof value === "string" && SLACK_ID_RE.test(value)) out[key] = value;
+  }
+  return out;
+}
+
 /** What a turn kept of an image or Figma link so the next turn can render it. */
 export interface VisionReference {
   files?: SlackEventFile[];

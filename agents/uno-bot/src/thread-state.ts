@@ -9,7 +9,7 @@
 // seam — and nowhere else; no caller and not this class computes an id.
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
-// `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
+// `event:{event_id}`, `actx:[channel,thread]` (JSON), `cancel:{channel}:{thread}`,
 // `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`,
 // `whq:{ts}` (an open "which one?" question) and `whc:{ts}` (a card it lists), and the
 // alarm's own `gc:next`.
@@ -130,6 +130,7 @@ import {
   type RunClaim,
   type ThreadRef,
 } from "./thread-state/store";
+import { sanitizeAssistantContext } from "./thread-state/store";
 import type { AssistantContext } from "./thread-state/store";
 import {
   outageOnFailure,
@@ -961,8 +962,10 @@ export class ThreadState extends DurableObject<Env> {
     context: AssistantContext,
     at: number,
   ): Promise<void> {
+    const clean = sanitizeAssistantContext(context);
+    if (!clean) return;
     await this.storage.transaction(async (txn) => {
-      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context, updatedAt: at });
+      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context: clean, updatedAt: at });
       await this.ensureGcAlarm(txn);
     });
   }
@@ -1264,5 +1267,5 @@ function activeRunKey(user: string): string {
 }
 
 function assistantContextKey(channel: string, thread: string): string {
-  return `actx:${channel}:${thread}`;
+  return `actx:${JSON.stringify([channel, thread])}`;
 }
