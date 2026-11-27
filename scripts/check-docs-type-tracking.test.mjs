@@ -13,10 +13,11 @@ describe('check-docs-type-tracking', () => {
     });
     it('passes typeStyle and non-style fonts', () => {
         assert.deepEqual(findUntracked("s = { ...typeStyle('body-sm') }"), []);
-        assert.deepEqual(findUntracked("s = { font: 'var(--code-sm)' }"), []);
+        assert.deepEqual(findUntracked("s = { font: 'var(--code-default)' }"), []);
     });
-    it('flags Label/eyebrow, which has a tracking companion too', () => {
+    it('flags Label/eyebrow and Code/small, which have tracking companions too', () => {
         assert.deepEqual(findUntracked("s = { font: 'var(--label-eyebrow)' }"), [1]);
+        assert.deepEqual(findUntracked("s = { font: 'var(--code-sm)' }"), [1]);
     });
     it('scopes docs and demo/cases files, not printed examples', () => {
         assert.equal(inScope('design-system/src/storybook-docs/foundation-page.jsx'), true);

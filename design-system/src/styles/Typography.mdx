@@ -12,7 +12,7 @@ import * as TypographyStories from './Typography.stories.jsx';
 import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export const Sample = ({ font, weight, children = 'Tutors plan the week from here' }) => (
-    <span style={{ font: `var(${font})`, fontVariantNumeric: font.startsWith('--metric') ? 'tabular-nums' : undefined, letterSpacing: `var(${font}-tracking)`, fontWeight: weight ? `var(${weight})` : undefined, color: 'var(--ds-text)' }}>{children}</span>
+    <span style={{ ...typeStyle(font.slice(2)), fontWeight: weight ? `var(${weight})` : undefined, color: 'var(--ds-text)' }}>{children}</span>
 );
 
 <Meta of={TypographyStories} />
@@ -282,6 +282,6 @@ export const MetricLargeForDoFigure = () => (
 
 export const MonoForTheDontFigure = () => (
     <>
-    <span style={{ ...typeStyle('metric-lg'), fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+    <span style={{ ...typeStyle('metric-lg'), fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
     </>
 );

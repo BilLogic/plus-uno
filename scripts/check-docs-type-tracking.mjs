@@ -10,7 +10,7 @@ import { main } from './lib/findings.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 const ROOT = 'design-system/src/';
-const FONT = /\bfont:\s*(['"`])var\(--(?:heading|body|metric|label)-[a-z0-9-]+\)\1/g;
+const FONT = /\bfont:\s*(['"`])var\(--(?:(?:heading|body|metric|label)-[a-z0-9-]+|code-sm)\)\1/g;
 const MIN_SOURCES = 30;
 const REMEDY =
   "A `font` shorthand cannot carry letter spacing. Spread `typeStyle('<style>')` from storybook-docs/lib/type-style.js instead.";
