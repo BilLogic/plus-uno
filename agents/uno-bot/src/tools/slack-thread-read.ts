@@ -67,7 +67,7 @@ export async function executeSlackThreadRead(
 }
 
 /** Whether Slack says a channel is public; a lookup that fails counts as not. */
-async function isPublicChannel(env: Env, channel: string): Promise<boolean> {
+export async function isPublicChannel(env: Env, channel: string): Promise<boolean> {
   try {
     const info = await conversationsInfo(env, channel);
     const c = info.ok ? info.channel : undefined;
