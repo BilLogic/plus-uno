@@ -73,6 +73,7 @@ import {
   type ThreadState,
   type ThreadStateDeps,
 } from "./store";
+import { sanitizeAssistantContext } from "./store";
 import type { AssistantContext } from "./store";
 
 interface HistoryRecord {
@@ -507,7 +508,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     // ----- assistant context -----
 
     async getAssistantContext(ref) {
-      const key = threadKey(ref);
+      const key = JSON.stringify([ref.channel, ref.thread]);
       const rec = assistantContext.get(key);
       if (!rec) return null;
       if (now() - rec.updatedAt > HISTORY_TTL_MS) {
@@ -518,7 +519,9 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     },
 
     async putAssistantContext(ref, context) {
-      assistantContext.set(threadKey(ref), { context, updatedAt: now() });
+      const clean = sanitizeAssistantContext(context);
+      if (!clean) return;
+      assistantContext.set(JSON.stringify([ref.channel, ref.thread]), { context: clean, updatedAt: now() });
     },
 
     // ----- cancel -----

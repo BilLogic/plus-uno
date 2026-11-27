@@ -130,6 +130,7 @@ import {
   type RunClaim,
   type ThreadRef,
 } from "./thread-state/store";
+import { sanitizeAssistantContext } from "./thread-state/store";
 import type { AssistantContext } from "./thread-state/store";
 import {
   outageOnFailure,
@@ -961,8 +962,10 @@ export class ThreadState extends DurableObject<Env> {
     context: AssistantContext,
     at: number,
   ): Promise<void> {
+    const clean = sanitizeAssistantContext(context);
+    if (!clean) return;
     await this.storage.transaction(async (txn) => {
-      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context, updatedAt: at });
+      await txn.put<AssistantContextRecord>(assistantContextKey(ref.channel, ref.thread), { context: clean, updatedAt: at });
       await this.ensureGcAlarm(txn);
     });
   }
@@ -1264,5 +1267,5 @@ function activeRunKey(user: string): string {
 }
 
 function assistantContextKey(channel: string, thread: string): string {
-  return `actx:${channel}:${thread}`;
+  return `actx:${JSON.stringify([channel, thread])}`;
 }
