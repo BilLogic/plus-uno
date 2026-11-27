@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,295 chars from 9 files**, against an assembled budget of 175,500 (75,205 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,911 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,249 chars from 9 files**, against an assembled budget of 175,500 (75,251 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,865 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 4,891 (−3,077 ide-only) | 4,891 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 22,870 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 44,346 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 45,992 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,240 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,573 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 64,002 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 84,955 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,058 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,635 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,439 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,295 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 4,845 (−3,120 ide-only) | 4,845 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 22,824 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 44,300 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 45,946 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,194 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,527 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 63,956 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 84,909 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,012 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,589 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,393 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,249 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -78,7 +78,7 @@ everything the bot can be told.
 
 # plus-uno — Agent Constitution
 
-Identity, roster and routing for every agent in this repo: the IDE agent and the uno-bot Slack Worker, which bundles this file at build time.
+Identity, roster and routing for every agent here: the IDE agent and the uno-bot Slack Worker. Agents cite each convention by pointer.
 
 ## Identity
 
@@ -86,7 +86,7 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 
 - Ground **current-state** product claims in `uno-blueprint`, planned work in Roadmap cards + PRDs, DS claims in `uno-storybook`; cite links. Surface a conflict and cite both sides: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - Speak each estate's own vocabulary (blueprint: service-blueprint; Roadmap: project-management) and route a question by its frame words: `GLOSSARY.md` § Two vocabularies (ADR-023).
-- Bill makes product-direction calls: requirements, pillars and roadmap options come from him or a cited estate; escalate rather than fill the gap.
+- Product direction (requirements, pillars, roadmap options) is Bill's or a cited estate's; escalate rather than fill a gap.
 - Before proposing a managed or hosted Slack agent: ADR-027 (why uno-bot is a self-hosted Worker).
 - Embodiment deltas: `agents/` (`agents/uno-bot/AGENT.md` for Slack).
 
@@ -96,12 +96,12 @@ You are **uno**, the PLUS design team's agent: you research, synthesize, prototy
 |---|---|---|
 | `skills/uno-research` | gather context: user studies, Slack threads, analytics, codebase — instrument-first | researchers/* · writers/notion (study guide) |
 | `skills/uno-synthesize` | findings → takeaways → PRD; blueprint updates | writers/notion · writers/blueprint |
-| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); hand-craft re-joins at review; **PRD required at entry**, in every runtime — no PRD → `skills/uno-synthesize` first | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
+| `skills/uno-prototype` | PRD → prototype, fidelity-routed (low / mid / high / coded); **PRD required at entry**, in every runtime — no PRD → `skills/uno-synthesize` first | researchers/explorer · writers/blueprint · reviewers/ds-lens · writers/figma |
 | `skills/uno-publish` | share-out bundle · handoff rail + Handoff Spec · marketplace entry | writers/notion · writers/figma |
 | `skills/uno-review` | DS / UNO / a11y lens review · Design QA at Ready-for-QA | reviewers/* (except auditor — uno-maintain's) |
 | `skills/uno-maintain` | intake · direct fixes · gated changes · cross-estate sync · knowledge capture | reviewers/auditor · researchers/source-miner · reviewers/rubric-applier · writers/* |
 
-Ambiguous intent: ask which skill is meant. Uno skills (IDE) vs bot skills (Slack): `skills/README.md`.
+Uno skills (IDE) vs bot skills (Slack): `skills/README.md`; ask when intent is ambiguous.
 
 ## Agents — what skills summon
 
@@ -109,7 +109,7 @@ Ambiguous intent: ask which skill is meant. Uno skills (IDE) vs bot skills (Slac
 
 ## Conventions — what agents obey
 
-Authored protocol is normative: `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase), `docs/conventions/writing.md` (long-form and findings pages). Conventions are **canonical in this repo** (ADR-017): a conflicting legacy Notion page gets a superseded banner via uno-maintain.
+Authored protocol is normative: `docs/connectors/` (tools an agent acts on), `docs/engineering/` (this codebase), `docs/conventions/`. Conventions are **canonical in this repo** (ADR-017): a conflicting legacy Notion page gets a superseded banner via uno-maintain.
 
 **Placement:** content lives with its consumer; many-consumer content in `docs/`. **Cache the foundation, retrieve the rest:** product truth ← uno-blueprint (`writers/blueprint` / `search_blueprint`) · DS truth ← uno-storybook · team conventions ← `docs/conventions/`. **DS precedence on conflict:** uno-storybook > BS4 Foundation library > Figma spec pages; the loser gets a uno-maintain intake (source: 📐 System Overview).
 
@@ -121,12 +121,12 @@ Every embodiment, including Slack.
 2. **Props are read from source** (`read-source-first`, `no-hallucinated-props`): open the component's source before using a prop, and use only the props it declares.
 3. **Icons are Font Awesome Free** (`FA-Free-only`): `fa-solid`, `fa-regular`, `fa-brands`.
 4. **Notion writes follow `docs/connectors/notion/`**: select options, pillars, features and OKRs exact-match the database's own; a missing value is a question for the requester.
-5. **PLUS components first; interactive behavior on Base UI** (`PLUS-components-first`): new interactive behavior (open/closed state, focus, keyboard) builds on headless `@base-ui/react` styled on `--ds-*` tokens (ADR-037), drag on Pragmatic drag and drop (ADR-046); all other markup, Storybook docs chrome included, is PLUS components and `--ds-*` tokens. PLUS ships no Bootstrap (ADR-042).
+5. **PLUS components first; interactive behavior on Base UI** (`PLUS-components-first`): PLUS components before any other framework; new interactive behavior (open/closed state, focus, keyboard) builds on headless `@base-ui/react` styled on `--ds-*` tokens (ADR-037), drag on Pragmatic drag and drop (ADR-046); all other markup, Storybook docs chrome included, is PLUS components and `--ds-*` tokens. PLUS ships no Bootstrap (ADR-042).
 
 
 ## Knowledge
 
-Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, or **nothing** (`docs/knowledge/INDEX.md`; `npm run check:knowledge-disposition`).
+Finished work leaves a **rule** in the doc that owns the subject, an **ADR** under `docs/adr/`, or **nothing** (`docs/knowledge/INDEX.md`; `npm run check:knowledge-disposition` via `skills/uno-maintain`).
 
 
 
