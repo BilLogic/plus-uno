@@ -9,7 +9,7 @@
 // seam — and nowhere else; no caller and not this class computes an id.
 //
 // Storage keys: `hist:{channel}:{thread}`, `prop:{ts}`, `exec:{ts}`, `report:{ts}`,
-// `event:{event_id}`, `actx:{channel}:{thread}`, `cancel:{channel}:{thread}`,
+// `event:{event_id}`, `actx:[channel,thread]` (JSON), `cancel:{channel}:{thread}`,
 // `run:{user}`, `filing:{key}`, `cmp:{channel}:{thread}:{scenario}` (a check's record), `chk:{ts}`,
 // `whq:{ts}` (an open "which one?" question) and `whc:{ts}` (a card it lists), and the
 // alarm's own `gc:next`.
