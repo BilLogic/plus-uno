@@ -1,5 +1,6 @@
 import React from 'react';
 import { chartPalette } from '@/components';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 const { CATEGORICAL, BRAND, NEUTRAL, STATUS, SMART_SUBJECTS, SMART, HUES, sequentialRamp } = chartPalette;
 
@@ -30,7 +31,7 @@ const swatchBox = (token, extraStyle = {}) => ({
     ...extraStyle,
 });
 
-const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const label = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 /** A labeled row of swatches, one per token. */
 const Swatches = ({ items }) => (

@@ -20,6 +20,7 @@ import {
 } from '@/dataviz/chartMotion';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { resolveColor } from '@/dataviz/colorMode';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Specimens for Data visualizations/Foundations — the chart foundations
@@ -125,7 +126,7 @@ const barStyle = {
 
 const labelStyle = {
     color: 'var(--ds-text-subtle)',
-    font: 'var(--body-default)',
+    ...typeStyle('body-default'),
     fontWeight: 'var(--type-weight-medium)',
     fontVariantNumeric: 'tabular-nums',
 };

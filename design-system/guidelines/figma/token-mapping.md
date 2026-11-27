@@ -38,6 +38,8 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Metric/large | `var(--metric-lg)` |
 | Metric/medium | `var(--metric-md)` |
 | Metric/small | `var(--metric-sm)` |
+| Label/eyebrow | `var(--label-eyebrow)` |
+| Code/small | `var(--code-sm)` |
 | Family/heading | `var(--type-family-heading)` |
 | Family/body | `var(--type-family-body)` |
 | Family/code | `var(--type-family-code)` |
@@ -46,20 +48,25 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Weight/regular | `var(--type-weight-regular)` |
 | Weight/medium | `var(--type-weight-medium)` |
 | Weight/semibold | `var(--type-weight-semibold)` |
-| Letter spacing/none | `var(--type-tracking-none)` |
-| Letter spacing/tight | `var(--type-tracking-tight)` |
 | Letter spacing/tighter | `var(--type-tracking-tighter)` |
+| Letter spacing/close | `var(--type-tracking-close)` |
+| Letter spacing/tight | `var(--type-tracking-tight)` |
+| Letter spacing/snug | `var(--type-tracking-snug)` |
+| Letter spacing/none | `var(--type-tracking-none)` |
+| Letter spacing/open | `var(--type-tracking-open)` |
+| Letter spacing/loose | `var(--type-tracking-loose)` |
+| Letter spacing/wide | `var(--type-tracking-wide)` |
 
-A variable bound to letter spacing renders in pixels in Figma, so `Heading/xxlarge`, `xlarge` and `large` hold their tracking as an explicit percent (-2%, -1%, -1%) on the style, and the `Letter spacing/*` variables (-1, -2) read as percent of font size. The token generator matches a style's percent to the variable of the same value.
+A variable bound to letter spacing renders in pixels in Figma, so every text style holds its tracking as an explicit percent on the style (−2% from `Heading/xxlarge` to `Heading/medium` and on `Metric/large` and `Metric/medium`, −0.5% on `Heading/small` and `Metric/small`, +4% on `Label/eyebrow`), and the `Letter spacing/*` variables read as percent of font size. The token generator matches a style's percent to the variable of the same value, and each CSS text style gets a `-tracking` companion (`letter-spacing: var(--heading-lg-tracking)`).
 
-The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-lg)`). A button or tab label is `Body/default` with `Weight/medium`.
+The `Heading/*`, `Body/*`, `Metric/*`, `Label/eyebrow` and `Code/small` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-lg)`). A button or tab label is `Body/default` with `Weight/medium`.
 
 ### Text that carries no style
 
 Two kinds of text node carry no text style, and each binds its type variables directly so a token change still reaches it:
 
 - **A weighted label or run** (a button or Tab group label at `Weight/medium`, a semibold run inside body text): a weight change drops a node's text style, so the node binds `Font size/0875`, `Line height/125`, `Family/body` and the `Weight/*` it needs. Create no medium or semibold style for it.
-- **A code sample in docs**: `Code` has no Figma style, so the sample is Google Sans Code (`Family/code`) bound to `Font size/0875` and `Line height/125`.
+- **A code sample in docs**: `Code/default` has no Figma style, so the sample is Google Sans Code (`Family/code`) bound to `Font size/0875` and `Line height/125`.
 
 ## Spacing Tokens
 

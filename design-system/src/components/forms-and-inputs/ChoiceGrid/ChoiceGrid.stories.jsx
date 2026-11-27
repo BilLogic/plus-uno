@@ -6,6 +6,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
 import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Choice grid',
@@ -119,7 +120,7 @@ export const Variants = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
             <div>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
                     id="choice-grid-radio"
                     name="choice-grid-radio"
@@ -133,7 +134,7 @@ export const Variants = () => {
                 />
             </div>
             <div>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Checkbox (multiple per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Checkbox (multiple per row)</span>
                 <ChoiceGrid
                     id="choice-grid-checkbox"
                     name="choice-grid-checkbox"
@@ -180,7 +181,7 @@ export const Size = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: '864px' /* demo frame */ }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{size}</span>
                 <ChoiceGrid
                     id={`choice-grid-size-${size}`}
                     name={`choice-grid-size-${size}`}

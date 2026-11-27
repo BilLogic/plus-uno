@@ -18,6 +18,7 @@ import * as Demo from './modalDemo.jsx';
 import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
 import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
 import * as FullSizeCases from './ModalCases.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
@@ -31,7 +32,7 @@ const WIDTHS_AT_1024 = {
 };
 
 const bodyCopy = (
-    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+    <p style={{ margin: 0, ...typeStyle('body-default') }}>
         Move Thursday’s session with Ana Ruiz to 4:30 PM? Ana and her tutor get an email with the new time.
     </p>
 );
@@ -39,7 +40,7 @@ const bodyCopy = (
 const longBody = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {Array.from({ length: 12 }, (_, i) => (
-            <p key={i} style={{ margin: 0, font: 'var(--body-default)' }}>
+            <p key={i} style={{ margin: 0, ...typeStyle('body-default') }}>
                 {`Paragraph ${i + 1}: long body content, so the body scrolls once the modal reaches its cap.`}
             </p>
         ))}
@@ -195,8 +196,8 @@ const fields = (rows) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {rows.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{label}</span>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{value}</span>
+                <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{label}</span>
+                <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{value}</span>
             </div>
         ))}
     </div>
@@ -277,7 +278,7 @@ export const Tabs = {
 export const BodyMinHeight = {
     render: () => (
         <Demo.ModalStage title="Short body" screenHeight={320} footer={saveActions}>
-            <p style={{ margin: 0, font: 'var(--body-default)' }}>One line.</p>
+            <p style={{ margin: 0, ...typeStyle('body-default') }}>One line.</p>
         </Demo.ModalStage>
     ),
     play: async ({ canvasElement }) => {
@@ -294,7 +295,7 @@ export const CustomHeader = {
             ariaLabel="Reschedule session"
             header={(
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <strong style={{ font: 'var(--heading-md)' }}>Reschedule</strong>
+                    <strong style={{ ...typeStyle('heading-md') }}>Reschedule</strong>
                     <Button text="Help" spacing="compact" onClick={() => {}} />
                 </div>
             )}
@@ -762,7 +763,7 @@ export const WidthStrip = {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                 {MODAL_WIDTHS.map((width) => (
                     <Demo.ModalStage key={width} width={width} screenHeight={240} title={width} footer={<Demo.TwoCells action="Save" />}>
-                        <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${width} on the 1024 screen grid.`}</p>
+                        <p style={{ margin: 0, ...typeStyle('body-default') }}>{`${width} on the 1024 screen grid.`}</p>
                     </Demo.ModalStage>
                 ))}
             </div>
@@ -793,7 +794,7 @@ export const ResponsiveWidth = {
     render: ({ width }) => (
         <ScrollStage width={width}>
             <Demo.ModalStage width="8-col" screenWidth={width} screenHeight={260} title="Session settings" footer={<Demo.TwoCells action="Save" />}>
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>The Modal takes its width from the screen grid.</p>
+                <p style={{ margin: 0, ...typeStyle('body-default') }}>The Modal takes its width from the screen grid.</p>
             </Demo.ModalStage>
         </ScrollStage>
     ),
@@ -889,7 +890,7 @@ export const FooterTwo = {
 
 export const FooterThree = {
     name: 'Footer: Three buttons',
-    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.ThreeCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Save it as a draft, or schedule it now.</p></Demo.ModalStage>),
+    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.ThreeCells />}><p style={{ margin: 0, ...typeStyle('body-default') }}>Save it as a draft, or schedule it now.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -908,7 +909,7 @@ export const FooterThree = {
 
 export const FooterLeadingAction = {
     name: 'Footer: Leading action',
-    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.LeadingCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Delete the draft, save it, or schedule it.</p></Demo.ModalStage>),
+    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.LeadingCells />}><p style={{ margin: 0, ...typeStyle('body-default') }}>Delete the draft, save it, or schedule it.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -941,7 +942,7 @@ export const FooterDestructive = {
 
 export const FooterNarrow = {
     name: 'Footer: Single action in a narrow container',
-    render: () => sized(<Demo.ModalStage width="4-col" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
+    render: () => sized(<Demo.ModalStage width="4-col" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, ...typeStyle('body-default') }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -1077,7 +1078,7 @@ const bandStyle = (extra) => ({
     pointerEvents: 'none',
     background: guideFill('--ds-background-information-bold', 24),
     color: 'var(--ds-text-information-bolder)',
-    font: 'var(--body-sm)',
+    ...typeStyle('body-sm'),
     zIndex: 1,
     ...extra,
 });
@@ -1194,12 +1195,12 @@ export const BlanketConfirmOverPanel = {
                 <PanelContainer width="var(--panel-width-default)">
                     <PanelHeader title="Session" actions={<PanelCloseAction onClick={() => {}} />} />
                     <PanelBody>
-                        <p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday, 4:30 PM with Ana Ruiz.</p>
+                        <p style={{ margin: 0, ...typeStyle('body-default') }}>Thursday, 4:30 PM with Ana Ruiz.</p>
                     </PanelBody>
                 </PanelContainer>
             </div>
             <Modal inline show screenWidth={1024} screenHeight={520} width="6-col" title="Discard changes?" onClose={() => {}} footer={footerWithAction('Discard')} style={{ margin: 'auto' }}>
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>Your edits to this session are not saved.</p>
+                <p style={{ margin: 0, ...typeStyle('body-default') }}>Your edits to this session are not saved.</p>
             </Modal>
         </div>
     ),

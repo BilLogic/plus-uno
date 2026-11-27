@@ -15,13 +15,14 @@ import LogoConstruction from '@/assets/Logo/LogoConstruction';
 import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
 import { LogoExpressions } from '@/storybook-docs/logos/LogoExpressions.jsx';
 import { LockupSizes, LockupRule, WordmarkStep, TypedWordmarkFigure, TrackedWordmarkFigure } from '@/storybook-docs/logos/LogoWordmark.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
 export const Ground = ({ token, mode, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <div data-color-mode={mode} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
-        {caption && <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
+        {caption && <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
 
@@ -72,7 +73,7 @@ The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and be
     {LOGO_SIZES.map((s) => (
         <figure key={s} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
             <Mark size={s} />
-            <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{s}</figcaption>
+            <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{s}</figcaption>
         </figure>
     ))}
 </div>

@@ -213,7 +213,7 @@
 }
 
 .sbdocs .sb-docs-landing__link--current {
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
     color: var(--ds-text);
 }
 

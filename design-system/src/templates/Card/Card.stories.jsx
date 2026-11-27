@@ -11,6 +11,7 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
 import sessionSummaryDark from '@/assets/images/kit/session-summary-dark.svg';
 import { LONG_TUTOR, LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '@/components/_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
@@ -23,7 +24,7 @@ const DemoCaption = ({ children }) => (
         style={{
             display: 'block',
             marginBottom: 'var(--stack-md)',
-            font: 'var(--heading-xxs)',
+            ...typeStyle('heading-xxs'),
             color: 'var(--ds-text-subtle)',
         }}
     >
@@ -32,7 +33,7 @@ const DemoCaption = ({ children }) => (
 );
 
 const sessionBody = (
-    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
+    <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
 );
 
 /** One action that goes somewhere is a link, hugging the start of the footer. */
@@ -501,7 +502,7 @@ export const ImageStartHalf = placementStory('start', 'rest', '1/2');
 export const ImageEndHalf = placementStory('end', 'rest', '1/2');
 export const ImageTopIgnoresSplit = placementStory('top', 'rest', '1/2');
 
-const slotNote = (text) => <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
+const slotNote = (text) => <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{text}</span>;
 
 /** No header: the body carries its own title, as a metric tile does. */
 export const BodyOnly = () => (

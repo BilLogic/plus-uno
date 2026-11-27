@@ -59,7 +59,7 @@ export const Overview = () => (
 );
 
 /**
- * The header is a heading in Google Sans Flex medium at 20, the description sits under it in
+ * The header is a heading in Google Sans Flex regular at 20, the description sits under it in
  * the subtle ink, the two actions follow in order, and the character is hidden
  * from assistive technology. Text and header ink resolve from tokens in every mode.
  */

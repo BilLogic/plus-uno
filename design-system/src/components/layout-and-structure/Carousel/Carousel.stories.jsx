@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Carousel from './Carousel';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Layout and structure/Carousel',
@@ -45,7 +46,7 @@ const SlideArt = ({ accent, icon, eyebrow }) => (
         color: `var(--ds-icon-accent-${accent})`,
     }}>
         <i className={`fa-solid fa-${icon}`} aria-hidden="true" style={{ fontSize: 'var(--image-md)' }} />
-        <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-subtle)' }}>{eyebrow}</span>
+        <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text-subtle)' }}>{eyebrow}</span>
     </div>
 );
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { expect } from 'storybook/test';
 import { Tile, Button, Icon, IconButton } from '@/components';
 import { C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Specimens for Foundations/Iconography: Font Awesome Free glyphs at the three
@@ -13,7 +14,7 @@ export default {
 };
 
 const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
-const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 const code = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 
 const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-icon-subtle' }) => (
@@ -38,7 +39,7 @@ export const Sizes = () => (
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface-sunken)' }}>
                     <Glyph name={name} size={token} color="--ds-icon" />
                 </span>
-                <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
+                <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
                 <span style={caption}>{use}</span>
             </div>
         ))}
@@ -199,7 +200,7 @@ const EveryDateInDoFigure = () => (
     <>
         <span style={col('var(--stack-md)')}>
             {['Tuesday, June 3', 'Due Friday', 'Started May 12'].map((t) => (
-                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                     <Glyph name="calendar-days" />{t}
                 </span>
             ))}
@@ -211,7 +212,7 @@ const ThreeDifferentGlyphsDontFigure = () => (
     <>
         <span style={col('var(--stack-md)')}>
             {[['Tuesday, June 3', 'calendar-days'], ['Due Friday', 'clock'], ['Started May 12', 'flag']].map(([t, g]) => (
-                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                     <Glyph name={g} />{t}
                 </span>
             ))}

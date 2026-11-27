@@ -1,5 +1,5 @@
 import React from 'react';
-import { ColorPalette, ColorItem, Typeset } from '@storybook/addon-docs/blocks';
+import { ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
 import { TOKENS } from './docs-tokens.js';
 import { accentGroups, chartGroups, typeGroups } from './lib/token-data.mjs';
 import { typeStyle } from './lib/type-style.js';
@@ -26,25 +26,36 @@ export const AccentPalette = () => <Palette groups={accentGroups(TOKENS)} />;
 /** The chart tokens, one row per job. */
 export const ChartPalette = () => <Palette groups={chartGroups(TOKENS)} />;
 
-const SAMPLE = { metric: '1,284 sessions' };
+const SAMPLE = { metric: '1,284 sessions', label: 'Upcoming sessions', code: '0:30 – 5:10 · v14' };
 
-/** The Heading, Body and Metric text styles, one Typeset per family and weight. */
+/** A specimen in its own text style: font, tracking, and the figures or case the style adds. */
+const specimenStyle = (token) => ({
+    ...typeStyle(token.slice(2)),
+    color: 'var(--ds-text)',
+    margin: 0,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+});
+
+/** The text styles, one group per family and weight, each specimen in its own style. */
 export const TypeScaleBlocks = () => (
     <>
         {typeGroups(TOKENS).map((g) => (
             <section key={g.title} style={{ marginBlock: 'var(--stack-lg)' }}>
-                <h4 style={{ ...typeStyle('heading-xs'), letterSpacing: 'var(--heading-xs-tracking)', margin: 0, padding: 0 }}>
+                <h4 style={{ ...typeStyle('heading-xs'), margin: 0, padding: 0 }}>
                     {g.title} · {g.family} {g.weight}
                 </h4>
-                <p style={{ ...typeStyle('body-sm'), letterSpacing: 'var(--body-sm-tracking)', color: 'var(--ds-text-subtle)', margin: 0, padding: 0 }}>
-                    {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}${s.tracking ? ` ${s.tracking.replace('-', '\u2212')}` : ''}`).join(' · ')}
-                </p>
-                <Typeset
-                    fontFamily={`var(${g.familyToken})`}
-                    fontWeight={`var(${g.weightToken})`}
-                    fontSizes={g.styles.map((s) => s.size)}
-                    sampleText={SAMPLE[g.category] ?? 'Tutors plan the week from here'}
-                />
+                <div className="sb-ds-type-scale" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-md)' }}>
+                    {g.styles.map((s) => (
+                        <div key={s.token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
+                            <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
+                                {`${s.token} · ${s.size}/${s.lineHeight}${s.tracking ? ` · ${s.tracking.replace('-', '\u2212')}` : ''}`}
+                            </span>
+                            <p style={specimenStyle(s.token)}>{SAMPLE[g.category] ?? 'Tutors plan the week from here'}</p>
+                        </div>
+                    ))}
+                </div>
             </section>
         ))}
     </>

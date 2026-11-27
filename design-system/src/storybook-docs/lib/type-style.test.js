@@ -12,4 +12,16 @@ describe('typeStyle', () => {
             fontVariantNumeric: 'tabular-nums',
         });
     });
+    it('gives Code/small tabular figures and Label/eyebrow its capitals, as their utility classes do', () => {
+        expect(typeStyle('code-sm')).toEqual({
+            font: 'var(--code-sm)',
+            letterSpacing: 'var(--code-sm-tracking)',
+            fontVariantNumeric: 'tabular-nums',
+        });
+        expect(typeStyle('label-eyebrow')).toEqual({
+            font: 'var(--label-eyebrow)',
+            letterSpacing: 'var(--label-eyebrow-tracking)',
+            textTransform: 'uppercase',
+        });
+    });
 });

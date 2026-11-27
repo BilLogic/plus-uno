@@ -11,6 +11,7 @@ import {
 
 import { Illustration } from '@/components';
 import * as IllustrationsStories from './Illustrations.stories.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 <Meta of={IllustrationsStories} />
 
@@ -176,13 +177,13 @@ A single character carries the mood; a crowd competes with the message.
 
 export const TheTechnologyCharacterDoFigure = () => (
     <>
-    <FigureRow gap="lg"><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Technology & tools</strong></FigureRow>
+    <FigureRow gap="lg"><Illustration character="technology" size={48} /><strong style={{ ...typeStyle('heading-xs') }}>Technology & tools</strong></FigureRow>
     </>
 );
 
 export const TheMasteringContentDontFigure = () => (
     <>
-    <FigureRow gap="lg"><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Relationships</strong></FigureRow>
+    <FigureRow gap="lg"><Illustration character="mastering-content" size={48} /><strong style={{ ...typeStyle('heading-xs') }}>Relationships</strong></FigureRow>
     </>
 );
 
@@ -196,8 +197,8 @@ export const OneCharacterAboveDoFigure = () => (
     <>
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
         <Illustration character="relationships" size={96} />
-        <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
-        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+        <strong style={{ ...typeStyle('heading-xs') }}>No sessions yet</strong>
+        <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
     </div>
     </>
 );
@@ -206,8 +207,8 @@ export const FourCharactersCrowdingDontFigure = () => (
     <>
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
         <span style={{ display: 'flex' }}>{['mastering-content', 'advocacy', 'technology', 'relationships'].map((c) => <Illustration key={c} character={c} size={48} />)}</span>
-        <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
-        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+        <strong style={{ ...typeStyle('heading-xs') }}>No sessions yet</strong>
+        <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
     </div>
     </>
 );

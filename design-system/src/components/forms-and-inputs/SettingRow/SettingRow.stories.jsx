@@ -5,6 +5,7 @@ import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { Button, Flag, FlagGroup, Select, StatusTag, Toggle } from '@/components';
 import SettingRow from './SettingRow';
 import { LONG_SENTENCE, LONG_SCHOOL, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 const LEAD_TIME_OPTIONS = [
     { value: '15m', label: '15 minutes before' },
@@ -19,7 +20,7 @@ const containerStyle = {
 
 const groupHeadingStyle = {
     margin: '0 0 var(--stack-sm)',
-    font: 'var(--heading-sm)',
+    ...typeStyle('heading-sm'),
     color: 'var(--ds-text)',
 };
 

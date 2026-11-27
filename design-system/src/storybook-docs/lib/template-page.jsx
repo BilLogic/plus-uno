@@ -371,7 +371,7 @@ export const LiveAnatomy = ({ width, live = false, scrollable = false, parts, ti
                                 background: 'var(--ds-background-brand-bold)',
                                 color: 'var(--ds-text-inverse)',
                                 ...typeStyle('body-sm'),
-                                fontWeight: 'var(--type-weight-semibold)',
+                                fontWeight: 'var(--type-weight-medium)',
                             }}
                         >
                             {i + 1}

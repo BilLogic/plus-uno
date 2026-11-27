@@ -274,8 +274,7 @@ const AnatomyItem = ({ title, token, children, figure }) => (
     >
       <strong
         style={{
-          ...typeStyle('body-default'),
-          fontWeight: "var(--type-weight-semibold)",
+          ...typeStyle('heading-xs'),
         }}
       >
         {title}

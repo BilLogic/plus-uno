@@ -6,6 +6,7 @@ import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
 import Icon, { ICON_COLORS, ICON_SIZES, ICON_STYLES } from './Icon';
 import { Ground } from '@/storybook-docs/lib/ground.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * `Icon` -- one Font Awesome Free glyph, drawn from its name.
@@ -40,7 +41,7 @@ export default {
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)' };
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)' };
-const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 const SIZE_TOKEN = { 12: '--icon-sm', 16: '--icon-md', 24: '--icon-lg' };
 const colorToken = (role) => (role === 'default' ? '--ds-icon' : `--ds-icon-${role}`);

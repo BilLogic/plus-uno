@@ -21,6 +21,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { fullSizeStory } from '@/storybook-docs/lib/full-size.jsx';
 import * as FullSizeCases from './FrameCases.jsx';
 import * as FrameExample from './FrameExamples.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Frame — the app frame: the Sidebar beside the Page (and the Panel). Open, the Sidebar's own toggle ends its logo row; closed, the
@@ -45,7 +46,7 @@ const slot = (label, minHeight = '80px' /* demo frame */) => (
             border: 'var(--border-width-default) dashed var(--ds-border-bold)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
-            font: 'var(--body-default)',
+            ...typeStyle('body-default'),
         }}
     >
         {label}
@@ -310,7 +311,7 @@ export const PairWithoutSidebar = { args: { sidebar: undefined } };
 
 /** Don't: a page title in the header row in place of the breadcrumb. */
 export const PairTitleInHeader = {
-    args: { header: <span style={{ font: 'var(--heading-lg)', color: 'var(--ds-text)' }}>Dashboard</span> },
+    args: { header: <span style={{ ...typeStyle('heading-lg'), color: 'var(--ds-text)' }}>Dashboard</span> },
 };
 
 /** The playground: the frame at the docs height, with its layout props live. */
@@ -1717,7 +1718,7 @@ export const LayoutMultiStepTaskLeaves = {
         const [left, setLeft] = useState('');
         return (
             <div>
-                <p data-probe="left" style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{left || 'In the task'}</p>
+                <p data-probe="left" style={{ margin: 0, ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{left || 'In the task'}</p>
                 <MultiStepTaskType count={4} start={1} scrollable onSaveAndExit={() => setLeft('Saved and exited')} onLeave={() => setLeft('Left through Back')} />
             </div>
         );
@@ -2679,7 +2680,7 @@ const RecordOverlayDemo = () => {
                                 />
                                 <PanelBody>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-                                        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                                        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
                                             {panelStudent?.detail}
                                         </p>
                                         <div>

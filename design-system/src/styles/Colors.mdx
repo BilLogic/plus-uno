@@ -11,6 +11,7 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 import { AccentPalette, ChartPalette } from '@/storybook-docs/token-blocks.jsx';
 import * as ColorsStories from './Colors.stories.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 <Meta of={ColorsStories} />
 
@@ -428,7 +429,7 @@ export const BiggestAtTheDoFigure = () => (
     <>
     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--ds-background-accent-blue-subtler']].map(([label, n, tone]) => (
-            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
+            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', ...typeStyle('body-sm') }}>
                 <span>{label}</span>
                 <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />
             </li>
@@ -441,7 +442,7 @@ export const GradesInAnyDontFigure = () => (
     <>
     <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
-            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
+            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', ...typeStyle('body-sm') }}>
                 <span>{label}</span>
                 <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-neutral)' }} />
             </li>
@@ -452,7 +453,7 @@ export const GradesInAnyDontFigure = () => (
 
 export const AGreenTickDoFigure = () => (
     <>
-    <div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
+    <div style={{ ...typeStyle('body-sm'), marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
     <div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--chart-success)' }}>
         <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />
         <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--chart-success-bold)' }} />
@@ -462,7 +463,7 @@ export const AGreenTickDoFigure = () => (
 
 export const AShadedBandDontFigure = () => (
     <>
-    <div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
+    <div style={{ ...typeStyle('body-sm'), marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
     <div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--chart-success)' }}>
         <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--chart-brand)' }} />
     </div>
@@ -471,13 +472,13 @@ export const AShadedBandDontFigure = () => (
 
 export const DisabledTakesColorDoFigure = () => (
     <>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', ...typeStyle('body-default'), fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
     </>
 );
 
 export const OpacityOnTheDontFigure = () => (
     <>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', ...typeStyle('body-default'), fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
     </>
 );
 
@@ -508,8 +509,8 @@ export const APurpleAccentDontFigure = () => (
 export const DangerTextOnDoFigure = () => (
     <>
     <div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
-        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
-        <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
+        <strong style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text-danger)' }}>Payment failed</strong>
+        <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
     </div>
     </>
 );
@@ -517,8 +518,8 @@ export const DangerTextOnDoFigure = () => (
 export const GrayTextOnDontFigure = () => (
     <>
     <div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
-        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
-        <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
+        <strong style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
+        <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
     </div>
     </>
 );

@@ -1,7 +1,8 @@
 /* The type token set, generated from Figma's `typography` collection: the font
    primitives (`--type-size-075` … and `--type-line-height-100` …), the
    `--type-family-*` and `--type-weight-*` variables, and the text styles
-   (`--heading-*`, `--body-*`, `--metric-*`, `--code-default`). Pulled in here so every
+   (`--heading-*`, `--body-*`, `--metric-*`, `--label-eyebrow`, `--code-sm`,
+   `--code-default`). Pulled in here so every
    entry point that loads this file gets it. */
 @use "type";
 
