@@ -726,6 +726,15 @@ export const CHECKS = [
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
+    name: 'check:writeback-gate',
+    script: 'node .cursor/hooks/uno-writeback/test-gate.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason: 'an assert-based suite that spawns the runner for each runtime and throws on the first broken invariant.',
+    guards: 'the Figma write-back gate on Cursor, Claude Code and Codex: inert without a write-back prompt, briefing on one, session end clears it.',
+  },
+  {
     name: 'check:build-load',
     script: 'node scripts/check-build-load.mjs',
     pkg: 'root',

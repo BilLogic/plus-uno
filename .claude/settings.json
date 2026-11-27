@@ -16,6 +16,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/run.mjs\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-writeback/run.mjs\"",
+            "timeout": 10
           }
         ]
       }
@@ -38,6 +43,11 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-prototype/run.mjs\" --session-end",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/uno-writeback/run.mjs\" --session-end",
             "timeout": 5
           }
         ]

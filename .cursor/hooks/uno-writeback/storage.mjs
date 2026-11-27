@@ -4,8 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { AUDIT_PASS_RELATIVE, GATE_BRIEFING_RELATIVE } from './constants.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const STATE_DIR = path.join(__dirname, '..', 'state');
-const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
+
+// UNO_WRITEBACK_HOOKS_DIR points state/ and briefings/ elsewhere (tests use a temp dir).
+function hooksDir() {
+  return process.env.UNO_WRITEBACK_HOOKS_DIR || path.join(__dirname, '..');
+}
+const stateDir = () => path.join(hooksDir(), 'state');
+const briefingDir = () => path.join(hooksDir(), 'briefings');
 
 /**
  * @typedef {object} WritebackSession
@@ -16,8 +21,8 @@ const BRIEFING_DIR = path.join(__dirname, '..', 'briefings');
  */
 
 function ensureDirs() {
-  fs.mkdirSync(STATE_DIR, { recursive: true });
-  fs.mkdirSync(BRIEFING_DIR, { recursive: true });
+  fs.mkdirSync(stateDir(), { recursive: true });
+  fs.mkdirSync(briefingDir(), { recursive: true });
 }
 
 /**
@@ -25,7 +30,7 @@ function ensureDirs() {
  */
 function sessionPath(conversationId) {
   const safe = conversationId.replace(/[^a-zA-Z0-9_-]/g, '_');
-  return path.join(STATE_DIR, `writeback-${safe}.json`);
+  return path.join(stateDir(), `writeback-${safe}.json`);
 }
 
 /**
@@ -63,13 +68,31 @@ export function clearSession(conversationId) {
   clearAuditPass();
 }
 
+/**
+ * Session end: drop this session's state, and the gate and audit-pass files
+ * only when they belong to it.
+ * @param {string} conversationId
+ */
+export function endSession(conversationId) {
+  const file = sessionPath(conversationId);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+  for (const name of ['active-writeback-gate.json', 'writeback-audit-pass.json']) {
+    const owned = path.join(briefingDir(), name);
+    try {
+      if (JSON.parse(fs.readFileSync(owned, 'utf8')).conversationId === conversationId) fs.unlinkSync(owned);
+    } catch {
+      // absent or unreadable: nothing of this session's to remove
+    }
+  }
+}
+
 export function clearGateBriefing() {
-  const file = path.join(BRIEFING_DIR, 'active-writeback-gate.json');
+  const file = path.join(briefingDir(), 'active-writeback-gate.json');
   if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 export function clearAuditPass() {
-  const file = path.join(BRIEFING_DIR, 'writeback-audit-pass.json');
+  const file = path.join(briefingDir(), 'writeback-audit-pass.json');
   if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
@@ -102,7 +125,7 @@ export function resolveRepoRoot(workspaceRoots = []) {
  * @returns {boolean}
  */
 export function hasAuditPass(conversationId) {
-  const file = path.join(BRIEFING_DIR, 'writeback-audit-pass.json');
+  const file = path.join(briefingDir(), 'writeback-audit-pass.json');
   if (!fs.existsSync(file)) return false;
   try {
     const pass = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -137,7 +160,7 @@ export function writeGateBriefing(conversationId, triggerPrompt) {
     ],
     triggerPrompt,
   };
-  fs.writeFileSync(path.join(BRIEFING_DIR, 'active-writeback-gate.json'), JSON.stringify(payload, null, 2));
+  fs.writeFileSync(path.join(briefingDir(), 'active-writeback-gate.json'), JSON.stringify(payload, null, 2));
 }
 
 export function buildAgentGateInstruction() {
