@@ -74,6 +74,6 @@ Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy an
 
 ## Docs blocks
 
-- A rule that is not a status is a `Callout` from `foundation-blocks.jsx`; a Banner is for status. A matched pair of examples is `DoDont`. A focus-ring demo is `RingDemo`, and an icon in a demo is `Glyph`, which passes `size` (12, 16 or 24) to Icon.
+- A rule that is not a status is a `Callout` from `foundation-blocks.jsx`; a Banner is for status. A matched pair of examples is `DoDont`. A focus-ring demo is `RingDemo`, and an icon in a demo is `Glyph`, which passes `size` (12 or 16) to Icon.
 - A hero's links row takes no label: `DocsLanding` defaults it to "Tokens".
 - `design-system/src/storybook-docs/foundation-names.test.js` fails a Foundations page that names a retired Figma collection or group.

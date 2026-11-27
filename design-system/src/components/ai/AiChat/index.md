@@ -106,7 +106,7 @@ Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 
 ## Parts
 
-1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
+1. **Button.** A primary circle Icon button with the AI icon at 16, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
 2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close.
 3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
 4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.

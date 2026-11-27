@@ -185,7 +185,7 @@ One home per fact: the owning page states it, and every other page links to it. 
 | The no-colored-side-stripe rule | Border | None restates it |
 | Heading levels and the one `h1` per page | Typography | Accessibility links |
 | How disabled looks | Color | Accessibility keeps the behavior rules (not a focus target, a visible reason) |
-| Icon sizes 12, 16, 24 | Iconography | Typography, Dimensions link |
+| Icon sizes 12 · 16 plain; 24 inside Tile and Avatar | Iconography | Typography, Dimensions link |
 | Contrast pairs and chart color | Color | Accessibility links |
 | Alt text for the logo | Logos, under Accessibility | None |
 

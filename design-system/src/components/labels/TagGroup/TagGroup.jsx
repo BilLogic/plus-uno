@@ -102,7 +102,7 @@ const menuRowOf = (child) => {
                     key={child.key}
                     component={props.linkComponent || 'a'}
                     href={props.href}
-                    elemAfter={<Icon name="arrow-right" />}
+                    elemAfter={<Icon name="arrow-right" size={12} />}
                     onClick={props.onClick}
                 >
                     {text}

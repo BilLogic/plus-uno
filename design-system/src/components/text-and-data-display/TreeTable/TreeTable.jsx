@@ -287,7 +287,7 @@ const TreeTable = ({
                                                     >
                                                         {toggleState === 'loading' && <Spinner size={16} />}
                                                         {(toggleState === 'expanded' || toggleState === 'collapsed') && (
-                                                            <Icon name={toggleState === 'expanded' ? 'chevron-down' : 'chevron-right'} />
+                                                            <Icon name={toggleState === 'expanded' ? 'chevron-down' : 'chevron-right'} size={12} />
                                                         )}
                                                     </span>
                                                 </>

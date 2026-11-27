@@ -89,7 +89,7 @@ const DropdownMenu = ({
                     >
                         {hasError && !isLoading ? (
                             <MenuGroup spacing={spacing} minWidth={minWidth}>
-                                <CustomItem elemBefore={<Icon name="circle-exclamation" />}>Couldn't load options</CustomItem>
+                                <CustomItem elemBefore={<Icon name="circle-exclamation" size={12} />}>Couldn't load options</CustomItem>
                                 <ButtonItem onClick={onRetry} data-keep-open="true">Retry</ButtonItem>
                             </MenuGroup>
                         ) : isLoading ? (

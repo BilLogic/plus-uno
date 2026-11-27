@@ -27,30 +27,32 @@ Pick the plainest glyph most people read the same way (calendar for dates, bell 
 
 A label states what the icon does and names it for screen readers. Leave an icon unlabeled only for a familiar action in a tight space, and give the control an accessible `label` in code.
 
-## Sizes: 12, 16 and 24
+## Sizes: 12 and 16
 
-Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Angles and chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
+A plain icon is 12 or 16, bound to `Size/Icon` tokens. An unsized glyph is 16, and it never scales with the text around it, headings included. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Angles and chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
 
 The swatches sit in a 48 preview frame for display; the icon's own box is its size, and the hit area comes from the control around it.
 
 | Size (px) | Figma token | Code | Use |
 | --- | --- | --- | --- |
 | 12 | `Size/Icon/sm` | `--icon-sm` | Angles and chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |
-| 16 | `Size/Icon/md` | `--icon-md` | Default beside 14 and 16 text in buttons, menus, fields and lists. |
-| 24 | `Size/Icon/lg` | `--icon-lg` | Empty states, section headers and standalone status marks. Above 24, use a Tile. |
+| 16 | `Size/Icon/md` | `--icon-md` | The default: an unsized glyph, and beside 14 and 16 text in buttons, menus, fields and lists. |
+| 24 | `Size/Icon/lg` | `--icon-lg` | The glyph Tile 40/48 and Avatar draw; never a plain icon. |
 
-## Above 24, use a Tile
+## Above 16, use a Tile
 
-24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a Tile, which sets its size, radius and fill together.
+16 is the top of the plain icon scale. A larger mark, tool logo or empty-state symbol belongs in a Tile (16 to 48), which sets its size, radius and fill together and picks the glyph inside: 12 at Tile 16/20, 16 at Tile 24/32, 24 at Tile 40/48.
+
+A glyph in a heading is a plain 16; it does not scale with the heading. A bigger mark beside a heading is a Tile placed on purpose and sized to the heading's line height: about Tile 32 for an h1, Tile 24 for an h2.
 
 ## Tile or bare icon
 
-An icon's box is the square of its size: 12, 16 or 24. That box only sets how big the glyph draws. A container around it — a button, a field, a list row or a Tile — sets the padding, the background and the hit area. A clickable icon's hit area always comes from its control, never from the glyph.
+A plain icon's box is the square of its size: 12 or 16. That box only sets how big the glyph draws. A container around it — a button, a field, a list row or a Tile — sets the padding, the background and the hit area. A clickable icon's hit area always comes from its control, never from the glyph.
 
 - **Bare icon:** use when the glyph sits inline with text or inside a control such as a button, field, menu or list row, with no background of its own.
-- **Tile:** use when the glyph stands for a thing (a file kind, a tool or a category), needs a colored ground, or needs to read larger than 24, as in empty states. Tile colors mark categories, never statuses, so a status icon (error, queued, success) stays bare even in a slot where Tiles sit.
+- **Tile:** use when the glyph stands for a thing (a file kind, a tool or a category), needs a colored ground, or needs to read larger than 16, as in empty states. Tile colors mark categories, never statuses, so a status icon (error, queued, success) stays bare even in a slot where Tiles sit.
 
-There is no 20 icon. Icon sizes are 12, 16 and 24 only. Tile sizes are a separate scale, and `Tile` picks the glyph size for each.
+There is no 20 or 24 plain icon. Plain icon sizes are 12 and 16 only. Tile sizes are a separate scale, and `Tile` picks the glyph size for each.
 
 ## Font Awesome Free and color tokens
 
@@ -62,7 +64,7 @@ Color icons with `--ds-icon-*` tokens (`--ds-icon-success`, `--ds-icon-danger`, 
 
 | Component | Job |
 | --- | --- |
-| Icon | Backs up a text label at 12, 16 or 24. |
+| Icon | Backs up a text label at 12 or 16. |
 | Tile | Frames an icon, partner/tool logo or picture at 16 to 48. |
 | Logo | Marks PLUS itself. |
 | Image | Places a photo or graphic in content. |

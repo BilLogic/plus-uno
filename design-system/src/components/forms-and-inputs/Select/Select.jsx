@@ -415,7 +415,7 @@ const Select = ({
         header = (
             <button type="button" className="plus-select-all" aria-pressed={allPicked} onClick={toggleAll}>
                 <span aria-hidden="true" className={`plus-select-all-mark${allPicked ? ' is-checked' : ''}`}>
-                    {allPicked && <Icon name="check" />}
+                    {allPicked && <Icon name="check" size={12} />}
                 </span>
                 Select all
             </button>

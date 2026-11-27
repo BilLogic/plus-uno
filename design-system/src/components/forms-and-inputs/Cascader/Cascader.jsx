@@ -349,7 +349,7 @@ const Cascader = ({
                     invalidIcon
                     onClick={handleInputClick}
                     elemAfter={(
-                        <Icon name="angle-down" className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />
+                        <Icon name="angle-down" size={12} className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />
                     )}
                 >
                     <ClippedTooltip text={isOpen ? '' : displayText} placement="top" deps={[displayText, isOpen]}>

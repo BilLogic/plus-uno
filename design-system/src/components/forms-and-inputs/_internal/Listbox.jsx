@@ -454,7 +454,7 @@ const Listbox = ({
 export const ListboxMessage = ({ kind, onRetry, children }) => (
     <div className={`plus-listbox-message plus-listbox-message--${kind}`} role="presentation">
         {kind === 'loading' && <Spinner size={16} label="" />}
-        {kind === 'error' && <Icon name="circle-exclamation" />}
+        {kind === 'error' && <Icon name="circle-exclamation" size={12} />}
         <span>{children}</span>
         {kind === 'error' && onRetry && (
             <button type="button" className="plus-listbox-retry" tabIndex={-1} onClick={onRetry}>Retry</button>

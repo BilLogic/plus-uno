@@ -37,17 +37,16 @@ body {
     overscroll-behavior: none;
 }
 
-/* A glyph with no size of its own sits one step under the body text, at the
-   small icon size. */
-body :is(.fa-solid, .fa-regular, .fas, .far) {
-    font-size: var(--icon-sm);
+/* A glyph with no size of its own is a plain 16: the default icon size. It
+   never scales with the text around it, headings included. */
+body :is(.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab) {
+    font-size: var(--icon-md);
     line-height: var(--type-line-height-150);
 }
 
 /* Bare heading elements take the heading text style that matches their level
    (h1 xxl, h2 lg, h3 md, h4 sm, h5 xs, h6 xxs), the same pairing the Heading component uses; a
-   component that names its own text style wins. A glyph in a heading takes the
-   heading's size. */
+   component that names its own text style wins. */
 h1,
 h2,
 h3,
@@ -86,9 +85,4 @@ h5 {
 h6 {
     font: var(--heading-xxs);
     letter-spacing: var(--heading-xxs-tracking);
-}
-
-:is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {
-    font-size: inherit;
-    line-height: inherit;
 }

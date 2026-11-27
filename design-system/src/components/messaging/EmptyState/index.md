@@ -2,7 +2,7 @@
 
 # EmptyState
 
-What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure ("Couldn't load sessions" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in: in a Tile on `default` spacing, bare at 24 on `compact`. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
+What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure ("Couldn't load sessions" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in: in a Tile 48 on `default` spacing, a Tile 32 on `compact`; the Tile picks the glyph. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
 
 Also asked as: no data, zero state, blank slate.
 
@@ -110,7 +110,7 @@ Same group: `Banner` · `Dialog` · `Flag` · `InlineMessage` · `NotificationIt
 
 ## Parts
 
-1. **Picture.** An `image` slot or a Font Awesome Free `icon`, which sits in a `Tile` on the default spacing and bare when compact. Decorative and hidden from assistive technology.
+1. **Picture.** An `image` slot or a Font Awesome Free `icon`, which sits in a `Tile` 48 on the default spacing and a `Tile` 32 when compact. Decorative and hidden from assistive technology.
 2. **Header.** A heading one level below the section that holds it.
 3. **Description.** One line on what goes here and what to do.
 4. **Actions.** One primary `Button` and an optional secondary one.
@@ -131,7 +131,7 @@ Same group: `Banner` · `Dialog` · `Flag` · `InlineMessage` · `NotificationIt
 | --- | --- |
 | Header | `--heading-md` (default), `--heading-sm` (compact), `--ds-text` |
 | Description | `--body-default`, `--ds-text-subtle` |
-| Icon | A gray Tile 40 holding the glyph at `--icon-lg`; compact is the bare icon at `--icon-lg` in `--ds-icon-subtle` |
+| Icon | A gray Tile 48, or Tile 32 when compact; the Tile picks the glyph |
 | Spacing | `--stack-sm`, `--stack-md` (compact), `--stack-xl`, `--inline-md`; padding is `--stack-3xl` plus `--stack-md` above and below and `--screen-pad-x` to the sides, or `--stack-2xl` and `--pad-x-lg` when compact |
 | Width | `--section-min-width-main` |
 
@@ -167,7 +167,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-default-tracking` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--icon-lg` · `--inline-md` · `--pad-x-lg` · `--screen-pad-x` · `--section-min-width-main` · `--stack-2xl` · `--stack-3xl` · `--stack-md` · `--stack-sm` · `--stack-xl`
+`--body-default` · `--body-default-tracking` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--heading-md-tracking` · `--heading-sm` · `--heading-sm-tracking` · `--inline-md` · `--pad-x-lg` · `--screen-pad-x` · `--section-min-width-main` · `--stack-2xl` · `--stack-3xl` · `--stack-md` · `--stack-sm` · `--stack-xl`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 

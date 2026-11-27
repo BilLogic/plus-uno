@@ -90,13 +90,13 @@ export const WithIcon = () => (
     />
 );
 
-/** With no image, the Font Awesome icon stands in inside a gray Tile 40, decorative and in the subtle icon ink in every mode. */
+/** With no image, the Font Awesome icon stands in inside a gray Tile 48, decorative and in the subtle icon ink in every mode. */
 WithIcon.play = async ({ canvasElement }) => {
     const tile = canvasElement.querySelector('.plus-empty-state__icon');
-    await expect(tile.classList.contains('plus-tile--40'), 'the icon sits in a Tile 40').toBe(true);
+    await expect(tile.classList.contains('plus-tile--48'), 'the icon sits in a Tile 48').toBe(true);
     await expect(tile.querySelector('.fa-calendar-plus'), 'the named icon').not.toBeNull();
     await expect(tile.getAttribute('aria-hidden'), 'decorative').toBe('true');
-    await expect(Math.round(tile.getBoundingClientRect().width), 'Tile 40 is 40 wide').toBe(40);
+    await expect(Math.round(tile.getBoundingClientRect().width), 'Tile 48 is 48 wide').toBe(48);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(tile).color, `icon, ${mode}`).toBe(token('--ds-icon-subtle'));
     });
@@ -129,11 +129,11 @@ export const Compact = () => (
     />
 );
 
-/** Compact drops the header to Heading/small 16 in the sans family, and keeps a bare icon at 24 with no Tile. */
+/** Compact drops the header to Heading/small 16 in the sans family, and frames the icon in a Tile 32. */
 Compact.play = async ({ canvasElement }) => {
     const icon = canvasElement.querySelector('.plus-empty-state__icon');
-    await expect(icon.closest('.plus-tile'), 'no Tile when compact').toBeNull();
-    await expect(px(getComputedStyle(icon).fontSize), 'bare icon at --icon-lg').toBe(24);
+    await expect(icon.classList.contains('plus-tile--32'), 'a Tile 32 when compact').toBe(true);
+    await expect(Math.round(icon.getBoundingClientRect().width), 'Tile 32 is 32 wide').toBe(32);
     const heading = within(canvasElement).getByRole('heading', { name: 'No students yet' });
     await expect(px(getComputedStyle(heading).fontSize), 'size 16').toBe(16);
     await expect(getComputedStyle(heading).fontFamily, 'sans below 20').toMatch(/Google Sans Flex/);

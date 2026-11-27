@@ -134,7 +134,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Row | `--control-sm` (24); gap `--inline-md`. |
 | Label | `--ds-text`, body default. |
 | Card | `--radius-control-md`, `--border-width-default` edge in `--ds-border`, `--ds-surface` fill. |
-| Soft row | `--radius-control-md`, `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
+| Soft row | `--radius-control-md`, `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-md` trailing check in `--ds-icon-selected`. |
 | Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`. |
 
 ## Content guidelines

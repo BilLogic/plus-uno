@@ -412,7 +412,7 @@
       "import": "import { AiIcon } from '@/components';",
       "group": "ai",
       "source": "design-system/src/components/ai/AiIcon/AiIcon.jsx",
-      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
+      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default). Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
           "name": "name",
@@ -438,8 +438,7 @@
           "default": "16",
           "values": [
             "12",
-            "16",
-            "24"
+            "16"
           ],
           "description": "The icon's size in px. 12 exists for generate and stop-generating only.",
           "deprecated": null
@@ -481,7 +480,6 @@
         "Rest"
       ],
       "tokens": [
-        "--icon-lg",
         "--icon-md",
         "--icon-sm"
       ]
@@ -5327,7 +5325,7 @@
       "import": "import { EmptyState } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/EmptyState/EmptyState.jsx",
-      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in: in a Tile on `default` spacing, bare at 24 on `compact`. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
+      "summary": "What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. It also fills the slot when content cannot be shown: a load failure (\"Couldn't load sessions\" with Try again) or no access (the plain reason and who can help). Those are the same parts with different words, so they need no props of their own. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in: in a Tile 48 on `default` spacing, a Tile 32 on `compact`; the Tile picks the glyph. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional default Button after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.",
       "props": [
         {
           "name": "header",
@@ -5423,14 +5421,12 @@
       "tokens": [
         "--body-default",
         "--body-default-tracking",
-        "--ds-icon-subtle",
         "--ds-text",
         "--ds-text-subtle",
         "--heading-md",
         "--heading-md-tracking",
         "--heading-sm",
         "--heading-sm-tracking",
-        "--icon-lg",
         "--inline-md",
         "--pad-x-lg",
         "--screen-pad-x",
@@ -7294,7 +7290,7 @@
       "import": "import { Icon } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Icon/Icon.jsx",
-      "summary": "One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where Free has a regular and solid where it does not; `regular` falls back to solid the same way. `solid` always draws solid. A name that carries its family ignores it. - **size** is 12, 16 or 24, each bound to its icon size token. Without it the glyph is the small icon size, or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.",
+      "summary": "One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where Free has a regular and solid where it does not; `regular` falls back to solid the same way. `solid` always draws solid. A name that carries its family ignores it. - **size** is 12 or 16, each bound to its icon size token. Without it the glyph is 16 (`--icon-md`), or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.",
       "props": [
         {
           "name": "name",
@@ -7324,10 +7320,9 @@
           "default": null,
           "values": [
             "12",
-            "16",
-            "24"
+            "16"
           ],
-          "description": "The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets.",
+          "description": "The size in px, bound to an icon size token. Unset, the glyph is 16, or the size the component around it sets.",
           "deprecated": null
         },
         {
@@ -7406,7 +7401,6 @@
         "--ds-icon-success",
         "--ds-icon-warning",
         "--ds-icon-warning-inverse",
-        "--icon-lg",
         "--icon-md",
         "--icon-sm"
       ]

@@ -17,7 +17,7 @@
 ## Usage
 
 Use `ProgressRing` when a task has a known percent done and sits in an
-icon-sized slot, such as an uploading file row where a list of horizontal bars
+icon-sized slot, such as the lead of an uploading file row where a list of horizontal bars
 would crowd the view. A ring is never indeterminate.
 
 ### Appearance guidance
@@ -62,10 +62,10 @@ Don't: A bare ring with no surrounding context.
 
 ### Match `size` from `PROGRESS_RING_SIZES` to the icon slot it replaces. {#match-size-from-progressringsizes-to-the-icon-slot-it-replaces}
 
-Use `size={24}` in a row's leading slot so the ring matches a 24 icon, and
-`size={16}` beside compact text or a 16 icon.
+Use `size={24}` where the slot holds a 24 icon, and `size={16}` beside compact
+text or a 16 icon.
 
-Do: A ring sized to match the row's leading icon slot.
+Do: A ring sized to match the 24 icon slot.
 Don't: An undersized ring that looks lost beside a larger icon slot.
 
 ### Use `appearance="inverse"` on bold surfaces. {#use-appearance-inverse-on-bold-surfaces}

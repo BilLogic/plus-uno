@@ -79,7 +79,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Lead (`start`).** A `--image-md` (`32px`) slot. A `done` item sits in a gray `Tile` 32: the folder icon when `kind="folder"`, or the matching file-type icon when `kind="file"`. A status stays bare and centered in the slot, never in a Tile: a `subtlest` clock when `queued`, a 24 `ProgressRing` when `uploading`, a danger icon on `error`.
+1. **Lead (`start`).** A `--image-md` (`32px`) slot. A `done` item sits in a gray `Tile` 32: the folder icon when `kind="folder"`, or the matching file-type icon when `kind="file"`. A status stays bare and centered in the slot, never in a Tile: a `subtlest` clock when `queued`, a 16 `ProgressRing` when `uploading` (the same 16 as the other status icons, so the row does not jump), a danger icon on `error`.
 2. **Name (`label`).** Single-line name that truncates before the extension so `.mp4` or `.pdf` remains readable, wrapped in a `Tooltip` with the full name. Opens via `Link` when `href` is set on a `done` item.
 3. **Meta (`description`).** Single-line secondary status: `Waiting` when `queued`, `Uploading · <n>%` when `uploading`, `meta` (or `Uploaded`) when `done`, and the `error` message in danger text on `error`.
 4. **Actions (`end`).** Omitted when `isReadOnly` or `isDisabled`. Draws a compact subtle X `IconButton` for `cancel` and `remove`, or a trash `IconButton` that confirms via `Popup` for `delete`. On `error`, a compact subtle `Retry` `Button` precedes the X control.
@@ -89,7 +89,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | State | What changes |
 | --- | --- |
 | Queued | Clock icon in `--ds-icon-subtlest`, `Waiting` in `--ds-text-subtle`, and Cancel X. |
-| Uploading | `ProgressRing` at `--icon-lg`, `Uploading · &lt;n&gt;%` in `--ds-text-subtle`, and Cancel X. |
+| Uploading | `ProgressRing` at `--icon-md`, `Uploading · &lt;n&gt;%` in `--ds-text-subtle`, and Cancel X. |
 | Done | File-type or folder icon in a gray Tile 32, `meta` (size, count, or date), optional `href` link, and Remove X or Delete trash with confirmation. |
 | Error | Danger icon in `--ds-icon-danger`, cause-and-fix message in `--ds-text-danger`, and `Retry` before Remove X. |
 | Read-only | Full contrast and openable `href` link, with all end actions hidden. |
@@ -101,7 +101,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Row height and padding | `--file-item-height`, horizontal padding `--pad-x-lg`, gap `--inline-lg`. |
 | Row surface and border | `--ds-surface`, `--ds-border`, radius `--radius-control-md`; list dividers use `--border-width-default` in `--ds-border`. |
-| Lead slot | `--image-md`; a Tile 32 for the kind of item, bare status icons in `--ds-icon-subtlest` and `--ds-icon-danger`, and a `ProgressRing` at `--icon-lg`. |
+| Lead slot | `--image-md`; a Tile 32 for the kind of item, bare status icons in `--ds-icon-subtlest` and `--ds-icon-danger`, and a `ProgressRing` at `--icon-md`. |
 | Name and meta | `--body-default` in `--ds-text`; meta in `--body-sm` and `--ds-text-subtle` (or `--ds-text-danger` on error). |
 
 ## Content guidelines

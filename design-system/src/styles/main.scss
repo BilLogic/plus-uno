@@ -232,8 +232,8 @@ time {
 }
 
 // A Font Awesome glyph's box is its font size: Free 7 draws every icon 1.25em
-// wide unless `--fa-width` says otherwise, so the 12, 16 and 24 icon sizes
-// (`--icon-sm`, `--icon-md`, `--icon-lg`) are the square the glyph sits in.
+// wide unless `--fa-width` says otherwise, so the icon sizes (`--icon-sm` 12,
+// `--icon-md` 16, and `--icon-lg` 24 inside Tile and Avatar) are the square the glyph sits in.
 .fa-solid,
 .fa-regular,
 .fa-brands,

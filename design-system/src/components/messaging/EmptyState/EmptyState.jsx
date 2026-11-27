@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
-import Icon from '../../images-and-icons/Icon';
 import Tile from '../../images-and-icons/Tile';
 import './EmptyState.scss';
 
@@ -17,8 +16,8 @@ export const EMPTY_STATE_SPACINGS = ['default', 'compact'];
  * different words, so they need no props of their own.
  *
  * - **image** is a slot for an Illustration or any picture. Without it, `icon`
- *   (a Font Awesome Free solid name) stands in: in a Tile on `default` spacing,
- *   bare at 24 on `compact`. Both are decorative.
+ *   (a Font Awesome Free solid name) stands in: in a Tile 48 on `default` spacing,
+ *   a Tile 32 on `compact`; the Tile picks the glyph. Both are decorative.
  * - **header** is a heading one level below the section that holds the
  *   EmptyState, so it joins the page's outline.
  * - **primaryAction** is one filled Button; **secondaryAction** an optional
@@ -48,11 +47,7 @@ const EmptyState = ({
             {image ? (
                 <div className="plus-empty-state__image" aria-hidden="true">{image}</div>
             ) : icon ? (
-                resolvedSpacing === 'compact' ? (
-                    <Icon name={icon} className="plus-empty-state__icon" />
-                ) : (
-                    <Tile icon={icon} size={40} className="plus-empty-state__icon" />
-                )
+                <Tile icon={icon} size={resolvedSpacing === 'compact' ? 32 : 48} className="plus-empty-state__icon" />
             ) : null}
             {(header || description) && (
                 <div className="plus-empty-state__text">

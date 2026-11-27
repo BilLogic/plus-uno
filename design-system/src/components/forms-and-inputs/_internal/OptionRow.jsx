@@ -95,7 +95,7 @@ const RowToggle = ({ state, onToggle }) => (
         }}
     >
         {state !== 'leaf' && (
-            <Icon name={state === 'expanded' ? 'caret-down' : 'caret-right'} />
+            <Icon name={state === 'expanded' ? 'caret-down' : 'caret-right'} size={12} />
         )}
     </span>
 );
@@ -109,7 +109,7 @@ RowToggle.propTypes = {
  *
  * @returns {JSX.Element}
  */
-const RowChevron = () => <Icon name="caret-right" className="plus-option-row-chevron" />;
+const RowChevron = () => <Icon name="caret-right" size={12} className="plus-option-row-chevron" />;
 
 /**
  * OptionRow — the one row every option list draws: Select, TagInput, the
@@ -269,7 +269,7 @@ const OptionRow = ({
                 <span className="plus-option-row-elem-after">
                     {elemAfter}
                     {kind === 'option' && selected && check && (
-                        <Icon name="check" className="plus-option-row-selected-mark" />
+                        <Icon name="check" size={12} className="plus-option-row-selected-mark" />
                     )}
                 </span>
             )}

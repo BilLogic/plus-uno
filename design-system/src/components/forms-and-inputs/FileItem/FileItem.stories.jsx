@@ -204,7 +204,7 @@ export const Uploading40 = {
         await expect(heightOf(rowOf(canvasElement))).toBe(56);
         await expect(canvas.getByRole('progressbar', { name: 'Uploading zoom_0.mp4' })).toHaveAttribute('aria-valuenow', '40');
         await expectLead(canvasElement, { tile: false });
-        await expect(Math.round(canvas.getByRole('progressbar').getBoundingClientRect().width), 'ring is 24').toBe(24);
+        await expect(Math.round(canvas.getByRole('progressbar').getBoundingClientRect().width), 'ring is 16, the lead glyph size').toBe(16);
         await expect(canvas.getByText('Uploading · 40%')).toBeInTheDocument();
     },
 };

@@ -113,7 +113,7 @@ export const CloseUp = () => (
     </div>
 );
 
-/** Every AI icon at its supported native token sizes (16 and 24, plus 12 for generate and stop-generating). */
+/** Every AI icon at its supported native token sizes (16, plus 12 for generate and stop-generating). */
 CloseUp.play = async ({ canvasElement }) => {
     const expected = AI_ICON_NAMES.reduce((count, name) => count + AI_ICON_SIZES[name].length, 0);
     const icons = [...canvasElement.querySelectorAll('svg')];

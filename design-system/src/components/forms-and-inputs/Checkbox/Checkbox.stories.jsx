@@ -467,14 +467,14 @@ Soft.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(restRow).borderTopColor).toBe('rgba(0, 0, 0, 0)');
     await expect(getComputedStyle(restRow.querySelector('.plus-choice-soft-check')).opacity).toBe('0');
 
-    // Selected row: selected fill, 1px selected border, visible trailing check (12px, selected icon color).
+    // Selected row: selected fill, 1px selected border, visible trailing check (16px, selected icon color).
     await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(selectedRow).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
     await expect(px(getComputedStyle(selectedRow).borderTopWidth)).toBe(1);
     await expect(getComputedStyle(selectedRow).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
     const check = selectedRow.querySelector('.plus-choice-soft-check');
     await expect(check).toHaveAttribute('aria-hidden', 'true');
     await expect(getComputedStyle(check).opacity).toBe('1');
-    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(px(getComputedStyle(check).fontSize)).toBe(16);
     await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
 
     // Unselected pressed row steps to --ds-background-neutral-pressed.

@@ -29,7 +29,7 @@ const AgentAction = () => {
             <IconButton
                 shape="circle"
                 className="plus-docs-fab__button"
-                icon={<AiIcon name="ask" size={24} />}
+                icon={<AiIcon name="ask" size={16} />}
                 label="AI chat"
                 tooltip="AI chat"
                 onClick={() => dispatch({ type: 'open' })}

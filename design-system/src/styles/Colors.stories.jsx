@@ -49,7 +49,7 @@ const Swatch = ({ token, kind = 'background', on }) => {
     } else if (kind === 'text') {
         sample = <span style={{ ...typeStyle('heading-sm'), color: `var(${token})` }}>Aa</span>;
     } else if (kind === 'icon') {
-        sample = <i className={iconClass('calendar-days')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: `var(${token})` }} />;
+        sample = <i className={iconClass('calendar-days')} aria-hidden="true" style={{ fontSize: 'var(--icon-md)', color: `var(${token})` }} />;
     } else if (kind === 'border') {
         box.boxShadow = `inset 0 0 0 var(--border-width-selected) var(${token})`;
     }

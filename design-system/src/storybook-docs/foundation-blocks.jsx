@@ -239,7 +239,7 @@ export const RingDemo = ({ children, style }) => (
 );
 
 /**
- * A Font Awesome Free glyph at a documented size (12, 16 or 24). `family`
+ * A Font Awesome Free glyph at a documented plain size (12 or 16). `family`
  * prefixes the name (`fa-regular`); `size` passes straight to Icon.
  */
 export const Glyph = ({ name, family, size = 16 }) => (

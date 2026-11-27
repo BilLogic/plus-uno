@@ -226,7 +226,7 @@ const Launcher = () => {
                     offset={[12]}
                     trigger={(
                         <IconButton
-                            icon={<AiIcon name="ask" size={24} />}
+                            icon={<AiIcon name="ask" size={16} />}
                             label={title}
                             appearance="primary"
                             shape="circle"
