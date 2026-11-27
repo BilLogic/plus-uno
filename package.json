@@ -125,6 +125,7 @@
     "check:docs-landing": "node scripts/check-docs-landing.mjs",
     "check:storybook-categories": "node scripts/check-storybook-categories.mjs",
     "check:intake-fsm": "node .cursor/hooks/uno-prototype/test-fsm.mjs",
+    "check:writeback-claude": "node .cursor/hooks/uno-writeback/test-claude-adapter.mjs",
     "check:build-load": "node scripts/check-build-load.mjs",
     "check:text-contrast": "node scripts/check-text-contrast.mjs",
     "check:storybook-docs": "node agents/uno-bot/scripts/generate-storybook-docs.mjs --check",
