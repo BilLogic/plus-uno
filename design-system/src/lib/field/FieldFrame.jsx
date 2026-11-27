@@ -113,7 +113,7 @@ export const FieldLabel = ({
                     className="plus-field-info"
                     aria-label={`About ${name ?? (typeof children === 'string' ? children : 'this field')}`}
                 >
-                    <Icon name="circle-info" />
+                    <Icon name="circle-info" size={12} />
                 </button>
             </Tooltip>
         </div>

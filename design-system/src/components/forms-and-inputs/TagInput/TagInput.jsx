@@ -297,6 +297,7 @@ const TagInput = ({
                 ? (
                     <Icon
                         name="grip-vertical"
+                        size={12}
                         className={`plus-tag-input__grip-mark${
                             (pinned !== undefined ? option.index === pinned : row === activeRow) ? ' is-covered' : ''
                         }`}

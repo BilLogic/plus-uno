@@ -210,7 +210,7 @@ Soft.play = async ({ canvasElement }) => {
     const check = rows[0].querySelector('.plus-choice-soft-check');
     await expect(check).toHaveAttribute('aria-hidden', 'true');
     await expect(getComputedStyle(check).opacity).toBe('1');
-    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(px(getComputedStyle(check).fontSize)).toBe(16);
     await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
 
     // Selected hover and pressed states.
