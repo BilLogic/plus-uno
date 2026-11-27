@@ -10,7 +10,7 @@
           },
           {
             "type": "command",
-            "command": "node .cursor/hooks/uno-writeback/claude.mjs",
+            "command": "node .cursor/hooks/uno-writeback/run.mjs",
             "timeout": 10
           }
         ]

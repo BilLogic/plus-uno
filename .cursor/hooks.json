@@ -19,6 +19,10 @@
       {
         "command": "node .cursor/hooks/uno-prototype/run.mjs --session-end",
         "timeout": 5
+      },
+      {
+        "command": "node .cursor/hooks/uno-writeback/run.mjs --session-end",
+        "timeout": 5
       }
     ],
     "afterFileEdit": [

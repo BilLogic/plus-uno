@@ -726,13 +726,13 @@ export const CHECKS = [
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
-    name: 'check:writeback-claude',
-    script: 'node .cursor/hooks/uno-writeback/test-claude-adapter.mjs',
+    name: 'check:writeback-gate',
+    script: 'node .cursor/hooks/uno-writeback/test-gate.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason: 'an assert-based smoke suite that spawns the adapter and throws on the first broken invariant.',
-    guards: 'the Claude Code adapter that runs the Figma write-back gate: inert without a write-back prompt, briefing on one.',
+    spawnReason: 'an assert-based suite that spawns the runner for each runtime and throws on the first broken invariant.',
+    guards: 'the Figma write-back gate on Cursor, Claude Code and Codex: inert without a write-back prompt, briefing on one, session end clears it.',
   },
   {
     name: 'check:build-load',

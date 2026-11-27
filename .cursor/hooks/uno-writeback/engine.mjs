@@ -6,6 +6,7 @@ import {
 import {
   buildAgentGateInstruction,
   clearSession,
+  endSession,
   hasAuditPass,
   isWritebackGateEnabled,
   loadSession,
@@ -13,6 +14,8 @@ import {
   saveSession,
   writeGateBriefing,
 } from './storage.mjs';
+
+export { endSession };
 
 /**
  * @typedef {object} HookInput
