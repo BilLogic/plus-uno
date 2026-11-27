@@ -11,6 +11,7 @@
 import type { Env, SlackContext } from "../types";
 import { conversationsHistoryLatest } from "../slack/api";
 import { rethrowIfBudget } from "../net";
+import { privateAllowlist } from "../slack/search-credential";
 import { isPublicChannel } from "./slack-thread-read";
 
 const MAX_LIMIT = 50;
@@ -28,17 +29,13 @@ export async function executeSlackChannelRead(
   const limit = Math.min(MAX_LIMIT, Math.max(1, asked));
 
   if (!(await isPublicChannel(env, channel))) {
-    const allowed = (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
-      .split(",")
-      .map((id) => id.trim())
-      .filter(Boolean);
     if (slack?.publicOnly) {
       return JSON.stringify({
         ok: false,
         error: "this answer is posted outside Slack, so only a public channel can be read; that one is private or could not be checked",
       });
     }
-    if (!allowed.includes(channel)) {
+    if (!privateAllowlist(env).includes(channel)) {
       return JSON.stringify({
         ok: false,
         error: "that channel is private, a DM or a group DM, and is not on the cleared list, so it can't be read",

@@ -56,8 +56,8 @@ export interface AssistantContext {
   enterprise_id?: string;
 }
 
-/** The largest raw context, in JSON characters, the store will look at. */
-const ASSISTANT_CONTEXT_MAX_CHARS = 2048;
+/** The largest raw context, in JSON characters, the store will look at: three Slack ids run about 130, so 512 leaves headroom. */
+const ASSISTANT_CONTEXT_MAX_CHARS = 512;
 const SLACK_ID_RE = /^[A-Z][A-Z0-9]{1,31}$/;
 
 /** The whitelisted shape of whatever Slack (or anything else) handed us as the

@@ -48,6 +48,7 @@
 
 import { channelIdsFor } from "../destination/env";
 import { teamSurfacesFor } from "./team-surfaces";
+import { privateAllowlist } from "../slack/search-credential";
 import type { Env } from "../types";
 import { LOOKUP_CEILING } from "../agent/loop-policy";
 import { selectProvider } from "../agent/run-agent";
@@ -362,10 +363,7 @@ async function sweepDepsFor(
       // Where the running notes live, and where a search hit may come from:
       // the specs and the answers the team keeps (`./surfaces.ts`).
       ...teamSurfacesFor(env),
-      privateAllowlist: (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
-        .split(",")
-        .map((id) => id.trim())
-        .filter(Boolean),
+      privateAllowlist: privateAllowlist(env),
     },
     meter: { subrequests: subrequestsUsed, d1Queries: d1QueriesUsed, headroom: budgetHeadroom },
     now: () => Date.now(),

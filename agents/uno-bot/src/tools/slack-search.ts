@@ -33,8 +33,9 @@
 
 import type { Env, SlackContext } from "../types";
 import { slackConnectUrl } from "../oauth/slack";
-import { turnSurfaceOf } from "../turn/request";
 import {
+  inOwnDm,
+  privateAllowlist,
   slackSearchCredentials,
   type SearchCredentialKind,
 } from "../slack/search-credential";
@@ -151,8 +152,8 @@ export async function executeSlackSearch(
   // turn whose answer leaves Slack (`publicOnly`, a Figma comment) is never
   // that, and below it runs no private pass either: public channels only.
   const publicOnly = slack?.publicOnly === true;
-  const inOwnDm = !publicOnly && Boolean(slack?.channel && turnSurfaceOf(slack.channel) === "assistant");
-  const requester = inOwnDm ? slack?.requestedBy : undefined;
+  const ownDm = inOwnDm(slack);
+  const requester = ownDm ? slack?.requestedBy : undefined;
   const credentials = await slackSearchCredentials(env, requester);
   // The connect link, resolved ONCE and above the credential loop.
   //
@@ -161,7 +162,7 @@ export async function executeSlackSearch(
   // search can run at all. Null when SLACK_OAUTH_REDIRECT_URI is unset, and
   // withheld outside the requester's own DM (ADR-020): a connect link offered
   // in a channel is addressed to whoever is in the room, not to the asker.
-  const connectUrl = inOwnDm ? slackConnectUrl(env) : null;
+  const connectUrl = ownDm ? slackConnectUrl(env) : null;
   // A bot-token search is invalid without the triggering event's action_token,
   // so that candidate only counts when we actually carry one.
   const actionToken = slack?.actionToken;
@@ -183,10 +184,7 @@ export async function executeSlackSearch(
   }
 
   const allowlist = new Set(
-    (publicOnly ? "" : (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? ""))
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean),
+    publicOnly ? [] : privateAllowlist(env),
   );
 
   // Which passes a credential runs, and what each pass may emit.
@@ -272,7 +270,7 @@ export async function executeSlackSearch(
           searchedSurfaces: passes.map((p) => p.channelTypes).join(","),
           results,
           dropped,
-          inOwnDm,
+          inOwnDm: ownDm,
           connectNote,
         }),
       );

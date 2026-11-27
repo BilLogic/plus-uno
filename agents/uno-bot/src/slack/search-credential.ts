@@ -10,8 +10,9 @@
 // own → legacy → bot; a future bot-first caller (thread_read) walks its own
 // order over the same list.
 
-import type { Env } from "../types";
+import type { Env, SlackContext } from "../types";
 import { getSlackAccessTokenFor } from "../oauth/slack";
+import { turnSurfaceOf } from "../turn/request";
 
 export type SearchCredentialKind = "own" | "legacy" | "bot";
 
@@ -47,4 +48,26 @@ export async function slackSearchCredentials(
   else if (stored) candidates.push({ token: stored.token, kind: "legacy" });
   if (env.SLACK_BOT_TOKEN) candidates.push({ token: env.SLACK_BOT_TOKEN, kind: "bot" });
   return candidates;
+}
+
+/**
+ * The private channels the team cleared for reading, parsed once from
+ * `SLACK_SEARCH_PRIVATE_ALLOWLIST`.
+ *
+ * Why the two read tools gate differently: slack_channel_read requires an id on
+ * this list for anything non-public, because a channel read is a broad one (the
+ * latest of everything said there). slack_thread_read does not, because a pasted
+ * thread link is a narrow read the user chose themselves.
+ */
+export function privateAllowlist(env: Pick<Env, "SLACK_SEARCH_PRIVATE_ALLOWLIST">): string[] {
+  return (env.SLACK_SEARCH_PRIVATE_ALLOWLIST ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
+/** The own-token gate (ADR-020), stated once: the turn is in the requester's own
+ *  bot DM and does not leave Slack (`publicOnly`). */
+export function inOwnDm(slack?: Partial<Pick<SlackContext, "channel" | "publicOnly">>): boolean {
+  return !!slack && slack.publicOnly !== true && !!slack.channel && turnSurfaceOf(slack.channel) === "assistant";
 }

@@ -16,8 +16,8 @@
 import type { Env, SlackContext } from "../types";
 import { conversationsInfo, conversationsReplies, slackReadAs } from "../slack/api";
 import { rethrowIfBudget } from "../net";
-import { turnSurfaceOf } from "../turn/request";
-import { slackSearchCredentials } from "../slack/search-credential";
+import { inOwnDm } from "../slack/search-credential";
+import { getSlackAccessTokenFor } from "../oauth/slack";
 
 // Refusals that mean "the bot cannot see this conversation", not "the read
 // failed": the only ones a person's own token can answer.
@@ -31,9 +31,9 @@ type RepliesResult = {
 
 /** The requester's own token, only on a turn in their own bot DM. */
 async function ownTokenFor(env: Env, slack?: Partial<Pick<SlackContext, "channel" | "requestedBy" | "publicOnly">>): Promise<string | null> {
-  if (!slack || slack.publicOnly === true || !slack.channel || turnSurfaceOf(slack.channel) !== "assistant") return null;
-  const credentials = await slackSearchCredentials(env, slack.requestedBy);
-  return credentials.find((c) => c.kind === "own")?.token ?? null;
+  if (!inOwnDm(slack)) return null;
+  const stored = await getSlackAccessTokenFor(env, slack?.requestedBy);
+  return stored?.own ? stored.token : null;
 }
 
 // Slack permalink: https://<ws>.slack.com/archives/<CHANNEL>/p<10 digits><6 digits>
@@ -62,10 +62,12 @@ export async function executeSlackThreadRead(
   }
 
   try {
+    let retriedOwn = false;
     let res = (await conversationsReplies(env, parsed.channel, parsed.ts, 50)) as RepliesResult;
     if (res.ok === false && res.error && BOT_BLIND_ERRORS.has(res.error)) {
       const own = await ownTokenFor(env, slack);
       if (own) {
+        retriedOwn = true;
         res = (await slackReadAs(own, "conversations.replies", {
           channel: parsed.channel,
           ts: parsed.ts,
@@ -78,7 +80,9 @@ export async function executeSlackThreadRead(
       return JSON.stringify({
         ok: false,
         error: `slack conversations.replies: ${res.error ?? "failed"}`,
-        note: "The bot may not be a member of that channel — it must be invited first.",
+        note: retriedOwn
+          ? "Neither the bot nor your own token could read that thread; the bot would have to be invited to its channel."
+          : "The bot may not be a member of that channel — it must be invited first.",
       });
     }
     const messages = res.messages.map((m) => ({

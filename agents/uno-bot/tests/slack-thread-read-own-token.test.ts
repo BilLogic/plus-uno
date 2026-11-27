@@ -85,4 +85,21 @@ describe("slack_thread_read own-token retry", () => {
     assert.doesNotMatch(out, /private plan/);
     assert.deepEqual(auths, ["Bearer xoxb-bot"]);
   });
+
+  it("says neither token could read the thread when the own-token retry fails too", async () => {
+    route = (async (input: RequestInfo | URL) => {
+      if (!String(input).includes("conversations.replies")) return Response.json({ ok: false, error: "unexpected" });
+      return Response.json({ ok: false, error: "channel_not_found" });
+    }) as typeof fetch;
+    const out = JSON.parse(await read(env(), dm)) as { ok: boolean; note?: string };
+    assert.equal(out.ok, false);
+    assert.match(out.note ?? "", /neither the bot nor your own token/i);
+    assert.doesNotMatch(out.note ?? "", /invited first/);
+  });
+
+  it("keeps the invite-the-bot note when no retry ran", async () => {
+    stubSlack();
+    const out = JSON.parse(await read(env({ ownToken: false }), dm)) as { note?: string };
+    assert.match(out.note ?? "", /invited first/);
+  });
 });
