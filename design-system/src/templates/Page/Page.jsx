@@ -10,7 +10,7 @@ import './Page.scss';
  * on every side and no radius, border, or shadow; children fill the content
  * slot. Inside a Frame the Frame owns the pad and the Page adds none.
  *
- * A Page can carry its `title`: the page's one h1, at Heading/large 24,
+ * A Page can carry its `title`: the page's one h1, at Heading/xxlarge 32,
  * above the content. Sections inside it open at h2.
  */
 const Page = ({
@@ -62,7 +62,7 @@ Page.propTypes = {
     id: PropTypes.string,
     /** Render element / component */
     as: PropTypes.elementType,
-    /** The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page.
+    /** The page's title: its one h1, at Heading/xxlarge 32. Leave it unset on a Page that is not a whole page.
      * @ds-context Used in: Page.title (ds guide page)
      */
     title: PropTypes.node,

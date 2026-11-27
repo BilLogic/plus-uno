@@ -118,6 +118,7 @@ Same group: `AiChat` · `AiIcon` · `GenerativeBorder` · `PromptInput` · `Prom
 | Part | Token |
 | --- | --- |
 | Text | `--body-default` in `--ds-text`. |
+| Icon | `--ds-icon` at `--icon-md`. |
 | Icon to text | `--inline-md`; the icon centers on the first line against `--icon-md`. |
 | Between parts | `--stack-md`. |
 | Progress indicator | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |

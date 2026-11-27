@@ -306,7 +306,7 @@ export const ButtonInField = () => (
     </CloseUp>
 );
 
-/** A joined group: the group's outer corners round, its inner seams stay square. */
+/** A joined pair, as a split button draws it: the outer corners round, the seam stays square. */
 export const JoinedGroup = () => {
     const clip = `joined-${useId().replace(/:/g, '')}`;
     return (

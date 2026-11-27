@@ -90,11 +90,11 @@ it in place.
 
 ## With a menu
 
-<ComponentExample of={StatusTagStories.WithMenu} title="Menu trigger" description={<><code>menu</code> takes the rows, Status tags in <code>ButtonItem</code>s, and the tag becomes a button that opens them. It keeps its box and tone and adds an <code>angle-down</code> chevron, 12 on default spacing and 16 on spacious, with equal padding on both sides.</>} />
+<ComponentExample of={StatusTagStories.WithMenu} title="Menu trigger" description={<><code>menu</code> takes the rows, Status tags in <code>ButtonItem</code>s, and the tag becomes a button that opens them. It keeps its box and tone and adds an <code>angle-down</code> glyph, 12 on default spacing and 16 on spacious, with equal padding on both sides.</>} />
 
 <ComponentExample of={StatusTagStories.MenuPick} title="Picking a status" description="A row closes the menu. The app updates the tag's text, appearance and accessible name from the pick." />
 
-<ComponentExample of={StatusTagStories.MenuRest} title="Rest" description="The tone's fill and the chevron down, in the tab order." />
+<ComponentExample of={StatusTagStories.MenuRest} title="Rest" description="The tone's fill and the angle down, in the tab order." />
 
 <ComponentExample of={StatusTagStories.MenuHovered} title="Hovered" description="The tone's hovered background. The edge stays the pressed background." />
 
@@ -102,7 +102,7 @@ it in place.
 
 <ComponentExample of={StatusTagStories.MenuFocused} title="Focused" description="The standard focus ring outside the edge." />
 
-<ComponentExample of={StatusTagStories.MenuOpen} title="Open" description="The menu lists the statuses with the current one checked. The tag is drawn selected, on the pressed background, and the chevron points up." />
+<ComponentExample of={StatusTagStories.MenuOpen} title="Open" description="The menu lists the statuses with the current one checked. The tag is drawn selected, on the pressed background, and the angle points up." />
 
 <ComponentExample of={StatusTagStories.MenuLoading} title="Loading" description={<><code>isLoading</code> hides the content at <code>opacity: 0</code> so the tag keeps its width, and centers one spinner over it: 12 on default spacing, 16 on spacious. The tag cannot be pressed.</>} />
 
@@ -210,7 +210,7 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a 16 `CountTag` nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
-5. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the menu is open.
+5. **Angle.** With a `menu` only: `angle-down`, and `angle-up` while the menu is open.
 
 ### States
 
@@ -222,7 +222,7 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 <tr><td>Rest</td><td>Without a menu, the only state: a label for the condition something is in.</td></tr>
 <tr><td>Hovered, pressed</td><td>Without a menu, none: it is a label. With a menu, the tone's hovered and pressed backgrounds.</td></tr>
 <tr><td>Focused</td><td>Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring.</td></tr>
-<tr><td>Open</td><td>With a menu only: drawn selected, on the pressed background, with the chevron up.</td></tr>
+<tr><td>Open</td><td>With a menu only: drawn selected, on the pressed background, with the angle up.</td></tr>
 <tr><td>Loading</td><td>With a menu only: the content is hidden at <code>opacity: 0</code>, keeping its width, with one spinner centered over it.</td></tr>
 <tr><td>Disabled</td><td>Without a menu, none: a label is never dimmed. With a menu, the disabled background and text, with no opacity.</td></tr>
 </tbody>
@@ -238,8 +238,8 @@ Use `spacing="default"` (`20`) in rows, lists, tables and sentences, and
 <tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--control-md</code> (32) when spacious.</td></tr>
 <tr><td>Padding and gap</td><td><code>--pad-x-xs</code> on the leading edge, <code>--tag-pad-x-end-compact</code> on the trailing edge, <code>--tag-gap-compact</code> between icon and label, <code>--stack-sm</code> inside the text; spacious <code>--pad-x-md</code> leading, <code>--tag-pad-x-end</code> trailing, <code>--tag-gap</code> between icon and label.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>; spacious <code>--radius-control-md</code>.</td></tr>
-<tr><td>With a menu: padding and gap</td><td><code>--pad-x-xs</code> on both sides with <code>--stack-sm</code> between the label and the chevron; spacious <code>--pad-x-md</code> on both sides with <code>--tag-gap</code>.</td></tr>
-<tr><td>With a menu: chevron and spinner</td><td>The chevron is <code>--icon-sm</code> (12), or <code>--icon-md</code> (16) when spacious. The spinner is <code>size={'{12}'}</code> (<code>--icon-sm</code>), or <code>size={'{16}'}</code> when spacious.</td></tr>
+<tr><td>With a menu: padding and gap</td><td><code>--pad-x-xs</code> on both sides with <code>--stack-sm</code> between the label and the angle; spacious <code>--pad-x-md</code> on both sides with <code>--tag-gap</code>.</td></tr>
+<tr><td>With a menu: angle and spinner</td><td>The angle is <code>--icon-sm</code> (12), or <code>--icon-md</code> (16) when spacious. The spinner is <code>size={'{12}'}</code> (<code>--icon-sm</code>), or <code>size={'{16}'}</code> when spacious.</td></tr>
 <tr><td>With a menu: hovered, pressed, open</td><td>The tone's <code>--ds-background-&lt;tone&gt;-hovered</code> and <code>-pressed</code>; open uses the pressed one.</td></tr>
 <tr><td>With a menu: disabled</td><td><code>--ds-background-disabled</code> and <code>--ds-text-disabled</code>, with no opacity.</td></tr>
 <tr><td>Neutral</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code>, edge <code>--ds-background-neutral-pressed</code>.</td></tr>

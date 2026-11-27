@@ -155,7 +155,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 | Part | Token |
 | --- | --- |
 | Ground | `--ds-background-brand-subtlest`, `--ds-background-neutral`, `--ds-background-success`, `--ds-background-danger`, `--ds-background-warning`, `--ds-background-information` |
-| Icon | `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning`, `--ds-icon-information` |
+| Icon | `--icon-md` (16), in `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning` or `--ds-icon-information` |
 | Title, body, link | `--heading-sm`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
 | Divider | `--ds-border`, `--border-width-default` |
 | Padding, gaps, corner | `--card-pad`, `--card-inline-sm`, `--stack-md`, `--card-radius` |

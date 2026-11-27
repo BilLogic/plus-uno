@@ -70,6 +70,7 @@ Don't: The whole list loaded to page on the screen, when it is thousands of rows
 
 - **Sorting is announced.** A sortable header carries `aria-sort` (`none`, `ascending` or `descending`) and holds a real button, so a keyboard reaches it with Tab and a press asks for the next sort.
 - **Focus is a ring.** The ring is inset in the cell and focus never changes the fill.
+- **A scroll region is reachable.** While the rows overflow it, sideways or past `maxHeight`, the region takes a tab stop and is a region named by the table's label, so the arrow keys scroll it; a table that fits takes neither.
 - **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
 - **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
 - **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one. The bulk bar's count is not announced a second time.

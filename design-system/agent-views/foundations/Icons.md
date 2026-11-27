@@ -29,13 +29,13 @@ A label states what the icon does and names it for screen readers. Leave an icon
 
 ## Sizes: 12, 16 and 24
 
-Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
+Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Angles and chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
 
 The swatches sit in a 48 preview frame for display; the icon's own box is its size, and the hit area comes from the control around it.
 
 | Size (px) | Figma token | Code | Use |
 | --- | --- | --- | --- |
-| 12 | `Size/Icon/sm` | `--icon-sm` | Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |
+| 12 | `Size/Icon/sm` | `--icon-sm` | Angles and chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |
 | 16 | `Size/Icon/md` | `--icon-md` | Default beside 14 and 16 text in buttons, menus, fields and lists. |
 | 24 | `Size/Icon/lg` | `--icon-lg` | Empty states, section headers and standalone status marks. Above 24, use a Tile. |
 
@@ -105,11 +105,11 @@ Don't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.
 
 ### Use 16 by default, 12 sparingly
 
-Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
+Icons are 16 beside body text. Keep 12 for angles, chevrons, validation and compact parts.
 
 An angle opens a list or menu; a chevron expands content in place.
 
-Do: A 16 icon leads the label; the trailing chevron is 12.
+Do: A 16 icon leads the label; the trailing angle is 12.
 
 Don't: A 12 leading icon is too small beside 14 body text.
 

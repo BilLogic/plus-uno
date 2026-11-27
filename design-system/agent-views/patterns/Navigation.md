@@ -47,7 +47,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 ## Alternatives
 
 - For narrowing a collection rather than switching views, follow Filtering; filters combine, views do not.
-- For more pills than fit, fold the extras into "More"; keep page tabs to five.
+- For more pills than fit, fold the extras into "More"; keep page tabs to five. On a narrow page (under 768), page tabs scroll sideways and pill views become one menu.
 - For a decision that blocks the page, use a Modal, not a page.
 
 ## Content guidelines
@@ -63,7 +63,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 ## Accessibility
 
 - The Sidebar is a navigation landmark; the selected item carries `aria-current="page"`. The selected row is a fill, not color on the icon alone.
-- Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab.
+- Views and page tabs are a real tab widget: one tab stop, Left and Right move selection, the panel is named by its tab. On a narrow page, pill views are a menu button instead.
 - The breadcrumb is a `nav` around an `ol` of parent links. The current record is the page's heading, so no crumb carries `aria-current`.
 - Leaving a multi-step task returns focus to the control that opened it .
 

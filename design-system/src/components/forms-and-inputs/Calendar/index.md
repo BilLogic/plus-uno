@@ -86,7 +86,7 @@ Six weeks render every month, and the cells before the first day and after the l
 - **The days are one tab stop** (the picked day, else today). From there the arrow keys move by day and week, Home and End go to the start and end of the week, and Page Up and Page Down change month (with Shift, year); `minDate` and `maxDate` stop the move and `Enter` picks the day.
 - **Each day is a real, named button.** The accessible name is the day's full date, not just a number, so a screen reader announces an unambiguous date on every cell.
 - **State is marked, not just styled.** `aria-pressed` marks the picked day or a range's ends, `aria-current="date"` marks today, and `data-in-range` marks the days between. None of this relies on color alone.
-- **Out-of-range and out-of-month days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`.
+- **Out-of-range days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`. Cells outside the month are empty and have nothing to focus.
 - **The month buttons are named** "Previous month" and "Next month".
 
 ## Related

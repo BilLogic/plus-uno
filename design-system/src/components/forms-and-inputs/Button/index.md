@@ -110,7 +110,7 @@ Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `Checkbox
 1. **Container.** Soft neutral fill (`--ds-background-neutral`) with no border on `default`, transparent on `subtle`, and bold semantic fills on `primary`, `warning`, `danger`, `discovery` and `ai`. Draws `32` high (`--control-md`) at `default` spacing, `24` (`--control-sm`) at `compact`, and `48` (`--control-xl`) at `spacious` inside `FooterActions`. Stretches to its parent's width with `shouldFitContainer`, keeping the label centered.
 2. **Icon before** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), before the label (`ai` always draws its sparkle).
 3. **Label.** Body/default at the medium weight, centered in the container; truncates with an ellipsis when constrained.
-4. **Icon after** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), or `12` (`--icon-sm`) for a trailing chevron.
+4. **Icon after** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), or `12` (`--icon-sm`) for a trailing chevron or angle.
 5. **Spinner** (loading only). A `16` `Spinner` in the label color that replaces the label and icons while the button is busy.
 
 Most buttons need no icon. Add one only when the glyph has an established meaning, such as `plus` for add.
@@ -140,7 +140,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | Padding | Default 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. Spacious 16: `--pad-x-lg`. |
 | Radius | Default 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Spacious 10: `--button-radius-spacious`. |
 | Icon-to-label gap | 4: `--inline-sm`. |
-| Label | Body/default at the medium weight; icons at 16 (`--icon-md`), chevrons at 12 (`--icon-sm`). |
+| Label | Body/default at the medium weight; icons at 16 (`--icon-md`), chevrons and angles at 12 (`--icon-sm`). |
 
 ## Content guidelines
 

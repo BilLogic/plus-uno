@@ -44,7 +44,7 @@ A button sits 4 inside a field, so it rounds at the field's radius minus 4: 6 at
 
 `--button-radius-default` and `--button-radius-compact` apply whether the button sits in a field or not. This covers Button, Icon button, Split button and every button built on them.
 
-A button group rounds its outer corners and keeps the inner seams square.
+A split button rounds its outer corners and keeps the seam between its two buttons square. A button group joins nothing: each button keeps its own radius.
 
 ## Templates
 

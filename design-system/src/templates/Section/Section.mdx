@@ -168,7 +168,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 <PlannedTag /> The Section does not place a side at its start yet, so this example composes it.
 
-<ComponentExample of={SectionStories.Detail} title="Detail" description="An inline expand: the disclosure row opens in place inside the Section and pushes the content below it down. Queue pages dock a Panel instead." />
+<ComponentExample of={SectionStories.Detail} title="Detail" description="An inline expand: the disclosure row opens in place inside the Section and pushes the content below it down. Queue pages open a floating Panel over the list instead." />
 
 </div>
 
@@ -377,7 +377,7 @@ Each control has one home. The Filter button returns with its count once the sid
 
 <RuleTag kind="review" />
 
-A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page docks a `Panel` beside the list instead, and the record opens on demand.
+A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page opens a floating `Panel` over the list instead, and the record opens on demand.
 
 ### Keep the footer for paging and "View all".
 
@@ -445,7 +445,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 ## Related
 
 - <DocsLink id="templates-page">Page</DocsLink>: use when the heading is the page's own.
-- <DocsLink id="templates-panel">Panel</DocsLink>: use when a queue page docks the Panel beside the list, or for a quick look from a table.
+- <DocsLink id="templates-panel">Panel</DocsLink>: use when a queue page floats the Panel over the list, or for a quick look from a table.
 - <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu a filter trigger opens (`PopupSelect` or `FilterMenu`).
 - <DocsLink id="templates-table">Table</DocsLink>: use when the body is rows and columns.
 - <DocsLink id="patterns-filtering">Filtering</DocsLink>: use when picking a filter tier for the header.

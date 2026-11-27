@@ -145,12 +145,12 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open, `--ds-background-selected` and `--ds-background-selected-hovered`. |
+| Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open and grouped, `--ds-background-selected` and `--ds-background-selected-hovered`. Open and separated stays on `--ds-surface`. |
 | Trigger and chevron | Title in `--heading-sm`, `--ds-text` when separated and `--ds-text-subtle` when grouped; chevron at `--icon-sm` in `--ds-text-subtle`; `--inline-md` between the parts. |
 | Leading slot and summary | Slot column `--image-md` wide; summary in `--body-sm` and `--ds-text-subtle`. |
-| Body | `--body-lg` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it. |
+| Body | `--body-lg` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it when grouped and none when separated. |
 | Edge | `--ds-border` at `--border-width-default`, corners `--card-radius`; separated items sit `--stack-sm` apart. |
-| Padding | `--card-pad` on every side. |
+| Padding | `--card-pad` on every side; a separated body has none above it. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
 | Disabled | `--ds-opacity-disabled`. |
 

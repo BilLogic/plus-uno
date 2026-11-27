@@ -2,7 +2,7 @@
 
 # Page
 
-The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. Inside a Frame the Frame owns the pad and the Page adds none. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
+The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. Inside a Frame the Frame owns the pad and the Page adds none. A Page can carry its `title`: the page's one h1, at Heading/xxlarge 32, above the content. Sections inside it open at h2.
 
 The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading.
 
@@ -191,7 +191,7 @@ Drag the width control. Above the content cap, content centers at the cap; below
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `as` | elementType | — | Render element / component |
-| `title` | node | — | The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. |
+| `title` | node | — | The page's title: its one h1, at Heading/xxlarge 32. Leave it unset on a Page that is not a whole page. |
 | `header` | node | — | One PageHeader with the page's h1, actions and tabs. Replaces title. |
 | `banner` | node | — | One page Banner below the header. Governed by Notifications (ds guide notifications). |
 | `className` | string | `''` | — |

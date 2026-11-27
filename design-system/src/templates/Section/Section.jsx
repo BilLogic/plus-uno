@@ -55,7 +55,7 @@ import './Section.scss';
  * smaller: a section on a page is an h2 at Heading/medium 20, a section
  * inside a section is a subsection, an h3 at Heading/small 16. Deeper
  * sections keep the subsection size. `level="page"` makes it the page
- * header: an h1 at Heading/large 24, and the sections it holds are h2s.
+ * header: an h1 at Heading/xxlarge 32, and the sections it holds are h2s.
  *
  * BODY. `layout="single"` is the content slot alone. `split` puts a main
  * column (span 8, min Section/min-width-main) beside a `side` column (span 4,
@@ -638,7 +638,7 @@ Section.propTypes = {
     defaultDetailOpen: PropTypes.bool,
     /** Called with the next open boolean when the inline detail expand toggles */
     onDetailOpenChange: PropTypes.func,
-    /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
+    /** `page` makes the title the page's h1 at Heading/xxlarge 32; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
     /** Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value */
     spacing: PropTypes.oneOf(SECTION_SPACINGS),

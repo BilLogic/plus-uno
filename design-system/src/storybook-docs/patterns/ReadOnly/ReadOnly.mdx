@@ -53,7 +53,7 @@ The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled-
 
 <ComponentExample of={ReadOnlyStories.KeyField} title="A read-only field" description="Neutral fill, full contrast, no hover change. It is in the tab order, the value can be selected and copied, and the caption says why. Tab into the field to select and copy the value." />
 
-<ComponentExample of={ReadOnlyStories.KeyPickers} title="A Select and a date" description="Select hides its chevron and DatePicker its calendar button; the value reads as text on the neutral fill." />
+<ComponentExample of={ReadOnlyStories.KeyPickers} title="A Select and a date" description="Select hides its angle and DatePicker its calendar button; the value reads as text on the neutral fill." />
 
 <ComponentExample of={ReadOnlyStories.KeyChoices} title="Choices" description="Checkbox, RadioGroup and Toggle keep their state at full contrast, ignore clicks, and report aria-readonly." />
 
@@ -92,7 +92,7 @@ Use Read-only for a value someone could change but this person cannot right now:
 <tr><th>Who can change it</th><th>Show it as</th><th>Tab order</th><th>Looks</th></tr>
 </thead>
 <tbody>
-<tr><td>Someone else, or this person later</td><td>Read-only field</td><td>In</td><td>Neutral fill, full contrast, no chevron or calendar, no hover</td></tr>
+<tr><td>Someone else, or this person later</td><td>Read-only field</td><td>In</td><td>Neutral fill, full contrast, no angle or calendar, no hover</td></tr>
 <tr><td>Nobody, ever, here</td><td>Plain text: label and value</td><td>Out</td><td>Text</td></tr>
 <tr><td>This person, once a prerequisite on this screen is met</td><td>Disabled field</td><td>Out</td><td>Faded, the reason in the caption</td></tr>
 </tbody>
@@ -124,7 +124,7 @@ It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` 
 
 <RuleTag kind="automatic" />
 
-`Select` hides its chevron and `DatePicker` its calendar button. `Checkbox`, `RadioGroup` and `Toggle` keep their state and ignore clicks.
+`Select` hides its angle and `DatePicker` its calendar button. `Checkbox`, `RadioGroup` and `Toggle` keep their state and ignore clicks.
 
 ### Say why in the caption.
 

@@ -99,7 +99,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Mark the sorted column with `aria-sort`, and give every icon-only control a name, such as "Actions for Ava Thompson".
 - Mark a selected row with `aria-selected="true"`. That attribute belongs to a row of a table with `role="grid"`.
 - Selection is never color alone. The row's checkbox is checked, and the head row says "2 selected".
-- A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
+- A scroll region takes keyboard focus, and a name from the table's label, only while its rows overflow it: sideways, or past `maxHeight`. A table that fits takes no tab stop.
 - When empty, the empty state replaces the table with no table roles left behind, and keeps the table's accessible name when one was provided.
 - Name the table with its `label`, or `label` on the template for the empty state box, when no caption names it.
 

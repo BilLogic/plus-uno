@@ -9427,7 +9427,7 @@
       "import": "import { Page } from '@/templates';",
       "group": "templates",
       "source": "design-system/src/templates/Page/Page.jsx",
-      "summary": "The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. Inside a Frame the Frame owns the pad and the Page adds none. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
+      "summary": "The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. Inside a Frame the Frame owns the pad and the Page adds none. A Page can carry its `title`: the page's one h1, at Heading/xxlarge 32, above the content. Sections inside it open at h2.",
       "props": [
         {
           "name": "id",
@@ -9453,7 +9453,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page.",
+          "description": "The page's title: its one h1, at Heading/xxlarge 32. Leave it unset on a Page that is not a whole page.",
           "deprecated": null
         },
         {
@@ -12949,7 +12949,7 @@
           "values": [
             "page"
           ],
-          "description": "`page` makes the title the page's h1 at Heading/large 24; by default it nests one level down",
+          "description": "`page` makes the title the page's h1 at Heading/xxlarge 32; by default it nests one level down",
           "deprecated": null
         },
         {

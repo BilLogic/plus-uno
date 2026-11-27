@@ -48,7 +48,7 @@ export const KeyField = {
     },
 };
 
-/** A Select and a DatePicker: no chevron, no calendar button. */
+/** A Select and a DatePicker: no angle, no calendar button. */
 export const KeyPickers = {
     name: 'Key case: A Select and a date',
     render: () => staged(<ReadOnlyPickers />),
