@@ -96,7 +96,8 @@ const FIXED_COPY: Record<string, string[]> = {
   "slack/feedback-door.ts": [],
   // App Home and the welcome
   "slack/home.ts": [GOAT],
-  "slack/assistant.ts": [GOAT],
+  "slack/assistant.ts": [],
+  "slack/capabilities.ts": [GOAT],
   "dm-watch/home.ts": [],
   "oauth/slack.ts": [],
   // End-of-day sweep, DM watch, follow-through, reminders
@@ -312,7 +313,7 @@ describe("the self-name", () => {
   });
 
   it("is what the App Home, the welcome and an untitled chat say", () => {
-    const home = JSON.stringify(homeView({ connectUrl: "https://example.test/link", viewer: { connected: false, on: [] } }));
+    const home = JSON.stringify(homeView({ connectUrl: "https://example.test/link", repoUrl: "https://github.com/Acme/widgets", viewer: { connected: false, on: [] } }));
     assert.match(home, /le goat 🐐/);
     assert.match(home, /@le goat/);
     assert.match(WELCOME, /I'm le goat :goat:/);
@@ -359,7 +360,7 @@ describe("the App Home", () => {
   for (const connected of [false, true]) {
     it(`shows 🐐 once and no emoji in a button (${connected ? "linked" : "not linked"})`, () => {
       const { texts, buttons } = viewTexts(
-        homeView({ connectUrl: "https://example.test/link", viewer: { connected, on: [], refused: connected ? { ok: false, reason: "missing-scopes", missing: ["im:history"] } : undefined } }),
+        homeView({ connectUrl: "https://example.test/link", repoUrl: "https://github.com/Acme/widgets", viewer: { connected, on: [], refused: connected ? { ok: false, reason: "missing-scopes", missing: ["im:history"] } : undefined } }),
       );
       for (const label of buttons) assert.deepEqual(emojiIn(label), [], `button "${label}"`);
       assert.equal(texts.flatMap(emojiIn).filter((e) => e === GOAT).length, 1);
