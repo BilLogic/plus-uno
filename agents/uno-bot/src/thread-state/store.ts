@@ -31,13 +31,36 @@
 // without touching a caller's signature.
 
 import type { ChannelRole } from "../destination/index";
-import type { AssistantContext } from "../slack/types";
-import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes, WhichCard } from "../turn/delivery";
 import type { ConversationType } from "../turn/turn";
 import { cardLiveAt, cardTtlMs } from "../card-expiry";
 
-export type { AssistantContext, VisionReference };
+/** Slack file attachment metadata as delivered on message/app_mention events.
+ *  Only the fields the vision path reads — everything else is ignored. */
+export interface SlackEventFile {
+  id?: string;
+  name?: string;
+  filetype?: string;
+  mimetype?: string;
+  permalink?: string;
+  url_private?: string;
+  size?: number;
+}
+
+/** The surface the user has open in the workspace while chatting in the assistant
+ *  panel — delivered on assistant_thread_started and every context change. All
+ *  fields optional: the user may have no channel focused. */
+export interface AssistantContext {
+  channel_id?: string;
+  team_id?: string;
+  enterprise_id?: string;
+}
+
+/** What a turn kept of an image or Figma link so the next turn can render it. */
+export interface VisionReference {
+  files?: SlackEventFile[];
+  figmaUrl?: string;
+}
 
 // ── Timings ──────────────────────────────────────────────────────────────────
 //

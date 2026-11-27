@@ -1,4 +1,4 @@
-import type { SlackEventFile } from "./types";
+import type { SlackEventFile, VisionReference } from "../thread-state/store";
 import { parseFigmaUrl } from "../integrations/figma-reading";
 
 /**
@@ -19,10 +19,7 @@ export function firstFigmaFrameUrl(text: string): string | undefined {
   return (text.match(/https?:\/\/[^\s<>|]+/g) ?? []).find((u) => parseFigmaUrl(u));
 }
 
-export interface VisionReference {
-  files?: SlackEventFile[];
-  figmaUrl?: string;
-}
+export type { VisionReference };
 
 interface VisionHistoryTurn {
   role: "user" | "assistant";
