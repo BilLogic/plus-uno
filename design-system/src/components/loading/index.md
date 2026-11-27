@@ -12,7 +12,7 @@ authored half, counted rather than assumed.
   - For a compact determinate ring beside a title or a file row, use `ProgressRing`.
   - For the outcome when a task finishes, use `Flag` or `SectionMessage`.
   - For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
-- **[ProgressRing](ProgressRing/index.md)** — Use `ProgressRing` when a task has a known percent done and sits in an icon-sized slot, such as an uploading file row where a list of horizontal bars would crowd the view. A ring is never indeterminate.
+- **[ProgressRing](ProgressRing/index.md)** — Use `ProgressRing` when a task has a known percent done and sits in an icon-sized slot, such as the lead of an uploading file row where a list of horizontal bars would crowd the view. A ring is never indeterminate.
   - For a wait whose duration is unknown, use `Spinner`.
   - For progress where a horizontal track fits (such as a card header or a form step), use `ProgressBar`.
   - For content loading into a layout that already has a shape, use `Skeleton`.

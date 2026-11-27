@@ -73,7 +73,7 @@ will not fit.
 
 <ComponentExample of={ProgressRingStories.Size16} title="16" description="The default. Pairs with compact inline text or a 16 icon slot." />
 
-<ComponentExample of={ProgressRingStories.Size24} title="24" description="Pairs with a 24 icon slot, such as the lead of an uploading file row." />
+<ComponentExample of={ProgressRingStories.Size24} title="24" description="Pairs with a 24 icon slot." />
 
 <ComponentExample of={ProgressRingStories.WithInlineText} title="With inline text" description="The ring carries no text inside its center; put the status and percent beside it." />
 
@@ -125,7 +125,7 @@ will not fit.
 ## Usage
 
 Use `ProgressRing` when a task has a known percent done and sits in an
-icon-sized slot, such as an uploading file row where a list of horizontal bars
+icon-sized slot, such as the lead of an uploading file row where a list of horizontal bars
 would crowd the view. A ring is never indeterminate.
 
 ### Appearance guidance
@@ -223,12 +223,12 @@ cannot hold text; put the percent beside it on the row's meta line.
 
 ### Match `size` from `PROGRESS_RING_SIZES` to the icon slot it replaces.
 
-Use `size={24}` in a row's leading slot so the ring matches a 24 icon, and
-`size={16}` beside compact text or a 16 icon.
+Use `size={24}` where the slot holds a 24 icon, and `size={16}` beside compact
+text or a 16 icon.
 
 <DoDontPair
     doExample={<FigureRow><ProgressRing value={40} size={24} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
-    doCaption="A ring sized to match the row's leading icon slot."
+    doCaption="A ring sized to match the 24 icon slot."
     dontExample={<FigureRow><ProgressRing value={40} size={16} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
     dontCaption="An undersized ring that looks lost beside a larger icon slot."
 />

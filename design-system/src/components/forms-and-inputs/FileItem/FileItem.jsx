@@ -174,7 +174,7 @@ const FileItem = ({
         leadNode = (
             <ProgressRing
                 value={clampedProgress}
-                size={24}
+                size={16}
                 label={`Uploading ${name}`}
             />
         );

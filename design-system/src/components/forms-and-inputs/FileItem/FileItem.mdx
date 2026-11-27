@@ -137,7 +137,7 @@ Use `FileItem` inside `FileUpload`'s `children` slot to represent every chosen f
 
 ## Parts
 
-1. **Lead (`start`).** A `--image-md` (`32px`) slot. A `done` item sits in a gray `Tile` 32: the folder icon when `kind="folder"`, or the matching file-type icon when `kind="file"`. A status stays bare and centered in the slot, never in a Tile: a `subtlest` clock when `queued`, a 24 `ProgressRing` when `uploading`, a danger icon on `error`.
+1. **Lead (`start`).** A `--image-md` (`32px`) slot. A `done` item sits in a gray `Tile` 32: the folder icon when `kind="folder"`, or the matching file-type icon when `kind="file"`. A status stays bare and centered in the slot, never in a Tile: a `subtlest` clock when `queued`, a 16 `ProgressRing` when `uploading` (the same 16 as the other status icons, so the row does not jump), a danger icon on `error`.
 2. **Name (`label`).** Single-line name that truncates before the extension so `.mp4` or `.pdf` remains readable, wrapped in a `Tooltip` with the full name. Opens via `Link` when `href` is set on a `done` item.
 3. **Meta (`description`).** Single-line secondary status: `Waiting` when `queued`, `Uploading · <n>%` when `uploading`, `meta` (or `Uploaded`) when `done`, and the `error` message in danger text on `error`.
 4. **Actions (`end`).** Omitted when `isReadOnly` or `isDisabled`. Draws a compact subtle X `IconButton` for `cancel` and `remove`, or a trash `IconButton` that confirms via `Popup` for `delete`. On `error`, a compact subtle `Retry` `Button` precedes the X control.
@@ -150,7 +150,7 @@ Use `FileItem` inside `FileUpload`'s `children` slot to represent every chosen f
 </thead>
 <tbody>
 <tr><td>Queued</td><td>Clock icon in <code>--ds-icon-subtlest</code>, <code>Waiting</code> in <code>--ds-text-subtle</code>, and Cancel X.</td></tr>
-<tr><td>Uploading</td><td><code>ProgressRing</code> at <code>--icon-lg</code>, <code>Uploading · &lt;n&gt;%</code> in <code>--ds-text-subtle</code>, and Cancel X.</td></tr>
+<tr><td>Uploading</td><td><code>ProgressRing</code> at <code>--icon-md</code>, <code>Uploading · &lt;n&gt;%</code> in <code>--ds-text-subtle</code>, and Cancel X.</td></tr>
 <tr><td>Done</td><td>File-type or folder icon in a gray Tile 32, <code>meta</code> (size, count, or date), optional <code>href</code> link, and Remove X or Delete trash with confirmation.</td></tr>
 <tr><td>Error</td><td>Danger icon in <code>--ds-icon-danger</code>, cause-and-fix message in <code>--ds-text-danger</code>, and <code>Retry</code> before Remove X.</td></tr>
 <tr><td>Read-only</td><td>Full contrast and openable <code>href</code> link, with all end actions hidden.</td></tr>
@@ -167,7 +167,7 @@ Use `FileItem` inside `FileUpload`'s `children` slot to represent every chosen f
 <tbody>
 <tr><td>Row height and padding</td><td><code>--file-item-height</code>, horizontal padding <code>--pad-x-lg</code>, gap <code>--inline-lg</code>.</td></tr>
 <tr><td>Row surface and border</td><td><code>--ds-surface</code>, <code>--ds-border</code>, radius <code>--radius-control-md</code>; list dividers use <code>--border-width-default</code> in <code>--ds-border</code>.</td></tr>
-<tr><td>Lead slot</td><td><code>--image-md</code>; a Tile 32 for the kind of item, bare status icons in <code>--ds-icon-subtlest</code> and <code>--ds-icon-danger</code>, and a <code>ProgressRing</code> at <code>--icon-lg</code>.</td></tr>
+<tr><td>Lead slot</td><td><code>--image-md</code>; a Tile 32 for the kind of item, bare status icons in <code>--ds-icon-subtlest</code> and <code>--ds-icon-danger</code>, and a <code>ProgressRing</code> at <code>--icon-md</code>.</td></tr>
 <tr><td>Name and meta</td><td><code>--body-default</code> in <code>--ds-text</code>; meta in <code>--body-sm</code> and <code>--ds-text-subtle</code> (or <code>--ds-text-danger</code> on error).</td></tr>
 </tbody>
 </DocsTable>

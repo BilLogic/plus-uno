@@ -38,7 +38,7 @@ describe('FileItem', () => {
 
         rerender(<FileItem name="notes.pdf" status="uploading" progress={10} />);
         expect(container.querySelector('.plus-tile')).toBeNull();
-        expect(screen.getByRole('progressbar')).toHaveAttribute('data-size', '24');
+        expect(screen.getByRole('progressbar')).toHaveAttribute('data-size', '16');
     });
 
     it('renders uploading status with ProgressRing, "Uploading · <n>%" meta, and Cancel X', () => {

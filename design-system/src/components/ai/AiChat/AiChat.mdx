@@ -121,7 +121,7 @@ and the component index and names that fallback.
 
 ## Parts
 
-1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
+1. **Button.** A primary circle Icon button with the AI icon at 24, at the bottom right of the Page. The 24 is the one exception to the 16 icon inside a button: the launcher is a standalone mark. It is the one way in, and it hides while chat is open in the Panel or full screen.
 2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close.
 3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
 4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.
@@ -158,6 +158,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 <tr><td>Popup</td><td><code>--ai-chat-width</code> wide and <code>--ai-chat-height</code> high; without the button it floats <code>--stack-md</code> above where the button would be.</td></tr>
 <tr><td>Floating popup fill</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popup-radius</code>.</td></tr>
 <tr><td>Full screen</td><td><code>--ds-surface</code>, on <code>--layer-dialog</code>; the conversation is capped at <code>--content-max-width-reading</code>.</td></tr>
+<tr><td>Button icon</td><td><code>--icon-lg</code> (24), a standalone mark rather than an icon inside a button label.</td></tr>
 <tr><td>Header AI icon</td><td><code>--ds-icon</code>, so it reads as an icon, not as the title beside it.</td></tr>
 <tr><td>Conversation</td><td><code>--stack-md</code> between messages, <code>--body-default</code> in <code>--ds-text</code>.</td></tr>
 <tr><td>The person's message</td><td><code>--ds-surface-sunken</code>, <code>--pad-y-sm</code> by <code>--pad-x-md</code>, <code>--radius-md</code>.</td></tr>

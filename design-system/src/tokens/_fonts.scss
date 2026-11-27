@@ -39,7 +39,7 @@ body {
 
 /* A glyph with no size of its own sits one step under the body text, at the
    small icon size. */
-body :is(.fa-solid, .fa-regular, .fas, .far) {
+body :is(.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab) {
     font-size: var(--icon-sm);
     line-height: var(--type-line-height-150);
 }
@@ -88,7 +88,7 @@ h6 {
     letter-spacing: var(--heading-xxs-tracking);
 }
 
-:is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {
+:is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab) {
     font-size: inherit;
     line-height: inherit;
 }
