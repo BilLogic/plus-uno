@@ -3,7 +3,7 @@ import { Button, Calendar } from '@/components';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { alpha, px, restingLabelFont, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import DateTag, { DATE_TAG_APPEARANCES, DATE_TAG_SPACINGS } from './DateTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
@@ -355,7 +355,8 @@ const inDocument = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 /**
  * With a `menu`, normally a Calendar, the tag is a button that opens it in a
- * Popup. Same outline as the label, plus the `angle-down` chevron: 12 in a
+ * Popup. Its label type (size, line height, family, weight) matches a plain
+ * tag's. Same outline as the label, plus the `angle-down` chevron: 12 in a
  * default tag, 16 in a spacious one, with equal padding on both sides.
  */
 export const WithCalendar = () => <MenuMatrix />;
@@ -376,6 +377,13 @@ WithCalendar.play = async ({ canvasElement }) => {
         const label = within(el).getByText(LABELS[appearance]).getBoundingClientRect();
         const chevron = el.querySelector('.plus-date-tag__chevron');
         const glyph = chevron.querySelector('i');
+
+        const plain = restingLabelFont(canvasElement, 'plus-date-tag', size);
+        const text = getComputedStyle(el.querySelector('.plus-date-tag__label'));
+        await expect(text.fontSize, `${name} label size matches a plain tag`).toBe(plain.fontSize);
+        await expect(text.lineHeight, `${name} label line height matches a plain tag`).toBe(plain.lineHeight);
+        await expect(text.fontFamily, `${name} label family matches a plain tag`).toBe(plain.fontFamily);
+        await expect(text.fontWeight, `${name} label weight matches a plain tag`).toBe(plain.fontWeight);
         await expect(getComputedStyle(glyph, '::before').content, `${name} draws angle-down`).toBe(glyphOf(canvasElement, 'fa-angle-down'));
         await expect(px(getComputedStyle(glyph).fontSize), `${name} chevron size`).toBe(CHEVRON_BOX[size]);
         await expect(icon.left - box.left, `${name} leading padding`).toBe(PAD[size]);

@@ -3,7 +3,7 @@ import { Button, ButtonItem } from '@/components';
 import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, restingLabelFont, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './StatusTag';
 import { expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
@@ -594,7 +594,8 @@ const eachMenuTag = async (canvasElement, check) => {
 const inDocument = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 /**
- * With a `menu` the tag is a button that opens the other statuses. Same box and
+ * With a `menu` the tag is a button that opens the other statuses. Its label
+ * type (size, line height, family, weight) matches a plain tag's. Same box and
  * tone as the label, plus the `angle-down` chevron: 12 in a default tag, 16 in a
  * spacious one, with equal padding on both sides.
  */
@@ -615,6 +616,13 @@ WithMenu.play = async ({ canvasElement }) => {
         const label = within(el).getByText(appearance).getBoundingClientRect();
         const chevron = el.querySelector('.plus-status__chevron');
         const glyph = chevron.querySelector('i');
+
+        const plain = restingLabelFont(canvasElement, 'plus-status', size);
+        const text = getComputedStyle(within(el).getByText(appearance));
+        await expect(text.fontSize, `${name} label size matches a plain tag`).toBe(plain.fontSize);
+        await expect(text.lineHeight, `${name} label line height matches a plain tag`).toBe(plain.lineHeight);
+        await expect(text.fontFamily, `${name} label family matches a plain tag`).toBe(plain.fontFamily);
+        await expect(text.fontWeight, `${name} label weight matches a plain tag`).toBe(plain.fontWeight);
         await expect(getComputedStyle(glyph, '::before').content, `${name} draws angle-down`).toBe(glyphOf(canvasElement, 'fa-angle-down'));
         await expect(px(getComputedStyle(glyph).fontSize), `${name} chevron size`).toBe(CHEVRON_BOX[size]);
         await expect(label.left - box.left, `${name} leading padding`).toBe(PAD[size]);

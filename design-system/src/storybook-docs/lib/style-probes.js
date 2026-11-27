@@ -47,3 +47,23 @@ export const alpha = (color) => {
     const parts = color.match(/[\d.]+/g).map(Number);
     return parts.length === 4 ? parts[3] : 1;
 };
+
+/**
+ * The label font of a resting (non-menu) tag, read from one built with the
+ * same block and spacing modifier inside `host`, so a menu tag that picks up
+ * the button's font fails against it. `block` is the tag's BEM block, such as
+ * `plus-status`; `spacing` is `default` or `spacious`.
+ */
+export const restingLabelFont = (host, block, spacing) => {
+    const doc = host.ownerDocument;
+    const tag = doc.createElement('span');
+    tag.className = `${block} ${block}--neutral ${block}--${spacing}`;
+    const label = doc.createElement('span');
+    label.className = `${block}__label`;
+    label.textContent = 'Plain';
+    tag.appendChild(label);
+    host.appendChild(tag);
+    const { fontSize, lineHeight, fontFamily, fontWeight } = doc.defaultView.getComputedStyle(label);
+    tag.remove();
+    return { fontSize, lineHeight, fontFamily, fontWeight };
+};
