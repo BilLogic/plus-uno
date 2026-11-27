@@ -110,7 +110,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Options gap | Stacked `--stack-md`; inline and tile gap `--inline-lg`. |
-| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
+| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-md` trailing check in `--ds-icon-selected`. |
 | Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Tile surface and edge | `--ds-surface` and `--ds-border`; selected `--ds-background-selected` and 2px `--ds-border-selected`; radius `--radius-control-md`. |
 | Reveal indent | `--checkbox-control-size` plus `--stack-md`. |

@@ -144,7 +144,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Options gap | Stacked `--stack-md`; inline column gap `--radio-group-inline-gap`; tile gap `--inline-lg`. |
-| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
+| Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-md` trailing check in `--ds-icon-selected`. |
 | Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Radio size | `--radio-control-size`, or `--radio-control-size-10` and `-14` through `size`. |
 | Scale ends | `--ds-text`, body default; gap `--radio-group-inline-gap`. |
