@@ -345,7 +345,7 @@ The Size and Border scales (spacing / foundations): heights, widths, and the Ico
 --height-300
 --height-500
 --height-750
---icon-lg  /* Size of a large icon, such as one in an EmptyState or a Tile. */
+--icon-lg  /* The glyph Tile 40 and 48 and Avatar draw; never a plain icon. */
 --icon-md  /* Size of a default icon beside body text or in a control. */
 --icon-sm  /* Size of a small icon, such as one inside a compact control. */
 --image-lg  /* Size of a large image or avatar, such as one in a profile header. */

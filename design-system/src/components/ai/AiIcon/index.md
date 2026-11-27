@@ -2,7 +2,7 @@
 
 # AiIcon
 
-An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.
+An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default). Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.
 
 **Import:** `import { AiIcon } from '@/components';`
 
@@ -60,7 +60,7 @@ Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 
 1. **Glyph.** A Font Awesome Free shape for the action: generate, ask, rewrite, summarize, plan, suggest or stop generating.
 2. **Sparkle.** One four-point sparkle at the top right, with a gap cut around it. Generate is the sparkle alone; stop generating has none.
-3. **Size.** 12 (generate and stop generating only), 16 or 24.
+3. **Size.** 12 (generate and stop generating only) or 16.
 
 ### States
 
@@ -74,7 +74,7 @@ Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 | Part | Token |
 | --- | --- |
 | Fill | `currentColor`, the color around the icon; set it to `--ds-icon` for a standalone icon. |
-| Size | A square box of exactly its size: `--icon-sm` (12), `--icon-md` (16) and `--icon-lg` (24). |
+| Size | A square box of exactly its size: `--icon-sm` (12) and `--icon-md` (16). |
 
 ## Content guidelines
 
@@ -97,13 +97,13 @@ Same group: `AiChat` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 
 **`name`** — `generate` · `ask` · `rewrite` · `summarize` · `plan` · `suggest` · `stop-generating`
 
-**`size`** — `12` · `16` · `24`
+**`size`** — `12` · `16`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--icon-lg` · `--icon-md` · `--icon-sm`
+`--icon-md` · `--icon-sm`
 
 From `design-system/src/components/ai/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
 

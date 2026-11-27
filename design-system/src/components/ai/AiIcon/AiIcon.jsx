@@ -6,7 +6,7 @@ import './AiIcon.scss';
 export { AI_ICON_NAMES, AI_ICON_SIZES } from './aiIconShapes';
 
 /** Every size the set draws. A given icon has a subset: see `AI_ICON_SIZES`. */
-export const AI_ICON_ALL_SIZES = [12, 16, 24];
+export const AI_ICON_ALL_SIZES = [12, 16];
 
 /**
  * An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest
@@ -15,7 +15,7 @@ export const AI_ICON_ALL_SIZES = [12, 16, 24];
  * sparkle alone, and stop generating has none because stopping is not generative.
  *
  * - **name** picks the icon.
- * - **size** is 16 (the default) or 24. Generate and stop generating also have 12.
+ * - **size** is 16 (the default). Generate and stop generating also have 12.
  *   Asking another icon for 12 draws it at 16 and warns.
  * - **label** names the icon for assistive technology. Without it the icon is
  *   hidden, so pair it with visible text.

@@ -845,7 +845,7 @@
 			"import": "import { AiIcon } from '@/components';",
 			"source": "design-system/src/components/ai/AiIcon/AiIcon.jsx",
 			"aliasOf": null,
-			"summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
+			"summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default). Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
 			"aliases": [],
 			"props": [
 				{
@@ -872,8 +872,7 @@
 					"default": "16",
 					"values": [
 						"12",
-						"16",
-						"24"
+						"16"
 					],
 					"description": "The icon's size in px. 12 exists for generate and stop-generating only.",
 					"deprecated": null
@@ -916,7 +915,7 @@
 					"\n",
 					"# AiIcon\n",
 					"\n",
-					"An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.\n",
+					"An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default). Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which is the color around the icon, as with `Icon`; set `color` to change it. Pair every icon with a label unless its meaning is obvious.\n",
 					"\n",
 					"**Import:** `import { AiIcon } from '@/components';`\n",
 					"\n",
@@ -974,7 +973,7 @@
 					"\n",
 					"1. **Glyph.** A Font Awesome Free shape for the action: generate, ask, rewrite, summarize, plan, suggest or stop generating.\n",
 					"2. **Sparkle.** One four-point sparkle at the top right, with a gap cut around it. Generate is the sparkle alone; stop generating has none.\n",
-					"3. **Size.** 12 (generate and stop generating only), 16 or 24.\n",
+					"3. **Size.** 12 (generate and stop generating only) or 16.\n",
 					"\n",
 					"### States\n",
 					"\n",
@@ -988,7 +987,7 @@
 					"| Part | Token |\n",
 					"| --- | --- |\n",
 					"| Fill | `currentColor`, the color around the icon; set it to `--ds-icon` for a standalone icon. |\n",
-					"| Size | A square box of exactly its size: `--icon-sm` (12), `--icon-md` (16) and `--icon-lg` (24). |\n",
+					"| Size | A square box of exactly its size: `--icon-sm` (12) and `--icon-md` (16). |\n",
 					"\n",
 					"## Content guidelines\n",
 					"\n",
@@ -1011,13 +1010,13 @@
 					"\n",
 					"**`name`** — `generate` · `ask` · `rewrite` · `summarize` · `plan` · `suggest` · `stop-generating`\n",
 					"\n",
-					"**`size`** — `12` · `16` · `24`\n",
+					"**`size`** — `12` · `16`\n",
 					"\n",
 					"The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.\n",
 					"\n",
 					"## Tokens touched\n",
 					"\n",
-					"`--icon-lg` · `--icon-md` · `--icon-sm`\n",
+					"`--icon-md` · `--icon-sm`\n",
 					"\n",
 					"From `design-system/src/components/ai/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.\n",
 					"\n",
@@ -52392,7 +52391,7 @@
 			"tier": "semantic",
 			"group": "Scale Tokens",
 			"value": "var(--size-150)",
-			"intent": "Size of a large icon, such as one in an EmptyState or a Tile."
+			"intent": "The glyph Tile 40 and 48 and Avatar draw; never a plain icon."
 		},
 		{
 			"name": "--icon-md",

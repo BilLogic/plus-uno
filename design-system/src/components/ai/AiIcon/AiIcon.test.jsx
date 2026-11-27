@@ -29,7 +29,7 @@ describe('AiIcon', () => {
     });
 
     it('fills with currentColor', () => {
-        const { container } = render(<AiIcon name="suggest" size={24} />);
+        const { container } = render(<AiIcon name="suggest" size={16} />);
         const svg = container.querySelector('svg');
         expect(svg).toHaveAttribute('fill', 'currentColor');
         expect(svg.querySelectorAll('[fill]:not(svg)')).toHaveLength(0);
@@ -78,10 +78,11 @@ describe('AiIcon', () => {
         expect(screen.getByTestId('icon')).toBe(container.firstChild);
     });
 
-    it('shifts the 24 ask drawing 0.75 right and up so it centers optically, and leaves 16 alone', () => {
-        const { container, rerender } = render(<AiIcon name="ask" size={24} />);
-        expect(container.querySelector('svg')).toHaveAttribute('viewBox', '-0.75 0.75 24 24');
-        rerender(<AiIcon name="ask" size={16} />);
+    it('draws a requested 24 at 16 and warns, since a plain icon is 12 or 16', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const { container } = render(<AiIcon name="ask" size={24} />);
         expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 16 16');
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('"ask" has no 24px size'));
+        warn.mockRestore();
     });
 });

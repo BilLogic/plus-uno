@@ -165,7 +165,7 @@ export const TOKEN_LADDER = [
   // ─── Semantics / Size (dimension roles; mostly reclassified, + Control) ─
   { tier: 'semantics', group: 'Size', new: '--icon-sm', old: '--icon-sm', use: 'Size of a small icon, such as one inside a compact control.' },
   { tier: 'semantics', group: 'Size', new: '--icon-md', old: '--icon-md', use: 'Size of a default icon beside body text or in a control.' },
-  { tier: 'semantics', group: 'Size', new: '--icon-lg', old: '--icon-lg', use: 'Size of a large icon, such as one in an EmptyState or a Tile.' },
+  { tier: 'semantics', group: 'Size', new: '--icon-lg', old: '--icon-lg', use: 'The glyph Tile 40 and 48 and Avatar draw; never a plain icon.' },
   { tier: 'semantics', group: 'Size', new: '--image-xxs', old: '--image-xxs', use: 'Size of the smallest image or avatar, such as one inline with text.' },
   { tier: 'semantics', group: 'Size', new: '--image-xs', old: '--image-xs', use: 'Size of an extra-small image or avatar, such as one in a dense row.' },
   { tier: 'semantics', group: 'Size', new: '--image-sm', old: '--image-sm', use: 'Size of a small image or avatar, such as one in a list row.' },
