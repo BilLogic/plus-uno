@@ -594,6 +594,23 @@ const eachMenuTag = async (canvasElement, check) => {
 const inDocument = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 /**
+ * The label's type, read from a plain tag of the same spacing built from the
+ * same classes beside it, so a menu tag that picks up the button's font fails.
+ */
+const plainLabelType = (host, block, size) => {
+    const tag = document.createElement('span');
+    tag.className = `${block} ${block}--neutral ${size === 'spacious' ? `${block}--spacious` : ''}`;
+    const label = document.createElement('span');
+    label.className = `${block}__label`;
+    label.textContent = 'Plain';
+    tag.appendChild(label);
+    host.appendChild(tag);
+    const { fontSize, lineHeight } = getComputedStyle(label);
+    tag.remove();
+    return { fontSize, lineHeight };
+};
+
+/**
  * With a `menu` the tag is a button that opens the other statuses. Same box and
  * tone as the label, plus the `angle-down` chevron: 12 in a default tag, 16 in a
  * spacious one, with equal padding on both sides.
@@ -615,6 +632,11 @@ WithMenu.play = async ({ canvasElement }) => {
         const label = within(el).getByText(appearance).getBoundingClientRect();
         const chevron = el.querySelector('.plus-status__chevron');
         const glyph = chevron.querySelector('i');
+
+        const plain = plainLabelType(canvasElement, 'plus-status', size);
+        const text = getComputedStyle(within(el).getByText(appearance));
+        await expect(text.fontSize, `${name} label size matches a plain tag`).toBe(plain.fontSize);
+        await expect(text.lineHeight, `${name} label line height matches a plain tag`).toBe(plain.lineHeight);
         await expect(getComputedStyle(glyph, '::before').content, `${name} draws angle-down`).toBe(glyphOf(canvasElement, 'fa-angle-down'));
         await expect(px(getComputedStyle(glyph).fontSize), `${name} chevron size`).toBe(CHEVRON_BOX[size]);
         await expect(label.left - box.left, `${name} leading padding`).toBe(PAD[size]);
