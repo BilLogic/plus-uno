@@ -25,7 +25,7 @@ Use Read-only for a value someone could change but this person cannot right now:
 
 | Who can change it | Show it as | Tab order | Looks |
 | --- | --- | --- | --- |
-| Someone else, or this person later | Read-only field | In | Neutral fill, full contrast, no chevron or calendar, no hover |
+| Someone else, or this person later | Read-only field | In | Neutral fill, full contrast, no angle or calendar, no hover |
 | Nobody, ever, here | Plain text: label and value | Out | Text |
 | This person, once a prerequisite on this screen is met | Disabled field | Out | Faded, the reason in the caption |
 
@@ -84,7 +84,7 @@ It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` 
 
 **Checked:** Automatic
 
-`Select` hides its chevron and `DatePicker` its calendar button. `Checkbox`, `RadioGroup` and `Toggle` keep their state and ignore clicks.
+`Select` hides its angle and `DatePicker` its calendar button. `Checkbox`, `RadioGroup` and `Toggle` keep their state and ignore clicks.
 
 ### Say why in the caption. {#say-why-in-the-caption}
 

@@ -108,7 +108,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
 
 ## Parts
 
-1. **Logo row.** The PLUS `Logo`, which goes Home, and the toggle at the end of the row.
+1. **Logo row.** The PLUS `Logo`, which goes Home, and the toggle at the end of the row. It is the top band the Page's header row shares: 36 high from the page pad (y 24), centered on y 42, so the first row starts at y 72.
 2. **Group.** Rows under an optional section title. A group without a title has no title row and never collapses.
 3. **Section title.** A full `--control-md` row in the subtlest text. On hover and focus the collapse angle shows after it.
 4. **Row.** An icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.

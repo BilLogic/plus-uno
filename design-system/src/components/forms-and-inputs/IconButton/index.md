@@ -102,7 +102,7 @@ Don't: The same two views as loose buttons read as unrelated actions.
 - `Button`: use when space allows a visible text label.
 - `LinkIconButton`: use when the icon navigates to another page or URL.
 - `CloseButton`: use when dismissing a modal, message or flag.
-- `ButtonGroup`: use when grouping related icon buttons into one control.
+- `ButtonGroup`: use when setting related icon buttons in one spaced row.
 - `SegmentedControl`: use when the icons switch between views of the same content.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`

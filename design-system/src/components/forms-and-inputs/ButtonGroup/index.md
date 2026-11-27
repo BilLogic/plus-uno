@@ -79,7 +79,7 @@ The group keeps one row inside its slot. A clipped label has no Tooltip, so keep
 
 - `SegmentedControl`: use when switching how the same content is shown, such as Day / Week / Month or Table / Cards.
 - `Button`: use when an action stands alone or sits in a spaced row.
-- `SplitButton`: use when one primary action pairs with a chevron menu.
+- `SplitButton`: use when one primary action pairs with an angle menu.
 - `ChoiceGrid`: use when offering illustrated choices (or `RadioGroup` / `CheckboxGroup` with `appearance="tile"`).
 
 Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SegmentedControl` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`

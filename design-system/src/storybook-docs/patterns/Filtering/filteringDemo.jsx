@@ -140,7 +140,7 @@ export const FilteredStudents = ({
         return () => { clearTimeout(replace); clearTimeout(blur); };
     }, [mount, openMenu]);
 
-    // Below 768 quick filters fold into a stacked menu behind the Filter icon; below 960 a filter side hides and the Filter icon returns.
+    // Below 768 two or more quick filters fold into the one Filter button, which opens the side; below 960 a filter side hides and the Filter icon returns.
     const folded = tier === '1' && width < FRAME_LAYOUT.fullWidthBelow;
     const sideFits = width >= SECTION_DETAIL_FLOOR;
     const menuProps = (id) => (openMenu

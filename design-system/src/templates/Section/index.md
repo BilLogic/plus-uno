@@ -105,7 +105,7 @@ Each control has one home. The Filter button returns with its count once the sid
 
 **Checked:** Review
 
-A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page docks a `Panel` beside the list instead, and the record opens on demand.
+A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page — a queue page opens a floating `Panel` over the list instead, and the record opens on demand.
 
 ### Keep the footer for paging and "View all". {#keep-the-footer-for-paging-and-view-all}
 
@@ -141,7 +141,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 ## Related
 
 - Page: use when the heading is the page's own.
-- Panel: use when a queue page docks the Panel beside the list, or for a quick look from a table.
+- Panel: use when a queue page floats the Panel over the list, or for a quick look from a table.
 - Popup: use when choosing the menu a filter trigger opens (`PopupSelect` or `FilterMenu`).
 - Table: use when the body is rows and columns.
 - Filtering: use when picking a filter tier for the header.
@@ -258,7 +258,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `detailOpen` | bool | — | Controlled open state of the inline detail expand |
 | `defaultDetailOpen` | bool | `false` | Whether an uncontrolled inline detail expand starts open |
 | `onDetailOpenChange` | func | — | Called with the next open boolean when the inline detail expand toggles |
-| `level` | enum | — | `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down |
+| `level` | enum | — | `page` makes the title the page's h1 at Heading/xxlarge 32; by default it nests one level down |
 | `spacing` | enum | `'default'` | Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value |
 | `isTitleHidden` | bool | `false` | Hides the title visually and keeps it as the Section's heading and accessible name. Set it when the page (or the active page tab) has one Section with no actions: the page title is enough, so the Section starts at the rows it needs. Several Sections, or a Section with actions, show the title row. |
 | `named` | bool | `false` | Makes the section a region named by its title, for a section that stands apart as a landmark |

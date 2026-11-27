@@ -509,7 +509,7 @@ export const BodyOnly = () => (
     <Card style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</Card>
 );
 
-/** A header with actions over the body, and a footer for actions that commit. */
+/** A header with actions over the body, and a footer: a link for one action that goes somewhere, or a compact pair with no Primary. */
 export const WithFooter = () => (
     <Card
         title="Grade 7 math · Session 4"

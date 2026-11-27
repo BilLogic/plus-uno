@@ -12,7 +12,7 @@ import { typeStyle } from '../../lib/type-style.js';
  * props: the docs page runs no plays.
  *
  *   ReadOnlyField    a TextField set by someone else, the reason in its caption
- *   ReadOnlyPickers  a Select and a DatePicker without their chevron and calendar
+ *   ReadOnlyPickers  a Select and a DatePicker without their angle and calendar
  *   ReadOnlyChoices  a Checkbox, a RadioGroup and a Toggle holding their state
  *   OwnedForm        a whole form someone else owns: every field read-only, one caption on the group
  *   LongValue        a long value in a TextArea whose rows show all of it
@@ -36,7 +36,7 @@ export const ReadOnlyField = ({ padded = true }) => (
     </div>
 );
 
-/** A Select and a DatePicker: no chevron, no calendar button, the value reads as text. */
+/** A Select and a DatePicker: no angle, no calendar button, the value reads as text. */
 export const ReadOnlyPickers = () => (
     <div style={paddedColumn}>
         <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly caption="Set by your supervisor." />

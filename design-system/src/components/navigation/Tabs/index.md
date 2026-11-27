@@ -176,7 +176,7 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar`
 | --- | --- |
 | Tab height | `--control-md` |
 | Tab padding | `--pad-x-lg` |
-| Narrow | scroll end fade `--inline-3xl`; menu chevron `--icon-sm`, check `--ds-icon-selected` |
+| Narrow | scroll end fade `--inline-3xl`; menu angle `--icon-sm`, check `--ds-icon-selected` |
 | Ink | `--ds-text-subtle`, selected `--ds-text-selected`, disabled `--ds-text-disabled` |
 | Baseline and bar | `--ds-border`, `--border-width-default`; `--ds-border-selected`, `--border-width-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |

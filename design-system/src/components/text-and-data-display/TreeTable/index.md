@@ -57,7 +57,7 @@ Don't: A link in the row, where a press means two things.
 ## Accessibility
 
 - **A treegrid.** Each row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`, so depth and state are announced.
-- **One tab stop.** Arrow keys move, open and close rows; Home and End jump to the ends; Enter toggles.
+- **One tab stop.** Arrow keys move, open and close rows; Home and End jump to the ends; Enter toggles. While the rows overflow the scroll area, the area itself takes one more tab stop and a region name, so a keyboard can scroll it.
 - **The chevron is a pointer target only.** It is `aria-hidden`; the keyboard route is the arrow keys on the row.
 - **Loading is busy.** A parent whose children are loading is `aria-busy`.
 

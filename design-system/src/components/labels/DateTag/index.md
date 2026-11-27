@@ -108,7 +108,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
 2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
 3. **Outline.** An inset border, so the height stays exact. A date tag has no fill.
-4. **Chevron.** With a `menu` only: `angle-down`, and `angle-up` while the popup is open.
+4. **Angle.** With a `menu` only: `angle-down`, and `angle-up` while the popup is open.
 
 ### States
 
@@ -117,7 +117,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | Rest | Without a menu, the only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window. |
 | Hovered, pressed | Without a menu, none: it is a label. With a menu, the neutral subtle hovered and pressed backgrounds. |
 | Focused | Without a menu, none: it is not in the tab order, and a truncated label takes focus only so a keyboard user can reach the tooltip with its full text. With a menu, the standard focus ring. |
-| Open | With a menu only: drawn selected, on the pressed background, with the chevron up. |
+| Open | With a menu only: drawn selected, on the pressed background, with the angle up. |
 | Loading | With a menu only: the content is hidden at `opacity: 0`, keeping its width, with one spinner centered over it. |
 | Disabled | Without a menu, none: a label is never dimmed. With a menu, the disabled text and edge, with no opacity. |
 
@@ -128,8 +128,8 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `StatusTag` · `Tag`
 | Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 | Padding and gap | `--pad-x-xs` on the leading edge, `--tag-pad-x-end-compact` on the trailing edge, `--tag-gap-compact` between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` leading, `--tag-pad-x-end` trailing, `--tag-gap` between icon and label. |
 | Corner | `--radius-md`; spacious `--radius-control-md`. |
-| With a menu: padding and gap | `--pad-x-xs` on both sides with `--stack-sm` between the label and the chevron; spacious `--pad-x-md` on both sides with `--tag-gap`. |
-| With a menu: chevron and spinner | The chevron is `--icon-sm` (12), or `--icon-md` (16) when spacious. The spinner is `size={12}` (`--icon-sm`), or `size={16}` when spacious. |
+| With a menu: padding and gap | `--pad-x-xs` on both sides with `--stack-sm` between the label and the angle; spacious `--pad-x-md` on both sides with `--tag-gap`. |
+| With a menu: angle and spinner | The angle is `--icon-sm` (12), or `--icon-md` (16) when spacious. The spinner is `size={12}` (`--icon-sm`), or `size={16}` when spacious. |
 | With a menu: hovered, pressed, open | `--ds-background-neutral-subtle-hovered` and `--ds-background-neutral-subtle-pressed`; open uses the pressed one. |
 | With a menu: disabled | `--ds-text-disabled` and `--ds-border-disabled`, with no opacity. |
 | Neutral | `--ds-border` edge, `--ds-text-subtle` words. |

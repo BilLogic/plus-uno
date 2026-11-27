@@ -93,7 +93,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Done | File-type or folder icon in a gray Tile 32, `meta` (size, count, or date), optional `href` link, and Remove X or Delete trash with confirmation. |
 | Error | Danger icon in `--ds-icon-danger`, cause-and-fix message in `--ds-text-danger`, and `Retry` before Remove X. |
 | Read-only | Full contrast and openable `href` link, with all end actions hidden. |
-| Disabled | `--ds-background-disabled`, `--ds-border-disabled`, and `--ds-text-disabled`; end actions hidden and links disabled. |
+| Disabled | `--ds-background-disabled`, `--ds-border-disabled`, and `--ds-text-disabled`, with the lead Tile on `--ds-background-disabled` and a `--ds-icon-disabled` glyph; end actions hidden and links disabled. |
 
 ### Tokens
 
