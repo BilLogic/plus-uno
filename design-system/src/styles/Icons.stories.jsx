@@ -26,7 +26,7 @@ const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-ic
 );
 
 const SIZES = [
-    ['--icon-sm', '12', 'chevron-down', 'Use sparingly: chevrons, small text, field validation, and inside small components such as tags and table headers.'],
+    ['--icon-sm', '12', 'chevron-down', 'Use sparingly: angles, chevrons, small text, field validation, and inside small components such as tags and table headers.'],
     ['--icon-md', '16', 'calendar-days', 'The default. Beside 14 and 16 text in buttons, menus, fields and lists.'],
     ['--icon-lg', '24', 'folder', 'The largest icon. Empty states, section headers and standalone status marks.'],
 ];
@@ -135,11 +135,11 @@ export const FreeFamiliesOnly = {
     },
 };
 
-/** Use 16 by default beside body text, and 12 sparingly for chevrons and compact parts. */
+/** Use 16 by default beside body text, and 12 sparingly for angles, chevrons and compact parts. */
 export const IconSizingInControls = {
     render: () => (
         <DoDont>
-            <Do caption="A 16 icon leads the label; the trailing chevron is 12.">
+            <Do caption="A 16 icon leads the label; the trailing angle is 12.">
                 <Button
                     appearance="default"
                     text="Add tutor"

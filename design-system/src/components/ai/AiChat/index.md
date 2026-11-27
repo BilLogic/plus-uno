@@ -135,6 +135,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | Popup | `--ai-chat-width` wide and `--ai-chat-height` high; without the button it floats `--stack-md` above where the button would be. |
 | Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
+| Header AI icon | `--ds-icon`, so it reads as an icon, not as the title beside it. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
 | Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-sm`. |

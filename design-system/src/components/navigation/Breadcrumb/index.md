@@ -95,7 +95,7 @@ Don't: A React element is stringified by CSS and disappears.
 
 ### Show the whole path, root first. {#show-the-whole-path-root-first}
 
-A trail that starts mid-hierarchy leaves people unsure where they are. List every parent from the top down to the page's own parent, and let a level too long end in an ellipsis rather than dropping it.
+A trail that starts mid-hierarchy leaves people unsure where they are. List every parent from the top down to the page's own parent, and let a level too long end in an ellipsis rather than dropping it. A trail of five or more levels folds its middle levels into the menu, never drops them.
 
 Do: Every parent from the root down.
 Don't: The trail starts mid-hierarchy, so the top is missing.
@@ -142,6 +142,7 @@ Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 1. **Landmark and list.** A `nav` named by `label` around an ordered list, one item per level, root first.
 2. **Parent link.** Every item, in the link color; an `onClick` intercepts it for a router.
 3. **Separator.** A slash drawn between items; `separator` swaps the character.
+4. **Fold.** On a trail of five or more levels, the middle levels fold into a "…" icon button named "Show hidden levels", which opens them as a menu; the root and the last two parents stay visible.
 
 ### States
 
