@@ -31,13 +31,60 @@
 // without touching a caller's signature.
 
 import type { ChannelRole } from "../destination/index";
-import type { AssistantContext } from "../slack/types";
-import type { VisionReference } from "../slack/vision-reference";
 import type { CardFixes, WhichCard } from "../turn/delivery";
 import type { ConversationType } from "../turn/turn";
 import { cardLiveAt, cardTtlMs } from "../card-expiry";
 
-export type { AssistantContext, VisionReference };
+/** Slack file attachment metadata as delivered on message/app_mention events.
+ *  Only the fields the vision path reads — everything else is ignored. */
+export interface SlackEventFile {
+  id?: string;
+  name?: string;
+  filetype?: string;
+  mimetype?: string;
+  permalink?: string;
+  url_private?: string;
+  size?: number;
+}
+
+/** The surface the user has open in the workspace while chatting in the assistant
+ *  panel — delivered on assistant_thread_started and every context change. All
+ *  fields optional: the user may have no channel focused. */
+export interface AssistantContext {
+  channel_id?: string;
+  team_id?: string;
+  enterprise_id?: string;
+}
+
+/** The largest raw context, in JSON characters, the store will look at: three Slack ids run about 130, so 512 leaves headroom. */
+const ASSISTANT_CONTEXT_MAX_CHARS = 512;
+const SLACK_ID_RE = /^[A-Z][A-Z0-9]{1,31}$/;
+
+/** The whitelisted shape of whatever Slack (or anything else) handed us as the
+ *  assistant's context: `channel_id`, `team_id` and `enterprise_id`, each only
+ *  when it is a Slack id; every other key is dropped. Returns null for input
+ *  that is not a plain object or is oversized, so the caller drops the write. */
+export function sanitizeAssistantContext(raw: unknown): AssistantContext | null {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
+  try {
+    if (JSON.stringify(raw).length > ASSISTANT_CONTEXT_MAX_CHARS) return null;
+  } catch {
+    return null;
+  }
+  const source = raw as Record<string, unknown>;
+  const out: AssistantContext = {};
+  for (const key of ["channel_id", "team_id", "enterprise_id"] as const) {
+    const value = source[key];
+    if (typeof value === "string" && SLACK_ID_RE.test(value)) out[key] = value;
+  }
+  return out;
+}
+
+/** What a turn kept of an image or Figma link so the next turn can render it. */
+export interface VisionReference {
+  files?: SlackEventFile[];
+  figmaUrl?: string;
+}
 
 // ── Timings ──────────────────────────────────────────────────────────────────
 //

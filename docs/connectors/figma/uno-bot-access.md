@@ -38,7 +38,7 @@ The workspace's conventions, and the short reach table the bot carries, are [`ov
 | `read_reference`, `present` | as on any turn | the same |
 | `notion_search` | hits on a team surface alone; a catalog scope only when its database is one | refused |
 | `roadmap_query` | when the Roadmap is a configured team surface | refused |
-| every Slack tool: `slack_search`, `slack_thread_read`, `slack_react`, `slack_user_profile`, `slack_channel_members` | refused: a public channel is still the team's own | refused |
+| every Slack tool: `slack_search`, `slack_thread_read`, `slack_channel_read`, `slack_react`, `slack_user_profile`, `slack_channel_members` | refused: a public channel is still the team's own | refused |
 | `search_blueprint`, `reminder_set` | refused | refused |
 
 A refusal is an ordinary tool result, so the answer says what could not be read. GitHub's answer on a repo's visibility is kept ten minutes, so a repo made private stops being read within that. The ask's thread remembers only the lines the reply posted, and an unmapped commenter's turn starts with none of the thread's memory. A teammate's ask stages no card: its proposed write is refused before it stages, and nothing posts to Slack. An unmapped commenter's turn is offered no gated tool at all, so it proposes no write.

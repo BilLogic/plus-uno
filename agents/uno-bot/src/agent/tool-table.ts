@@ -224,6 +224,12 @@ export const TOOL_TABLE = {
     retrieval: true,
     taskCard: { title: "Checking who's in the channel", estate: "slack" },
   },
+  slack_channel_read: {
+    access: "ungated",
+    retrieval: true,
+    taskCard: { title: "Reading the Slack channel", estate: "slack" },
+    offersTable: false,
+  },
   slack_thread_read: {
     access: "ungated",
     retrieval: true,

@@ -29,6 +29,7 @@ import { executeBlueprintSearch } from "../tools/blueprint-search";
 import { executeReadSource } from "../tools/read-source";
 import { executeGithubRead } from "../tools/github-read";
 import { executeGithubIntakeSearch } from "../tools/github-intake-search";
+import { executeSlackChannelRead } from "../tools/slack-channel-read";
 import { executeSlackThreadRead } from "../tools/slack-thread-read";
 import { executeSlackSearch } from "../tools/slack-search";
 import { executeSlackUserProfile, executeSlackChannelMembers } from "../tools/slack-people";
@@ -76,6 +77,7 @@ export const TOOL_BODIES: Record<ToolName, ToolBody> = {
   github_intake_search: (env, input) => executeGithubIntakeSearch(env, input),
   slack_user_profile: (env, input) => executeSlackUserProfile(env, input),
   slack_channel_members: (env, input) => executeSlackChannelMembers(env, input),
+  slack_channel_read: (env, input, slack) => executeSlackChannelRead(env, input, slack),
   slack_thread_read: (env, input, slack) => executeSlackThreadRead(env, input, slack),
   slack_react: (env, input, slack) => executeSlackReact(env, input, slack),
   reminder_set: (env, input, slack) => executeReminderSet(env, input, slack),

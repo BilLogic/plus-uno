@@ -9,7 +9,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { homeView, publishHome } from "../src/slack/home";
-import { promptsFor } from "../src/slack/assistant";
+import { CAPABILITIES, HAND_OFF_TARGETS, repoUrl } from "../src/slack/capabilities";
+import { WELCOME, promptsFor } from "../src/slack/assistant";
 import { TRY_ASKING_ACTION_PREFIX, runTryAskingDoor, type TryAskingDoorDeps } from "../src/slack/try-asking";
 import type { SlackMessageEvent } from "../src/slack/types";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
@@ -17,7 +18,7 @@ import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 type Block = Record<string, any>;
 
 const view = (connected: boolean) =>
-  homeView({ connectUrl: "https://uno.example/oauth/slack/start", viewer: { connected, on: [] } }) as { type: string; blocks: Block[] };
+  homeView({ connectUrl: "https://uno.example/oauth/slack/start", repoUrl: "https://github.com/Acme/widgets", viewer: { connected, on: [] } }) as { type: string; blocks: Block[] };
 
 function buttonsIn(blocks: Block[]): Block[] {
   return blocks.flatMap((b) => (b.type === "actions" ? (b.elements as Block[]) : []));
@@ -41,6 +42,21 @@ describe("the App Home view", () => {
     for (const card of cards) {
       assert.ok(card.body.text.length > 0 && card.body.text.length <= 200, card.body.text);
     }
+  });
+
+  it("shows the capabilities the shared list holds, and names every hand-off target", () => {
+    const cards = view(false).blocks.find((b) => b.type === "carousel")!.elements as Block[];
+    assert.deepEqual(
+      cards.map((c) => [c.title.text, c.body.text]),
+      CAPABILITIES.map((c) => [c.title, c.body]),
+    );
+    const handOff = cards.map((c) => c.body.text).join(" ");
+    for (const target of HAND_OFF_TARGETS) assert.ok(handOff.includes(target), target);
+  });
+
+  it("opens the repo the Worker is configured for", () => {
+    const repo = buttonsIn(view(false).blocks).find((b) => b.text?.text === "Repo");
+    assert.equal(repo?.url, "https://github.com/Acme/widgets");
   });
 
   it("offers each starter prompt as a button that sends it", () => {
@@ -73,7 +89,7 @@ describe("the App Home view", () => {
 
 describe("publishing the App Home", () => {
   const build = (carousel: boolean) =>
-    homeView({ connectUrl: null, viewer: { connected: false, on: [] }, carousel }) as { blocks: Block[] };
+    homeView({ connectUrl: null, repoUrl: "https://github.com/Acme/widgets", viewer: { connected: false, on: [] }, carousel }) as { blocks: Block[] };
 
   /** Publish against a Slack that answers each call in turn. */
   async function publishAgainst(answers: Array<{ ok: boolean; error?: string }>) {
@@ -171,5 +187,21 @@ describe("a Try asking button", () => {
     const deps = fakes({ postTs: null });
     await runTryAskingDoor({ userId: "U0BILL", value: PROMPT }, deps);
     assert.deepEqual(deps.queued, []);
+  });
+});
+
+describe("the capability story", () => {
+  it("derives the repo URL from GITHUB_REPO", () => {
+    assert.equal(repoUrl({ GITHUB_REPO: "BilLogic/plus-uno" }), "https://github.com/BilLogic/plus-uno");
+    assert.equal(repoUrl({ GITHUB_REPO: " Acme/widgets " }), "https://github.com/Acme/widgets");
+  });
+
+  it("keeps the welcome in step with the shared capabilities", () => {
+    assert.equal(
+      WELCOME,
+      "Hey — I'm le goat :goat:. Ask me about Roadmap cards, how a product flow works, " +
+        "or design-system components — or drop a Notion/Figma link and I'll dig in. " +
+        "Anything I'd create or change in Notion or GitHub waits for your approval first.",
+    );
   });
 });

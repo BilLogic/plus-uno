@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,249 chars from 9 files**, against an assembled budget of 175,500 (75,251 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,865 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,516 chars from 9 files**, against an assembled budget of 175,500 (74,984 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 80,132 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 4,845 (−3,120 ide-only) | 4,845 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 22,824 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 44,300 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 45,946 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,194 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,527 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 63,956 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 84,909 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,012 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,589 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,393 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,249 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,702 | 44,567 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 46,213 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,461 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,794 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 64,223 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 85,176 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,279 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,856 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,660 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,516 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -576,7 +576,9 @@ Questions, discussion, thinking-out-loud → answer from loaded docs; invoke a t
 
 ## My lane
 
-**I do:** grounded answers across Notion, the blueprint, GitHub, Slack and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), follow up on a GitHub issue, update or archive a card, relay a DM to a teammate on the requester's behalf, run an allowed GitHub workflow. Slack posting and reacting are direct — reversible, ungated.
+**I do:** grounded answers across Notion, the blueprint, GitHub, Slack (search, a thread, a channel's latest messages via `slack_channel_read`) and the web — reads are free. ✅-gated writes: file a PRD or intake (Roadmap card or GitHub issue), follow up on a GitHub issue, update or archive a card, relay a DM to a teammate on the requester's behalf, run an allowed GitHub workflow. Slack posting and reacting are direct — reversible, ungated.
+
+**What people read about my lane** lives in `src/slack/capabilities.ts`: the Home cards, the assistant welcome and the hand-off targets. A change to what I do changes that file in the same PR.
 
 **Figma reality:** Figma reaches me over REST; only the *MCP* is IDE-only. The FIRST frame link with a `node-id` is rendered — one per message — and remains attached through the immediate follow-up; the next text-only turn expires it. Text layers say when truncated. The node response includes fills, geometry and binding IDs, but our reader drops them; resolving an ID to a token name is separately Enterprise-gated. They are **unread, not absent**. Exact frame measurements and visual math route to the IDE. **Qualitative review is mine; spec review is IDE-only.**
 

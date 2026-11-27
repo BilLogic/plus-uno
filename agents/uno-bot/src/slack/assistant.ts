@@ -26,6 +26,7 @@ import type { SessionStatus, StatusResult } from "./session-status";
 import { threadStateFor } from "../thread-state/production";
 import { getSlackAccessTokenFor, slackConnectUrl } from "../oauth/slack";
 import type { AssistantContext, SlackAppContextChangedEvent } from "./types";
+import { WELCOME_TEXT } from "./capabilities";
 
 export interface SuggestedPrompt {
   /** Chip label shown to the user. */
@@ -219,10 +220,7 @@ export function formatAssistantContext(ctx: AssistantContext | null | undefined)
 // A panel opened: greet once, offer the starter chips, name the thread. The
 // welcome is protocol (like the Worker's own 👀/⏳ posts), not the model
 // talking — so it's a fixed line, kept to one breath, and the chips do the rest.
-export const WELCOME =
-  "Hey — I'm le goat :goat:. Ask me about Roadmap cards, how a product flow works, " +
-  "or design-system components — or drop a Notion/Figma link and I'll dig in. " +
-  "Anything I'd create or change in Notion or GitHub waits for your approval first.";
+export const WELCOME = WELCOME_TEXT;
 
 // First-contact onboarding (ADR-020): when the panel opens for someone who
 // hasn't connected their own Slack history, the welcome carries the one-tap

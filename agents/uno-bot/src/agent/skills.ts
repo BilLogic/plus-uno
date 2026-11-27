@@ -126,9 +126,9 @@ function renderAssistantContextBlock(ctx: string): string {
     "<assistant_panel_context>",
     `The user is chatting from the assistant panel and currently has this open: ${ctx}.`,
     // Deictic examples must map to real tool paths: "who's in here" →
-    // slack_channel_members, "this channel" → disambiguation only. "What's
-    // happening here" was cut — no tool reads a channel's recent history yet.
-    'Use this ONLY to disambiguate a vague, deictic ask ("this channel", "who\'s in here") — never assume it is the subject of a specific question. When in doubt, answer the words, not the panel.',
+    // slack_channel_members, "what's happening here" → slack_channel_read,
+    // "this channel" → disambiguation only.
+    'Use this ONLY to disambiguate a vague, deictic ask ("this channel", "who\'s in here", "what\'s happening here") — never assume it is the subject of a specific question. When in doubt, answer the words, not the panel.',
     "</assistant_panel_context>",
   ].join("\n");
 }

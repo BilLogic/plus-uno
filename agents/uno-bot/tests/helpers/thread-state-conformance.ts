@@ -1300,6 +1300,33 @@ export function runThreadStateConformance(
     assert.equal(await store.getAssistantContext(THREAD), null);
   });
 
+  it("assistant context keeps only the whitelisted ids and drops every other key", async () => {
+    const { store } = setup();
+    const hostile = { channel_id: "C1", team_id: "T1", enterprise_id: "E1", token: "xoxb-secret", nested: { a: 1 } };
+    await store.putAssistantContext(THREAD, hostile as never);
+    assert.deepEqual(await store.getAssistantContext(THREAD), { channel_id: "C1", team_id: "T1", enterprise_id: "E1" });
+  });
+
+  it("assistant context drops an id that is not a Slack id", async () => {
+    const { store } = setup();
+    await store.putAssistantContext(THREAD, { channel_id: "C1", team_id: "<script>", enterprise_id: 7 } as never);
+    assert.deepEqual(await store.getAssistantContext(THREAD), { channel_id: "C1" });
+  });
+
+  it("assistant context that is not an object, or is oversized, is not stored", async () => {
+    const { store } = setup();
+    for (const bad of [null, "C1", 7, ["C1"], { channel_id: "C" + "A".repeat(5000) }]) {
+      await store.putAssistantContext(THREAD, bad as never);
+      assert.equal(await store.getAssistantContext(THREAD), null);
+    }
+  });
+
+  it("assistant context records for different threads never collide on a colon", async () => {
+    const { store } = setup();
+    await store.putAssistantContext({ channel: "D1:x", thread: "y" }, { channel_id: "C1" });
+    assert.equal(await store.getAssistantContext({ channel: "D1", thread: "x:y" }), null);
+  });
+
   // ----- cancel (/stop) -----
 
   // One /stop cancels one turn. A flag left set would abort the NEXT question

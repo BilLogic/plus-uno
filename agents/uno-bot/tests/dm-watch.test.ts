@@ -651,7 +651,7 @@ describe("the Home tab", () => {
     await turnOn(w, ["promises_made"]);
     await setDmWatch(BEA, ["promises_to_me"], { records: w.records, access: async () => ({ ok: true, api: w.slack.api, url: URL }), now: () => ON_AT });
     const viewFor = async (user: string, connected = true) =>
-      homeView({ connectUrl: "https://uno.example/oauth/slack/start", viewer: { connected, on: (await w.records.switches(user)).map((s) => s.feature) } });
+      homeView({ connectUrl: "https://uno.example/oauth/slack/start", repoUrl: "https://github.com/Acme/widgets", viewer: { connected, on: (await w.records.switches(user)).map((s) => s.feature) } });
     const ticked = (view: { blocks: unknown[] }) => {
       const boxes = JSON.stringify(view.blocks);
       const el = (view.blocks as { elements?: { action_id?: string; initial_options?: { value: string }[] }[] }[])
@@ -858,7 +858,7 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
     const w = world({ scopes: ["im:read"] });
     const result = await setDmWatch(MAYA, ["promises_made"], { records: w.records, access: (u) => accessOf(u, ownerSlackOf(w)), now: () => ON_AT });
     assert.deepEqual(result, { on: [], refused: { ok: false, reason: "missing-scopes", missing: ["im:history"] } });
-    const view = homeView({ connectUrl: "https://uno.example/oauth/slack/start", viewer: { connected: true, on: result.on, refused: result.refused } });
+    const view = homeView({ connectUrl: "https://uno.example/oauth/slack/start", repoUrl: "https://github.com/Acme/widgets", viewer: { connected: true, on: result.on, refused: result.refused } });
     const text = JSON.stringify(view.blocks);
     assert.match(text, /missing `im:history`/);
     assert.match(text, /uno\.example\/oauth\/slack\/start/);
