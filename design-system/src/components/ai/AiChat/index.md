@@ -106,7 +106,7 @@ Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `P
 
 ## Parts
 
-1. **Button.** A primary circle Icon button with the AI icon at 24, at the bottom right of the Page. The 24 is the one exception to the 16 icon inside a button: the launcher is a standalone mark. It is the one way in, and it hides while chat is open in the Panel or full screen.
+1. **Button.** A primary circle Icon button with the AI icon at 16, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
 2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close.
 3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
 4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.
@@ -135,7 +135,6 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | Popup | `--ai-chat-width` wide and `--ai-chat-height` high; without the button it floats `--stack-md` above where the button would be. |
 | Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`. |
 | Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
-| Button icon | `--icon-lg` (24), a standalone mark rather than an icon inside a button label. |
 | Header AI icon | `--ds-icon`, so it reads as an icon, not as the title beside it. |
 | Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
 | The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |

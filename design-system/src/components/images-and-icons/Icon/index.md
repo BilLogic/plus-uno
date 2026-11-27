@@ -2,7 +2,7 @@
 
 # Icon
 
-One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where Free has a regular and solid where it does not; `regular` falls back to solid the same way. `solid` always draws solid. A name that carries its family ignores it. - **size** is 12, 16 or 24, each bound to its icon size token. Without it the glyph is the small icon size, or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.
+One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where Free has a regular and solid where it does not; `regular` falls back to solid the same way. `solid` always draws solid. A name that carries its family ignores it. - **size** is 12 or 16, each bound to its icon size token. Without it the glyph is 16 (`--icon-md`), or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.
 
 **Import:** `import { Icon } from '@/components';`
 
@@ -33,7 +33,7 @@ Navigation icons are always outlined: a selected row shows a fill, not a filled 
 
 - For AI actions such as generate or summarize or rewrite, use `AiIcon`.
 - For an action shown as an icon alone, use `IconButton`.
-- For a framed mark or logo or thumbnail, use `Tile`.
+- For a mark bigger than 16, or a framed mark, logo or thumbnail, use `Tile`.
 - For a typed record glyph such as a task or bug, use `Object`.
 
 ## Best practices
@@ -64,7 +64,7 @@ Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` �
 
 ## Parts
 
-1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes 12 (`--icon-sm`) from the global glyph rule, the heading's size inside a heading, or the size the component around it sets.
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it takes 16 (`--icon-md`) from the global glyph rule, in a heading too, or the size the component around it sets.
 
 ### States
 
@@ -77,7 +77,7 @@ Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` �
 
 | Prop | Value | Token |
 | --- | --- | --- |
-| `size` | 12 · 16 · 24 | `--icon-sm` · `--icon-md` · `--icon-lg` |
+| `size` | 12 · 16 | `--icon-sm` · `--icon-md` |
 | `color` | `default` · `subtle` · `subtlest` | `--ds-icon` · `--ds-icon-subtle` · `--ds-icon-subtlest`: beside body text, beside a label, beside metadata. |
 | `color` | `success` · `warning` · `danger` · `information` · `discovery` | The status icon tokens, such as `--ds-icon-danger`. |
 | `color` | `brand` · `selected` · `disabled` · `inverse` · `warning-inverse` | The brand, selected and disabled icon tokens, and the inverse pair for a bold background. |
@@ -88,7 +88,7 @@ Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` �
 |------|------|---------|-------------|
 | `name` | string (required) | — | A Font Awesome Free name, such as `calendar-days`, or a name with its family. |
 | `iconStyle` | enum | — | `regular` or `solid`. Unset, regular where Font Awesome Free has a regular and solid where it does not; `regular` falls back to solid where Free has none. Ignored when the name carries its family. |
-| `size` | enum | — | The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets. |
+| `size` | enum | — | The size in px, bound to an icon size token. Unset, the glyph is 16, or the size the component around it sets. |
 | `color` | enum | — | An icon color role. Unset, the glyph takes the color around it. |
 | `label` | string | — | An accessible name. Without it the icon is hidden from assistive technology. |
 | `className` | string | — | More classes for the glyph, beside the family and name classes. |
@@ -98,7 +98,7 @@ Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` �
 
 **`iconStyle`** — `regular` · `solid`
 
-**`size`** — `12` · `16` · `24`
+**`size`** — `12` · `16`
 
 **`color`** — `default` · `subtle` · `subtlest` · `inverse` · `brand` · `selected` · `disabled` · `success` · `warning` · `warning-inverse` · `danger` · `information` · `discovery`
 
@@ -106,7 +106,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--icon-lg` · `--icon-md` · `--icon-sm`
+`--ds-icon` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--icon-md` · `--icon-sm`
 
 From `design-system/src/components/images-and-icons/Icon/Icon.scss`. Override these through the token layer, never with a literal.
 

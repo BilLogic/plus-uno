@@ -37,16 +37,9 @@
         }
     }
 
-    /* Default spacing frames the icon in a Tile 40, which draws the glyph at 24. */
+    /* The icon sits in a Tile: 48 on default spacing, 32 when compact. */
     &__icon {
         flex: none;
-    }
-
-    /* Compact keeps a bare icon at 24. */
-    &--compact &__icon {
-        color: var(--ds-icon-subtle);
-        font-size: var(--icon-lg);
-        line-height: 1;
     }
 
     &__text {

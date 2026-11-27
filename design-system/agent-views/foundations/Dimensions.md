@@ -54,7 +54,7 @@ Five box sizes, every `050` from `100` to `300`: 16 · 24 · 32 · 40 · 48. Rea
 
 ## Size roles
 
-Pick the role, then its size; the pixel leads and the token is the binding. Icon sizes (12 · 16 · 24) live on Iconography; frame sizes on Grid; template sizes on Spacing.
+Pick the role, then its size; the pixel leads and the token is the binding. Icon sizes (12 · 16 plain; 24 inside Tile 40–48 and Avatar) live on Iconography; frame sizes on Grid; template sizes on Spacing.
 
 | Role | Sizes | Tokens | Use |
 | --- | --- | --- | --- |
@@ -125,5 +125,5 @@ Don't: 40, 32 and 24 in one toolbar.
 | Grid | Columns, breakpoints, content widths |
 | Radius | Corners: control height ÷ 4 |
 | Border | Stroke widths |
-| Iconography | Icon sizes 12 · 16 · 24 |
+| Iconography | 12 · 16 plain; 24 inside Tile 40–48 and Avatar |
 | Tokens: Spacing and size | Every token |

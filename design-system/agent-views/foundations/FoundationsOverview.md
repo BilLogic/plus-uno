@@ -38,7 +38,7 @@ Grouped as tokens, brand, visual, layout, expression and accessibility.
 
 - **Color.** Every color as a token named for its job.
 - **Typography.** Heading, Body, Metric and Code text styles.
-- **Iconography.** Font Awesome Free icons at three sizes.
+- **Iconography.** Font Awesome Free icons at 12 and 16.
 - **Elevation.** Surface and shadow pairs that lift a layer.
 - **Radius.** Corner roundness: height ÷ 4, with buttons at 6 and 4.
 - **Border.** A width token paired with a color token.

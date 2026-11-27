@@ -43,7 +43,7 @@ const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'v
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)' };
 const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
-const SIZE_TOKEN = { 12: '--icon-sm', 16: '--icon-md', 24: '--icon-lg' };
+const SIZE_TOKEN = { 12: '--icon-sm', 16: '--icon-md' };
 const colorToken = (role) => (role === 'default' ? '--ds-icon' : `--ds-icon-${role}`);
 
 /* ------------------------------------------------------------------ names */
@@ -54,7 +54,7 @@ export const Names = () => (
     <div style={row}>
         {NAMES.map((name) => (
             <div key={name} style={cell}>
-                <Icon name={name} size={24} color="default" data-name={name} />
+                <Icon name={name} size={16} color="default" data-name={name} />
                 <span style={caption}>{name}</span>
             </div>
         ))}
@@ -82,7 +82,7 @@ export const Styles = () => (
     <div style={row}>
         {STYLE_CASES.map(({ name, iconStyle, caption: text }) => (
             <div key={text} style={cell}>
-                <Icon name={name} iconStyle={iconStyle} size={24} color="default" />
+                <Icon name={name} iconStyle={iconStyle} size={16} color="default" />
                 <span style={caption}>{text}</span>
             </div>
         ))}
@@ -135,7 +135,7 @@ export const Colors = () => (
             const [ground, text] = INVERSE_GROUND[role] ?? [];
             return (
                 <Ground key={role} background={ground} text={text} inset="sm" style={cell}>
-                    <Icon name="star" size={24} color={role} data-role={role} />
+                    <Icon name="star" size={16} color={role} data-role={role} />
                     <span className="body-sm">{role}</span>
                 </Ground>
             );
@@ -161,13 +161,13 @@ export const Inherited = () => (
     </span>
 );
 
-/** Without a color the glyph takes the color around it; without a size it is the small icon size, unless the component around it sets one. */
+/** Without a color the glyph takes the color around it; without a size it is 16, unless the component around it sets one. */
 Inherited.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const text = getComputedStyle(canvas.getByTestId('text'));
     const glyph = getComputedStyle(canvas.getByTestId('glyph'));
     await expect(glyph.color).toBe(text.color);
-    await expect(px(glyph.fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
+    await expect(px(glyph.fontSize)).toBe(tokenLength(canvasElement, '--icon-md'));
 };
 
 /* --------------------------------------------------------- accessibility */
@@ -211,7 +211,7 @@ InAComponent.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------ playground */
 
 export const Interactive = (args) => <Icon {...args} />;
-Interactive.args = { name: 'calendar-days', size: 24, color: 'default' };
+Interactive.args = { name: 'calendar-days', size: 16, color: 'default' };
 
 /** The controls drive `name`, `iconStyle`, `size`, `color` and `label`. */
 Interactive.play = async ({ canvasElement }) => {

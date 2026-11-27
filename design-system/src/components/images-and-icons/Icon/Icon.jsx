@@ -6,8 +6,8 @@ import './Icon.scss';
 /** The Font Awesome styles. `fa-brands` is a family, not a style: it rides in the name. */
 export const ICON_STYLES = ['regular', 'solid'];
 
-/** The token sizes in px: 12 (`--icon-sm`), 16 (`--icon-md`) and 24 (`--icon-lg`). */
-export const ICON_SIZES = [12, 16, 24];
+/** The plain icon sizes in px: 12 (`--icon-sm`) and 16 (`--icon-md`, the default). Anything bigger is a Tile. */
+export const ICON_SIZES = [12, 16];
 
 /** The icon color roles. `default` is `--ds-icon`; every other role is `--ds-icon-<role>`. */
 export const ICON_COLORS = [
@@ -35,8 +35,8 @@ export const ICON_COLORS = [
  *   Free has a regular and solid where it does not; `regular` falls back to
  *   solid the same way. `solid` always draws solid. A name that carries its
  *   family ignores it.
- * - **size** is 12, 16 or 24, each bound to its icon size token. Without it the
- *   glyph is the small icon size, or the size the component around it sets.
+ * - **size** is 12 or 16, each bound to its icon size token. Without it the
+ *   glyph is 16 (`--icon-md`), or the size the component around it sets.
  * - **color** is an icon color role. Without it the glyph takes the color around it.
  * - **label** names the icon for assistive technology. Without it the icon is
  *   hidden, so the words beside it carry the meaning.
@@ -62,7 +62,7 @@ Icon.propTypes = {
     name: PropTypes.string.isRequired,
     /** `regular` or `solid`. Unset, regular where Font Awesome Free has a regular and solid where it does not; `regular` falls back to solid where Free has none. Ignored when the name carries its family. */
     iconStyle: PropTypes.oneOf(ICON_STYLES),
-    /** The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets. */
+    /** The size in px, bound to an icon size token. Unset, the glyph is 16, or the size the component around it sets. */
     size: PropTypes.oneOf(ICON_SIZES),
     /** An icon color role. Unset, the glyph takes the color around it. */
     color: PropTypes.oneOf(ICON_COLORS),

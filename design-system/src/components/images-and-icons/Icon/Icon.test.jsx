@@ -71,7 +71,7 @@ describe('Icon', () => {
     });
 
     it('draws at a token size', () => {
-        [12, 16, 24].forEach((size) => {
+        [12, 16].forEach((size) => {
             const { container, unmount } = render(<Icon name="bell" size={size} />);
             expect(glyph(container)).toHaveClass(`plus-icon--size-${size}`);
             unmount();
