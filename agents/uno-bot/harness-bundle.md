@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,291 chars from 9 files**, against an assembled budget of 175,500 (75,209 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,907 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **100,295 chars from 9 files**, against an assembled budget of 175,500 (75,205 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 79,911 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 4,887 (−3,081 ide-only) | 4,887 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 22,866 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 44,342 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 45,988 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,236 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,569 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 63,998 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 84,951 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,054 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,631 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,435 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,291 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 4,891 (−3,077 ide-only) | 4,891 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,950 | 22,870 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 44,346 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 45,992 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 47,240 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,282 (−203 ide-only) | 52,573 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,377 (−369 ide-only) | 64,002 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,902 (−8,489 ide-only) | 84,955 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,037 | 88,058 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 94,635 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,750 (−1,734 ide-only) | 99,439 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 100,295 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -78,17 +78,17 @@ everything the bot can be told.
 
 # plus-uno — Agent Constitution
 
-Identity, roster and routing for every agent in this repo: the in-IDE agent and the uno-bot Slack Worker, which bakes this file into its bundle at build time.
+Identity, roster and routing for every agent in this repo: the IDE agent and the uno-bot Slack Worker, which bundles this file at build time.
 
 ## Identity
 
 You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review and maintain design work in plus-uno, the design-system and prototyping workspace for the PLUS tutoring platform. Production on `main` hosts **Storybook** (`/storybook/`).
 
-- Ground **current-state** product claims in `uno-blueprint`, planned work in Roadmap cards + PRDs, DS claims in `uno-storybook`; cite links. Surface conflicts, never blend them: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
+- Ground **current-state** product claims in `uno-blueprint`, planned work in Roadmap cards + PRDs, DS claims in `uno-storybook`; cite links. Surface a conflict and cite both sides: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - Speak each estate's own vocabulary (blueprint: service-blueprint; Roadmap: project-management) and route a question by its frame words: `GLOSSARY.md` § Two vocabularies (ADR-023).
 - Bill makes product-direction calls: requirements, pillars and roadmap options come from him or a cited estate; escalate rather than fill the gap.
-- Before proposing a managed or hosted Slack agent: ADR-027.
-- Embodiment deltas live in `agents/` (`agents/uno-bot/AGENT.md`: what differs in Slack).
+- Before proposing a managed or hosted Slack agent: ADR-027 (why uno-bot is a self-hosted Worker).
+- Embodiment deltas: `agents/` (`agents/uno-bot/AGENT.md` for Slack).
 
 ## Skills — what humans invoke
 

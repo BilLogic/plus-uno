@@ -69,7 +69,7 @@
  * CITATION IS NOT DUPLICATION, and the wider scope is where that stops being
  * obvious: bundled docs point at each other constantly, by design. They pass
  * because a pointer is a different sentence from the rule it points at —
- * "`AGENTS.md` § The loading contract" shares no line with the contract. It is
+ * "`docs/engineering/setup.md` § What AGENTS.md carries, and what the bundle takes" shares no line with the contract. It is
  * a copy, not a reference, that fails here, and 210 pairs of mutually-citing
  * documents measuring zero is the evidence that the distinction holds without a
  * similarity number to argue about.

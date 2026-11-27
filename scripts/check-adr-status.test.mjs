@@ -68,7 +68,7 @@ test('`status: superseded` that names an ADR passes', () => {
 test('`status: superseded` that names a linked document or a path passes', () => {
   const r = repo({
     '099-a.md': adr('superseded', '- **Status**: Superseded by [ADR-047](047-x.md) (2026-11-13)'),
-    '098-b.md': adr('superseded', '- **Status**: Superseded by the tier contract in `AGENTS.md` § The loading contract'),
+    '098-b.md': adr('superseded', '- **Status**: Superseded by the tier contract in `docs/engineering/setup.md` § What AGENTS.md carries, and what the bundle takes'),
   });
   try {
     assert.deepEqual(messages(r.root), []);

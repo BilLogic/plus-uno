@@ -28,9 +28,6 @@
   "sets": {
     "bundled": {
       "entries": {
-        "AGENTS.md": {
-          "count": 1
-        },
         "GLOSSARY.md": {
           "count": 4
         },
