@@ -773,6 +773,18 @@ export async function conversationsHistoryBefore(
   return [...res.messages].reverse();
 }
 
+/** The latest `limit` messages of a channel, oldest-first. Unlike the
+ *  before-ts reader above, a Slack refusal comes back as `ok: false` with its
+ *  error rather than as an empty list. */
+export async function conversationsHistoryLatest(env: Env, channel: string, limit: number) {
+  const res = await slackGet<SlackResponse & { messages?: HistoryMessage[] }>(env, "conversations.history", {
+    channel,
+    limit: String(limit),
+  });
+  // Slack returns newest-first here (the opposite of conversations.replies).
+  return { ok: res.ok, error: res.error, messages: [...(res.messages ?? [])].reverse() };
+}
+
 /** Delete one of the bot's own messages. Only ever called for a message the
  *  bot posted — Slack rejects anything else on a bot token, which is the
  *  authorization we want rather than one we would have to write. */

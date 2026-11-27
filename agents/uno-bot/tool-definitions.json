@@ -258,6 +258,29 @@
     }
   },
   {
+    "name": "slack_channel_read",
+    "description": "Read-only. Read the latest messages of one Slack channel, oldest first, text only (no reactions) — for 'what's happening here', 'what did #plus-design say today', catching up on a channel. Pass the channel id and a limit (up to 50). A public channel reads; a private channel, DM or group DM reads only when it is on the cleared list, and never when the answer is posted outside Slack. The bot must be a member of the channel. For one thread, use slack_thread_read.",
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel"
+      ],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "description": "Slack channel id (C…), e.g. the channel the user is in."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50,
+          "description": "How many recent messages to read (default 20, max 50)."
+        }
+      }
+    }
+  },
+  {
     "name": "slack_thread_read",
     "description": "Read-only. Read the messages of a Slack thread you were given a link to, outside this conversation's own memory — to read reviewer verdicts in its messages, or pull a source discussion to synthesize into findings. It returns message text only, never reactions. Pass the message/thread permalink. The bot must be a member of the channel; a linked thread reads about 50 messages.",
     "input_schema": {

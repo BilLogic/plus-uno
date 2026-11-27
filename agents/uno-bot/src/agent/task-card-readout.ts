@@ -352,6 +352,12 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     output: countOutput("member_ids", "member", "no members"),
     sources: noSources,
   },
+  // A channel's recent messages: the card says how much it read, and no more.
+  slack_channel_read: {
+    details: () => null,
+    output: countOutput("messages", "message", "no messages"),
+    sources: noSources,
+  },
   // The link it reads is a Slack permalink, and a permalink can name a thread
   // the room cannot see — so the card says how much it read, and no more.
   slack_thread_read: {
