@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 import { Illustration } from '@/components';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Specimens for Foundations/Illustrations: the SMART and math characters,
@@ -13,7 +14,7 @@ export default {
 
 const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)' };
 const figure = { margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' };
-const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 const Gallery = ({ characters }) => (
     <div style={row}>

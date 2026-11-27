@@ -4,6 +4,7 @@ import { Heading } from '@/components';
 import Sparkline, { SPARKLINE_TONES } from './Sparkline';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Data visualizations/Temporal/Sparkline',
@@ -42,14 +43,14 @@ const rowStyle = {
 };
 
 const valueStyle = {
-    font: 'var(--metric-sm)',
+    ...typeStyle('metric-sm'),
     fontVariantNumeric: 'tabular-nums',
     color: 'var(--ds-text)',
 };
 
 const captionStyle = {
     color: 'var(--ds-text-subtle)',
-    font: 'var(--body-sm)',
+    ...typeStyle('body-sm'),
 };
 
 export const Overview = {

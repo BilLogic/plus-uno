@@ -21,7 +21,7 @@ export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Log
 export const Ground = ({ token, mode, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <div data-color-mode={mode} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
-        {caption && <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
+        {caption && <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
 
@@ -49,6 +49,7 @@ The wordmark is Google Sans Flex, the product's type family, with four brand twe
 
 ```jsx
 import { Logo } from '@/components';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 ```
 
 See <DocsLink id="components-images-and-icons-logo">Logo</DocsLink> for props and code.
@@ -72,7 +73,7 @@ The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and be
     {LOGO_SIZES.map((s) => (
         <figure key={s} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
             <Mark size={s} />
-            <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{s}</figcaption>
+            <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{s}</figcaption>
         </figure>
     ))}
 </div>

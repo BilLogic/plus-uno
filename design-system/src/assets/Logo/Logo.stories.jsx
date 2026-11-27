@@ -5,6 +5,7 @@ import Logo, { LOGO_SIZES, LOGO_APPEARANCES, LOCKUP_MIN_SIZE } from './Logo';
 import LogoClearSpace from './LogoClearSpace';
 import LogoConstruction, { CONSTRUCTION_RADII } from './LogoConstruction';
 import { CORNER_CENTERS } from './logoConstructionGeometry.js';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * `Logo` — the PLUS mark and lockup.
@@ -26,7 +27,7 @@ export default {
 };
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-lg)', alignItems: 'flex-end' };
-const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 /** A ground for a theme: the dark theme the logo's stronger glows are drawn for. */
 const Ground = ({ mode, children }) => (

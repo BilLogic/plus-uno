@@ -7,6 +7,7 @@ import { applyColorModes, resolveColorScheme } from '@/storybook-docs/lib/color-
 import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
 import figmaSpec from '../tokens/color/figma-spec.json';
 import { iconClass } from '../lib/icon';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Specimens for Foundations/Color. Every swatch paints a `--ds-*` token, and
@@ -19,7 +20,7 @@ export default {
 };
 
 const name = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)', wordBreak: 'break-word' };
-const label = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const label = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 const grid = () => ({
     display: 'grid',
@@ -44,9 +45,9 @@ const Swatch = ({ token, kind = 'background', on }) => {
         if (kind === 'surface') box.boxShadow = token.includes('raised') || token.includes('overlay')
             ? `var(${token.replace('surface', 'shadow').replace(/-(hovered|pressed)$/, '')})`
             : box.boxShadow;
-        if (on) sample = <span style={{ font: 'var(--body-default)', color: `var(${on})` }}>Aa</span>;
+        if (on) sample = <span style={{ ...typeStyle('body-default'), color: `var(${on})` }}>Aa</span>;
     } else if (kind === 'text') {
-        sample = <span style={{ font: 'var(--heading-sm)', color: `var(${token})` }}>Aa</span>;
+        sample = <span style={{ ...typeStyle('heading-sm'), color: `var(${token})` }}>Aa</span>;
     } else if (kind === 'icon') {
         sample = <i className={iconClass('calendar-days')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: `var(${token})` }} />;
     } else if (kind === 'border') {
@@ -74,7 +75,7 @@ const action = {
     height: 'var(--control-md)',
     padding: '0 var(--pad-x-md)',
     borderRadius: 'var(--radius-control-md)',
-    font: 'var(--body-default)',
+    ...typeStyle('body-default'),
     fontWeight: 'var(--type-weight-medium)',
 };
 
@@ -92,13 +93,13 @@ export const Overview = () => (
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
         >
-            <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Session with Maya</span>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Tuesday, June 3 · 11:00 am</span>
+            <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>Session with Maya</span>
+            <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Tuesday, June 3 · 11:00 am</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
-                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
-                <span style={{ font: 'var(--body-sm)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
+                <span style={{ ...typeStyle('body-sm'), padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
+                <span style={{ ...typeStyle('body-sm'), padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
             </span>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' }}>View the lesson plan</span>
+            <span style={{ ...typeStyle('body-default'), color: 'var(--ds-link)', textDecoration: 'underline' }}>View the lesson plan</span>
             <span style={{ display: 'inline-flex', gap: 'var(--inline-md)' }}>
                 <span style={{ ...action, background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Join session</span>
                 <span style={{ ...action, background: 'var(--ds-background-neutral)', color: 'var(--ds-text)' }}>Reschedule</span>
@@ -145,7 +146,7 @@ export const StatusRoles = () => (
                         [`--ds-background-${role}-bold`, role === 'warning' ? '--ds-text-warning-inverse' : '--ds-text-inverse', 'bold'],
                     ].map(([bg, fg, step]) => (
                         <div key={bg} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
-                            <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: `var(${fg})`, font: 'var(--body-default)' }}>
+                            <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: `var(${fg})`, ...typeStyle('body-default') }}>
                                 {role}
                             </div>
                             <span style={label}>{step}</span>
@@ -171,7 +172,7 @@ export const SmartSubjects = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {SMART.map(([key, title]) => (
                 <div key={key} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)', alignItems: 'center' }}>
-                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-competency-${key})`, color: `var(--ds-text-competency-${key})`, boxShadow: `inset 0 0 0 var(--border-width-default) var(--ds-border-competency-${key})`, justifySelf: 'start' }}>
+                    <span style={{ ...typeStyle('body-default'), padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-competency-${key})`, color: `var(--ds-text-competency-${key})`, boxShadow: `inset 0 0 0 var(--border-width-default) var(--ds-border-competency-${key})`, justifySelf: 'start' }}>
                         {title}
                     </span>
                     <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-full)', background: `var(--ds-background-competency-${key}-subtle)` }} />
@@ -217,7 +218,7 @@ const MeasuredPair = ({ fg, bg, bar }) => {
     }, []);
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
-            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-width-selected) var(${fg})` : 'none', font: 'var(--body-default)' }}>
+            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-width-selected) var(${fg})` : 'none', ...typeStyle('body-default') }}>
                 <span ref={ref} aria-hidden="true" style={{ display: 'inline-flex', width: 'var(--icon-md)', height: 'var(--icon-md)', borderRadius: 'var(--radius-full)', background: `var(${fg})` }} />
                 <span>{ratio ? `${ratio.toFixed(2)}:1` : ' '}</span>
             </div>
@@ -369,7 +370,7 @@ const swatchBase = {
     padding: 'var(--pad-x-md)',
     display: 'flex',
     alignItems: 'center',
-    font: 'var(--body-default)',
+    ...typeStyle('body-default'),
 };
 
 const SWATCHES = [
@@ -410,7 +411,7 @@ export const Modes = () => {
                 padding: 'var(--stack-xl)',
                 display: 'grid',
                 gap: 'var(--stack-xl)',
-                font: 'var(--body-default)',
+                ...typeStyle('body-default'),
             }}
         >
             <p style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
@@ -426,7 +427,7 @@ export const Modes = () => {
                 {SWATCHES.map(({ label, tokens, style }) => (
                     <figure key={label} style={{ margin: 0, display: 'grid', gap: 'var(--stack-md)' }}>
                         <div style={{ ...swatchBase, ...style }}>{label}</div>
-                        <figcaption style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                        <figcaption style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                             {tokens.map((name) => (
                                 <div key={name} style={{ overflowWrap: 'anywhere' }}>
                                     <code>{name}</code>: <span data-token={name}>{values[name]}</span>
@@ -570,8 +571,8 @@ FromToolbar.play = async () => {
 const BodyTextInDoFigure = () => (
     <>
         <div style={sample}>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
-            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
+            <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
+            <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
             <span><Button text="Join session" appearance="primary" /></span>
         </div>
     </>
@@ -580,8 +581,8 @@ const BodyTextInDoFigure = () => (
 const RunningTextInDontFigure = () => (
     <>
         <div style={sample}>
-            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
-            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
+            <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
+            <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
             <span><Button text="Join session" appearance="primary" /></span>
         </div>
     </>
@@ -590,7 +591,7 @@ const RunningTextInDontFigure = () => (
 const AWarningWrittenDoFigure = () => (
     <>
         <div style={{ ...sample, boxShadow: 'none', background: 'var(--ds-background-warning)' }}>
-            <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
+            <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', ...typeStyle('body-default'), color: 'var(--ds-text-warning)' }}>
                 <i className={iconClass('triangle-exclamation')} aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
                 Two reflections are due today.
             </span>
@@ -601,7 +602,7 @@ const AWarningWrittenDoFigure = () => (
 const TheSameWordsDontFigure = () => (
     <>
         <div style={sample}>
-            <span aria-hidden="true" style={{ font: 'var(--body-default)', color: 'var(--ds-background-warning-bold)' }}>
+            <span aria-hidden="true" style={{ ...typeStyle('body-default'), color: 'var(--ds-background-warning-bold)' }}>
                 Two reflections are due today.
             </span>
         </div>

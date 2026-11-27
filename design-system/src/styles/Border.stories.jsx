@@ -9,6 +9,7 @@ import {
 import { Page, Card, Section } from '@/templates';
 import { Do, Dont, DoDont, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/template-demo';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Specimens for Foundations / Visual / Border: live PLUS fields, focus rings,
@@ -20,8 +21,8 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-const captionStyle = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
-const labelStyle = { color: 'var(--ds-text)', font: 'var(--body-sm)' };
+const captionStyle = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
+const labelStyle = { color: 'var(--ds-text)', ...typeStyle('body-sm') };
 const fieldStackStyle = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%' };
 
 /** Width paired with color across field states. */
@@ -110,7 +111,7 @@ export const Dividers = {
             <Card>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Upcoming sessions</span>
+                        <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>Upcoming sessions</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
                             <Button appearance="default" text="Grade 6 math" />
                             <Button appearance="default" text="Grade 7 algebra" />
@@ -125,7 +126,7 @@ export const Dividers = {
                         }}
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Past sessions</span>
+                        <span style={{ ...typeStyle('heading-xs'), color: 'var(--ds-text)' }}>Past sessions</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
                             <Button appearance="subtle" text="Oct 24 review" />
                             <Button appearance="subtle" text="Oct 20 check-in" />

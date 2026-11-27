@@ -5,6 +5,7 @@ import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFiel
 import TimePicker from './TimePicker';
 import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import { expectNoSilentClip, expectInsideWell, expectReachableByFocus } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Time picker',
@@ -123,7 +124,7 @@ export const PickTime = () => {
                         borderRadius: 'var(--radius-md)',
                     }}
                 >
-                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                    <p style={{ margin: 0, ...typeStyle('body-default') }}>
                         <strong>Time:</strong> {value}
                     </p>
                 </div>

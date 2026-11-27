@@ -39,6 +39,7 @@ import {
   implSymbol,
   parsePropTypes,
 } from '../../../scripts/doc-identifiers.mjs';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /* ------------------------------------------------------------- the corpus */
 
@@ -242,7 +243,7 @@ const load = (jsxPath, name) => {
  * rather than an empty canvas.
  */
 const Manifest = ({ subjects }) => (
-  <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>
+  <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text)' }}>
     <p>
       <strong>{subjects.length}</strong> documented components ·{' '}
       <strong>{subjects.reduce((n, s) => n + [...s.variants.values()].flat().length, 0)}</strong>{' '}

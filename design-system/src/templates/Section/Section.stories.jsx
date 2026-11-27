@@ -27,6 +27,7 @@ import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { STORY_CODE } from './SectionCases.jsx';
 import * as Example from './SectionExamples.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 const codeOf = (name) => ({ docs: { source: { code: STORY_CODE[name] } } });
 
@@ -43,8 +44,8 @@ const description = 'Optional supporting description for this section.';
 
 const StatCard = ({ title, body }) => (
     <Card style={{ flex: 1 }} minWidth="var(--card-min-width-sm)">
-        <p style={{ margin: 0, font: 'var(--body-default)' }}>{title}</p>
-        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{body}</p>
+        <p style={{ margin: 0, ...typeStyle('body-default') }}>{title}</p>
+        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{body}</p>
     </Card>
 );
 
@@ -114,8 +115,8 @@ export const HeaderCustom = {
             title="This week"
             header={(
                 <>
-                    <p style={{ margin: 0, font: 'var(--heading-md)' }}>Week of October 20</p>
-                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
+                    <p style={{ margin: 0, ...typeStyle('heading-md') }}>Week of October 20</p>
+                    <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
                 </>
             )}
         >
@@ -629,8 +630,8 @@ const Facts = ({ pairs, columns = 2 }) => (
     <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--stack-lg) var(--inline-xl)' }}>
         {pairs.map(([label, value]) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                <dt style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{label}</dt>
-                <dd style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{value}</dd>
+                <dt style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{label}</dt>
+                <dd style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>{value}</dd>
             </div>
         ))}
     </dl>

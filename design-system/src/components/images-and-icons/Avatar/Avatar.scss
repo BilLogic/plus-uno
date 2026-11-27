@@ -42,7 +42,7 @@ $avatar-colors: (
     vertical-align: middle;
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
-    // Initials are set in the semibold text style nearest the avatar's size;
+    // Initials are set in the heading text style nearest the avatar's size;
     // each size sets --avatar-font and --avatar-tracking to that style.
     @include ds-type(var(--avatar-font, var(--heading-xs)), $tracking: var(--avatar-tracking, var(--heading-xs-tracking)));
     border-radius: var(--radius-full);

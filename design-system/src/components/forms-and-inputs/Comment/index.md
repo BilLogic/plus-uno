@@ -104,7 +104,7 @@ A comment has no hover, pressed, focus or disabled state of its own. The actions
 
 | Part | Token |
 | --- | --- |
-| Author | Body default, semibold. |
+| Author | Body default, medium. |
 | Time, edited, restricted, saving | `--ds-text-subtle`, body small. |
 | Highlight fill | `--ds-background-selected`. |
 | Padding and gaps | `--comment-pad`, `--comment-gap`, `--inline-lg`, `--stack-md`, `--stack-sm`. |

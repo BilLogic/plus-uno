@@ -9,6 +9,7 @@ import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.j
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 import { CountTag, FooterActions, Icon, SectionMessage } from '@/components';
 import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 const icons = {
     'none': null,
     'plus': 'plus',
@@ -695,7 +696,7 @@ const footerCardStyle = {
 const footerCaptionStyle = {
     margin: '0 0 var(--stack-sm)',
     color: 'var(--ds-text-subtle)',
-    font: 'var(--body-sm)',
+    ...typeStyle('body-sm'),
 };
 
 /** Footer tracks (r5): 4 equal tracks inside container padding, spacious (48) buttons with shouldFitContainer. */

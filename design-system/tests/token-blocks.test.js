@@ -44,10 +44,11 @@ describe('chart palette', () => {
 describe('type scale', () => {
   const groups = typeGroups(TOKENS);
   const styles = groups.flatMap((g) => g.styles);
-  const expected = [...corpus.keys()].filter((n) => /^--(heading|body|metric)-[a-z]+$/.test(n) && !n.endsWith('-tracking'));
+  // Code/default is relative to its parent (0.875em, line height 1), so it has no row on the scale.
+  const expected = [...corpus.keys()].filter((n) => /^--(heading|body|metric|label|code)-[a-z]+$/.test(n) && !n.endsWith('-tracking') && n !== '--code-default');
 
   it('lists every text style the type tokens define, once each', () => {
-    expect(expected).toHaveLength(13);
+    expect(expected).toHaveLength(15);
     expect(styles.map((s) => s.token).sort()).toEqual([...expected].sort());
   });
 

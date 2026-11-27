@@ -5,6 +5,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Cascader from './Cascader';
 import { LONG_SCHOOL, LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Forms and inputs/Select/Cascader',
@@ -188,7 +189,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
-                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                     Selected path: {value.join(' → ')}
                 </p>
             )}

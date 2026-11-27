@@ -198,7 +198,7 @@ Breadcrumbs.play = async ({ canvasElement }) => {
     }
 };
 
-/** Nav tabs follow the button: 32, labels 14/20 medium; a selected tab is semibold. */
+/** Nav tabs follow the button: 32, labels 14/20 medium, selected or not. */
 export const Tabs = () => (
     <div style={stack}>
         <TabsComponent activeKey="1" onSelect={() => {}} aria-label="Tabs">

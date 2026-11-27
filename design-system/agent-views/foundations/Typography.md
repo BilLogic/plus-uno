@@ -33,7 +33,7 @@ Every text style binds to a typography variable (family, weight, size, line heig
 ### Body, metric and weights
 
 - **Body/large (16/24):** long-form reading such as lessons, help articles and quotes (quotes use the body family; never add a decorative face).
-- **Body/default (14/20):** default interface text and control labels (sets the 24, 32 and 40 control heights). Do not use heading styles inside components; use body with a heavier weight instead.
+- **Body/default (14/20):** default interface text and control labels (sets the 24 and 32 control heights). A label inside a control (button, tab, menu row, field) is Body/default at the medium weight, never a heading style.
 - **Body/small (12/16):** secondary meta text, tags, statuses, counts and tooltips.
 - **Metric (large, medium, small):** featured numbers such as session counts or scores.
 - **Label/eyebrow (12/16, medium, uppercase, +4%):** the label that names a group of rows or a stat. Use it for a menu group title, a select-list group row, a Sidebar section title, and the stat label above a metric. Type the text in sentence case; the style sets the capitals.
@@ -83,7 +83,7 @@ Markup without its own stylesheet can use the generated utility classes (`.headi
 
 ## Heading levels
 
-Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards, never a page title. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
+Headings step down one size per nesting level; containers use a fixed title size. `Heading/xxlarge` (32) is the page title and nothing else; reserve `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
 
 | Level | Style |
 | --- | --- |

@@ -4,6 +4,7 @@ import PromptInput from './PromptInput';
 import { iconClass } from '../../../lib/icon';
 import { LONG_TOPIC, expectNoSilentClip, expectInsideWell } from '../../_internal/overflowPlays';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * `PromptInput` — where a person writes to the AI.
@@ -195,7 +196,7 @@ export const WithSlots = () => (
             label="Message to AI chat"
             placeholder="Ask anything"
             startSlot={<i className={iconClass('paperclip')} aria-hidden="true" title="Attach a file" />}
-            attachments={<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
+            attachments={<span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
             actions={<i className={iconClass('microphone')} aria-hidden="true" title="Dictate" />}
             onSubmit={fn()}
         />

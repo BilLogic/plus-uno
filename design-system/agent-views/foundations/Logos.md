@@ -16,6 +16,7 @@ The wordmark is Google Sans Flex, the product's type family, with four brand twe
 
 ```jsx
 import { Logo } from '@/components';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 ```
 
 See Logo for props and code.

@@ -5,6 +5,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TreeSelect from './TreeSelect';
 import { LONG_TOPIC, expectNoSilentClip, expectInsideWell, expectFullTextReachable } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Forms and inputs/Select/Tree select',
@@ -200,7 +201,7 @@ export const Interactive = (args) => {
                 placeholder={args.placeholder}
             />
             {selectionSummary && (
-                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                     Selected: {selectionSummary}
                 </p>
             )}

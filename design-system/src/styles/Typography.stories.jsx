@@ -2,11 +2,13 @@ import React from 'react';
 import { expect } from 'storybook/test';
 import { Button, Heading, StatusTag } from '@/components';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
- * Specimens for Foundations/Typography. Each specimen sets `font` to its text
- * style token, so a change to a size, line height, family or weight shows here
- * without touching this file. Specimens are spans, not headings, so the docs
+ * Specimens for Foundations/Typography. Each specimen takes its text style
+ * through `typeStyle` (the `font` token and its `-tracking` companion), so a
+ * change to a size, line height, family, weight or tracking shows here without
+ * touching this file. Specimens are spans, not headings, so the docs
  * page keeps one heading outline.
  */
 export default {
@@ -14,7 +16,7 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const meta = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const meta = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 const LEVELS = [
     ['Page title', '--heading-xxl', 'Heading/xxlarge · 32 · the page’s one h1'],
@@ -40,24 +42,24 @@ export const HeadingLevels = () => (
 
 /** Code/default sets code, token names and values. */
 export const CodeStyle = () => (
-    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+    <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
         Pad a card with <C>--card-pad</C>: the code span takes 0.875em of the text around it, in Google Sans Code.
     </p>
 );
 
 /** Code/small sets a position or range in a recording and a version. */
 export const CodeSmallStyle = () => (
-    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+    <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
         Flag at <span className="code-sm">22:48</span>, range <span className="code-sm">0:30 – 5:10</span>, model <span className="code-sm">gemini-2.5-pro</span>.
     </p>
 );
 
 const Outline = ({ sizes }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={{ font: `var(${sizes[0]})`, color: 'var(--ds-text)' }}>Sessions</span>
-        <span style={{ font: `var(${sizes[1]})`, color: 'var(--ds-text)' }}>This week</span>
-        <span style={{ font: `var(${sizes[2]})`, color: 'var(--ds-text)' }}>Upcoming</span>
-        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Three sessions are scheduled before Friday.</span>
+        <span style={{ ...typeStyle(sizes[0].slice(2)), color: 'var(--ds-text)' }}>Sessions</span>
+        <span style={{ ...typeStyle(sizes[1].slice(2)), color: 'var(--ds-text)' }}>This week</span>
+        <span style={{ ...typeStyle(sizes[2].slice(2)), color: 'var(--ds-text)' }}>Upcoming</span>
+        <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>Three sessions are scheduled before Friday.</span>
     </div>
 );
 
@@ -147,10 +149,10 @@ const RegularOrBoldDontFigure = () => (
     <>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
             <Button appearance="primary">
-                <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-regular)' }}>Save changes</span>
+                <span style={{ ...typeStyle('body-default'), fontWeight: 'var(--type-weight-regular)' }}>Save changes</span>
             </Button>
             <Button appearance="primary">
-                <span style={{ font: 'var(--heading-sm)' }}>Save changes</span>
+                <span style={{ ...typeStyle('heading-sm') }}>Save changes</span>
             </Button>
         </div>
     </>
@@ -159,7 +161,7 @@ const RegularOrBoldDontFigure = () => (
 const OneLineWithDoFigure = () => (
     <>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', ...typeStyle('body-default'), fontWeight: 'var(--type-weight-medium)' }}>
                 Alexandria Montgomery-Hernandez, Lincoln Middle
             </span>
             <StatusTag appearance="success">Active</StatusTag>
@@ -170,7 +172,7 @@ const OneLineWithDoFigure = () => (
 const TheNameWrapsDontFigure = () => (
     <>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-            <span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
+            <span style={{ flex: 1, minWidth: 0, ...typeStyle('body-default'), fontWeight: 'var(--type-weight-medium)' }}>
                 Alexandria Montgomery-Hernandez, Lincoln Middle
             </span>
             <StatusTag appearance="success">Active</StatusTag>
@@ -180,7 +182,7 @@ const TheNameWrapsDontFigure = () => (
 
 const BoldBodyTextDontFigure = () => (
     <>
-        <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
+        <span style={{ ...typeStyle('body-default'), fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
     </>
 );
 
@@ -216,8 +218,8 @@ const AnH3StraightDontFigure = () => (
 const MetricLargeForDoFigure = () => (
     <>
         <div>
-            <span style={{ font: 'var(--metric-lg)', fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>1,284</span>
-            <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+            <span style={{ ...typeStyle('metric-lg'), color: 'var(--ds-text)' }}>1,284</span>
+            <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
         </div>
     </>
 );
@@ -226,7 +228,7 @@ const HeadingMediumForDontFigure = () => (
     <>
         <div>
             <Heading as="span" size="md">1,284</Heading>
-            <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+            <div style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
         </div>
     </>
 );

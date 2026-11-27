@@ -8,6 +8,7 @@ import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
 import Select from './Select';
 import { Button } from '@/components';
 import { LONG_SCHOOL, expectNoSilentClip, expectInsideWell, expectTrailingKept, expectFullTextReachable, expectReachableByFocus } from '../../_internal/overflowPlays';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
@@ -570,7 +571,7 @@ export const Interactive = {
 
         return (
             <div style={{ maxWidth: '400px' /* demo frame */ }}>
-                <p style={{ margin: '0 0 var(--stack-md)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ margin: '0 0 var(--stack-md)', ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.isMulti
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')

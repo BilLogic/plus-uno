@@ -5,6 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Rating from './Rating';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export default {
     title: 'Components/Forms and inputs/Rating',
@@ -87,7 +88,7 @@ export const Content = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
@@ -111,14 +112,14 @@ export const Variants = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-type" value={commentsValue} type="comments" onChange={setCommentsValue} />
             </section>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
@@ -131,7 +132,7 @@ export const Variants = () => {
 export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
-            <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
+            <span style={{ display: 'block', marginBottom: 'var(--stack-md)', ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>DISABLED</span>
             <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>

@@ -65,8 +65,8 @@ body,
  *   h2 section        --heading-lg     24 / 28 sans regular
  *   h3 example, sub   --heading-md     20 / 24 sans regular
  *   h4                --heading-sm     16 / 20 sans regular
- *   h5                --heading-xs     14 / 20 sans regular
- *   h6                --heading-xxs    12 / 16 sans regular
+ *   h5                --heading-xs     14 / 20 sans medium
+ *   h6                --heading-xxs    12 / 16 sans medium
  *
  * The space above a heading is the Page template's: `--page-stack-lg` before a
  * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
@@ -193,9 +193,9 @@ body,
 }
 
 .sbdocs .sbdocs-content table:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) th {
-    font: var(--body-sm);
-    letter-spacing: var(--body-sm-tracking);
-    font-weight: var(--type-weight-semibold);
+    /* A head cell takes the app's table head style, Heading/xxsmall. */
+    font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text);
 }
 
@@ -211,12 +211,12 @@ body,
  * the text, not on the column: canvases stay full-bleed at 864px while prose
  * narrows, and splitting the two is what lets both be right.
  *
- * 55ch, not the 72ch the ticket suggested. `ch` is the advance width of "0",
- * which in Merriweather Sans is 10.8px at 16px type while the average prose
- * glyph is about 7.9px — so `ch` runs a third wide for this face, and 72ch
- * measured 98 characters per line rather than 72. Walked down against the
- * longest paragraph in the sample: 72ch gave 98, 58ch gave 83, 55ch gives 78.
- * The number is chosen against the measured line, not against the unit.
+ * 55ch, not 72ch. `ch` is the advance width of "0", which in Google Sans Flex
+ * is 10.5px at 16px type while the average prose glyph is about 7.2px, so
+ * `ch` runs a third wide for this face and 72ch would hold about 105
+ * characters per line. 55ch holds about 80 on the longest paragraph of
+ * Foundations/Typography. The number is chosen against the measured line,
+ * not against the unit.
  *
  * The cap goes on the LIST rather than on each item, so a wrapped item and its
  * marker stay in one column.
@@ -414,7 +414,8 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th {
-  font-weight: var(--type-weight-semibold);
+  font: var(--heading-xxs);
+  letter-spacing: var(--heading-xxs-tracking);
 }
 
 /*
@@ -501,7 +502,8 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-ds-doc-table th {
-  font-weight: var(--type-weight-semibold);
+  font: var(--heading-xxs);
+  letter-spacing: var(--heading-xxs-tracking);
   white-space: nowrap;
 }
 
@@ -1056,22 +1058,23 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 /*
- * Token blocks (Foundations Color and Typography): Storybook's ColorPalette and
- * Typeset, fed from the generated token files by design-system/src/storybook-docs/
- * token-blocks.jsx. They take the docs look: the page's ink and type, the token
- * radius, and a container ground that follows the Color mode.
+ * Token blocks (Foundations Color and Typography), fed from the generated token
+ * files by design-system/src/storybook-docs/token-blocks.jsx: Storybook's
+ * ColorPalette and the type scale's specimen panel. They take the docs look:
+ * the page's ink and type, the token radius, and a container ground that
+ * follows the Color mode. Each type specimen sets its own text style inline.
  */
-.docblock-colorpalette,
-.docblock-typeset {
+.docblock-colorpalette {
   font-family: var(--type-family-body) !important;
   color: var(--ds-text) !important;
 }
 
-.docblock-typeset {
-  background: var(--ds-surface-sunken) !important;
-  border: var(--border-width-default) solid var(--ds-border) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow: none !important;
+.sb-ds-type-scale {
+  padding: var(--card-pad);
+  background: var(--ds-surface-sunken);
+  border: var(--border-width-default) solid var(--ds-border);
+  border-radius: var(--radius-lg);
+  color: var(--ds-text);
 }
 
 /*
@@ -1087,9 +1090,8 @@ html[data-color-mode="dark"] .docs-story {
 
 .sbdocs .docblock-argstable th,
 .sbdocs .docblock-argstable-head th {
-    font: var(--body-sm);
-    letter-spacing: var(--body-sm-tracking);
-    font-weight: var(--type-weight-semibold);
+    font: var(--heading-xxs);
+    letter-spacing: var(--heading-xxs-tracking);
     color: var(--ds-text);
     background: transparent;
 }
@@ -1112,7 +1114,7 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .docblock-argstable td:first-of-type > span:first-of-type {
     font: var(--body-sm);
     letter-spacing: var(--body-sm-tracking);
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
 }
 
 .sbdocs .docblock-argstable td :is(p, div, span, label) {
@@ -1155,7 +1157,7 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .sb-ds-docs-all-props > summary {
     font: var(--body-lg);
     letter-spacing: var(--body-lg-tracking);
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
     color: var(--ds-text);
     cursor: pointer;
     margin-block-end: var(--stack-sm);
@@ -1270,12 +1272,3 @@ html[data-color-mode="dark"] .docs-story {
   color: var(--ds-icon-subtle);
 }
 
-/*
- * Storybook's Typeset block brings their own 25px / 40px
- * margins, so a type specimen sat 25 under its token line and 40 over the next
- * specimen's title. The Section gap is the only space here, as in an example.
- */
-.sbdocs .docblock-typeset {
-  margin-top: var(--section-stack-md) !important;
-  margin-bottom: 0 !important;
-}

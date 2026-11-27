@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import AiIcon, { AI_ICON_NAMES, AI_ICON_SIZES, AI_ICON_ALL_SIZES } from './AiIcon';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * `AiIcon` -- icons for AI actions.
@@ -41,7 +42,7 @@ export default {
 };
 
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)', minWidth: 'var(--card-min-width-sm)' };
-const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
+const caption = { ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' };
 
 const ModeSet = ({ mode }) => (
     <div
@@ -55,7 +56,7 @@ const ModeSet = ({ mode }) => (
             border: 'var(--border-width-default) solid var(--ds-border)',
         }}
     >
-        <div style={{ font: 'var(--heading-sm)', marginBottom: 'var(--inline-md)' }}>{mode === 'dark' ? 'Dark' : 'Light'}</div>
+        <div style={{ ...typeStyle('heading-sm'), marginBottom: 'var(--inline-md)' }}>{mode === 'dark' ? 'Dark' : 'Light'}</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: 'var(--stack-xl) var(--inline-xl)', justifyContent: 'start' }}>
             {AI_ICON_NAMES.flatMap((name) => AI_ICON_ALL_SIZES.filter((size) => AI_ICON_SIZES[name].includes(size)).map((size) => (
                 <div key={`${name}-${size}`} style={cell}>
@@ -129,7 +130,7 @@ CloseUp.play = async ({ canvasElement }) => {
 export const Labeled = () => (
     <div style={{ display: 'flex', gap: 'var(--inline-xl)', alignItems: 'center' }}>
         <AiIcon name="summarize" label="Summarize" data-testid="named" />
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', ...typeStyle('body-default'), color: 'var(--ds-text)' }}>
             <AiIcon name="rewrite" data-testid="decorative" />
             Rewrite
         </span>

@@ -7,6 +7,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import GenerativeBorder, { GENERATIVE_BORDER_RADII } from './GenerativeBorder';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 /**
  * `GenerativeBorder` -- the border that shows the AI is generating content.
@@ -64,14 +65,14 @@ const toggle = {
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-input)',
     color: 'var(--ds-text)',
-    font: 'var(--body-default)',
+    ...typeStyle('body-default'),
     cursor: 'pointer',
 };
 
 const Draft = ({ text = 'Here is a first draft of the session summary.' }) => (
     <div style={box}>
-        <strong style={{ font: 'var(--heading-sm)' }}>Session summary</strong>
-        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{text}</span>
+        <strong style={{ ...typeStyle('heading-sm') }}>Session summary</strong>
+        <span style={{ ...typeStyle('body-default'), color: 'var(--ds-text-subtle)' }}>{text}</span>
     </div>
 );
 
@@ -158,7 +159,7 @@ export const Radii = () => (
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>
-                    <span style={{ font: 'var(--body-sm)' }}>{radius}</span>
+                    <span style={{ ...typeStyle('body-sm') }}>{radius}</span>
                 </div>
             </GenerativeBorder>
         ))}

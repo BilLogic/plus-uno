@@ -60,8 +60,8 @@ export function chartGroups(tokens) {
 }
 
 /**
- * The text styles grouped by what a Typeset block can draw at once: one family
- * and one weight. A style is the `font` shorthand `weight size / line-height
+ * The text styles grouped by family and weight, the way the type scale lists
+ * them. A style is the `font` shorthand `weight size / line-height
  * family`, so each group names its family and weight tokens and each style its
  * size and line-height tokens, resolved to their values.
  *
@@ -73,7 +73,7 @@ export function typeGroups(tokens) {
   const resolve = (token) => decl.get(token);
   const families = new Map();
   for (const [name, value] of decl) {
-    const m = name.match(/^--(heading|body|metric)-([a-z]+)$/);
+    const m = name.match(/^--(heading|body|metric|label|code)-([a-z]+)$/);
     if (!m || name.endsWith('-tracking')) continue;
     const parts = value.match(/^var\((--type-weight-[a-z]+)\)\s+var\((--type-size-[0-9]+)\)\s*\/\s*var\((--type-line-height-[0-9]+)\)\s+var\((--type-family-[a-z-]+)\)$/);
     if (!parts) continue;
