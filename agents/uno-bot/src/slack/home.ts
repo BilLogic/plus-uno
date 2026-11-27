@@ -19,6 +19,7 @@ import type { Env } from "../types";
 import type { SlackAppHomeOpenedEvent } from "./types";
 import { refusalDetail, slackCall } from "./api";
 import { refusedForBlocks } from "./delivery";
+import { CAPABILITIES, repoUrl } from "./capabilities";
 import { tryAskingButtons } from "./try-asking";
 import { slackConnectUrl } from "../oauth/slack";
 import { dmWatchHomeBlocks, type DmAccess, type DmWatchFeature } from "../dm-watch/index";
@@ -42,26 +43,6 @@ const HOME_INTRO = [
   },
 ];
 
-/** What I can do, one card each: a title and a body of at most 200
- *  characters, the most a card's body holds. */
-const CAPABILITIES = [
-  {
-    icon: "book",
-    title: "Answer, grounded",
-    body: "Roadmap card status, owner and pillar, how a product flow works, design-system components and tokens, and any linked Notion, Figma or Slack doc. Cited, live.",
-  },
-  {
-    icon: "edit",
-    title: "Create, with your approval",
-    body: "Draft a PRD, file or update a card, start a component build or prototype, share work for feedback. Nothing is written until someone approves it.",
-  },
-  {
-    icon: "code",
-    title: "Hand off to code",
-    body: "Anything that needs real code, I write as a ready-to-paste prompt for your IDE agent: Claude Code, Cursor, Codex or Antigravity.",
-  },
-] as const;
-
 /** The capabilities as three cards side by side. Card and carousel blocks are
  *  allowed on a Home tab per Slack's block reference (both list "Home tabs"
  *  among their surfaces); the icons are Slack's named ones, so nothing is
@@ -82,7 +63,7 @@ const capabilityCards = () => [
 const capabilitySections = () =>
   CAPABILITIES.map((c) => ({ type: "section", text: { type: "mrkdwn", text: `*${c.title}*\n${c.body}` } }));
 
-const homeBody = (connected: boolean, carousel: boolean) => [
+const homeBody = (connected: boolean, carousel: boolean, repo: string) => [
     { type: "divider" },
     { type: "section", text: { type: "mrkdwn", text: "*What I can do*" } },
     ...(carousel ? capabilityCards() : capabilitySections()),
@@ -155,7 +136,7 @@ const homeBody = (connected: boolean, carousel: boolean) => [
         {
           type: "button",
           text: { type: "plain_text", text: "Repo" },
-          url: "https://github.com/BilLogic/plus-uno",
+          url: repo,
         },
       ],
     },
@@ -206,24 +187,26 @@ const connectBlocks = (url: string) => [
  * then their DM watch switches in its place.
  *
  * @param input.connectUrl - Where to connect, or null when OAuth is not set up
+ * @param input.repoUrl - The repo the Repo button opens
  * @param input.viewer - Whether this person has connected, and their switches
  * @param input.carousel - The capabilities as cards (the default), or as
  *   plain sections when Slack has refused the cards
  */
 export function homeView(input: {
   connectUrl: string | null;
+  repoUrl: string;
   viewer: { connected: boolean; on: readonly DmWatchFeature[]; refused?: Exclude<DmAccess, { ok: true }> };
   carousel?: boolean;
 }) {
   const { viewer, connectUrl } = input;
   const notice = viewer.refused ? { refused: viewer.refused, connectUrl } : undefined;
   const personal = viewer.connected ? dmWatchHomeBlocks(viewer.on, notice) : connectUrl ? connectBlocks(connectUrl) : [];
-  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected, input.carousel ?? true)] };
+  return { type: "home", blocks: [...HOME_INTRO, ...personal, ...homeBody(viewer.connected, input.carousel ?? true, input.repoUrl)] };
 }
 
 async function homeViewBuilder(env: Env, userId: string, refused?: Exclude<DmAccess, { ok: true }>) {
   const viewer = await dmWatchHomeStateFor(env, userId);
-  const input = { connectUrl: slackConnectUrl(env), viewer: refused ? { ...viewer, refused } : viewer };
+  const input = { connectUrl: slackConnectUrl(env), repoUrl: repoUrl(env), viewer: refused ? { ...viewer, refused } : viewer };
   return (carousel: boolean) => homeView({ ...input, carousel });
 }
 
