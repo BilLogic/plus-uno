@@ -22,7 +22,7 @@ summary: uno-maintain — eval scenarios
 
 ## S3 — conflict with a legacy Notion playbook page
 - **Trigger:** a legacy Notion playbook page contradicts `docs/connectors/notion/overview.md`
-- **Expected:** the repo file wins — conventions are repo-canonical (ADR-017); file an intake for writers/notion to banner the Notion page as superseded; the monthly integrity sweep catches unbannered legacy pages
+- **Expected:** the repo file wins — conventions are repo-canonical; file an intake for writers/notion to banner the Notion page as superseded; the monthly integrity sweep catches unbannered legacy pages
 - **Fails if:** the repo is "re-synced" to match the obsoleted page · the conflict is resolved silently with no intake trail
 
 ## S4 — knowledge capture
