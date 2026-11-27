@@ -82,7 +82,7 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Section gap | `var(--section-stack-{sm\|md\|lg})` |
 | Page padding | `var(--page-pad)` |
 | Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |
-| Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md · lg 12 · 16 · 24, Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
+| Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md 12 · 16 (lg 24 only inside Tile and Avatar), Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
 
 ### Scale Tokens
 
@@ -98,7 +98,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Foundations `Size/Item/height-{sm\|md}` | `var(--control-md)` | 24 · 32; there is no 40 Item |
 | Foundations `Size/Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |
 | Foundations `Size/Label/*`, `Field/*` | `var(--label-height-md)`, `var(--field-width-md)` | Label 16 · 20, max 160; Field widths 80 … 480, min heights 80 · 120 |
-| Foundations `Size/Icon/*`, `Image/*` | `var(--icon-md)`, `var(--image-sm)` | Icon 12 · 16 · 24; Image 16 … 48 |
+| Foundations `Size/Icon/*`, `Image/*` | `var(--icon-md)`, `var(--image-sm)` | Icon 12 · 16 plain, 24 inside Tile and Avatar; Image 16 … 48 |
 | Foundations `Border/default`, `selected`, `focused` | `var(--border-width-default)` | 1 · 2 · 2 |
 
 ## Elevation Tokens

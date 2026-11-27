@@ -48,7 +48,7 @@ Every text style binds to a typography variable (family, weight, size, line heig
 
 ## In code
 
-Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm`, `--icon-md` or `--icon-lg` (Iconography). Never hardcode a font size, family or weight.
+Set component text with `font: var(--heading-sm)` and `letter-spacing: var(--heading-sm-tracking)` (or the same pair for `--body-default`), and icon glyphs with `--icon-sm` or `--icon-md` (Iconography). Never hardcode a font size, family or weight.
 
 ### Family, weight and tracking tokens
 

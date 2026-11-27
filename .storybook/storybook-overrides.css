@@ -1253,7 +1253,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sb-ds-resource-card__icon {
-  font-size: var(--icon-lg);
+  font-size: var(--icon-md);
   line-height: 1;
   color: var(--ds-icon);
 }
