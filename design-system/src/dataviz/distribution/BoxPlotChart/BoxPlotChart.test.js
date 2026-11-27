@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { SEMIBOLD } from '@/dataviz/chartTheme';
+import { MEDIUM } from '@/dataviz/chartTheme';
 import { BRAND, CHROME } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -36,7 +36,7 @@ describe('BoxPlotChart options', () => {
         expect(options.plotOptions.boxplot.whiskerColor).toBe(BRAND);
         expect(options.plotOptions.boxplot.medianColor).toBe(CHROME.separator);
         expect(options.legend.enabled).toBe(false);
-        expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(options.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(options.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(options.tooltip.pointFormat).not.toMatch(/<b\b/i);
         expect(options.plotOptions.boxplot.tooltip.pointFormat).not.toMatch(/<b\b/i);

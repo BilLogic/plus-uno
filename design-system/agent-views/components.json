@@ -14993,7 +14993,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Index of the one column that names the record, set in semibold",
+          "description": "Index of the one column that names the record, set in medium weight",
           "deprecated": null
         },
         {

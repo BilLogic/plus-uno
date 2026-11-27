@@ -35,7 +35,7 @@ export default {
         },
         titleColumn: {
             control: 'number',
-            description: 'Index of the one column that names the record, set in semibold',
+            description: 'Index of the one column that names the record, set in medium weight',
             table: { category: 'Content' }
         },
         rowStates: {

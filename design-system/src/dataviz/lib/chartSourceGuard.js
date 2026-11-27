@@ -129,12 +129,12 @@ export const HARD_BAN_LINE_RULES = [
             /\banimate\s*:|\banimate=(?!=)|\(\s*\{[^{})]*\banimate\b|\b(?:animationDelay|animationDuration|enableAnimation)\b/,
     },
     {
-        // Charts allow weights 500 and 600 only, and this guard intentionally
-        // bans numeric 500 and 600 literals too so only the medium and semibold
-        // weight tokens pass (tokens beat literals).
+        // Charts allow weight 500 only, and this guard intentionally
+        // bans numeric 500 literals too so only the medium weight token
+        // passes (tokens beat literals).
         id: 'banned-font-weight',
         pattern:
-            /<b\b|<strong\b|\b(?:font-weight|fontWeight)\s*:\s*['"]?(?:bold|bolder|lighter|normal|[1-9]00)\b['"]?|--type-weight-(?!medium\b|semibold\b)[a-z0-9-]+/i,
+            /<b\b|<strong\b|\b(?:font-weight|fontWeight)\s*:\s*['"]?(?:bold|bolder|lighter|normal|[1-9]00)\b['"]?|--type-weight-(?!medium\b)[a-z0-9-]+/i,
     },
     {
         id: 'series-color-text',

@@ -56,8 +56,8 @@
 /*
  * Shared chart typography and tabular figures.
  *
- * Every chart text slot wears `--type-family-body` (Google Sans Flex) at either
- * medium (500) for labels or semibold (600) for titles and emphasized values.
+ * Every chart text slot wears `--type-family-body` (Google Sans Flex) at medium
+ * (500) only: titles, axis titles, labels and emphasized values alike.
  * Number slots (axis tick labels, data labels, tooltips, legend items and
  * `.plus-chart-value` spans) set `font-variant-numeric: tabular-nums` in CSS
  * as well as in the Highcharts theme object so SVG `<text>` and `<tspan>` nodes
@@ -75,7 +75,7 @@
 .highcharts-title,
 .highcharts-axis-title {
     font-family: var(--type-family-body);
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
 }
 
 .highcharts-subtitle,
@@ -112,7 +112,7 @@
 .highcharts-tooltip-container b,
 .highcharts-tooltip-container strong {
     font-family: var(--type-family-body);
-    font-weight: var(--type-weight-semibold);
+    font-weight: var(--type-weight-medium);
     font-variant-numeric: tabular-nums;
 }
 

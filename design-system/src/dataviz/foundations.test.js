@@ -14,7 +14,6 @@ import {
     CHART_RADAR_FILL_OPACITY,
     CHART_RANGE_FILL_OPACITY,
     MEDIUM,
-    SEMIBOLD,
     TABULAR,
 } from '@/dataviz/chartTheme';
 import {
@@ -199,7 +198,7 @@ describe('data-viz foundations', () => {
             auditChartSource('sample/Chart.jsx', 'const Chart = ({ animationDuration, enableAnimation }) => null;'),
         ).toEqual([expect.stringContaining('[animation-ms-or-removed-prop]')]);
 
-        // 3. <b>, bold, numeric font weights (including 500 and 600 literals — tokens beat literals), and non-medium/semibold weight tokens
+        // 3. <b>, bold, numeric font weights (including 500 and 600 literals — tokens beat literals), and any weight token other than medium
         expect(auditChartSource('sample/Chart.jsx', "pointFormat: '<b>{point.y}</b>'")).toEqual([
             expect.stringContaining('[banned-font-weight]'),
         ]);
@@ -218,6 +217,10 @@ describe('data-viz foundations', () => {
         expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'var(--type-weight-regular)' }")).toEqual([
             expect.stringContaining('[banned-font-weight]'),
         ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'var(--type-weight-semibold)' }")).toEqual([
+            expect.stringContaining('[banned-font-weight]'),
+        ]);
+        expect(auditChartSource('sample/Chart.jsx', "style: { fontWeight: 'var(--type-weight-medium)' }")).toEqual([]);
 
         // 4. Series-color text
         expect(
@@ -343,7 +346,6 @@ describe('data-viz foundations', () => {
     it('sets the Google Sans Flex body family token on chart.style and explicitly on every theme text slot', () => {
         expect(BODY).toBe('var(--type-family-body)');
         expect(MEDIUM).toBe('var(--type-weight-medium)');
-        expect(SEMIBOLD).toBe('var(--type-weight-semibold)');
         expect(TABULAR).toBe('tabular-nums');
 
         const slots = {
@@ -365,14 +367,14 @@ describe('data-viz foundations', () => {
         }
     });
 
-    it('uses only weights 500 (medium) and 600 (semibold) across theme text slots and kills Highcharts default data-label outline and bold', () => {
+    it('uses only weight 500 (medium) across theme text slots and kills Highcharts default data-label outline and bold', () => {
         const titleSlots = [
             chartTheme.title?.style,
             chartTheme.xAxis?.title?.style,
             chartTheme.yAxis?.title?.style,
         ];
         for (const style of titleSlots) {
-            expect(style?.fontWeight).toBe(SEMIBOLD);
+            expect(style?.fontWeight).toBe(MEDIUM);
         }
 
         const labelSlots = [
@@ -413,7 +415,7 @@ describe('data-viz foundations', () => {
         expect(css).not.toContain(':has(> .highcharts-container) ~ div');
     });
 
-    it('formats values with a semibold tabular value span in chartFormat and keeps dataLabels.format unset in chartTheme so custom formatters survive', () => {
+    it('formats values with a medium tabular value span in chartFormat and keeps dataLabels.format unset in chartTheme so custom formatters survive', () => {
         expect(valueSpan('{point.y}')).toBe('<span class="plus-chart-value">{point.y}</span>');
         expect(valueSpan('{point.percentage:.1f}%')).toBe('<span class="plus-chart-value">{point.percentage:.1f}%</span>');
 

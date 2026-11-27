@@ -111,9 +111,9 @@ A **Section detail** is an inline expand: a row or card opens in place inside it
 
 **Checked:** Review
 
-Actions that commit changes belong in the card or form that holds the fields.
+A form's Save and Cancel sit at the start under its last field, Primary first. They never go in the Section footer, and never in a Card footer, which holds only a link or a compact pair with no Primary.
 
-Do: The form card holds its own Save; the Section footer is for paging and "View all".
+Do: Save and Cancel under the fields; the Section footer is for paging and "View all".
 Don't: Cancel and Save in the Section footer, away from the fields they commit.
 
 ### Give a part a fill with a Card, not a Section. {#give-a-part-a-fill-with-a-card-not-a-section}
@@ -159,7 +159,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 - **Stats.** A row of cards, each one number and its label, four at most.
 - **Details.** Label and value pairs in two columns, with Edit in the title row.
 - **Main and side.** A split with the side at the end and no fill: facts beside the main content.
-- **Form.** Fields in a card, with the card's own Save and Cancel at its bottom.
+- **Form.** Fields under the Section header, with Save and Cancel at the start under the last field.
 - **Subsections.** Sections nested one level, each an h3, for a long settings page.
 
 ## Anatomy

@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { CHART_BAR_RADIUS, SEMIBOLD } from '@/dataviz/chartTheme';
+import { CHART_BAR_RADIUS, MEDIUM } from '@/dataviz/chartTheme';
 import { BRAND, CHROME, toneByRank } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -32,8 +32,8 @@ describe('VariwidthChart options', () => {
         expect(options.series[0].colorByPoint).toBeUndefined();
         expect(options.plotOptions.variwide.borderColor).toBe(CHROME.separator);
         expect(options.plotOptions.variwide.borderRadius).toEqual(CHART_BAR_RADIUS);
-        expect(options.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
-        expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(options.xAxis.title.style.fontWeight).toBe(MEDIUM);
+        expect(options.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(options.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(options.tooltip.pointFormat).not.toMatch(/<b\b/i);
         expect(options.series[0].dataLabels.format).toContain(CHART_VALUE_CLASS);

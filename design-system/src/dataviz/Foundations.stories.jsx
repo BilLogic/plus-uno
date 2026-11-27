@@ -210,8 +210,8 @@ const TYPE_OPTIONS = {
 };
 
 /**
- * Google Sans Flex (`--type-family-body`) across every text slot, weights 500 and 600
- * only, tabular figures (`tabular-nums`) on every number slot, and tooltip
+ * Google Sans Flex (`--type-family-body`) across every text slot, weight 500 only,
+ * tabular figures (`tabular-nums`) on every number slot, and tooltip
  * text in `--ds-text` with the series color confined to the leading swatch.
  */
 export const TypeAndNumbers = {
@@ -249,7 +249,7 @@ export const TypeAndNumbers = {
         const tooltipValue = doc.querySelector('.highcharts-tooltip-container .plus-chart-value');
 
         expect(getComputedStyle(title).fontFamily).toContain('Google Sans Flex');
-        expect(getComputedStyle(title).fontWeight).toBe('600');
+        expect(getComputedStyle(title).fontWeight).toBe('500');
         expect(getComputedStyle(subtitle).fontWeight).toBe('500');
         expect(getComputedStyle(caption).fontWeight).toBe('500');
         expect(getComputedStyle(tooltipEl).color).toBe(resolveColor('--ds-text', canvasElement));
@@ -260,8 +260,8 @@ export const TypeAndNumbers = {
             expect(cs.fontFamily).toContain('Google Sans Flex');
             expect(cs.fontVariantNumeric).toBe('tabular-nums');
         }
-        expect(getComputedStyle(dataLabelValue).fontWeight).toBe('600');
-        expect(getComputedStyle(tooltipValue).fontWeight).toBe('600');
+        expect(getComputedStyle(dataLabelValue).fontWeight).toBe('500');
+        expect(getComputedStyle(tooltipValue).fontWeight).toBe('500');
     },
 };
 

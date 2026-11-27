@@ -112,7 +112,7 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Facts` · `Heading` · `
 | `verticalLines` | bool | — | Vertical hairlines between columns |
 | `frame` | enum | — | Plain spans its section with no outer frame; framed draws its own edge |
 | `size` | enum | — | Row height in pixels, from the Row size tokens |
-| `titleColumn` | number | — | Index of the one column that names the record, set in semibold |
+| `titleColumn` | number | — | Index of the one column that names the record, set in medium weight |
 | `rowStates` | enum | — | One state per row: rest, highlighted, selected or disabled |
 | `summary` | arrayOf | — | One calculation per column, in a muted row that closes the table |
 | `emptyState` | node | — | Shown as a message row spanning every column when there are no rows |

@@ -284,7 +284,7 @@ describe('Template docs live examples', () => {
         expect(screen.getByRole('button', { name: 'Share' })).toBeInTheDocument();
         r6.unmount();
 
-        const r7 = render(<Cases.CardOwnsSave />);
+        const r7 = render(<Cases.SaveUnderFields />);
         expect(screen.getByRole('heading', { name: 'Contact details' })).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: 'Guardian name' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();

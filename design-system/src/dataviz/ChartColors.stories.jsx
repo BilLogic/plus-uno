@@ -195,7 +195,7 @@ export const EveryChartInEveryMode = {
         await expect([...new Set(strays)], 'paints that are not chart, text or border tokens').toEqual([]);
 
         // Type & numbers: every chart text node renders in Google Sans Flex
-        // (never a system-font fallback), weights are 500 or 600 only,
+        // (never a system-font fallback), weights are 500 only,
         // and number slots compute tabular-nums.
         const typeStrays = [];
         for (const section of canvasElement.querySelectorAll('[data-chart]')) {
@@ -216,7 +216,7 @@ export const EveryChartInEveryMode = {
                 ) {
                     typeStrays.push(`${chart} family: ${style.fontFamily}`);
                 }
-                if (style.fontWeight === '700' || style.fontWeight === '300' || !['500', '600'].includes(style.fontWeight)) {
+                if (style.fontWeight !== '500') {
                     typeStrays.push(`${chart} weight: ${style.fontWeight} (${node.textContent.trim()})`);
                 }
             }

@@ -7,7 +7,7 @@ import {
     CHART_MARKER_RADIUS,
     CHART_RANGE_FILL_OPACITY,
     CHART_SPACING_MICRO,
-    SEMIBOLD,
+    MEDIUM,
 } from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL, CHROME } from '@/dataviz/palette';
 import AreaChart from './AreaChart/AreaChart.jsx';
@@ -47,8 +47,8 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(options.series[0].color).toBe(BRAND);
         expect(options.plotOptions.area.marker.radius).toBe(CHART_MARKER_RADIUS);
         expect(options.plotOptions.area.marker.states).toBeUndefined();
-        expect(options.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
-        expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(options.xAxis.title.style.fontWeight).toBe(MEDIUM);
+        expect(options.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(options.xAxis.categories).toEqual(['Q1', 'Q2', 'Q3']);
         expect(options.series[0].data).toEqual([40, 90, 60]);
 
@@ -65,7 +65,7 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(sorted.series[0].data).toEqual([90, 60, 40]);
     });
 
-    it('AreaRangeChart uses BRAND for its single band series and semibold axis titles', () => {
+    it('AreaRangeChart uses BRAND for its single band series and medium axis titles', () => {
         capturedOptions.length = 0;
         render(
             React.createElement(AreaRangeChart, {
@@ -78,8 +78,8 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(options.series[0].color).toBe(BRAND);
         expect(options.series[0].fillOpacity).toBe(CHART_RANGE_FILL_OPACITY);
         expect(options.series[0].fillOpacity).toBe(0.3);
-        expect(options.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
-        expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(options.xAxis.title.style.fontWeight).toBe(MEDIUM);
+        expect(options.yAxis.title.style.fontWeight).toBe(MEDIUM);
     });
 
     it('ComboChart uses BRAND for a single series, CATEGORICAL for multiple, token chrome, CHART_BAR_RADIUS, and sort opt-in', () => {
@@ -234,7 +234,7 @@ describe('Temporal family charts on the shared foundation', () => {
         expect(options.tooltip.pointFormat).not.toContain('<b>');
         expect(options.tooltip.pointFormat).toContain('plus-chart-value');
         expect(options.plotOptions.waterfall.borderRadius).toEqual(CHART_BAR_RADIUS);
-        expect(options.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(options.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(options.series[0].dataLabels.style).toBeUndefined();
     });
 
