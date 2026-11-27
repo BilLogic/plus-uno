@@ -162,7 +162,7 @@ test('a citation is not a duplication', () => {
   // apart without a similarity number to argue about.
   const found = findSharedLines(
     doc('AGENTS.md', 'Every deliverable carries the evidence it was judged against, in the same message.'),
-    doc('agents/uno-bot/skills/critique-a-design/SKILL.md', 'Evidence travels with the deliverable — `AGENTS.md` § The loading contract.'),
+    doc('agents/uno-bot/skills/critique-a-design/SKILL.md', 'Evidence travels with the deliverable — `docs/engineering/setup.md` § What AGENTS.md carries, and what the bundle takes.'),
   );
   assert.deepEqual(found, []);
 });

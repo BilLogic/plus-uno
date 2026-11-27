@@ -15,7 +15,7 @@ verified: 2026-08-24 (#171)
 
 
 - **Date**: 2026-04-11
-- **Status**: Superseded by the tier contract in `AGENTS.md` § The loading contract (stated in `loading-order.md` until #164 folded it in) — Tier 1 is now exactly `AGENTS.md`, docs/context/* is Tier 2, and Tier 3 means "retrieved live, never cached" rather than ephemeral handoffs; `.agent/handoffs/` no longer exists
+- **Status**: Superseded by the tier contract in `docs/engineering/setup.md` § What AGENTS.md carries, and what the bundle takes (stated earlier in `AGENTS.md` and, before #164, in `loading-order.md`) — Tier 1 is now exactly `AGENTS.md`, docs/context/* is Tier 2, and Tier 3 means "retrieved live, never cached" rather than ephemeral handoffs; `.agent/handoffs/` no longer exists
 - **Context**: Agent context windows are finite. The flat docs/ structure mixed always-loaded context with on-demand references. No way to distinguish essential product truth from supplementary guides.
 - **Decision**: Implement three tiers: (1) Always-loaded -- identity, conventions, principles, knowledge index via AGENTS.md "See" references to `docs/context/`. (2) On-demand -- skills, detailed context, knowledge entries triggered by skill invocation. (3) Ephemeral -- tool outputs, exploration, handoffs in `.agent/handoffs/` (gitignored).
 - **Source**: `git show 7b0cea5ef:docs/plans/2026-04-11-001-refactor-three-tier-context-architecture-plan.md`
