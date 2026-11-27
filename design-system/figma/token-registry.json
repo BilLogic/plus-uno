@@ -56,6 +56,12 @@
       "Metric/small": [
         "var(--metric-sm)"
       ],
+      "Label/eyebrow": [
+        "var(--label-eyebrow)"
+      ],
+      "Code/small": [
+        "var(--code-sm)"
+      ],
       "Family/heading": [
         "var(--type-family-heading)"
       ],
@@ -80,14 +86,29 @@
       "Weight/semibold": [
         "var(--type-weight-semibold)"
       ],
-      "Letter spacing/none": [
-        "var(--type-tracking-none)"
+      "Letter spacing/tighter": [
+        "var(--type-tracking-tighter)"
+      ],
+      "Letter spacing/close": [
+        "var(--type-tracking-close)"
       ],
       "Letter spacing/tight": [
         "var(--type-tracking-tight)"
       ],
-      "Letter spacing/tighter": [
-        "var(--type-tracking-tighter)"
+      "Letter spacing/snug": [
+        "var(--type-tracking-snug)"
+      ],
+      "Letter spacing/none": [
+        "var(--type-tracking-none)"
+      ],
+      "Letter spacing/open": [
+        "var(--type-tracking-open)"
+      ],
+      "Letter spacing/loose": [
+        "var(--type-tracking-loose)"
+      ],
+      "Letter spacing/wide": [
+        "var(--type-tracking-wide)"
       ]
     },
     "spacing": {
