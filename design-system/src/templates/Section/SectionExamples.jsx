@@ -179,21 +179,21 @@ const contactFields = (
     </div>
 );
 
-export const CardOwnsSave = () => (
+/** A form's Save and Cancel: at the start under the last field, Primary first. */
+const formActions = (
+    <div style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
+        <Button text="Save" appearance="primary" onClick={() => {}} />
+        <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+    </div>
+);
+
+export const SaveUnderFields = () => (
     <Section
         title="Contact details"
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
     >
-        <Card
-            footer={(
-                <>
-                    <Button text="Save" spacing="compact" onClick={() => {}} />
-                    <Button text="Cancel" spacing="compact" onClick={() => {}} />
-                </>
-            )}
-        >
-            {contactFields}
-        </Card>
+        {contactFields}
+        {formActions}
     </Section>
 );
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, SEMIBOLD } from '@/dataviz/chartTheme';
+import { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, MEDIUM } from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -34,8 +34,8 @@ describe('BubbleChart options', () => {
         expect(single.plotOptions.bubble.minSize).toBe(12);
         expect(single.plotOptions.bubble.maxSize).toBe(48);
         expect(single.plotOptions.bubble.marker.fillOpacity).toBe(0.7);
-        expect(single.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
-        expect(single.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(single.xAxis.title.style.fontWeight).toBe(MEDIUM);
+        expect(single.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(single.tooltip.headerFormat).toContain(CHART_VALUE_CLASS);
         expect(single.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(single.tooltip.headerFormat).not.toMatch(/<b\b/i);

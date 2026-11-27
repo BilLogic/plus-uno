@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
-import { CHART_MARKER_RADIUS, SEMIBOLD } from '@/dataviz/chartTheme';
+import { CHART_MARKER_RADIUS, MEDIUM } from '@/dataviz/chartTheme';
 import { BRAND, CATEGORICAL } from '@/dataviz/palette';
 
 const capturedOptions = [];
@@ -33,8 +33,8 @@ describe('ScatterChart options', () => {
         expect(single.plotOptions.scatter.marker.radius).toBe(3);
         expect(single.plotOptions.scatter.marker.states).toBeUndefined();
         expect(single.plotOptions.scatter.states).toBeUndefined();
-        expect(single.xAxis.title.style.fontWeight).toBe(SEMIBOLD);
-        expect(single.yAxis.title.style.fontWeight).toBe(SEMIBOLD);
+        expect(single.xAxis.title.style.fontWeight).toBe(MEDIUM);
+        expect(single.yAxis.title.style.fontWeight).toBe(MEDIUM);
         expect(single.plotOptions.scatter.tooltip.headerFormat).toContain(CHART_VALUE_CLASS);
         expect(single.plotOptions.scatter.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(single.plotOptions.scatter.tooltip.headerFormat).not.toMatch(/<b\b/i);

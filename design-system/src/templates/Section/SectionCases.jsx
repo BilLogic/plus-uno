@@ -19,7 +19,7 @@ export const CODE = showCode(examplesSource, [
     'ActionsInTwoHomes',
     'RightSideInOrder',
     'RightSideCrowded',
-    'CardOwnsSave',
+    'SaveUnderFields',
     'FooterCommits',
 ]);
 
@@ -71,5 +71,5 @@ export const ActionsInTitleRow = unstyled(Example.ActionsInTitleRow);
 export const ActionsInTwoHomes = unstyled(Example.ActionsInTwoHomes);
 export const RightSideInOrder = unstyled(Example.RightSideInOrder);
 export const RightSideCrowded = unstyled(Example.RightSideCrowded);
-export const CardOwnsSave = unstyled(Example.CardOwnsSave);
+export const SaveUnderFields = unstyled(Example.SaveUnderFields);
 export const FooterCommits = unstyled(Example.FooterCommits);

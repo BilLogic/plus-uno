@@ -83,12 +83,12 @@ default Highcharts border or line entirely) needs no token — it draws nothing.
 Every text slot in a chart — title, subtitle, caption, axis labels and titles,
 legend items, data labels, tooltips and empty-data notices — takes the Google Sans Flex
 body family (`--type-family-body`) and the current text tokens
-(`--type-size-075`, `--type-weight-semibold`, `--type-weight-medium`, and so on) — never a
+(`--type-size-075`, `--type-weight-medium`, and so on) — never a
 `'12px'` literal, never a token `var()` paired with a literal fallback
 value, and never a system-font fallback or a monospace
-font. Titles and emphasized values use semibold (`--type-weight-semibold`, 600);
-labels and supporting copy use medium (`--type-weight-medium`, 500). Nothing
-renders at 700 or 300, and data-label text outlines stay off.
+font. Titles, axis titles, labels and emphasized values all use medium
+(`--type-weight-medium`, 500), with tabular figures on emphasized values.
+Nothing renders at 600, 700 or 300, and data-label text outlines stay off.
 
 Number slots (axis tick labels, data labels, tooltips, legend items and
 emphasized values) set tabular figures (`tabular-nums`) so columns of numbers
@@ -124,7 +124,7 @@ Charts follow the same spring physics and choreography as the rest of the design
 `foundations.test.js` and `chartText.test.js` hold `design-system/src/dataviz/`
 to the tier tokens and enforce a hard ban (with a self-test) against eased
 curves, animation millisecond literals and removed animation props, `<b>` or
-`bold` or numeric font weights and weights other than 500 and 600,
+`bold` or numeric font weights and weights other than 500,
 series-color text, pixel offsets, control radii on non-controls, and number
 slots without tabular figures; `design-system/tests/dataviz-tokens.test.js`
 does the same for color.

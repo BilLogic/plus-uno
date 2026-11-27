@@ -5,16 +5,16 @@
  * strings, and its SVG renderer copies a `<span>`'s `class` attribute onto the
  * `<tspan>` it creates even when `useHTML` is off. Wrapping emphasized values
  * in `<span class="plus-chart-value">…</span>` lets `chartTheme.css` style both
- * HTML tooltips and SVG data labels at semibold (600) with tabular figures
+ * HTML tooltips and SVG data labels at medium (500) with tabular figures
  * (`tabular-nums`), while keeping tooltip text in `--ds-text` and confining
  * series colors to the leading swatch (`●`).
  */
 
-/** CSS class styled as semibold (600) with tabular figures in `chartTheme.css`. */
+/** CSS class styled as medium (500) with tabular figures in `chartTheme.css`. */
 export const CHART_VALUE_CLASS = 'plus-chart-value';
 
 /**
- * Wraps a Highcharts template expression (or literal value) in the semibold,
+ * Wraps a Highcharts template expression (or literal value) in the medium,
  * tabular value span. Works in both SVG `<text>` (`useHTML: false`) and HTML
  * (`useHTML: true`) labels and tooltips.
  *
@@ -36,7 +36,7 @@ export const seriesSwatch = (colorExpr = '{point.color}') =>
 
 /**
  * Default Highcharts `tooltip.headerFormat` with the category or key set in
- * the semibold tabular value span.
+ * the medium tabular value span.
  *
  * @param {string} [keyExpr='{point.key}']
  * @returns {string}
@@ -46,7 +46,7 @@ export const tooltipHeaderFormat = (keyExpr = '{point.key}') =>
 
 /**
  * Highcharts `tooltip.pointFormat` with an optional series-colored swatch,
- * `--ds-text` label, and semibold tabular value span.
+ * `--ds-text` label, and medium tabular value span.
  *
  * @param {object} [options]
  * @param {string} [options.label='{series.name}']
@@ -67,7 +67,7 @@ export const tooltipPointFormat = ({
 
 /**
  * Highcharts `dataLabels.format` with the numeric expression wrapped in the
- * semibold tabular value span and an optional leading label.
+ * medium tabular value span and an optional leading label.
  *
  * @param {string} [value='{point.y}']
  * @param {string} [label]

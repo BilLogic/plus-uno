@@ -750,24 +750,19 @@ export const TypeMainAndSide = {
     parameters: codeOf('MainAndSide'),
 };
 
-/** Form: fields in a card, with its own Cancel and Save. */
+/** Form: fields under the Section header, with Save and Cancel at the start under the last field. */
 export const TypeForm = {
     name: 'Type: Form',
     render: () => (
         <Section title="Contact details">
-            <Card
-                footer={(
-                    <>
-                        <Button text="Save" appearance="primary" onClick={() => {}} />
-                        <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-                    </>
-                )}
-            >
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-lg) var(--inline-xl)' }}>
-                    <TextField label="Guardian name" defaultValue="Dana Thompson" />
-                    <TextField label="Phone" defaultValue="(412) 555-0148" />
-                </div>
-            </Card>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-lg) var(--inline-xl)' }}>
+                <TextField label="Guardian name" defaultValue="Dana Thompson" />
+                <TextField label="Phone" defaultValue="(412) 555-0148" />
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
+                <Button text="Save" appearance="primary" onClick={() => {}} />
+                <Button text="Cancel" appearance="subtle" onClick={() => {}} />
+            </div>
         </Section>
     ),
 };

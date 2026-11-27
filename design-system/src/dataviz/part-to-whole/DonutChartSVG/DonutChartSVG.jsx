@@ -109,7 +109,7 @@ const DonutChartSVG = ({
                     }}
                 >
                     {paths[hoveredIndex].label && (
-                        <div style={{ fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--pad-x-xs)' }}>
+                        <div style={{ fontWeight: 'var(--type-weight-medium)', marginBottom: 'var(--pad-x-xs)' }}>
                             {paths[hoveredIndex].label}
                         </div>
                     )}

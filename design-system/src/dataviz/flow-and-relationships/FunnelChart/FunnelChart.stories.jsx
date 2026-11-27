@@ -101,11 +101,11 @@ export const Overview = {
             if (!node.textContent?.trim()) continue;
             const style = getComputedStyle(node);
             expect(style.fontFamily).toContain('Google Sans Flex');
-            expect(['500', '600']).toContain(style.fontWeight);
+            expect(style.fontWeight).toBe('500');
         }
         for (const valueNode of canvasElement.querySelectorAll('.plus-chart-value')) {
             const style = getComputedStyle(valueNode);
-            expect(style.fontWeight).toBe('600');
+            expect(style.fontWeight).toBe('500');
             expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },

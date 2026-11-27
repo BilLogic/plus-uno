@@ -70,8 +70,9 @@ import './Section.scss';
  * is a sunken Card, so it takes the Card's pad and radius.
  * Queue pages open a floating Panel over the list instead.
  *
- * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
- * commit changes belong in a card footer, not on the section.
+ * FOOTER. Only for "View all" or paging, aligned to the end. A form's Save
+ * and Cancel sit at the start under its last field, never here or in a Card
+ * footer.
  */
 
 export const SECTION_HEADER_TYPES = ['default', 'custom'];

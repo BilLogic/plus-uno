@@ -69,7 +69,7 @@ export const Overview = {
             if (!node.textContent?.trim()) continue;
             const style = getComputedStyle(node);
             expect(style.fontFamily).toContain('Google Sans Flex');
-            expect(['500', '600']).toContain(style.fontWeight);
+            expect(style.fontWeight).toBe('500');
         }
     },
 };

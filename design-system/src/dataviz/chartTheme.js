@@ -28,7 +28,6 @@ import '@/dataviz/chartTheme.css';
 
 export const BODY = 'var(--type-family-body)';
 export const MEDIUM = 'var(--type-weight-medium)';
-export const SEMIBOLD = 'var(--type-weight-semibold)';
 export const TABULAR = 'tabular-nums';
 
 /**
@@ -155,7 +154,7 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
             color: CHROME.text,
             fontSize: TEXT_SIZE.small,
             fontFamily: BODY,
-            fontWeight: SEMIBOLD,
+            fontWeight: MEDIUM,
         },
     },
 });
@@ -225,7 +224,7 @@ const chartTheme = {
             color: CHROME.text,
             fontSize: TEXT_SIZE.title,
             fontFamily: BODY,
-            fontWeight: SEMIBOLD,
+            fontWeight: MEDIUM,
         },
     },
     subtitle: {
@@ -303,14 +302,14 @@ const chartTheme = {
         wordcloud: {
             style: {
                 fontFamily: BODY,
-                fontWeight: SEMIBOLD,
+                fontWeight: MEDIUM,
             },
         },
         treegraph: {
             collapseButton: {
                 style: {
                     fontFamily: BODY,
-                    fontWeight: SEMIBOLD,
+                    fontWeight: MEDIUM,
                 },
             },
         },
