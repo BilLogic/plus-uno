@@ -142,7 +142,7 @@ export const CoreSizeMatrix = () => (
         {MATRIX_ROWS.map((row) => (
             <div key={row.label} role="row" style={matrixGrid}>
                 <div role="rowheader" style={{ ...matrixCell, flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center' }}>
-                    <span style={{ ...typeStyle('body-sm'), fontWeight: 'var(--type-weight-semibold)' }}>{row.label}</span>
+                    <span style={typeStyle('heading-xxs')}>{row.label}</span>
                     {row.note && <span style={{ ...typeStyle('body-sm'), color: 'var(--ds-text-subtle)' }}>{row.note}</span>}
                 </div>
                 {row.cells.map((name, i) => (

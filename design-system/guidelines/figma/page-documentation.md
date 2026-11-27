@@ -236,7 +236,7 @@ Bind every value inside the Docs frame to a semantic variable, as
 
 Text uses the current text styles: Heading/large for the page title,
 Heading/medium for section headings, Heading/small for subsections, Body/default
-for prose and table cells (semibold weight for table headers), and Body/small for
+for prose and table cells, Heading/xxsmall for table headers, and Body/small for
 the Header's Figma line. Code and property names carry no style; they bind the
 type variables as `token-mapping.md` § Text that carries no style says. Color
 comes from `on-surface` and `on-surface-variant`.

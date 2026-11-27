@@ -15,6 +15,7 @@ import LogoConstruction from '@/assets/Logo/LogoConstruction';
 import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
 import { LogoExpressions } from '@/storybook-docs/logos/LogoExpressions.jsx';
 import { LockupSizes, LockupRule, WordmarkStep, TypedWordmarkFigure, TrackedWordmarkFigure } from '@/storybook-docs/logos/LogoWordmark.jsx';
+import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
@@ -49,7 +50,6 @@ The wordmark is Google Sans Flex, the product's type family, with four brand twe
 
 ```jsx
 import { Logo } from '@/components';
-import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 ```
 
 See <DocsLink id="components-images-and-icons-logo">Logo</DocsLink> for props and code.

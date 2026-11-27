@@ -44,7 +44,7 @@ Every text style binds to a typography variable (family, weight, size, line heig
 | --- | --- | --- | --- | --- |
 | Body/default/regular | 14/20 | 400 | Paragraphs and descriptions |  |
 | Body/default/medium | 14/20 | 500 | Control labels and text beside an icon |  |
-| Body/default/bold | 14/20 | 600 | Inline emphasis, used sparingly |  |
+| Body/default + semibold (a run, not a style) | 14/20 | 600 | Inline emphasis in running text (strong), used sparingly |  |
 
 ## In code
 
