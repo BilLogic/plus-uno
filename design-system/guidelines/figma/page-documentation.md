@@ -234,11 +234,11 @@ Bind every value inside the Docs frame to a semantic variable, as
 | Table rows | gap `Table/cell-gap`; vertical padding `Element/gap-sm`; stroke `outline-variant` |
 | Open-state examples | the field and its popup stacked in a vertical auto-layout frame, gap `Element/gap-xs`, placed by auto-layout alone |
 
-Text uses the current text styles, on the Storybook docs page's ladder:
-Heading/xxlarge for the page title, Heading/large for section headings,
-Heading/medium for subsections and rule headings, Body/default
-for prose and table cells, Heading/xxsmall for table headers, and Body/small for
-the Header's Figma line. Code and property names carry no style; they bind the
+Headings use the same text styles as the Storybook docs page: Heading/xxlarge
+for the page title, Heading/large for section headings, and Heading/medium for
+subsections, including the short imperative heading over each Usage rule.
+Prose and table cells use Body/default, table headers Heading/xxsmall, and the
+Header's Figma line Body/small. Code and property names carry no style; they bind the
 type variables as `token-mapping.md` § Text that carries no style says. Color
 comes from `on-surface` and `on-surface-variant`.
 
