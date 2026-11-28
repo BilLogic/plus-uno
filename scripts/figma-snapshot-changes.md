@@ -1,159 +1,11 @@
 # Figma Component Snapshot — Changed Components
 
-993 changed component(s) in `scripts/figma-component-snapshot.json`:
+646 changed component(s) in `scripts/figma-component-snapshot.json`:
 
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=default, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=default, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=raised, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=raised, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=sunken, text=truncate, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=end, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/2, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/2, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/2, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=start, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=1:1`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=lg, imageRatio=4:3`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=1:1`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=md, imageRatio=4:3`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=16:9`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=1:1`
-- `Card / surface=sunken, text=wrap, imagePlacement=top, imageSplit=1/3, gap=sm, imageRatio=4:3`
-- `Components / Docs / Example`
-- `Components / Docs / Parts group`
-- `Components / Docs / Related card`
-- `Components / appearance=color`
-- `Components / appearance=radius`
-- `Components / appearance=space`
-- `Components / appearance=type`
-- `Components / kind=ai`
-- `Components / kind=component`
-- `Components / kind=foundation`
-- `Components / kind=label`
-- `Components / kind=pattern`
-- `Components / kind=spec`
-- `Components / layout=side by side`
-- `Components / layout=stacked`
-- `Components / level=section`
-- `Components / level=subsection`
-- `Components / orientation=inline, appearance=tile`
-- `Components / size=20, appearance=default, value=0`
-- `Components / size=20, appearance=default, value=100`
-- `Components / size=20, appearance=default, value=40`
-- `Components / size=20, appearance=default, value=80`
-- `Components / size=20, appearance=inverse, value=0`
-- `Components / size=20, appearance=inverse, value=100`
-- `Components / size=20, appearance=inverse, value=40`
-- `Components / size=20, appearance=inverse, value=80`
+- `Components / orientation=inline, appearance=soft`
+- `Components / orientation=stacked, appearance=soft`
+- `Components / status=uploading, kind=file, removal=cancel, isReadOnly=false, isDisabled=false`
+- `Components / status=uploading, kind=folder, removal=cancel, isReadOnly=false, isDisabled=false`
 - `Components / unread=false, state=focused`
 - `Components / unread=false, state=hovered`
 - `Components / unread=false, state=pressed`
@@ -162,24 +14,8 @@
 - `Components / unread=true, state=hovered`
 - `Components / unread=true, state=pressed`
 - `Components / unread=true, state=rest`
-- `Components / userType=lead tutor`
-- `Components / userType=supervisor`
-- `Components / userType=tutor`
-- `Components / verdict=do`
-- `Components / verdict=dont`
-- `Deprecated / Card (legacy)`
-- `Deprecated / Carousel (legacy)`
-- `Deprecated / horizontal alignment=left, vertical alignment=bottom`
-- `Deprecated / horizontal alignment=left, vertical alignment=center`
-- `Deprecated / horizontal alignment=left, vertical alignment=top`
-- `Deprecated / horizontal alignment=right, vertical alignment=bottom`
-- `Deprecated / horizontal alignment=right, vertical alignment=center`
-- `Deprecated / horizontal alignment=right, vertical alignment=top`
-- `Deprecated / kind=group heading, state=default`
-- `Deprecated / level=level 1`
-- `Deprecated / level=level 2`
-- `Deprecated / level=level 3`
-- `Deprecated / level=section`
+- `Deprecated / kind=option, state=hover`
+- `Deprecated / kind=option, state=selected`
 - `Deprecated / mode=multi (badges), state=closed, filled?=false`
 - `Deprecated / mode=multi (badges), state=closed, filled?=true`
 - `Deprecated / mode=multi (badges), state=disabled, filled?=false`
@@ -236,6 +72,7 @@
 - `Deprecated / state=open, filled?=true, range?=true, size=large`
 - `Deprecated / state=open, filled?=true, range?=true, size=medium`
 - `Deprecated / state=open, filled?=true, range?=true, size=small`
+- `Deprecated / state=open, multiple?=false`
 - `Deprecated / state=read-only, validation=none, filled?=false, spacing=compact`
 - `Deprecated / state=read-only, validation=none, filled?=false, spacing=default`
 - `Deprecated / state=read-only, validation=none, filled?=true, spacing=compact`
@@ -244,14 +81,6 @@
 - `Deprecated / state=time open, validation=none, filled?=false, spacing=default`
 - `Deprecated / state=time open, validation=none, filled?=true, spacing=compact`
 - `Deprecated / state=time open, validation=none, filled?=true, spacing=default`
-- `Deprecated / style=danger`
-- `Deprecated / style=info`
-- `Deprecated / style=primary`
-- `Deprecated / style=secondary`
-- `Deprecated / style=success`
-- `Deprecated / style=warning`
-- `Deprecated / type=default`
-- `Deprecated / type=multiple target`
 - `Deprecated / type=person, state=default, isSelected=false`
 - `Deprecated / type=person, state=default, isSelected=true`
 - `Deprecated / type=person, state=focused, isSelected=false`
@@ -264,11 +93,6 @@
 - `Deprecated / type=team, state=hovered, isSelected=false`
 - `Deprecated / type=team, state=hovered, isSelected=true`
 - `Deprecated / type=team, state=pressed, isSelected=false`
-- `Deprecated — kept until the Specs file swaps to Date picker · moved from Date picker, 2026-10-24 / state=first date`
-- `Deprecated — kept until the Specs file swaps to Date picker · moved from Date picker, 2026-10-24 / state=second date`
-- `Deprecated — kept until the Specs file swaps to Date picker · moved from Date picker, 2026-10-24 / state=selected, alignment=center`
-- `Deprecated — kept until the Specs file swaps to Date picker · moved from Date picker, 2026-10-24 / state=selected, alignment=left`
-- `Deprecated — kept until the Specs file swaps to Date picker · moved from Date picker, 2026-10-24 / state=selected, alignment=right`
 - `Drawer / width=lg`
 - `Drawer / width=md`
 - `Drawer / width=sm`
@@ -288,386 +112,156 @@
 - `Form / host=steps, marked=false, sending=true`
 - `Form / host=steps, marked=true, sending=false`
 - `Form / host=steps, marked=true, sending=true`
-- `Frame / sidebarDocked=false, defaultPanelOpen=false, sectionDetail=false`
 - `Frame / sidebarDocked=false, defaultPanelOpen=false, sectionDetail=true`
-- `Frame / sidebarDocked=false, defaultPanelOpen=true, sectionDetail=false`
-- `Frame / sidebarDocked=false, defaultPanelOpen=true, sectionDetail=true`
-- `Frame / sidebarDocked=true, defaultPanelOpen=false, sectionDetail=false`
-- `Frame / sidebarDocked=true, defaultPanelOpen=false, sectionDetail=true`
-- `Frame / sidebarDocked=true, defaultPanelOpen=true, sectionDetail=false`
-- `Frame / sidebarDocked=true, defaultPanelOpen=true, sectionDetail=true`
-- `Frame / sidebarDocked=unset, defaultPanelOpen=false, sectionDetail=false`
-- `Frame / sidebarDocked=unset, defaultPanelOpen=false, sectionDetail=true`
-- `Frame / sidebarDocked=unset, defaultPanelOpen=true, sectionDetail=false`
-- `Frame / sidebarDocked=unset, defaultPanelOpen=true, sectionDetail=true`
-- `Illustration kit / Kit / Shimmer band`
-- `Jumbotron (deprecated, superseded by the Section + Card Jumbotron) · moved from Jumbotron, 2026-10-24 / size=small`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=lg, height=fill`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=lg, height=hug`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=md, height=fill`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=md, height=hug`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=sm, height=fill`
-- `Modal + _Modal/header + _Modal/button (deprecated, superseded by Pattern/Modal + _Modal header, 2026-10-23) / width=sm, height=hug`
-- `Modal / tab group (old)`
-- `Modal / width=10-col, height=fill`
-- `Modal / width=10-col, height=hug`
-- `Modal / width=4-col, height=fill`
-- `Modal / width=4-col, height=hug`
-- `Modal / width=6-col, height=fill`
-- `Modal / width=6-col, height=hug`
-- `Modal / width=8-col, height=fill`
-- `Modal / width=8-col, height=hug`
-- `Page / width=content`
-- `Page / width=reading`
-- `Panel / type=details, width=1000, editing=false`
-- `Panel / type=details, width=1440, editing=false`
+- `Panel / type=details, width=1000, editing=true`
+- `Panel / type=details, width=1440, editing=true`
 - `Panel / type=notifications, width=1000, editing=false`
 - `Panel / type=notifications, width=1440, editing=false`
 - `Patterns / size=lg`
 - `Patterns / size=md`
 - `Patterns / size=sm`
-- `Popups / placement=bottom, triggerType=click`
-- `Popups / placement=bottom, triggerType=focus`
-- `Popups / placement=bottom, triggerType=hover`
-- `Popups / placement=bottom, triggerType=hover+focus`
-- `Popups / placement=left, triggerType=click`
-- `Popups / placement=left, triggerType=focus`
-- `Popups / placement=left, triggerType=hover`
-- `Popups / placement=left, triggerType=hover+focus`
-- `Popups / placement=right, triggerType=click`
-- `Popups / placement=right, triggerType=focus`
-- `Popups / placement=right, triggerType=hover`
-- `Popups / placement=right, triggerType=hover+focus`
-- `Popups / placement=top, triggerType=click`
-- `Popups / placement=top, triggerType=focus`
-- `Popups / placement=top, triggerType=hover`
-- `Popups / placement=top, triggerType=hover+focus`
-- `Popups / spacing=compact`
-- `Popups / spacing=default`
-- `Retired / type=all`
-- `Retired / type=nav dropdown`
-- `Sign-up Portal`
+- `Retired / type=input group`
 - `Table / kind=dynamic`
 - `Table / kind=static`
 - `Table / kind=tree`
-- `Table first pass (superseded) · moved from Patterns, 2026-10-24 / frame=framed, state=empty`
-- `Table first pass (superseded) · moved from Patterns, 2026-10-24 / frame=plain, state=empty`
-- `Templates / frame=default, content=blank`
-- `Templates / frame=default, content=dashboard`
-- `Templates / frame=default, content=reading`
-- `Templates / frame=focused, content=blank`
-- `Templates / frame=focused, content=reading`
-- `Updated / Card`
-- `Updated / Code`
-- `Updated / Dropdown list`
-- `Updated / alignment=center, appearance=default, breakpoint=wide`
-- `Updated / alignment=center, appearance=pill, breakpoint=wide`
-- `Updated / alignment=center, spacing=compact, appearance=default`
-- `Updated / alignment=center, spacing=compact, appearance=pill`
-- `Updated / alignment=justified, appearance=default, breakpoint=wide`
-- `Updated / alignment=justified, appearance=pill, breakpoint=wide`
-- `Updated / alignment=justified, spacing=compact, appearance=default`
-- `Updated / alignment=justified, spacing=compact, appearance=pill`
-- `Updated / alignment=left, appearance=default, breakpoint=narrow`
-- `Updated / alignment=left, appearance=default, breakpoint=wide`
-- `Updated / alignment=left, appearance=pill, breakpoint=narrow`
-- `Updated / alignment=left, appearance=pill, breakpoint=wide`
-- `Updated / alignment=left, spacing=compact, appearance=default`
-- `Updated / alignment=left, spacing=compact, appearance=pill`
-- `Updated / alignment=right, appearance=default, breakpoint=wide`
-- `Updated / alignment=right, appearance=pill, breakpoint=wide`
-- `Updated / alignment=right, spacing=compact, appearance=default`
-- `Updated / alignment=right, spacing=compact, appearance=pill`
-- `Updated / appearance=danger`
-- `Updated / appearance=danger, spacing=default, material=bold, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=danger, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=danger, spacing=default, material=subtle, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=default, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=default, menu=true, state=disabled`
-- `Updated / appearance=danger, spacing=default, menu=true, state=focused`
-- `Updated / appearance=danger, spacing=default, menu=true, state=hovered`
-- `Updated / appearance=danger, spacing=default, menu=true, state=loading`
-- `Updated / appearance=danger, spacing=default, menu=true, state=pressed`
-- `Updated / appearance=danger, spacing=default, menu=true, state=rest`
-- `Updated / appearance=danger, spacing=default, menu=true, state=selected`
-- `Updated / appearance=danger, spacing=spacious, material=bold, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=danger, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=danger, spacing=spacious, material=subtle, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=spacious, menu=false, state=rest`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=disabled`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=focused`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=hovered`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=loading`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=pressed`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=rest`
-- `Updated / appearance=danger, spacing=spacious, menu=true, state=selected`
-- `Updated / appearance=default, spacing=compact, isSelected=false, isDisabled=false`
-- `Updated / appearance=default, spacing=compact, isSelected=false, isDisabled=true`
-- `Updated / appearance=default, spacing=compact, isSelected=true, isDisabled=false`
-- `Updated / appearance=default, spacing=default, isSelected=false, isDisabled=false`
-- `Updated / appearance=default, spacing=default, isSelected=false, isDisabled=true`
-- `Updated / appearance=default, spacing=default, isSelected=true, isDisabled=false`
-- `Updated / appearance=default, state=default, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=default, spacing=compact, isSelected=false, isDisabled=false, isLoading=true`
-- `Updated / appearance=default, state=default, spacing=compact, isSelected=false, isDisabled=true, isLoading=false`
-- `Updated / appearance=default, state=default, spacing=compact, isSelected=true, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=default, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=default, spacing=default, isSelected=false, isDisabled=false, isLoading=true`
-- `Updated / appearance=default, state=default, spacing=default, isSelected=false, isDisabled=true, isLoading=false`
-- `Updated / appearance=default, state=default, spacing=default, isSelected=true, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=focused, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=focused, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=hovered, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=hovered, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=pressed, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=default, state=pressed, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=discovery, spacing=default, material=bold, menu=false, state=rest`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=discovery, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=discovery, spacing=default, material=subtle, menu=false, state=rest`
-- `Updated / appearance=discovery, spacing=spacious, material=bold, menu=false, state=rest`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=discovery, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=discovery, spacing=spacious, material=subtle, menu=false, state=rest`
-- `Updated / appearance=info`
-- `Updated / appearance=info, spacing=default, material=bold, menu=false, state=rest`
-- `Updated / appearance=info, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=info, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=info, spacing=default, material=subtle, menu=false, state=rest`
-- `Updated / appearance=info, spacing=spacious, material=bold, menu=false, state=rest`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=info, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=info, spacing=spacious, material=subtle, menu=false, state=rest`
-- `Updated / appearance=inherit, size=12`
-- `Updated / appearance=invert, size=12`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=neutral, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=neutral, spacing=default, menu=false, state=rest`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=disabled`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=focused`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=hovered`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=loading`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=pressed`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=rest`
-- `Updated / appearance=neutral, spacing=default, menu=true, state=selected`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=neutral, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=neutral, spacing=spacious, menu=false, state=rest`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=disabled`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=focused`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=hovered`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=loading`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=pressed`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=rest`
-- `Updated / appearance=neutral, spacing=spacious, menu=true, state=selected`
-- `Updated / appearance=primary`
-- `Updated / appearance=primary, spacing=compact, isSelected=false, isDisabled=false`
-- `Updated / appearance=primary, spacing=compact, isSelected=false, isDisabled=true`
-- `Updated / appearance=primary, spacing=compact, isSelected=true, isDisabled=false`
-- `Updated / appearance=primary, spacing=default, isSelected=false, isDisabled=false`
-- `Updated / appearance=primary, spacing=default, isSelected=false, isDisabled=true`
-- `Updated / appearance=primary, spacing=default, isSelected=true, isDisabled=false`
-- `Updated / appearance=secondary`
+- `Updated / AI chat button`
+- `Updated / Button group`
+- `Updated / appearance=soft, state=default, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=default, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=default, isChecked=true, size=12`
+- `Updated / appearance=soft, state=disabled, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=disabled, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=disabled, isChecked=true, size=12`
+- `Updated / appearance=soft, state=focused, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=focused, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=focused, isChecked=true, size=12`
+- `Updated / appearance=soft, state=hovered, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=hovered, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=hovered, isChecked=true, size=12`
+- `Updated / appearance=soft, state=invalid, isChecked=true, size=12`
+- `Updated / appearance=soft, state=pressed, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=pressed, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=pressed, isChecked=true, size=12`
+- `Updated / appearance=soft, state=read-only, isChecked=false, isIndeterminate=true, size=18`
+- `Updated / appearance=soft, state=read-only, isChecked=true, isIndeterminate=false, size=18`
+- `Updated / appearance=soft, state=read-only, isChecked=true, size=12`
+- `Updated / appearance=standard, spacing=compact, state=default, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=default, input=value`
 - `Updated / appearance=standard, spacing=compact, state=default, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=default, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=default, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=default, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=compact, state=disabled, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=disabled, input=value`
 - `Updated / appearance=standard, spacing=compact, state=disabled, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=disabled, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=disabled, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=disabled, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=compact, state=focused, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=focused, input=value`
 - `Updated / appearance=standard, spacing=compact, state=focused, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=focused, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=focused, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=focused, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=compact, state=hovered, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=hovered, input=value`
 - `Updated / appearance=standard, spacing=compact, state=hovered, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=hovered, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=hovered, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=hovered, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=compact, state=invalid, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=invalid, input=value`
 - `Updated / appearance=standard, spacing=compact, state=invalid, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=invalid, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=invalid, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=invalid, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=compact, state=read-only, input=placeholder`
+- `Updated / appearance=standard, spacing=compact, state=read-only, input=value`
 - `Updated / appearance=standard, spacing=compact, state=read-only, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=read-only, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=compact, state=read-only, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=compact, state=read-only, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=default, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=default, input=value`
 - `Updated / appearance=standard, spacing=default, state=default, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=default, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=default, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=default, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=disabled, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=disabled, input=value`
 - `Updated / appearance=standard, spacing=default, state=disabled, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=disabled, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=disabled, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=disabled, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=focused, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=focused, input=value`
 - `Updated / appearance=standard, spacing=default, state=focused, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=focused, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=focused, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=focused, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=hovered, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=hovered, input=value`
 - `Updated / appearance=standard, spacing=default, state=hovered, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=hovered, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=hovered, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=hovered, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=invalid, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=invalid, input=value`
 - `Updated / appearance=standard, spacing=default, state=invalid, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=invalid, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=invalid, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=invalid, isMulti=true, input=value`
+- `Updated / appearance=standard, spacing=default, state=read-only, input=placeholder`
+- `Updated / appearance=standard, spacing=default, state=read-only, input=value`
 - `Updated / appearance=standard, spacing=default, state=read-only, isMulti=false, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=read-only, isMulti=false, input=value`
 - `Updated / appearance=standard, spacing=default, state=read-only, isMulti=true, input=placeholder`
 - `Updated / appearance=standard, spacing=default, state=read-only, isMulti=true, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=default, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=default, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=disabled, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=disabled, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=focused, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=focused, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=hovered, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=hovered, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=invalid, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=invalid, input=value`
+- `Updated / appearance=subtle, spacing=compact, state=read-only, input=placeholder`
+- `Updated / appearance=subtle, spacing=compact, state=read-only, input=value`
+- `Updated / appearance=subtle, spacing=default, state=default, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=default, input=value`
 - `Updated / appearance=subtle, spacing=default, state=default, isMulti=false, input=placeholder`
 - `Updated / appearance=subtle, spacing=default, state=default, isMulti=false, input=value`
+- `Updated / appearance=subtle, spacing=default, state=disabled, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=disabled, input=value`
 - `Updated / appearance=subtle, spacing=default, state=disabled, isMulti=false, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=focused, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=focused, input=value`
 - `Updated / appearance=subtle, spacing=default, state=focused, isMulti=false, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=hovered, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=hovered, input=value`
 - `Updated / appearance=subtle, spacing=default, state=hovered, isMulti=false, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=invalid, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=invalid, input=value`
 - `Updated / appearance=subtle, spacing=default, state=invalid, isMulti=false, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=read-only, input=placeholder`
+- `Updated / appearance=subtle, spacing=default, state=read-only, input=value`
 - `Updated / appearance=subtle, spacing=default, state=read-only, isMulti=false, input=placeholder`
-- `Updated / appearance=subtle, state=default, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=default, spacing=compact, isSelected=false, isDisabled=false, isLoading=true`
-- `Updated / appearance=subtle, state=default, spacing=compact, isSelected=false, isDisabled=true, isLoading=false`
-- `Updated / appearance=subtle, state=default, spacing=compact, isSelected=true, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=default, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=default, spacing=default, isSelected=false, isDisabled=false, isLoading=true`
-- `Updated / appearance=subtle, state=default, spacing=default, isSelected=false, isDisabled=true, isLoading=false`
-- `Updated / appearance=subtle, state=default, spacing=default, isSelected=true, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=focused, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=focused, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=hovered, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=hovered, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=pressed, spacing=compact, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=subtle, state=pressed, spacing=default, isSelected=false, isDisabled=false, isLoading=false`
-- `Updated / appearance=success`
-- `Updated / appearance=success, spacing=default, material=bold, menu=false, state=rest`
-- `Updated / appearance=success, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=success, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=success, spacing=default, material=subtle, menu=false, state=rest`
-- `Updated / appearance=success, spacing=spacious, material=bold, menu=false, state=rest`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=success, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=success, spacing=spacious, material=subtle, menu=false, state=rest`
-- `Updated / appearance=warning`
-- `Updated / appearance=warning, spacing=default, material=bold, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=default, material=none, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=disabled`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=focused`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=hovered`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=loading`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=pressed`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=rest`
-- `Updated / appearance=warning, spacing=default, material=none, menu=true, state=selected`
-- `Updated / appearance=warning, spacing=default, material=subtle, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=default, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=default, menu=true, state=disabled`
-- `Updated / appearance=warning, spacing=default, menu=true, state=focused`
-- `Updated / appearance=warning, spacing=default, menu=true, state=hovered`
-- `Updated / appearance=warning, spacing=default, menu=true, state=loading`
-- `Updated / appearance=warning, spacing=default, menu=true, state=pressed`
-- `Updated / appearance=warning, spacing=default, menu=true, state=rest`
-- `Updated / appearance=warning, spacing=default, menu=true, state=selected`
-- `Updated / appearance=warning, spacing=spacious, material=bold, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=disabled`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=focused`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=hovered`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=loading`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=pressed`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=rest`
-- `Updated / appearance=warning, spacing=spacious, material=none, menu=true, state=selected`
-- `Updated / appearance=warning, spacing=spacious, material=subtle, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=spacious, menu=false, state=rest`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=disabled`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=focused`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=hovered`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=loading`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=pressed`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=rest`
-- `Updated / appearance=warning, spacing=spacious, menu=true, state=selected`
-- `Updated / autoplay=off`
-- `Updated / autoplay=on`
-- `Updated / content=breakdown`
-- `Updated / content=summary`
+- `Updated / brand=figma, size=24`
+- `Updated / brand=font-awesome, size=24`
+- `Updated / brand=github, size=24`
+- `Updated / brand=google, size=24`
+- `Updated / brand=microsoft, size=24`
+- `Updated / brand=notion, size=24`
+- `Updated / brand=slack, size=24`
+- `Updated / brand=youtube, size=24`
 - `Updated / frame=framed, size=32`
 - `Updated / frame=framed, size=40`
 - `Updated / frame=framed, size=48`
 - `Updated / frame=plain, size=32`
 - `Updated / frame=plain, size=40`
 - `Updated / frame=plain, size=48`
-- `Updated / horizontal alignment=left, vertical alignment=bottom`
-- `Updated / horizontal alignment=left, vertical alignment=center`
-- `Updated / horizontal alignment=left, vertical alignment=top`
-- `Updated / horizontal alignment=right, vertical alignment=bottom`
-- `Updated / horizontal alignment=right, vertical alignment=center`
-- `Updated / horizontal alignment=right, vertical alignment=top`
-- `Updated / item=1`
-- `Updated / item=2`
-- `Updated / item=3`
-- `Updated / kind=group heading, state=default, isSelected=false, isDisabled=false, spacing=compact, marker=check`
-- `Updated / kind=group heading, state=default, isSelected=false, isDisabled=false, spacing=default, marker=check`
-- `Updated / kind=group, state=default, spacing=compact`
-- `Updated / kind=group, state=default, spacing=default`
 - `Updated / kind=option, state=default, isSelected=false, isDisabled=false, spacing=compact, marker=check`
 - `Updated / kind=option, state=default, isSelected=false, isDisabled=false, spacing=compact, marker=radio`
 - `Updated / kind=option, state=default, isSelected=false, isDisabled=false, spacing=default, marker=check`
@@ -692,13 +286,30 @@
 - `Updated / kind=option, state=pressed, isSelected=false, isDisabled=false, spacing=compact, marker=radio`
 - `Updated / kind=option, state=pressed, isSelected=false, isDisabled=false, spacing=default, marker=check`
 - `Updated / kind=option, state=pressed, isSelected=false, isDisabled=false, spacing=default, marker=radio`
-- `Updated / layout=side-by-side, width=3-col`
-- `Updated / layout=stacked, width=3-col`
-- `Updated / layout=stacked, width=4-col`
-- `Updated / level=level 1`
-- `Updated / level=level 2`
-- `Updated / level=level 3`
-- `Updated / level=section`
+- `Updated / labelMarker=none, type=error, state=default`
+- `Updated / labelMarker=none, type=error, state=disabled`
+- `Updated / labelMarker=none, type=helper, state=default`
+- `Updated / labelMarker=none, type=helper, state=disabled`
+- `Updated / labelMarker=none, type=success, state=default`
+- `Updated / labelMarker=none, type=success, state=disabled`
+- `Updated / labelMarker=none, type=warning, state=default`
+- `Updated / labelMarker=none, type=warning, state=disabled`
+- `Updated / labelMarker=optional, type=error, state=default`
+- `Updated / labelMarker=optional, type=error, state=disabled`
+- `Updated / labelMarker=optional, type=helper, state=default`
+- `Updated / labelMarker=optional, type=helper, state=disabled`
+- `Updated / labelMarker=optional, type=success, state=default`
+- `Updated / labelMarker=optional, type=success, state=disabled`
+- `Updated / labelMarker=optional, type=warning, state=default`
+- `Updated / labelMarker=optional, type=warning, state=disabled`
+- `Updated / labelMarker=required, type=error, state=default`
+- `Updated / labelMarker=required, type=error, state=disabled`
+- `Updated / labelMarker=required, type=helper, state=default`
+- `Updated / labelMarker=required, type=helper, state=disabled`
+- `Updated / labelMarker=required, type=success, state=default`
+- `Updated / labelMarker=required, type=success, state=disabled`
+- `Updated / labelMarker=required, type=warning, state=default`
+- `Updated / labelMarker=required, type=warning, state=disabled`
 - `Updated / mode=active, spacing=compact, isCollapsible=false, defaultOpen=false, isLoading=false, isDisabled=false, filled=false`
 - `Updated / mode=active, spacing=compact, isCollapsible=false, defaultOpen=false, isLoading=false, isDisabled=false, filled=true`
 - `Updated / mode=active, spacing=compact, isCollapsible=false, defaultOpen=false, isLoading=false, isDisabled=true, filled=false`
@@ -771,16 +382,15 @@
 - `Updated / mode=focused, spacing=default, isCollapsible=true, defaultOpen=true, isLoading=false, isDisabled=true, filled=true`
 - `Updated / mode=focused, spacing=default, isCollapsible=true, defaultOpen=true, isLoading=true, isDisabled=false, filled=false`
 - `Updated / mode=focused, spacing=default, isCollapsible=true, defaultOpen=true, isLoading=true, isDisabled=false, filled=true`
-- `Updated / mode=fullscreen, conversation=empty`
-- `Updated / mode=fullscreen, conversation=filled`
-- `Updated / mode=panel, conversation=empty`
-- `Updated / mode=panel, conversation=filled`
 - `Updated / mode=popup, conversation=empty`
 - `Updated / mode=popup, conversation=filled`
-- `Updated / open?=false, appearance=grouped`
-- `Updated / open?=false, appearance=separated`
-- `Updated / open?=true, appearance=grouped`
-- `Updated / open?=true, appearance=separated`
+- `Updated / name=ask, size=24`
+- `Updated / name=generate, size=24`
+- `Updated / name=plan, size=24`
+- `Updated / name=rewrite, size=24`
+- `Updated / name=stop-generating, size=24`
+- `Updated / name=suggest, size=24`
+- `Updated / name=summarize, size=24`
 - `Updated / role=Admin, state=focus`
 - `Updated / role=Admin, state=hover`
 - `Updated / role=Admin, state=menu open`
@@ -793,30 +403,52 @@
 - `Updated / role=Tutor, state=hover`
 - `Updated / role=Tutor, state=menu open`
 - `Updated / role=Tutor, state=rest`
-- `Updated / showLineNumbers=false, wrap=false, highlight=false`
-- `Updated / showLineNumbers=false, wrap=false, highlight=true`
-- `Updated / showLineNumbers=false, wrap=true, highlight=false`
-- `Updated / showLineNumbers=false, wrap=true, highlight=true`
-- `Updated / showLineNumbers=true, wrap=false, highlight=false`
-- `Updated / showLineNumbers=true, wrap=false, highlight=true`
-- `Updated / showLineNumbers=true, wrap=true, highlight=false`
-- `Updated / showLineNumbers=true, wrap=true, highlight=true`
+- `Updated / size=10, orientation=inline, appearance=card`
+- `Updated / size=10, orientation=inline, appearance=plain`
+- `Updated / size=10, orientation=inline, appearance=soft`
+- `Updated / size=10, orientation=stacked, appearance=card`
+- `Updated / size=10, orientation=stacked, appearance=plain`
+- `Updated / size=10, orientation=stacked, appearance=soft`
+- `Updated / size=12, orientation=inline, appearance=card`
+- `Updated / size=12, orientation=inline, appearance=plain`
+- `Updated / size=12, orientation=inline, appearance=soft`
+- `Updated / size=12, orientation=inline, appearance=tile`
+- `Updated / size=12, orientation=stacked, appearance=card`
+- `Updated / size=12, orientation=stacked, appearance=plain`
+- `Updated / size=12, orientation=stacked, appearance=soft`
+- `Updated / size=12, orientation=stacked, appearance=tile`
+- `Updated / size=12, state=focus`
+- `Updated / size=12, state=hover`
+- `Updated / size=12, state=rest`
+- `Updated / size=14, orientation=inline, appearance=card`
+- `Updated / size=14, orientation=inline, appearance=plain`
+- `Updated / size=14, orientation=inline, appearance=soft`
+- `Updated / size=14, orientation=stacked, appearance=card`
+- `Updated / size=14, orientation=stacked, appearance=plain`
+- `Updated / size=14, orientation=stacked, appearance=soft`
+- `Updated / size=16, state=focus`
+- `Updated / size=16, state=hover`
+- `Updated / size=16, state=rest`
+- `Updated / size=24, iconStyle=brands`
+- `Updated / size=24, iconStyle=regular`
+- `Updated / size=24, iconStyle=solid`
+- `Updated / size=8, state=focus`
+- `Updated / size=8, state=hover`
+- `Updated / size=8, state=rest`
 - `Updated / spacing=compact`
 - `Updated / spacing=compact, marker=check, isSearchable=false`
 - `Updated / spacing=compact, marker=check, isSearchable=true`
 - `Updated / spacing=compact, marker=radio, isSearchable=false`
 - `Updated / spacing=compact, marker=radio, isSearchable=true`
-- `Updated / spacing=compact, toolbarPreset=compact, state=default`
-- `Updated / spacing=compact, toolbarPreset=compact, state=disabled`
-- `Updated / spacing=compact, toolbarPreset=compact, state=read-only`
 - `Updated / spacing=default`
 - `Updated / spacing=default, marker=check, isSearchable=false`
 - `Updated / spacing=default, marker=check, isSearchable=true`
 - `Updated / spacing=default, marker=radio, isSearchable=false`
 - `Updated / spacing=default, marker=radio, isSearchable=true`
-- `Updated / spacing=default, toolbarPreset=compact, state=default`
-- `Updated / spacing=default, toolbarPreset=compact, state=disabled`
-- `Updated / spacing=default, toolbarPreset=compact, state=read-only`
+- `Updated / spacing=default, navigator=icon`
+- `Updated / spacing=default, state=empty`
+- `Updated / state=create, spacing=compact`
+- `Updated / state=create, spacing=default`
 - `Updated / state=default, filled?=false, spacing=compact, isOpen=false`
 - `Updated / state=default, filled?=false, spacing=compact, isOpen=true`
 - `Updated / state=default, filled?=false, spacing=default, isOpen=false`
@@ -863,6 +495,14 @@
 - `Updated / state=default, isMulti=true, spacing=compact, isOpen=true`
 - `Updated / state=default, isMulti=true, spacing=default, isOpen=false`
 - `Updated / state=default, isMulti=true, spacing=default, isOpen=true`
+- `Updated / state=default, range?=false, spacing=compact, isOpen=false`
+- `Updated / state=default, range?=false, spacing=compact, isOpen=true`
+- `Updated / state=default, range?=false, spacing=default, isOpen=false`
+- `Updated / state=default, range?=false, spacing=default, isOpen=true`
+- `Updated / state=default, range?=true, spacing=compact, isOpen=false`
+- `Updated / state=default, range?=true, spacing=compact, isOpen=true`
+- `Updated / state=default, range?=true, spacing=default, isOpen=false`
+- `Updated / state=default, range?=true, spacing=default, isOpen=true`
 - `Updated / state=default, spacing=compact, isOpen=false`
 - `Updated / state=default, spacing=compact, isOpen=false, openPart=date`
 - `Updated / state=default, spacing=compact, isOpen=true`
@@ -881,8 +521,12 @@
 - `Updated / state=disabled, isMulti=false, spacing=default, isOpen=false`
 - `Updated / state=disabled, isMulti=true, spacing=compact, isOpen=false`
 - `Updated / state=disabled, isMulti=true, spacing=default, isOpen=false`
+- `Updated / state=disabled, range?=false, spacing=compact, isOpen=false`
+- `Updated / state=disabled, range?=false, spacing=default, isOpen=false`
+- `Updated / state=disabled, spacing=compact`
 - `Updated / state=disabled, spacing=compact, isOpen=false`
 - `Updated / state=disabled, spacing=compact, isOpen=false, openPart=date`
+- `Updated / state=disabled, spacing=default`
 - `Updated / state=disabled, spacing=default, isOpen=false`
 - `Updated / state=disabled, spacing=default, isOpen=false, openPart=date`
 - `Updated / state=empty, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=32`
@@ -897,6 +541,7 @@
 - `Updated / state=empty, frame=plain, size=32`
 - `Updated / state=empty, frame=plain, size=40`
 - `Updated / state=empty, frame=plain, size=48`
+- `Updated / state=empty, spacing=compact`
 - `Updated / state=error, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=32`
 - `Updated / state=error, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=40`
 - `Updated / state=error, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=48`
@@ -907,8 +552,14 @@
 - `Updated / state=filled, isMulti=false, spacing=default, isOpen=false`
 - `Updated / state=filled, isMulti=true, spacing=compact, isOpen=false`
 - `Updated / state=filled, isMulti=true, spacing=default, isOpen=false`
+- `Updated / state=filled, spacing=compact`
 - `Updated / state=filled, spacing=compact, isOpen=false`
+- `Updated / state=filled, spacing=compact, isOpen=true`
+- `Updated / state=filled, spacing=default`
 - `Updated / state=filled, spacing=default, isOpen=false`
+- `Updated / state=filled, spacing=default, isOpen=true`
+- `Updated / state=focus, spacing=compact`
+- `Updated / state=focus, spacing=default`
 - `Updated / state=hovered, spacing=compact, isOpen=false, openPart=date`
 - `Updated / state=hovered, spacing=default, isOpen=false, openPart=date`
 - `Updated / state=invalid, filled?=true, spacing=compact, isOpen=false`
@@ -921,9 +572,13 @@
 - `Updated / state=invalid, isMulti=true, spacing=compact, isOpen=true`
 - `Updated / state=invalid, isMulti=true, spacing=default, isOpen=false`
 - `Updated / state=invalid, isMulti=true, spacing=default, isOpen=true`
+- `Updated / state=invalid, range?=false, spacing=compact, isOpen=false`
+- `Updated / state=invalid, range?=false, spacing=default, isOpen=false`
+- `Updated / state=invalid, spacing=compact`
 - `Updated / state=invalid, spacing=compact, isOpen=false`
 - `Updated / state=invalid, spacing=compact, isOpen=false, openPart=date`
 - `Updated / state=invalid, spacing=compact, isOpen=true`
+- `Updated / state=invalid, spacing=default`
 - `Updated / state=invalid, spacing=default, isOpen=false`
 - `Updated / state=invalid, spacing=default, isOpen=false, openPart=date`
 - `Updated / state=invalid, spacing=default, isOpen=true`
@@ -951,7 +606,11 @@
 - `Updated / state=read-only, filled?=false, spacing=default, isOpen=false`
 - `Updated / state=read-only, filled?=true, spacing=compact, isOpen=false`
 - `Updated / state=read-only, filled?=true, spacing=default, isOpen=false`
+- `Updated / state=read-only, range?=false, spacing=compact, isOpen=false`
+- `Updated / state=read-only, range?=false, spacing=default, isOpen=false`
+- `Updated / state=read-only, spacing=compact`
 - `Updated / state=read-only, spacing=compact, isOpen=false, openPart=date`
+- `Updated / state=read-only, spacing=default`
 - `Updated / state=read-only, spacing=default, isOpen=false, openPart=date`
 - `Updated / state=refreshing, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=32`
 - `Updated / state=refreshing, frame=framed, frozen?=false, dividers vertical?=false, wrap all?=false, size=40`
@@ -959,23 +618,23 @@
 - `Updated / state=refreshing, frame=plain, frozen?=false, dividers vertical?=false, wrap all?=false, size=32`
 - `Updated / state=refreshing, frame=plain, frozen?=false, dividers vertical?=false, wrap all?=false, size=40`
 - `Updated / state=refreshing, frame=plain, frozen?=false, dividers vertical?=false, wrap all?=false, size=48`
+- `Updated / state=reordering, spacing=compact`
+- `Updated / state=reordering, spacing=default`
+- `Updated / state=typing, spacing=compact`
+- `Updated / state=typing, spacing=default`
 - `Updated / state=valid, filled?=true, spacing=compact, isOpen=false`
 - `Updated / state=valid, filled?=true, spacing=default, isOpen=false`
-- `Updated / trigger=button, spacing=compact, isOpen=false`
 - `Updated / trigger=button, spacing=compact, isOpen=true`
-- `Updated / trigger=button, spacing=default, isOpen=false`
 - `Updated / trigger=button, spacing=default, isOpen=true`
 - `Updated / trigger=icon button, spacing=compact, isOpen=true`
 - `Updated / trigger=icon button, spacing=default, isOpen=true`
-- `Updated / trigger=split, spacing=compact, isOpen=false`
 - `Updated / trigger=split, spacing=compact, isOpen=true`
-- `Updated / trigger=split, spacing=default, isOpen=false`
 - `Updated / trigger=split, spacing=default, isOpen=true`
-- `Updated / type=default`
 - `Updated / type=dropdown`
-- `Updated / type=multiple target`
-- `Updated / view=inner, state=docked, user=tutor`
-- `Updated / view=inner, state=overlay, user=tutor`
+- `Updated / view=edit, spacing=compact`
+- `Updated / view=edit, spacing=default`
+- `Updated / view=invalid, spacing=compact`
+- `Updated / view=invalid, spacing=default`
 - `Updated / view=noMatches, action=false`
 - `Updated / view=noMatches, action=true`
 - `Updated / view=outer, state=docked, user=supervisor`
@@ -987,11 +646,5 @@
 - `Updated / view=recent, action=true`
 - `Updated / view=results, action=false`
 - `Updated / view=results, action=true`
-- `Updated / width=10-col, height=fill`
-- `Updated / width=10-col, height=hug`
-- `Updated / width=4-col, height=fill`
-- `Updated / width=4-col, height=hug`
-- `Updated / width=6-col, height=fill`
-- `Updated / width=6-col, height=hug`
-- `Updated / width=8-col, height=fill`
-- `Updated / width=8-col, height=hug`
+- `Updated / view=saving, spacing=compact`
+- `Updated / view=saving, spacing=default`
