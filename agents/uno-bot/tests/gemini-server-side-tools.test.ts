@@ -142,3 +142,20 @@ test("a call without an id gets a response without one", async () => {
   const history = sent[1]!.contents as Array<{ role: string; parts: unknown[] }>;
   assert.deepEqual(history.at(-1)!.parts, [{ functionResponse: { name: "search_blueprint", response: { result: "none" } } }]);
 });
+
+test("a fallback to a model without built-in tools strips the server-side parts", async () => {
+  sent.length = 0;
+  replies = [{ candidates: [{ content: { parts: [SERVER_CALL, SERVER_RESULT, LOCAL_CALL] } }] }, OK];
+  const env = { ...KEY_ENV, GEMINI_FALLBACK_MODEL: "gemini-2.5-pro" } as unknown as Env;
+  const provider = await startedProvider(env);
+  const first = await provider.send({ toolsEnabled: true });
+  const call = first.ok ? first.toolCalls[0]! : assert.fail("no reply");
+  provider.recordToolResults([{ id: call.id, name: call.name, text: "three tutors" }]);
+  assert.equal(provider.fallback(429), true);
+  await provider.send({ toolsEnabled: true });
+
+  const body = sent[1]!;
+  assert.equal(body.toolConfig, undefined);
+  const history = body.contents as Array<{ role: string; parts: unknown[] }>;
+  assert.deepEqual(history.at(-2), { role: "model", parts: [LOCAL_CALL] });
+});

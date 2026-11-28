@@ -112,6 +112,12 @@ function cleanSchema(node: unknown): unknown {
   return node;
 }
 
+/** The parts that call one of the bot's own tools, in order. A call's position
+ *  here is the opaque handle the loop carries (see `send`). */
+function functionCallParts(parts: GeminiPart[]): GeminiPart[] {
+  return parts.filter((p) => p.functionCall?.name);
+}
+
 function textOf(parts: GeminiPart[]): string {
   return parts
     .filter((p) => typeof p.text === "string" && !p.thought)
@@ -181,6 +187,13 @@ export function geminiProvider(env: Env): ModelProvider {
     // silently delete the oldest history turn (ce:review 067).
     if (perRequestSystem && contents[0]?.parts?.[0]?.text === perRequestSystem) contents.shift();
     cacheName = null;
+  };
+
+  const stripServerSideToolParts = (): void => {
+    contents = contents
+      .map((c) => ({ ...c, parts: c.parts.filter((p) => !p.toolCall && !p.toolResponse) }))
+      .filter((c) => c.parts.length > 0);
+    lastParts = lastParts.filter((p) => !p.toolCall && !p.toolResponse);
   };
 
   return {
@@ -359,13 +372,14 @@ export function geminiProvider(env: Env): ModelProvider {
         `[gemini] call ok model=${model} ms=${Date.now() - started} turns=${contents.length} ` +
           `in=${meta?.promptTokenCount ?? 0} out=${meta?.candidatesTokenCount ?? 0} ` +
           `thoughts=${meta?.thoughtsTokenCount ?? "-"} finish=${parsed.candidates?.[0]?.finishReason ?? "-"} ` +
-          `calls=[${lastParts.filter((p) => p.functionCall?.name).map((p) => p.functionCall!.name).join(",")}]`,
+          `calls=[${functionCallParts(lastParts).map((p) => p.functionCall!.name).join(",")}]`,
       );
-      const toolCalls: ModelToolCall[] = lastParts
-        .filter((p) => p.functionCall?.name)
-        // Gemini has no per-call id: the functionResponse is paired by NAME and
-        // by position within the turn. The index is that position, minted here
-        // so the loop can carry an opaque handle like every other provider's.
+      const toolCalls: ModelToolCall[] = functionCallParts(lastParts)
+        // The loop's handle is the call's position within the turn, minted here
+        // so it can carry an opaque handle like every other provider's. Vertex
+        // sends no per-call id and pairs a functionResponse by NAME and
+        // position; the API-key path may send one, which `recordToolResults`
+        // echoes back.
         .map((p, i) => ({
           id: `${i}`,
           name: p.functionCall!.name!,
@@ -388,7 +402,7 @@ export function geminiProvider(env: Env): ModelProvider {
       if (results.length === 0) return;
       // The loop's handle is the call's position (see `send`); the wire id,
       // when the call carried one, pairs the response with it.
-      const calls = lastParts.filter((p) => p.functionCall?.name);
+      const calls = functionCallParts(lastParts);
       contents.push({
         role: "user",
         parts: results.map((r): GeminiPart => {
@@ -414,6 +428,10 @@ export function geminiProvider(env: Env): ModelProvider {
       // the model under it changes, and the level is re-derived against it —
       // a 2.x backup takes no thinking dial at all.
       ({ thinkingLevel, builtinSearchTools } = geminiDials(tier, model));
+      // Server-side tool parts are only valid beside the circulation flag, which
+      // a model without built-in tools does not get; a 2.x backup would 400 on
+      // them in its history. Its searches already ran, so drop them.
+      if (builtinSearchTools.length === 0) stripServerSideToolParts();
       inlineTheSystemPrompt("dropped for the fallback model");
       return true;
     },
