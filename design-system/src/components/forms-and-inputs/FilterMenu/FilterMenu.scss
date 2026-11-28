@@ -31,8 +31,17 @@
     overflow-y: auto;
 }
 
+// Side by side, the menu hugs its columns: never under the 3-col step, and
+// wider when the labels need it, so a label never runs into the next column.
+// Past 6 columns of the screen grid, the columns share it and labels wrap.
+.plus-popup.plus-popup--3-col.plus-filter-menu--side-by-side {
+    min-width: calc(var(--plus-overlay-span) * var(--plus-overlay-column) + (var(--plus-overlay-span) - 1) * var(--grid-gutter) + 2 * var(--popup-pad));
+    max-width: calc(6 * var(--plus-overlay-column) + 5 * var(--grid-gutter) + 2 * var(--popup-pad));
+    width: max-content;
+}
+
 .plus-filter-menu--side-by-side .plus-filter-menu__categories {
-    grid-template-columns: repeat(var(--plus-filter-menu-columns, 1), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--plus-filter-menu-columns, 1), minmax(0, max-content));
 }
 
 .plus-filter-menu--stacked .plus-filter-menu__categories {

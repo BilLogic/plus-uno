@@ -2,7 +2,7 @@
 
 # FilterMenu
 
-Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Clear** clears every box in the menu without applying. Apply then applies the empty set. Both are compact (24) at the end of the menu: Clear is Subtle, Apply is Default, with no Primary. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
+Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Clear** clears every box in the menu without applying. Apply then applies the empty set. Both are compact (24) at the end of the menu: Clear is Subtle, Apply is Default, with no Primary. - **Layout follows the count.** Two or three categories sit side by side from `3-col`, wider when labels need it; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
 
 Also asked as: filter dropdown.
 
@@ -78,7 +78,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Trigger.** The Filter `IconButton`. Once any value is applied it shows the count on the selected fill and reads "Filters, 2 applied".
-2. **Popup.** A `Popup` at a column step: `3-col` side by side; `3-col` or `4-col` stacked.
+2. **Popup.** A `Popup` at a column step: from `3-col` side by side, growing to fit the labels; `3-col` or `4-col` stacked.
 3. **Categories.** A `Fieldset` per category, its label the legend, its options `Checkbox`es. Pick as many as apply.
 4. **Footer.** Clear (subtle) and Apply (default), compact, at the end. No Primary.
 
@@ -129,7 +129,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `trigger` | node or func | — | A trigger of your own, or `({ isOpen, count }) => node`. Without it the Filter icon button is drawn. |
 | `placement` | enum | `'bottom-end'` | `bottom-end` (default) for a trigger at the end of a bar, `bottom-start` for one at its start. |
 | `layout` | enum | — | Leave it out to follow the count: two or three categories side by side, four or more stacked. Set `stacked` for a few categories with long lists. |
-| `width` | enum | `'3-col'` | The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`. |
+| `width` | enum | `'3-col'` | The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu starts at `3-col` and grows to fit its labels. |
 | `isOpen` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
 | `defaultOpen` | bool | `false` | Opens the menu on first render, when `isOpen` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
@@ -151,7 +151,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--dropdown-menu-max-height` · `--heading-xs` · `--heading-xs-tracking` · `--inline-lg` · `--inline-md` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
+`--dropdown-menu-max-height` · `--grid-gutter` · `--heading-xs` · `--heading-xs-tracking` · `--inline-lg` · `--inline-md` · `--plus-filter-menu-columns` · `--plus-overlay-column` · `--plus-overlay-span` · `--popup-pad` · `--stack-lg`
 
 From `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.scss`. Override these through the token layer, never with a literal.
 

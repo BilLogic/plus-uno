@@ -31,7 +31,7 @@ Two or three categories sit side by side; four or more stack.
 
 ## Content
 
-<ComponentExample of={FilterMenuStories.Overview} title="Side by side" description="Three categories in columns at 3-col. Ticks wait for Apply; Apply closes the menu and the sessions under it swap in place once." />
+<ComponentExample of={FilterMenuStories.Overview} title="Side by side" description="Three categories in columns, from 3-col, wider when the labels need it. Ticks wait for Apply; Apply closes the menu and the sessions under it swap in place once." />
 
 <ComponentExample of={FilterMenuStories.Stacked} title="Stacked" description="Four or more categories, or a few with long lists, stack one under another at 3-col, or 4-col when the options need it." />
 
@@ -113,7 +113,7 @@ Use `FilterMenu` when a section's content takes two or more filter categories st
 ## Parts
 
 1. **Trigger.** The Filter `IconButton`. Once any value is applied it shows the count on the selected fill and reads "Filters, 2 applied".
-2. **Popup.** A `Popup` at a column step: `3-col` side by side; `3-col` or `4-col` stacked.
+2. **Popup.** A `Popup` at a column step: from `3-col` side by side, growing to fit the labels; `3-col` or `4-col` stacked.
 3. **Categories.** A `Fieldset` per category, its label the legend, its options `Checkbox`es. Pick as many as apply.
 4. **Footer.** Clear (subtle) and Apply (default), compact, at the end. No Primary.
 
