@@ -38,7 +38,6 @@ Pick by what the reader needs. Each type has a home component.
 Say what broke, what’s safe, and the next step.
 
 Do: Answers the first worry: did I lose my work?
-
 Don't: Polite and short, but the tutor still wonders if the notes are gone.
 
 ### Warnings: name who it affects
@@ -46,7 +45,6 @@ Don't: Polite and short, but the tutor still wonders if the notes are gone.
 Say what happens to other people, then name both buttons.
 
 Do: The tutor sees the ripple before deciding.
-
 Don't: Clear action, but it hides the people it touches.
 
 ### Success: say what’s next
@@ -54,7 +52,6 @@ Don't: Clear action, but it hides the people it touches.
 Name what finished, then what happens with it.
 
 Do: The tutor knows their work lands somewhere.
-
 Don't: Warm, but the tutor doesn’t know who reads it.
 
 ### Empty states: say how it fills
@@ -62,7 +59,6 @@ Don't: Warm, but the tutor doesn’t know who reads it.
 Say why it’s empty and what will fill it.
 
 Do: Sets the expectation and names who acts.
-
 Don't: Calm, but later when, and why?
 
 ### Field errors: write the fix
@@ -70,7 +66,6 @@ Don't: Calm, but later when, and why?
 One line, under the field, phrased as what to do.
 
 Do: An instruction, with the unit.
-
 Don't: Correct, but reads like a rule, and drops the unit.
 
 ## Related

@@ -20,7 +20,7 @@ import dividerBody from '@/assets/images/illustrations/body-divider.png';
  * One of the PLUS illustration characters: a textured body with a face, arms
  * and legs drawn in line work.
  *
- * Five characters stand for the SMART areas of tutoring, and seven are math
+ * Five characters stand for the competency areas of tutoring, and seven are math
  * characters. The body takes its color from a token and the line work from
  * `--ds-icon-subtle`, so a character follows every color and contrast mode.
  *
@@ -28,7 +28,7 @@ import dividerBody from '@/assets/images/illustrations/body-divider.png';
  * is, filled with the token color. The line work is inline SVG.
  */
 
-/** The five SMART characters, in SMART order, then the seven math characters. */
+/** The five competency area characters, in competency area order, then the seven math characters. */
 export const SMART_CHARACTERS = ['mastering-content', 'advocacy', 'technology', 'relationships', 'social-emotional'];
 
 export const MATH_CHARACTERS = ['dot', 'approximately-equal', 'root', 'all', 'pi', 'equal', 'divider'];
@@ -124,7 +124,7 @@ export const Illustration = ({
 };
 
 Illustration.propTypes = {
-    /** Which character. The first five are the SMART areas; the rest are math characters. */
+    /** Which character. The first five are the competency areas; the rest are math characters. */
     character: PropTypes.oneOf(ILLUSTRATION_CHARACTERS),
     /** The frame's width and height in pixels: 48, 96, 160 or 240, or any number. Limbs reach past it. */
     size: PropTypes.number,

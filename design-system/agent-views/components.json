@@ -7613,7 +7613,7 @@
             "equal",
             "divider"
           ],
-          "description": "Which character. The first five are the SMART areas; the rest are math characters.",
+          "description": "Which character. The first five are the competency areas; the rest are math characters.",
           "deprecated": null
         },
         {
@@ -7655,7 +7655,7 @@
       ],
       "stories": [
         "Gallery",
-        "SmartCharacters",
+        "CompetencyAreaCharacters",
         "MathCharacters",
         "Sizes",
         "Size48",

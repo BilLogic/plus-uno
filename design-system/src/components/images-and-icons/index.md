@@ -19,7 +19,7 @@ authored half, counted rather than assumed.
   - For an action shown as an icon alone, use `IconButton`.
   - For a mark bigger than 16, or a framed mark, logo or thumbnail, use `Tile`.
   - For a typed record glyph such as a task or bug, use `Object`.
-- **[Illustration](Illustration/index.md)** — Use `Illustration` in empty states, onboarding and feature moments where a PLUS character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math moment is on Illustrations.
+- **[Illustration](Illustration/index.md)** — Use `Illustration` in empty states, onboarding and feature moments where a PLUS character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which competency area or math moment is on Illustrations.
   - For a small square picture of a school or tool or lesson, use `Tile`.
   - For a person or an agent, use `Avatar`.
   - For a photo or raster screenshot, use `Image`.

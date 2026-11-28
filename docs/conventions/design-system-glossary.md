@@ -247,7 +247,7 @@ The component that draws one Font Awesome Free glyph at a token size and an icon
 _Avoid_: "glyph" for the component, a bare `<i>` with Font Awesome classes
 
 **Illustration**:
-The component that draws one PLUS character, a SMART character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
+The component that draws one PLUS character, a competency area character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
 _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:

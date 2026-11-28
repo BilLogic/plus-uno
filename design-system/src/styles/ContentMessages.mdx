@@ -1,4 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { DoDontStory } from '@/storybook-docs/ds-docs-layout.jsx';
 import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
@@ -67,11 +68,7 @@ Pick by what the reader needs. Each type has a home component.
 
 Say what broke, what’s safe, and the next step.
 
-Do: Answers the first worry: did I lose my work?
-
-Don't: Polite and short, but the tutor still wonders if the notes are gone.
-
-<Canvas of={ContentMessagesStories.Errors} />
+<DoDontStory of={ContentMessagesStories.Errors} doCaption="Answers the first worry: did I lose my work?" dontCaption="Polite and short, but the tutor still wonders if the notes are gone." />
 
 </FoundationSubsection>
 
@@ -81,11 +78,7 @@ Don't: Polite and short, but the tutor still wonders if the notes are gone.
 
 Say what happens to other people, then name both buttons.
 
-Do: The tutor sees the ripple before deciding.
-
-Don't: Clear action, but it hides the people it touches.
-
-<Canvas of={ContentMessagesStories.Warnings} />
+<DoDontStory of={ContentMessagesStories.Warnings} doCaption="The tutor sees the ripple before deciding." dontCaption="Clear action, but it hides the people it touches." />
 
 </FoundationSubsection>
 
@@ -95,11 +88,7 @@ Don't: Clear action, but it hides the people it touches.
 
 Name what finished, then what happens with it.
 
-Do: The tutor knows their work lands somewhere.
-
-Don't: Warm, but the tutor doesn’t know who reads it.
-
-<Canvas of={ContentMessagesStories.Success} />
+<DoDontStory of={ContentMessagesStories.Success} doCaption="The tutor knows their work lands somewhere." dontCaption="Warm, but the tutor doesn’t know who reads it." />
 
 </FoundationSubsection>
 
@@ -109,11 +98,7 @@ Don't: Warm, but the tutor doesn’t know who reads it.
 
 Say why it’s empty and what will fill it.
 
-Do: Sets the expectation and names who acts.
-
-Don't: Calm, but later when, and why?
-
-<Canvas of={ContentMessagesStories.EmptyStates} />
+<DoDontStory of={ContentMessagesStories.EmptyStates} doCaption="Sets the expectation and names who acts." dontCaption="Calm, but later when, and why?" />
 
 </FoundationSubsection>
 
@@ -123,11 +108,7 @@ Don't: Calm, but later when, and why?
 
 One line, under the field, phrased as what to do.
 
-Do: An instruction, with the unit.
-
-Don't: Correct, but reads like a rule, and drops the unit.
-
-<Canvas of={ContentMessagesStories.FieldErrors} />
+<DoDontStory of={ContentMessagesStories.FieldErrors} doCaption="An instruction, with the unit." dontCaption="Correct, but reads like a rule, and drops the unit." />
 
 </FoundationSubsection>
 

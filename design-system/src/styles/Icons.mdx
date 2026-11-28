@@ -1,4 +1,5 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
+import { DoDontStory } from '@/storybook-docs/ds-docs-layout.jsx';
 import { RefTable, C, Glyph } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
@@ -40,13 +41,13 @@ The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component re
 <FoundationSubsection title="Use one recognized symbol per meaning">
 Pick the plainest glyph most people read the same way (calendar for dates, bell for notifications, gear for settings) and keep one glyph per meaning across the product.
 
-<Canvas of={IconsStories.OneGlyphOneMeaning} />
+<Story of={IconsStories.OneGlyphOneMeaning} />
 </FoundationSubsection>
 
 <FoundationSubsection title="Pair icons with text labels">
 A label states what the icon does and names it for screen readers. Leave an icon unlabeled only for a familiar action in a tight space, and give the control an accessible `label` in code.
 
-<Canvas of={IconsStories.PairWithLabels} />
+<Story of={IconsStories.PairWithLabels} />
 </FoundationSubsection>
 
 </FoundationSection>
@@ -154,11 +155,7 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 
 Solid, regular and brands are licensed here, including brand glyphs.
 
-Do: Free families (fa-regular, fa-solid, fa-brands) render everywhere.
-
-Don't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.
-
-<Canvas of={IconsStories.FreeFamiliesOnly} />
+<DoDontStory of={IconsStories.FreeFamiliesOnly} doCaption="Free families (fa-regular, fa-solid, fa-brands) render everywhere." dontCaption="Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank." />
 
 </FoundationSubsection>
 
@@ -168,11 +165,7 @@ Icons are 16 beside body text. Keep 12 for angles, chevrons, validation and comp
 
 An angle opens a list or menu; a chevron expands content in place.
 
-Do: A 16 icon leads the label; the trailing angle is 12.
-
-Don't: A 12 leading icon is too small beside 14 body text.
-
-<Canvas of={IconsStories.IconSizingInControls} />
+<DoDontStory of={IconsStories.IconSizingInControls} doCaption="A 16 icon leads the label; the trailing angle is 12." dontCaption="A 12 leading icon is too small beside 14 body text." />
 
 </FoundationSubsection>
 
@@ -180,11 +173,7 @@ Don't: A 12 leading icon is too small beside 14 body text.
 
 Pick the glyph most people read the same way.
 
-Do: A bell for notifications.
-
-Don't: A gear reads as settings, so it misleads here.
-
-<Canvas of={IconsStories.RecognizableSymbols} />
+<DoDontStory of={IconsStories.RecognizableSymbols} doCaption="A bell for notifications." dontCaption="A gear reads as settings, so it misleads here." />
 
 </FoundationSubsection>
 

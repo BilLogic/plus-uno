@@ -20,7 +20,7 @@ Nine rules decide a corner. Take the first one that matches. A radius comes only
 6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.
 7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).
 8. **Templates:** Modal and Card 16; Popup, Table and boxes inside a page 12; the smallest nested visual 8.
-9. **Focus ring:** the element's radius + the ring's offset.
+9. **Focus ring:** the nested rule read outward. The ring is the outer shape and the element the inner one, so the ring takes the element's radius + the 2 px offset.
 
 ## Scale
 
@@ -85,7 +85,7 @@ Small parts keep the two smallest steps wherever they sit. A tight grid, such as
 
 ## Focus ring
 
-The focus ring sits 2 px outside the element (`--focus-ring-width`), so its radius is the element's radius + 2. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
+The focus ring is a nested case read from the outside. The ring is the outer shape, the element is the inner one, and the 2 px offset (`--focus-ring-width`) is the gap between them. As in [Nesting](#foundation-nesting), the gap stays even only when outer = inner + gap, so the ring's radius is the element's radius + 2. The ring takes no radius token of its own: it follows the element's, as a nested shape follows its parent's. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.
 
 | Element | Radius (px) | Focus ring radius (px) |
 | --- | --- | --- |
@@ -137,7 +137,6 @@ Don't: The same tiles at 12; every gap pinches where the curves meet.
 Use a subtle Icon button for close controls instead of a hand-built circle, whose corner, its states and its focus ring are all guesses.
 
 Do: The subtle Icon button: the button radius, the ring and the states come with it.
-
 Don't: A hand-built circle. Its corner, its states and its focus ring are all guesses.
 
 ### Read a token, never a px value

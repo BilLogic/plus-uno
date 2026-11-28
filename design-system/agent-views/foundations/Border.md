@@ -54,7 +54,6 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 | Containers | Cards and modals draw no ring of their own |
 
 Do: The field keeps its fill and gains the ring.
-
 Don't: A filled field reads as selected and hides what is typed.
 
 ## Selected states
@@ -83,7 +82,6 @@ Take pattern borders from this table rather than adding one of your own.
 The sidebar ends in a 1 px divider in `color/border/default`. The page header has no border.
 
 Do: One hairline on the sidebar edge.
-
 Don't: A line under the page header adds a second edge the Frame does not use.
 
 ## Do and don't
@@ -93,7 +91,6 @@ Don't: A line under the page header adds a second edge the Frame does not use.
 A selected row takes the 2 px selected border on every side, in `color/border/selected`.
 
 Do: The 2 px outline wraps the whole row.
-
 Don't: A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.
 
 ### Use the selected width only for selection
@@ -101,7 +98,6 @@ Don't: A colored stripe on one edge marks nothing the system recognizes. Use the
 `Border/default` is the width for everything that is not a state.
 
 Do: Resting rows and cards keep Border/default.
-
 Don't: The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.
 
 ## Accessibility

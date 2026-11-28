@@ -306,24 +306,27 @@ export const ButtonInField = () => (
     </CloseUp>
 );
 
-/** A joined pair, as a split button draws it: the outer corners round, the seam stays square. */
+/**
+ * A split button, as the real one draws: one rounded shape, the main action and
+ * its menu chevron joined at a square seam. Only the group's outer corners round.
+ */
 export const JoinedGroup = () => {
     const clip = `joined-${useId().replace(/:/g, '')}`;
     return (
         <CloseUp testid="radius-joined">
-            <Illustration width={200} height={48} title="Three joined buttons: rounded at the group's ends, square at each seam">
+            <Illustration width={200} height={48} title="A split button: rounded at the group's two ends, square at the seam between its action and its menu">
                 <defs>
                     <clipPath id={clip}>
-                        <TokenRect x={10} y={8} w={180} h={32} token="--button-radius-default" />
+                        <TokenRect x={30} y={8} w={140} h={32} token="--button-radius-default" />
                     </clipPath>
                 </defs>
-                <TokenRect x={10} y={8} w={180} h={32} token="--button-radius-default" fill={PAINT.buttonDefault} />
-                <rect x={10} y={8} width={60} height={32} fill={PAINT.rowSelected} stroke={PAINT.buttonSelectedBorder} style={HAIRLINE} clipPath={`url(#${clip})`} />
-                <Rule x1={70} y1={8} x2={70} y2={40} stroke={PAINT.buttonSelectedBorder} />
-                <Rule x1={130} y1={8} x2={130} y2={40} stroke={PAINT.frameDivider} />
-                <rect data-part="seam" x={70} y={8} width={0} height={32} fill="none" />
-                <rect data-part="seam" x={130} y={8} width={0} height={32} fill="none" />
-                {[0, 1, 2].map((i) => <SkeletonBar key={i} x={26 + i * 60} y={22} w={28} />)}
+                <g clipPath={`url(#${clip})`}>
+                    <rect x={30} y={8} width={140} height={32} fill={PAINT.buttonDefault} />
+                    <Rule x1={138} y1={8} x2={138} y2={40} stroke={PAINT.pageSurface} />
+                </g>
+                <rect data-part="seam" x={138} y={8} width={0} height={32} fill="none" />
+                <SkeletonBar x={50} y={22} w={68} />
+                <polyline points="149,21 154,26 159,21" fill="none" stroke={PAINT.sidebarIcon} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
             </Illustration>
         </CloseUp>
     );

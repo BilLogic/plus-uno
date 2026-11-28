@@ -1,4 +1,4 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
 import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
@@ -42,13 +42,13 @@ Each token adds three layers: an edge, a key and an ambient shadow. Overflow is 
 
 <FoundationSection title="Using the tokens">
 
-<Canvas of={ElevationStories.UsingShadowTokens} />
+<Story of={ElevationStories.UsingShadowTokens} />
 
-<Canvas of={ElevationStories.TokensAdaptInDark} />
+<Story of={ElevationStories.TokensAdaptInDark} />
 
 <FoundationSubsection title="Keep the token a component ships with">
 
-<Canvas of={ElevationStories.KeepComponentShadow} />
+<Story of={ElevationStories.KeepComponentShadow} />
 
 </FoundationSubsection>
 

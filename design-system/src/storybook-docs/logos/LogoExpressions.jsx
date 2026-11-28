@@ -99,14 +99,14 @@ export const LogoExpressions = () => (
             <Expression
                 tagLetter="A"
                 name="Logomark"
-                job="The plus on its tile. Use it where PLUS is already named nearby, or where space is tight. Its job is to mark the app itself: the sidebar header, the browser tab, the loading screen."
+                job="The plus on its tile. Use it where the page already says what it is, or where space is tight: sign-in, the browser tab and the loading screen."
             >
                 <Logo size={96} />
             </Expression>
             <Expression
                 tagLetter="B"
                 name="Lockup"
-                job="The logomark with the PLUS wordmark beside it. Use it where nothing else on screen names PLUS. Its job is the first hello: sign-in, email headers, partner and funder materials."
+                job="The logomark with the PLUS wordmark beside it. Use it where PLUS is named in full: the sidebar header that carries the app on every page, email headers, partner and funder materials."
             >
                 <Logo size={LOCKUP_SIZE} wordmark />
             </Expression>
@@ -125,11 +125,11 @@ export const LogoExpressions = () => (
         </figure>
 
         <h3 style={{ margin: 0, ...typeStyle('heading-md'), color: 'var(--ds-text)' }}>In the product</h3>
-        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Where each expression lives. The logomark marks the app; the lockup introduces PLUS.</p>
+        <p style={{ margin: 0, ...typeStyle('body-default'), color: 'var(--ds-text)' }}>Where each expression lives, as the redesigned screens draw it: the lockup in the sidebar header, the logomark on sign-in.</p>
         <ul aria-label="In the product" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-            <Example title="Sidebar header ·" expression="Logomark">
+            <Example title="Sidebar header ·" expression="Lockup">
                 <div style={{ ...pad, width: '35%', background: 'var(--ds-surface-sunken)' }}>
-                    <Logo size={24} />
+                    <Logo size={24} wordmark />
                     <Bar width="80%" />
                     <Bar width="80%" />
                     <Bar width="80%" />
@@ -140,9 +140,9 @@ export const LogoExpressions = () => (
                     <Bar width="60%" />
                 </div>
             </Example>
-            <Example title="Sign-in ·" expression="Lockup">
+            <Example title="Sign-in ·" expression="Logomark">
                 <div style={{ ...pad, alignItems: 'center' }}>
-                    <Logo size={32} wordmark />
+                    <Logo size={32} />
                     <Bar width="70%" height="var(--stack-md)" />
                     <Bar width="70%" height="var(--stack-md)" />
                 </div>

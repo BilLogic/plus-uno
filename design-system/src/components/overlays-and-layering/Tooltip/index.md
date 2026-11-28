@@ -64,13 +64,11 @@ The text wraps and stays whole; a Tooltip never truncates. Keep it short. See [O
 ### Say what the control does. {#say-what-the-control-does}
 
 Do: A few words on what the control does.
-
 Don't: Repeats the label the control already shows.
 
 ### Keep it to one short line. {#keep-it-to-one-short-line}
 
 Do: One line, sentence case, no closing period.
-
 Don't: Two sentences that wrap, with a closing period.
 
 ### Never put a tooltip on a disabled control. {#never-put-a-tooltip-on-a-disabled-control}
@@ -90,7 +88,6 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 ### Put anything the user can click in a `Popup`. {#put-anything-the-user-can-click-in-a-popup}
 
 Do: A popup holds content the user can reach.
-
 Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.
 
 ## Accessibility

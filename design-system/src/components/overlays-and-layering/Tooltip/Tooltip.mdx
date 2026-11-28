@@ -1,13 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Canvas, Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TooltipStories from './Tooltip.stories.jsx';
-import {
-    ComponentExample,
-    DocsInteractivePlayground,
-    DocsTable,
-    ResourcesBlock,
-} from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, ResourcesBlock, DoDontStory } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -190,19 +185,11 @@ The text wraps and stays whole; a Tooltip never truncates. Keep it short. See [O
 
 ### Say what the control does.
 
-Do: A few words on what the control does.
-
-Don't: Repeats the label the control already shows.
-
-<Canvas of={TooltipStories.SayWhatControlDoes} />
+<DoDontStory of={TooltipStories.SayWhatControlDoes} doCaption="A few words on what the control does." dontCaption="Repeats the label the control already shows." />
 
 ### Keep it to one short line.
 
-Do: One line, sentence case, no closing period.
-
-Don't: Two sentences that wrap, with a closing period.
-
-<Canvas of={TooltipStories.KeepToOneLine} />
+<DoDontStory of={TooltipStories.KeepToOneLine} doCaption="One line, sentence case, no closing period." dontCaption="Two sentences that wrap, with a closing period." />
 
 ### Never put a tooltip on a disabled control.
 
@@ -220,11 +207,7 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 
 ### Put anything the user can click in a `Popup`.
 
-Do: A popup holds content the user can reach.
-
-Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.
-
-<Canvas of={TooltipStories.InteractiveContentInPopup} />
+<DoDontStory of={TooltipStories.InteractiveContentInPopup} doCaption="A popup holds content the user can reach." dontCaption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides." />
 
 </div>
 

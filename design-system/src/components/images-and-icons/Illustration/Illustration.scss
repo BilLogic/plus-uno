@@ -14,10 +14,10 @@
  */
 
 /*
- * Body colors. The five SMART characters take their area's `subtle` step, the
+ * Body colors. The five competency area characters take their area's `subtle` step, the
  * one made for illustration bodies. The seven math characters take an accent
- * hue at the same strength, and never a SMART hue, so a math character is
- * never read as a SMART area.
+ * hue at the same strength, and never a competency area hue, so a math character is
+ * never read as a competency area.
  */
 $illustration-bodies: (
     'mastering-content': var(--ds-background-competency-mastering-content-subtle),

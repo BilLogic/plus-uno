@@ -1,4 +1,4 @@
-import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -115,7 +115,7 @@ Every story runs axe in the Storybook test suite, and a story may not add a viol
 
 The control's fill stays as it is.
 
-<Canvas of={AccessibilityStories.FocusRing} />
+<Story of={AccessibilityStories.FocusRing} />
 
 </FoundationSubsection>
 
@@ -123,7 +123,7 @@ The control's fill stays as it is.
 
 Pair a status color with an icon and a word.
 
-<Canvas of={AccessibilityStories.StatusNotColorAlone} />
+<Story of={AccessibilityStories.StatusNotColorAlone} />
 
 </FoundationSubsection>
 

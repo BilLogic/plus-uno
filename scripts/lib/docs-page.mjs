@@ -30,7 +30,7 @@
  *
  * JSX TO TEXT. No raw JSX reaches the model's text. A docs table (`DocsTable`,
  * `table`, `RefTable`) becomes one markdown row per line; a `TokenTable` one
- * line per token. A do/don't pair (`DoDontPair`, `DoDont` with `Do`/`Dont`)
+ * line per token. A do/don't pair (`DoDontPair`, `DoDont` with `Do`/`Dont`, or a `DoDontStory`'s caption props)
  * keeps its captions as `Do:` and `Don't:` lines and drops the examples.
  * A `DocsLink` keeps its text; a template's `TypeCard` (or an overview's `ThumbTile`) becomes `- **Title.** line`. Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
  * children; a `Banner` keeps its text, since foundation pages state rules in
@@ -451,6 +451,8 @@ function elementText(el) {
       return htmlTable(el.children);
     case 'DoDontPair':
       return block([attrs.doExample || attrs.doCaption ? doLine('Do', valueText(attrs.doCaption)) : null, attrs.dontExample || attrs.dontCaption ? doLine("Don't", valueText(attrs.dontCaption)) : null].filter(Boolean).join('\n'));
+    case 'DoDontStory':
+      return block([doLine('Do', valueText(attrs.doCaption)), doLine("Don't", valueText(attrs.dontCaption))].join('\n'));
     case 'DoDont':
       return block(elementsIn(el.children).map(elementText).map((t) => t.trim()).filter(Boolean).join('\n'));
     case 'Do':
