@@ -20,11 +20,13 @@
 // local tools and every call costs Worker subrequests — which is why the loop's
 // lookup ceiling matters more here than anywhere. Built-in googleSearch and
 // urlContext run on Google's infra at zero subrequests and mix with function
-// declarations only on Gemini 3 (see gemini-tiers.ts).
+// declarations only on Gemini 3 (see gemini-tiers.ts), and on the API-key path
+// only with tool context circulation on (`geminiToolConfig`).
 
 import type { Env } from "../../types";
 import { geminiDials, resolveGeminiModel, type ThinkingLevel } from "../gemini-tiers";
 import { geminiConfigured, geminiGenerate, geminiGenerateRaw } from "../../gemini/client";
+import { geminiCredentialPath } from "../../gemini/credential";
 import { ensureHarnessCache } from "../../gemini/cache";
 import { MAX_TOKENS } from "../loop-policy";
 import type {
@@ -45,8 +47,13 @@ interface GeminiPart {
   text?: string;
   thought?: boolean;
   thoughtSignature?: string;
-  functionCall?: { name?: string; args?: Record<string, unknown> };
-  functionResponse?: { name: string; response: Record<string, unknown> };
+  /** `id` is set on the API-key path once tool context circulation is on. */
+  functionCall?: { id?: string; name?: string; args?: Record<string, unknown> };
+  functionResponse?: { id?: string; name: string; response: Record<string, unknown> };
+  /** A built-in tool the server ran (googleSearch, urlContext). Neither text
+   *  nor a call for the loop; it rides back to the model verbatim. */
+  toolCall?: Record<string, unknown>;
+  toolResponse?: Record<string, unknown>;
   inlineData?: { mimeType: string; data: string };
 }
 
@@ -105,12 +112,43 @@ function cleanSchema(node: unknown): unknown {
   return node;
 }
 
+/** The parts that call one of the bot's own tools, in order. A call's position
+ *  here is the opaque handle the loop carries (see `send`). */
+function functionCallParts(parts: GeminiPart[]): GeminiPart[] {
+  return parts.filter((p) => p.functionCall?.name);
+}
+
 function textOf(parts: GeminiPart[]): string {
   return parts
     .filter((p) => typeof p.text === "string" && !p.thought)
     .map((p) => p.text)
     .join("\n")
     .trim();
+}
+
+/**
+ * The request's `toolConfig`, or undefined when it needs none.
+ *
+ * Vertex takes built-in tools beside function declarations as is. The Gemini
+ * API refuses the mix ("Please enable
+ * tool_config.include_server_side_tool_invocations to use Built-in tools with
+ * Function calling", 400) unless the request opts into tool context
+ * circulation, and the GenAI SDKs document that flag as not supported on
+ * Vertex, so only the API-key path sends it. Mode NONE keeps the declarations,
+ * which Gemini requires when the history already contains function turns.
+ */
+export function geminiToolConfig(opts: {
+  toolsEnabled: boolean;
+  builtins: ReadonlyArray<unknown>;
+  path: ReturnType<typeof geminiCredentialPath>;
+}): Record<string, unknown> | undefined {
+  const config: Record<string, unknown> = {
+    ...(opts.toolsEnabled ? {} : { functionCallingConfig: { mode: "NONE" } }),
+    ...(opts.builtins.length > 0 && opts.path === "api-key"
+      ? { includeServerSideToolInvocations: true }
+      : {}),
+  };
+  return Object.keys(config).length > 0 ? config : undefined;
 }
 
 export function geminiProvider(env: Env): ModelProvider {
@@ -149,6 +187,13 @@ export function geminiProvider(env: Env): ModelProvider {
     // silently delete the oldest history turn (ce:review 067).
     if (perRequestSystem && contents[0]?.parts?.[0]?.text === perRequestSystem) contents.shift();
     cacheName = null;
+  };
+
+  const stripServerSideToolParts = (): void => {
+    contents = contents
+      .map((c) => ({ ...c, parts: c.parts.filter((p) => !p.toolCall && !p.toolResponse) }))
+      .filter((c) => c.parts.length > 0);
+    lastParts = lastParts.filter((p) => !p.toolCall && !p.toolResponse);
   };
 
   return {
@@ -264,6 +309,11 @@ export function geminiProvider(env: Env): ModelProvider {
     },
 
     async send({ toolsEnabled }): Promise<ModelReply> {
+      const toolConfig = geminiToolConfig({
+        toolsEnabled,
+        builtins: builtinSearchTools,
+        path: geminiCredentialPath(env),
+      });
       const body: Record<string, unknown> = {
         contents,
         ...(cacheName
@@ -277,9 +327,7 @@ export function geminiProvider(env: Env): ModelProvider {
         // mix with function declarations ONLY on Gemini 3; on 2.x they're
         // dropped so the request doesn't 400.
         tools: [{ functionDeclarations }, ...builtinSearchTools],
-        // toolConfig NONE keeps the declarations, which Gemini requires when the
-        // history already contains function turns.
-        ...(toolsEnabled ? {} : { toolConfig: { functionCallingConfig: { mode: "NONE" } } }),
+        ...(toolConfig ? { toolConfig } : {}),
         generationConfig: {
           maxOutputTokens: MAX_TOKENS,
           ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
@@ -324,13 +372,14 @@ export function geminiProvider(env: Env): ModelProvider {
         `[gemini] call ok model=${model} ms=${Date.now() - started} turns=${contents.length} ` +
           `in=${meta?.promptTokenCount ?? 0} out=${meta?.candidatesTokenCount ?? 0} ` +
           `thoughts=${meta?.thoughtsTokenCount ?? "-"} finish=${parsed.candidates?.[0]?.finishReason ?? "-"} ` +
-          `calls=[${lastParts.filter((p) => p.functionCall?.name).map((p) => p.functionCall!.name).join(",")}]`,
+          `calls=[${functionCallParts(lastParts).map((p) => p.functionCall!.name).join(",")}]`,
       );
-      const toolCalls: ModelToolCall[] = lastParts
-        .filter((p) => p.functionCall?.name)
-        // Gemini has no per-call id: the functionResponse is paired by NAME and
-        // by position within the turn. The index is that position, minted here
-        // so the loop can carry an opaque handle like every other provider's.
+      const toolCalls: ModelToolCall[] = functionCallParts(lastParts)
+        // The loop's handle is the call's position within the turn, minted here
+        // so it can carry an opaque handle like every other provider's. Vertex
+        // sends no per-call id and pairs a functionResponse by NAME and
+        // position; the API-key path may send one, which `recordToolResults`
+        // echoes back.
         .map((p, i) => ({
           id: `${i}`,
           name: p.functionCall!.name!,
@@ -347,16 +396,21 @@ export function geminiProvider(env: Env): ModelProvider {
 
     recordToolResults(results: ModelToolResult[]): void {
       // The model turn goes back VERBATIM — that is what preserves
-      // thoughtSignature on a function-calling turn.
+      // thoughtSignature on a function-calling turn, and the server-side
+      // toolCall / toolResponse parts the API-key path asks to be echoed.
       contents.push({ role: "model", parts: lastParts });
       if (results.length === 0) return;
+      // The loop's handle is the call's position (see `send`); the wire id,
+      // when the call carried one, pairs the response with it.
+      const calls = functionCallParts(lastParts);
       contents.push({
         role: "user",
-        parts: results.map(
-          (r): GeminiPart => ({
-            functionResponse: { name: r.name, response: { result: r.text } },
-          }),
-        ),
+        parts: results.map((r): GeminiPart => {
+          const id = calls[Number(r.id)]?.functionCall?.id;
+          return {
+            functionResponse: { ...(id ? { id } : {}), name: r.name, response: { result: r.text } },
+          };
+        }),
       });
     },
 
@@ -374,6 +428,10 @@ export function geminiProvider(env: Env): ModelProvider {
       // the model under it changes, and the level is re-derived against it —
       // a 2.x backup takes no thinking dial at all.
       ({ thinkingLevel, builtinSearchTools } = geminiDials(tier, model));
+      // Server-side tool parts are only valid beside the circulation flag, which
+      // a model without built-in tools does not get; a 2.x backup would 400 on
+      // them in its history. Its searches already ran, so drop them.
+      if (builtinSearchTools.length === 0) stripServerSideToolParts();
       inlineTheSystemPrompt("dropped for the fallback model");
       return true;
     },
