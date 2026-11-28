@@ -10,24 +10,24 @@ Hand-drawn characters for moments with room to breathe.
 
 ## Overview
 
-PLUS illustrations are 12 hand-drawn spot characters: five for the SMART areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See Illustration for props, sizes and code. A low-fidelity illustration of the UI uses basic shapes in mostly gray, never a real screenshot; see the Illustration kit. Decide first that an illustration is needed.
+PLUS illustrations are 12 hand-drawn spot characters: five for the competency areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See Illustration for props, sizes and code. A low-fidelity illustration of the UI uses basic shapes in mostly gray, never a real screenshot; see the Illustration kit. Decide first that an illustration is needed.
 
 ## Characters
 
-The five SMART characters each stand for an area; the seven math characters stand for general moments and take an accent hue.
+The five competency area characters each stand for an area; the seven math characters stand for general moments and take an accent hue.
 
 | Moment | Character |
 | --- | --- |
-| A lesson, card or page about one SMART area | That area's character: `mastering-content`, `advocacy`, `technology`, `relationships` or `social-emotional`. |
+| A lesson, card or page about one competency area | That area's character: `mastering-content`, `advocacy`, `technology`, `relationships` or `social-emotional`. |
 | General moments: empty state, welcome, completion | A math character: `dot`, `approximately-equal`, `root`, `all`, `pi`, `equal` or `divider`. |
 
-### SMART characters
+### Competency area characters
 
 ### Math characters
 
-## Color and SMART mapping
+## Color and competency area mapping
 
-All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/competency/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.
+All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. Competency area characters take `color/background/competency/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a competency area hue. Line work takes `color/icon/subtle`.
 
 | Character | Body token |
 | --- | --- |
@@ -49,7 +49,7 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
 | Empty state | Yes | One character above the message: 96 on a card, 160 on a page. |
 | Onboarding and tours | Yes | One character per step: 160 or 240. |
 | Completion and encouragement | Yes | A finished session or met goal: 160 or 240. |
-| SMART area header | Yes | The area’s own character, at 48 or 96. |
+| Competency area header | Yes | The area’s own character, at 48 or 96. |
 | Tables, forms and toolbars | No | Working surfaces. Use icons or copy instead. |
 | Inline errors and buttons | No | These need words, not mood. Use a Banner. |
 
@@ -61,7 +61,7 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
 
 ## Do and don't
 
-### Match the character to its SMART area
+### Match the character to its competency area
 
 The body color stands for the area, so a character only appears with its own area.
 

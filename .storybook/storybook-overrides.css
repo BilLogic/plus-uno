@@ -512,6 +512,18 @@ a.sbdocs-a {
   border-bottom: none;
 }
 
+/*
+ * Token tables (`TokenTable`) share one fixed column grid, so the tables on a
+ * token page line up down the page. A long name or value wraps in its cell.
+ */
+.sbdocs .sb-ds-token-table .sb-ds-doc-table {
+  table-layout: fixed;
+}
+
+.sbdocs .sb-ds-token-table .sb-ds-doc-table td {
+  overflow-wrap: anywhere;
+}
+
 .sbdocs .sb-ds-doc-table a {
   color: var(--ds-link);
   text-decoration: none;

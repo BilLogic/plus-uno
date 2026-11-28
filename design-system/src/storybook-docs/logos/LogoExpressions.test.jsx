@@ -12,8 +12,8 @@ describe('LogoExpressions', () => {
         render(<LogoExpressions />);
         expect(screen.getByRole('heading', { name: 'Logomark' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Lockup' })).toBeInTheDocument();
-        expect(screen.getByText(/mark the app itself/i)).toBeInTheDocument();
-        expect(screen.getByText(/first hello/i)).toBeInTheDocument();
+        expect(screen.getByText(/the page already says what it is/i)).toBeInTheDocument();
+        expect(screen.getByText(/named in full/i)).toBeInTheDocument();
     });
 
     it('draws each expression with the Logo component', () => {
@@ -42,7 +42,9 @@ describe('LogoExpressions', () => {
             expect.stringContaining('Email header'),
             expect.stringContaining('Loading screen'),
         ]);
-        expect(within(items[0]).getByText('Logomark')).toBeInTheDocument();
-        expect(within(items[1]).getByText('Lockup')).toBeInTheDocument();
+        expect(within(items[0]).getByText('Lockup')).toBeInTheDocument();
+        expect(items[0].querySelector('.plus-logo--lockup')).not.toBeNull();
+        expect(within(items[1]).getByText('Logomark')).toBeInTheDocument();
+        expect(items[1].querySelector('.plus-logo--lockup')).toBeNull();
     });
 });

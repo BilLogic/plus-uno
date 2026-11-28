@@ -32,7 +32,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'One of the twelve PLUS illustration characters: five SMART areas and seven math characters. '
+                    'One of the twelve PLUS illustration characters: five competency areas and seven math characters. '
                     + 'Decorative by default, and colored by tokens in every mode.',
             },
         },
@@ -146,7 +146,7 @@ Gallery.play = async ({ canvasElement }) => {
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '96px', padding: '32px 64px 64px', alignItems: 'center' };
 
-export const SmartCharacters = () => (
+export const CompetencyAreaCharacters = () => (
     <div style={row}>
         {SMART_CHARACTERS.map((character) => (
             <Illustration key={character} character={character} size={120} data-testid={character} />
@@ -154,8 +154,8 @@ export const SmartCharacters = () => (
     </div>
 );
 
-/** The five SMART characters take their area's `subtle` step. */
-SmartCharacters.play = async ({ canvasElement }) => expectTokenColors(canvasElement, SMART_CHARACTERS);
+/** The five competency area characters take their area's `subtle` step. */
+CompetencyAreaCharacters.play = async ({ canvasElement }) => expectTokenColors(canvasElement, SMART_CHARACTERS);
 
 export const MathCharacters = () => (
     <div style={row}>
@@ -165,7 +165,7 @@ export const MathCharacters = () => (
     </div>
 );
 
-/** The seven math characters take an accent hue at the same strength, never a SMART hue. */
+/** The seven math characters take an accent hue at the same strength, never a competency area hue. */
 MathCharacters.play = async ({ canvasElement }) => expectTokenColors(canvasElement, MATH_CHARACTERS);
 
 /* ------------------------------------------------------------------ sizes */

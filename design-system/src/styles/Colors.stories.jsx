@@ -138,20 +138,23 @@ export const StatusRoles = () => (
     <ModeCompare>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {STATUSES.map((role) => (
-                <div key={role} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>
-                    {[
-                        [`--ds-background-${role}`, `--ds-text-${role}`, 'default'],
-                        [`--ds-background-${role}-subtler`, `--ds-text-${role}-bolder`, 'subtler'],
-                        [`--ds-background-${role}-subtle`, `--ds-text-${role}-bolder`, 'subtle'],
-                        [`--ds-background-${role}-bold`, role === 'warning' ? '--ds-text-warning-inverse' : '--ds-text-inverse', 'bold'],
-                    ].map(([bg, fg, step]) => (
-                        <div key={bg} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
-                            <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: `var(${fg})`, ...typeStyle('body-default') }}>
-                                {role}
+                <div key={role} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                    <span style={{ ...typeStyle('heading-xxs'), color: 'var(--ds-text)' }}>{role[0].toUpperCase() + role.slice(1)}</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>
+                        {[
+                            [`--ds-background-${role}`, `--ds-text-${role}`, 'default'],
+                            [`--ds-background-${role}-subtler`, `--ds-text-${role}-bolder`, 'subtler'],
+                            [`--ds-background-${role}-subtle`, `--ds-text-${role}-bolder`, 'subtle'],
+                            [`--ds-background-${role}-bold`, role === 'warning' ? '--ds-text-warning-inverse' : '--ds-text-inverse', 'bold'],
+                        ].map(([bg, fg, step]) => (
+                            <div key={bg} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
+                                <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: `var(${fg})`, ...typeStyle('body-default') }}>
+                                    Aa
+                                </div>
+                                <span style={label}>{step}</span>
                             </div>
-                            <span style={label}>{step}</span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             ))}
         </div>
@@ -404,13 +407,19 @@ const SWATCHES = [
 export const Modes = () => {
     const { values, modes } = useResolvedTokens();
     return (
+        // The Shadow ramp panel: a neutral field, its top row naming the mode the
+        // toolbar has set, and the swatches on the surface that mode resolves.
         <div
+            data-docs-stage=""
             style={{
-                background: 'var(--ds-surface)',
+                boxSizing: 'border-box',
+                width: '100%',
+                padding: 'var(--card-pad)',
+                borderRadius: 'var(--card-radius)',
+                background: 'var(--ds-background-neutral)',
                 color: 'var(--ds-text)',
-                padding: 'var(--stack-xl)',
                 display: 'grid',
-                gap: 'var(--stack-xl)',
+                gap: 'var(--stack-lg)',
                 ...typeStyle('body-default'),
             }}
         >
@@ -420,8 +429,11 @@ export const Modes = () => {
             <div
                 style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-                    gap: 'var(--inline-xl)',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
+                    gap: 'var(--grid-gutter)',
+                    padding: 'var(--card-pad)',
+                    borderRadius: 'var(--card-radius)',
+                    background: 'var(--ds-surface)',
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (

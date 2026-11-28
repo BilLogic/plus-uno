@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 165,548 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 165,558 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,437 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 26,854 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,472 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,482 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,307 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 1,967 |
@@ -2237,7 +2237,7 @@ The component that draws one Font Awesome Free glyph at a token size and an icon
 _Avoid_: "glyph" for the component, a bare `<i>` with Font Awesome classes
 
 **Illustration**:
-The component that draws one PLUS character, a SMART character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
+The component that draws one PLUS character, a competency area character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
 _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:

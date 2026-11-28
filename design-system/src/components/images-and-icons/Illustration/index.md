@@ -12,14 +12,14 @@ Also asked as: mascot.
 
 **Source:** `design-system/src/components/images-and-icons/Illustration/Illustration.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, Size48, Size96, Size160, Size240, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive, WidthCappedStaysSquare
+**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, CompetencyAreaCharacters, MathCharacters, Sizes, Size48, Size96, Size160, Size240, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive, WidthCappedStaysSquare
 
 **Storybook page:** `design-system/src/components/images-and-icons/Illustration/Illustration.mdx`
 
 ## Usage
 
 Use `Illustration` in empty states, onboarding and feature moments where a PLUS
-character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which SMART area or math
+character sets the tone. In an empty state, the header and action do the work; the illustration is decorative and hidden from assistive technology. Pass a `title` only when the character sits alone with no heading beside it. Which character pairs with which competency area or math
 moment is on Illustrations.
 
 ```jsx
@@ -85,7 +85,7 @@ Same group: `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
 
 | Part | Token |
 | --- | --- |
-| Body, SMART characters | The area's `subtle` background, such as `--ds-background-competency-advocacy-subtle`. |
+| Body, competency area characters | The area's `subtle` background, such as `--ds-background-competency-advocacy-subtle`. |
 | Body, math characters | An accent `subtle` background: red, blue, green or purple. |
 | Line work | `--ds-icon-subtle` |
 
@@ -103,7 +103,7 @@ Illustrations.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `character` | oneOf | `'mastering-content'` | Which character. The first five are the SMART areas; the rest are math characters. |
+| `character` | oneOf | `'mastering-content'` | Which character. The first five are the competency areas; the rest are math characters. |
 | `size` | number | `96` | The frame's width and height in pixels: 48, 96, 160 or 240, or any number. Limbs reach past it. |
 | `title` | string | — | Makes the character an image with this name. Without it the character is decorative and hidden. |
 | `className` | string | `''` | Extra class names added to the character's frame element beside the component's own. |

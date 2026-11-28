@@ -22,7 +22,7 @@ import { typeStyle } from '@/storybook-docs/lib/type-style.js';
     purpose="Hand-drawn characters for moments with room to breathe."
     links={{
         items: [
-            { title: 'Color mapping', href: '#foundation-color-and-smart-mapping' },
+            { title: 'Color mapping', href: '#foundation-color-and-competency-area-mapping' },
             { title: 'Characters', href: '#foundation-characters' },
         ],
     }}
@@ -30,25 +30,25 @@ import { typeStyle } from '@/storybook-docs/lib/type-style.js';
 
 <FoundationSection title="Overview">
 
-PLUS illustrations are 12 hand-drawn spot characters: five for the SMART areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See <DocsLink id="components-images-and-icons-illustration">Illustration</DocsLink> for props, sizes and code. A low-fidelity illustration of the UI uses basic shapes in mostly gray, never a real screenshot; see the <DocsLink id="get-started-illustration-kit">Illustration kit</DocsLink>. Decide first that an illustration is needed.
+PLUS illustrations are 12 hand-drawn spot characters: five for the competency areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See <DocsLink id="components-images-and-icons-illustration">Illustration</DocsLink> for props, sizes and code. A low-fidelity illustration of the UI uses basic shapes in mostly gray, never a real screenshot; see the <DocsLink id="get-started-illustration-kit">Illustration kit</DocsLink>. Decide first that an illustration is needed.
 
 </FoundationSection>
 
 <FoundationSection title="Characters">
 
-The five SMART characters each stand for an area; the seven math characters stand for general moments and take an accent hue.
+The five competency area characters each stand for an area; the seven math characters stand for general moments and take an accent hue.
 
 <RefTable
     head={['Moment', 'Character']}
     rows={[
-        ['A lesson, card or page about one SMART area', <>That area's character: <C>mastering-content</C>, <C>advocacy</C>, <C>technology</C>, <C>relationships</C> or <C>social-emotional</C>.</>],
+        ['A lesson, card or page about one competency area', <>That area's character: <C>mastering-content</C>, <C>advocacy</C>, <C>technology</C>, <C>relationships</C> or <C>social-emotional</C>.</>],
         ['General moments: empty state, welcome, completion', <>A math character: <C>dot</C>, <C>approximately-equal</C>, <C>root</C>, <C>all</C>, <C>pi</C>, <C>equal</C> or <C>divider</C>.</>],
     ]}
 />
 
-<FoundationSubsection title="SMART characters">
+<FoundationSubsection title="Competency area characters">
 
-<Canvas of={IllustrationsStories.SmartCharacters} />
+<Canvas of={IllustrationsStories.CompetencyAreaCharacters} />
 
 </FoundationSubsection>
 
@@ -60,9 +60,9 @@ The five SMART characters each stand for an area; the seven math characters stan
 
 </FoundationSection>
 
-<FoundationSection title="Color and SMART mapping">
+<FoundationSection title="Color and competency area mapping">
 
-All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/competency/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.
+All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. Competency area characters take `color/background/competency/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a competency area hue. Line work takes `color/icon/subtle`.
 
 <RefTable
     head={['Character', 'Body token']}
@@ -90,7 +90,7 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
         ['Empty state', 'Yes', 'One character above the message: 96 on a card, 160 on a page.'],
         ['Onboarding and tours', 'Yes', 'One character per step: 160 or 240.'],
         ['Completion and encouragement', 'Yes', 'A finished session or met goal: 160 or 240.'],
-        ['SMART area header', 'Yes', 'The area’s own character, at 48 or 96.'],
+        ['Competency area header', 'Yes', 'The area’s own character, at 48 or 96.'],
         ['Tables, forms and toolbars', 'No', 'Working surfaces. Use icons or copy instead.'],
         ['Inline errors and buttons', 'No', 'These need words, not mood. Use a Banner.'],
     ]}
@@ -106,7 +106,7 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
 
 <FoundationSection title="Do and don't">
 
-<FoundationSubsection title="Match the character to its SMART area">
+<FoundationSubsection title="Match the character to its competency area">
 
 The body color stands for the area, so a character only appears with its own area.
 

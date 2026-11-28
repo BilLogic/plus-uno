@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArgTypes, Canvas, Controls, Source, Stories, useOf } from '@storybook/addon-docs/blocks';
+import { ArgTypes, Canvas, Controls, Source, Stories, Story, useOf } from '@storybook/addon-docs/blocks';
 import { typeStyle } from './lib/type-style.js';
 
 /**
@@ -621,6 +621,20 @@ export function DoDontPair({ doExample, doCaption, doCode, doFullSize, dontExamp
             <DoDontCard tone="dont" caption={dontCaption} code={dontCode} fullSize={dontFullSize}>{dontExample}</DoDontCard>
         </div>
     );
+}
+
+/**
+ * A do/don't story on a docs page, drawn bare: the pair's own cards, with no
+ * Canvas frame around them. `doCaption` and `dontCaption` repeat the story's
+ * captions for the docs reader (`scripts/lib/docs-page.mjs`), which cannot see
+ * inside a story; the page shows them once, on the cards.
+ *
+ * @param {unknown} of - the story, as `<DoDontStory of={BorderStories.FocusRingDoDont} ... />`
+ * @param {string} doCaption - the Do card's caption, word for word
+ * @param {string} dontCaption - the Don't card's caption, word for word
+ */
+export function DoDontStory({ of: ofStory }) {
+    return <Story of={ofStory} />;
 }
 
 /** Several pairs, one under another, a Section group apart. `pairs` is an array of `DoDontPair` props. */

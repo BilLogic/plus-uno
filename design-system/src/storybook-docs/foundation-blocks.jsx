@@ -61,8 +61,19 @@ export const TokenTable = ({ rows, swatch = false, valueHeader = 'Value', showFi
     const values = useTokenValues(rows.filter((r) => r.value === undefined).map((r) => r.token));
     const hasUse = rows.some((r) => r.use);
     const hasFigma = showFigma && rows.some((r) => r.figma);
+    // The same column widths in every token table, set by which columns it has,
+    // so a page of tables reads down one line instead of zigzagging between them.
+    const widths = {
+        'token,value': [40, 60],
+        'token,figma,value': [35, 25, 40],
+        'token,value,use': [40, 25, 35],
+        'token,figma,value,use': [30, 20, 20, 30],
+    }[['token', hasFigma && 'figma', 'value', hasUse && 'use'].filter(Boolean).join(',')];
     return (
-        <DocsTable>
+        <DocsTable className="sb-ds-token-table">
+            <colgroup>
+                {widths.map((w, i) => <col key={i} style={{ width: `${w}%` }} />)}
+            </colgroup>
             <thead>
                 <tr>
                     <th scope="col">Token</th>
@@ -152,21 +163,37 @@ const MODES = [
  * generated tokens key off that attribute on any element, so the pane reads
  * its own mode's values. The page's contrast setting carries into both panes.
  * `stacked` puts the panes one above the other at full width, for a figure too wide to halve.
+ * It is drawn as the Shadow ramp figures are: one neutral panel, the mode switch at the end of
+ * its top row, and no Canvas frame around it (`data-docs-stage`).
  */
 export const ModeCompare = ({ children, initial = 'both', stacked = false }) => {
     const [mode, setMode] = useState(initial);
     const contrast = usePageContrast();
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <SegmentedControl
-                label="Color mode for these examples"
-                spacing="compact"
-                style={{ alignSelf: 'flex-start' }}
-                value={mode}
-                onChange={setMode}
-                options={MODES.map((m) => ({ value: m.id, label: m.label }))}
-            />
+        <div
+            data-docs-stage=""
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--stack-lg)',
+                boxSizing: 'border-box',
+                width: '100%',
+                padding: 'var(--card-pad)',
+                borderRadius: 'var(--card-radius)',
+                background: 'var(--ds-background-neutral)',
+                color: 'var(--ds-text)',
+            }}
+        >
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}>
+                <SegmentedControl
+                    label="Color mode for these examples"
+                    spacing="compact"
+                    value={mode}
+                    onChange={setMode}
+                    options={MODES.map((m) => ({ value: m.id, label: m.label }))}
+                />
+            </div>
             <div
                 style={{
                     display: 'grid',

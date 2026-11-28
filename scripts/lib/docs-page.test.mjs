@@ -513,3 +513,17 @@ test('pagesUnder lists the authored pages under one folder, Finder copies left o
   assert.deepEqual(pagesUnder(root, 'a'), ['a/One.mdx', 'a/b/Two.mdx']);
   assert.deepEqual(pagesUnder(root, 'missing'), []);
 });
+
+test('a DoDontStory keeps its captions as Do and Don\'t lines and drops the story', () => {
+  const page = readDocsPage(`<FoundationSection title="Focus ring">
+
+The ring sits outside the field.
+
+<DoDontStory of={BorderStories.FocusRingDoDont} doCaption="The field keeps its fill and gains the ring." dontCaption="A filled field reads as selected." />
+
+</FoundationSection>`);
+  const focus = sectionText(page, 'Focus ring');
+  assert.match(focus, /^Do: The field keeps its fill and gains the ring\.$/m);
+  assert.match(focus, /^Don't: A filled field reads as selected\.$/m);
+  assert.doesNotMatch(focus, /BorderStories|DoDontStory/);
+});

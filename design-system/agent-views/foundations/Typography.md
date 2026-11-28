@@ -102,7 +102,6 @@ Every page has one `h1` (visually hidden when a tab strip replaces a visible pag
 Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); letter-spacing: var(--body-default-tracking); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
 Do: Body/default/medium on a button or tab label.
-
 Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 ## Code
@@ -122,7 +121,6 @@ Names and titles truncate; primary content wraps. Never shrink font size to fit 
 A student name in a roster row.
 
 Do: One line with an ellipsis. The Status keeps its place.
-
 Don't: The name wraps onto extra lines and makes the row taller than its neighbors.
 
 ## Do and don't
@@ -132,7 +130,6 @@ Don't: The name wraps onto extra lines and makes the row taller than its neighbo
 Introduce a section with a heading style, not with bold body text.
 
 Do: Heading/small, tagged as the section's heading.
-
 Don't: Bold body text looks like a heading but carries no structure.
 
 ### Do not skip heading levels
@@ -140,7 +137,6 @@ Don't: Bold body text looks like a heading but carries no structure.
 Headings step down one level at a time.
 
 Do: h1, then h2, then h3.
-
 Don't: An h3 straight after the h1 skips the h2.
 
 ## Headings, numbers and mono
@@ -156,7 +152,6 @@ Text styles use only 400 and 500. Do not add a 600 or 700 weight to a heading, a
 Metric styles are Google Sans Flex 400 with tabular figures; the large and medium sizes track at −2% and the small at −0.5%. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A clock time or duration ("3:30 – 4:30 pm", "12 min") takes the body or heading style of its context, never mono. A stat label above a metric uses `Label/eyebrow`.
 
 Do: Metric/large for the figure.
-
 Don't: Heading/medium for a number.
 
 ### Mono
