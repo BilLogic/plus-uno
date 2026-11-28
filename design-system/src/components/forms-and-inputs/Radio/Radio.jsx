@@ -87,7 +87,9 @@ const Radio = ({
     ].filter(Boolean).join(' ');
 
     const groupValueProps = isControlled
-        ? { value: isChecked ? value : undefined }
+        // `null`, not `undefined`: Base UI reads `undefined` as uncontrolled
+        // and would keep the radio checked after `isChecked` turns false.
+        ? { value: isChecked ? value : null }
         : { defaultValue: defaultChecked ? value : undefined };
 
     const radioControl = (

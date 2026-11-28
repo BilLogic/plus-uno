@@ -15,7 +15,7 @@ export const FILTER_MENU_PLACEMENTS = ['bottom-start', 'bottom-end'];
 /** `side-by-side` sets the categories in columns; `stacked` sets them one under another. */
 export const FILTER_MENU_LAYOUTS = ['side-by-side', 'stacked'];
 
-/** Popup's column steps. Side by side is always `3-col`; stacked may take `4-col`. */
+/** Popup's column steps. Side by side starts at `3-col` and grows to fit its columns; stacked may take `4-col`. */
 export const FILTER_MENU_WIDTHS = ['3-col', '4-col'];
 
 /** Up to this many categories sit side by side; more stack. */
@@ -41,7 +41,7 @@ const countApplied = (value) => Object.values(value ?? {})
  *   applies the empty set. Both are compact (24) at the end of the menu:
  *   Clear is Subtle, Apply is Default, with no Primary.
  * - **Layout follows the count.** Two or three categories sit side by side
- *   at `3-col`; four or more stack, at `3-col` or `4-col`.
+ *   from `3-col`, wider when labels need it; four or more stack, at `3-col` or `4-col`.
  * - **The trigger** is the Filter icon button, its count the number of values
  *   applied, on the selected fill once any is. It opens `bottom-end`, the
  *   end of the bar where filters sit.
@@ -191,7 +191,7 @@ FilterMenu.propTypes = {
     placement: PropTypes.oneOf(FILTER_MENU_PLACEMENTS),
     /** Leave it out to follow the count: two or three categories side by side, four or more stacked. Set `stacked` for a few categories with long lists. */
     layout: PropTypes.oneOf(FILTER_MENU_LAYOUTS),
-    /** The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu is always `3-col`. */
+    /** The column step of a stacked menu, `3-col` (default) or `4-col`. A side-by-side menu starts at `3-col` and grows to fit its labels. */
     width: PropTypes.oneOf(FILTER_MENU_WIDTHS),
     /** Whether the menu is open. Leave it out to let the trigger open and close it. */
     isOpen: PropTypes.bool,
